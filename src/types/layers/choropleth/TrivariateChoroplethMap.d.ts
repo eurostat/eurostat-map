@@ -1,5 +1,7 @@
 import type { MapInstance } from '../../core/MapInstance'
-import type { TrivariateChoroplethConfig, TrivariateTernarySettings } from './TrivariateChoroplethConfig'
+import type { Layer } from '../../core/layer/Layer'
+import type { TrivariateLegendConfig } from '../../legend/choropleth/TrivariateLegendConfig'
+import type { TrivariateTernarySettings, TrivariateVennSettings } from './TrivariateChoroplethConfig'
 
 type TernarySettings = TrivariateTernarySettings
 
@@ -19,4 +21,15 @@ export interface TrivariateChoroplethMap extends MapInstance {
 
     ternarySettings(): TernarySettings
     ternarySettings(v: Partial<TernarySettings>): this
+
+    vennSettings(): TrivariateVennSettings | false
+    vennSettings(v: TrivariateVennSettings | false): this
+}
+
+/** Trivariate layer with ternary and Venn choropleth modes. */
+export interface TrivariateChoroplethLayer extends Layer {
+    vennSettings(): TrivariateVennSettings | false
+    vennSettings(v: TrivariateVennSettings | false): this
+    legend(): TrivariateLegendConfig | false | undefined
+    legend(config: TrivariateLegendConfig | false): this
 }

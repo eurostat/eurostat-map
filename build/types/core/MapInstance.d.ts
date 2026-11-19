@@ -4,6 +4,8 @@ import type { Layer } from './layer/Layer'
 import type { LayerConfig } from './layer/LayerConfig'
 import type { CompositionStatConfig } from '../layers/composition/CompositionStatConfig'
 import type { LegendConfig } from '../legend/LegendConfig'
+import type { TrivariateLegendConfig } from '../legend/choropleth/TrivariateLegendConfig'
+import type { TrivariateChoroplethLayer } from '../layers/choropleth/TrivariateChoroplethMap'
 import type { RankedBarChartConfig } from './decoration/RankedBarChartConfig'
 import type { TooltipConfig } from './TooltipConfig'
 import type { InsetConfig } from './InsetConfig'
@@ -687,6 +689,7 @@ export interface MapInstance {
     layer(ref?: number | string): Layer | undefined
     layers(): Layer[]
     layers(configs: LayerConfig[]): this
+    addLayer(type: 'trivariateChoropleth' | 'ternary' | 'chtri', config?: Omit<LayerConfig, 'type' | 'legend'> & { legend?: TrivariateLegendConfig | false }): TrivariateChoroplethLayer
     addLayer(type: string, config?: LayerConfig): Layer
     addLayer(config: LayerConfig): Layer
     removeLayer(ref: number | string): this

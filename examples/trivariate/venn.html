@@ -6,7 +6,7 @@
         <title>Population Age Groups — Venn Map</title>
     </head>
     <body>
-        <svg id="map" aria-label="Venn circles showing three population age shares by NUTS 3 region"></svg>
+        <svg id="map" aria-label="Choropleth of population age shares at or above their medians by NUTS 3 region"></svg>
         <script src="../../build/eurostatmap.js"></script>
         <script>
             const ageShare = (label, indicator) => ({
@@ -16,10 +16,10 @@
                 unitText: '%',
             })
 
-            eurostatmap
-                .map('venn')
+            const map = eurostatmap
+                .map()
                 .title('Population age groups')
-                .subtitle('Share of residents by NUTS 3 region, 2023')
+                .subtitle('Age shares at or above the regional median, 2023')
                 .nutsYear(2024)
                 .nutsLevel(3)
                 .scale('20M')
@@ -27,16 +27,18 @@
                 .stat('young', ageShare('Aged 15–29', 'PC_Y15_29'))
                 .stat('middle', ageShare('Aged 45–64', 'PC_Y45_64'))
                 .stat('older', ageShare('Aged 65 and over', 'PC_Y65_MAX'))
+
+            map.addLayer('trivariateChoropleth')
                 .encoding('color', { stats: ['young', 'middle', 'older'] })
-                .vennSettings({ maxRadius: 6 })
+                .vennSettings({})
                 .legend({
                     position: 'top right',
                     boxOpacity: 1,
                     title: 'Population shares',
                     labels: ['15–29', '45–64', '65+'],
-                    sizeValues: [30, 20, 10],
                 })
-                .build()
+
+            map.build()
         </script>
     </body>
 </html>

@@ -17,8 +17,8 @@ export interface Layer {
 
     encoding(): Record<string, EncodingConfig>
     encoding(channel: string): EncodingConfig | undefined
-    encoding(channel: string, config: EncodingConfig): Layer
-    encoding(map: Record<string, EncodingConfig>): Layer
+    encoding(channel: string, config: EncodingConfig): this
+    encoding(map: Record<string, EncodingConfig>): this
 
     getEncodingStat(channel: string, fallback?: string): string | undefined
     getEncodingStats(channel: string, fallback?: string[]): string[] | undefined

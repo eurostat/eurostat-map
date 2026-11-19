@@ -26,8 +26,18 @@ export interface TrivariateTernarySettings {
 }
 
 /**
- * Configuration for trivariate choropleth maps.
+ * Threshold and color settings for Venn choropleths.
  */
+export interface TrivariateVennSettings {
+    /** Per-stat thresholds in encoding order. Defaults to each stat's median. */
+    thresholds?: [number, number, number]
+    /** Base colors in encoding order. Overlap colors are multiplied. */
+    colors?: [string, string, string]
+    /** Fill for regions below all three thresholds. @default '#eeeeee' */
+    belowColor?: string
+}
+
+/** Configuration for trivariate choropleth maps. */
 export interface TrivariateChoroplethConfig extends MapConfig {
     /** Trivariate choropleth legend configuration. */
     legend?: TrivariateLegendConfig | false
@@ -38,4 +48,6 @@ export interface TrivariateChoroplethConfig extends MapConfig {
     noDataFillStyle?: string
     /** Ternary settings. */
     ternarySettings?: TrivariateTernarySettings
+    /** Enable Venn choropleth classification. Set to false to use ternary mode. */
+    vennSettings?: TrivariateVennSettings | false
 }

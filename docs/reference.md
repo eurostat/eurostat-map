@@ -25,7 +25,7 @@ This document is the narrative usage guide. For generated, signature-accurate AP
         - [Categorical map](#categorical-map)
         - [Bivariate choropleth map](#bivariate-choropleth-map)
         - [Trivariate choropleth map](#trivariate-choropleth-map)
-        - [Venn symbol map](#venn-symbol-map)
+        - [Venn choropleth](#venn-choropleth)
         - [Stripe composition map](#stripe-composition-map)
         - [Sparkline map](#sparkline-map)
         - [Flow map](#flow-map)
@@ -80,7 +80,6 @@ Create a map with `let map = eurostatmap.map( mapType )`. Set the parameter `map
 - `"choropleth"` for a [choropleth map](#choropleth-map),
 - `"bivariateChoropleth"` for a [bivariate choropleth map](#bivariate-choropleth-map).
 - `"trivariateChoropleth"` for a [ternary choropleth map](#trivariate-choropleth-map).
-- `"venn"` for [overlapping proportional circles](#venn-symbol-map).
 - "proportionalSymbol" (or `ps`) for a [proportional symbol map](#proportional-symbol-map),
 - "pie" (or `pieChart`) for a [proportional pie chart map](#proportional-pie-chart-map),
 - `"categorical"` for a [categorical map](#categorical-map).
@@ -668,29 +667,31 @@ By default, bivariate maps read datasets `v1` and `v2`. You can override this th
 .encoding('y', { stat: 'mySecondDataset' })
 ```
 
-### Venn symbol map
+### Venn choropleth
 
-A Venn layer draws up to three concentric circles at each geographic region's centroid. Circle area represents each variable's magnitude on a shared scale. The circles blend by multiplication where they overlap. Use datasets with comparable units. Zero, negative and missing values draw no circle for that variable. The tooltip still distinguishes zero from unavailable data.
+Venn classification fills each region by the combination of variables that meet their thresholds. A region that meets two or three thresholds takes the multiplied colour of those variables. A region below all thresholds takes the neutral fill. When a value is unavailable, the region uses the layer's no-data treatment.
 
 ```javascript
-eurostatmap.map('venn')
+const map = eurostatmap.map()
     .stat('young', youngPopulationStat)
     .stat('middle', middlePopulationStat)
     .stat('older', olderPopulationStat)
+
+map.addLayer('trivariateChoropleth')
     .encoding('color', { stats: ['young', 'middle', 'older'] })
-    .vennSettings({ maxRadius: 14, opacity: 0.9 })
+    .vennSettings({})
     .legend({ title: 'Population shares', labels: ['15–29', '45–64', '65+'] })
-    .build()
+
+map.build()
 ```
 
-The same overlay is available through `map.addLayer('venn')` on a multi-layer map. A ternary choropleth represents composition by filling entire regions. Venn circles preserve each variable's magnitude, and the three inputs can have any combined total.
+Venn mode uses independent thresholds. The default ternary mode uses the three values as parts of a composition. Set `vennSettings(false)` to switch back to ternary mode.
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| **colors** | `['#00c7dd', '#f4cf18', '#e94398']` | Circle colors in the order of the encoding. |
-| **maxRadius** | 18 | Radius of the largest circle in SVG pixels. |
-| **maxValue** | automatic | Value corresponding to the maximum radius. Higher values are capped. |
-| **opacity** | 0.85 | Fill opacity between 0 and 1. |
+| **colors** | `['#00c7dd', '#f4cf18', '#e94398']` | Base colours in the order of the encoding. |
+| **thresholds** | Regional medians | Three thresholds in encoding order. Equality counts as meeting a threshold. |
+| **belowColor** | `'#eeeeee'` | Fill for regions below all three thresholds. |
 
 ### Trivariate choropleth map
 
@@ -1768,16 +1769,14 @@ In addition to [the default legend parameters](#map-legend), trivariate chorople
 | **colorTarget**             | 'triangles' or 'points'    | _'points'_                                     | Whether colour is applied to the triangles or to the data points.      |
 | **showData**                | boolean                    | _true_                                         | Render the data points.                                                |
 
-### Venn legends
+#### Venn legends
 
-The Venn diagram explains the colors and their overlaps. Hover over a circle or intersection to isolate those variables on the map. Hover over or focus a label to isolate one variable. A row of reference circles explains the shared area scale.
+The diagram labels each variable with its threshold. Hover over a circle segment or intersection to highlight regions in that exact class. Hover over or focus a variable label to highlight all regions that meet its threshold.
 
 | Option | Default | Description |
 | --- | --- | --- |
 | **labels** | Stat labels or keys | Override the visible labels in encoding order. |
-| **radius** | 26 | Radius of the Venn diagram circles in SVG pixels. |
-| **sizeValues** | Automatic | Reference values for the size legend. Use an empty array to hide it. |
-| **interactive** | true | Enable hover and keyboard highlighting. |
+| **vennRadius** | 26 | Radius of the Venn diagram circles in SVG pixels. |
 
 ### Proportional symbol legends
 

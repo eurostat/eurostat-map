@@ -1,6 +1,8 @@
 import type { LegendConfig } from '../LegendConfig'
 
 export interface TrivariateLegendConfig extends LegendConfig {
+    /** Radius of the Venn diagram circles in SVG pixels. @default 26 */
+    vennRadius?: number
     /** Width of the legend in pixels. @default 160 */
     width?: number
     /** Height of the legend in pixels. @default 160 */

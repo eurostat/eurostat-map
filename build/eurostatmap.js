@@ -29016,7 +29016,6 @@ const LAYER_ROLES = {
     // overlays
     ps: 'overlay',
     proportionalSymbol: 'overlay',
-    venn: 'overlay',
     proportionalSymbols: 'overlay',
     pie: 'overlay',
     pieChart: 'overlay',
@@ -35318,11 +35317,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   map: () => (/* binding */ map)
 /* harmony export */ });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/stat-map */ "./src/core/stat-map.js");
-/* harmony import */ var _core_layer_registry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/layer-registry */ "./src/core/layer-registry.js");
-/* harmony import */ var _legend_choropleth_legend_choropleth_trivariate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../legend/choropleth/legend-choropleth-trivariate */ "./src/legend/choropleth/legend-choropleth-trivariate.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
-/* harmony import */ var _lib_tricolore_src__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../lib/tricolore/src */ "./src/lib/tricolore/src/index.ts");
+/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/median.js");
+/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/stat-map */ "./src/core/stat-map.js");
+/* harmony import */ var _core_layer_registry__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/layer-registry */ "./src/core/layer-registry.js");
+/* harmony import */ var _legend_choropleth_legend_choropleth_trivariate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../legend/choropleth/legend-choropleth-trivariate */ "./src/legend/choropleth/legend-choropleth-trivariate.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _lib_tricolore_src__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../lib/tricolore/src */ "./src/lib/tricolore/src/index.ts");
+/* harmony import */ var _venn_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./venn-utils */ "./src/layers/choropleth/venn-utils.js");
+
+
 
 
 
@@ -35341,7 +35344,7 @@ __webpack_require__.r(__webpack_exports__);
  * @returns {TrivariateChoroplethMap}
  */
 const map = function (config) {
-    return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_1__.buildSingleLayerMap)('trivariateChoropleth', config)
+    return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_2__.buildSingleLayerMap)('trivariateChoropleth', config)
 }
 
 const decorateTrivariateChoroplethLayer = function (out, config) {
@@ -35371,6 +35374,18 @@ const decorateTrivariateChoroplethLayer = function (out, config) {
     out._ternaryColors_ = null
     out._ternaryData_ = null //stats composition data
     out._ternaryCenter_ = null
+    out.vennSettings_ = false
+    out.vennSettings = function (settings) {
+        if (!arguments.length) return out.vennSettings_
+        out.vennSettings_ = settings === false ? false : {
+            colors: ['#00c7dd', '#f4cf18', '#e94398'],
+            belowColor: '#eeeeee',
+            ...out.vennSettings_,
+            ...settings,
+        }
+        return out
+    }
+    if (config?.vennSettings) out.vennSettings(config.vennSettings)
 
     // ===============================
 
@@ -35438,11 +35453,12 @@ const decorateTrivariateChoroplethLayer = function (out, config) {
         const statData1 = out.statData(c1)
         const statData2 = out.statData(c2)
         const statData3 = out.statData(c3)
+        const venn = out.vennSettings_
 
         // collect features from main map AND all insets
         const allMaps = [out]
         if (out.insetTemplates_) {
-            (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(out.insetTemplates_, out.svgId_, (inset) => allMaps.push(inset))
+            (0,_core_utils__WEBPACK_IMPORTED_MODULE_5__.executeForAllInsets)(out.insetTemplates_, out.svgId_, (inset) => allMaps.push(inset))
         }
 
         const filtered = []
@@ -35467,11 +35483,10 @@ const decorateTrivariateChoroplethLayer = function (out, config) {
                 const sv1 = statData1.get(id)
                 const sv2 = statData2.get(id)
                 const sv3 = statData3.get(id)
-                const v1 = +sv1?.value
-                const v2 = +sv2?.value
-                const v3 = +sv3?.value
-                if (Number.isFinite(v1) && Number.isFinite(v2) && Number.isFinite(v3) && v1 + v2 + v3 > 0) {
-                    filtered.push({ id, values: [v1, v2, v3] })
+                const raw = [sv1?.value, sv2?.value, sv3?.value]
+                const values = venn ? raw.map(_venn_utils__WEBPACK_IMPORTED_MODULE_7__.parseVennValue) : raw.map(Number)
+                if (values.every(Number.isFinite) && (venn || values[0] + values[1] + values[2] > 0)) {
+                    filtered.push({ id, values })
                 } else if (sv1 || sv2 || sv3) {
                     // region is part of the dataset (e.g. value ':') but has no usable composition -
                     // flag it explicitly so it's styled as "no data" rather than left as background
@@ -35481,14 +35496,41 @@ const decorateTrivariateChoroplethLayer = function (out, config) {
         })
 
         out._ternaryData_ = filtered.map((d) => d.values)
-        out._ternaryCenter_ = out.ternarySettings_.meanCentering && out._ternaryData_.length > 0 ? _lib_tricolore_src__WEBPACK_IMPORTED_MODULE_5__.CompositionUtils.centre(out._ternaryData_) : [1 / 3, 1 / 3, 1 / 3]
+        if (venn) {
+            const thresholds = [0, 1, 2].map((index) => venn.thresholds?.[index] ?? (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(filtered, ({ values }) => values[index]) ?? 0)
+            const palette = (0,_venn_utils__WEBPACK_IMPORTED_MODULE_7__.vennPalette)(venn.colors, venn.belowColor)
+            out._vennThresholds_ = thresholds
+            out._vennPalette_ = palette
+            for (const { id, values } of filtered) {
+                const mask = (0,_venn_utils__WEBPACK_IMPORTED_MODULE_7__.vennMask)(values, thresholds)
+                out._ternaryClassById_.set(id, mask)
+                out._ternaryColorById_.set(id, palette[mask])
+            }
+        } else {
+            classifyTernary(filtered)
+        }
+
+        // share lookup with all insets
+        if (out.insetTemplates_) {
+            (0,_core_utils__WEBPACK_IMPORTED_MODULE_5__.executeForAllInsets)(out.insetTemplates_, out.svgId_, (inset) => {
+                inset._ternaryColorById_ = out._ternaryColorById_
+                inset._ternaryClassById_ = out._ternaryClassById_
+                inset._ternaryNoDataIds_ = out._ternaryNoDataIds_
+                inset._ternaryCenter_ = out._ternaryCenter_
+                inset._ternaryData_ = out._ternaryData_
+            })
+        }
+    }
+
+    function classifyTernary(filtered) {
+        out._ternaryCenter_ = out.ternarySettings_.meanCentering && out._ternaryData_.length > 0 ? _lib_tricolore_src__WEBPACK_IMPORTED_MODULE_6__.CompositionUtils.centre(out._ternaryData_) : [1 / 3, 1 / 3, 1 / 3]
 
         const colors = out.ternarySettings_.sextant
-            ? (0,_lib_tricolore_src__WEBPACK_IMPORTED_MODULE_5__.tricoloreSextant)(out._ternaryData_, {
+            ? (0,_lib_tricolore_src__WEBPACK_IMPORTED_MODULE_6__.tricoloreSextant)(out._ternaryData_, {
                   center: out._ternaryCenter_,
                   values: out.ternarySettings_.sextantColors,
               })
-            : (0,_lib_tricolore_src__WEBPACK_IMPORTED_MODULE_5__.tricolore)(out._ternaryData_, {
+            : (0,_lib_tricolore_src__WEBPACK_IMPORTED_MODULE_6__.tricolore)(out._ternaryData_, {
                   center: out._ternaryCenter_,
                   breaks: out.ternarySettings_.breaks,
                   hue: out.ternarySettings_.hue,
@@ -35506,16 +35548,6 @@ const decorateTrivariateChoroplethLayer = function (out, config) {
             }
         })
 
-        // share lookup with all insets
-        if (out.insetTemplates_) {
-            (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(out.insetTemplates_, out.svgId_, (inset) => {
-                inset._ternaryColorById_ = out._ternaryColorById_
-                inset._ternaryClassById_ = out._ternaryClassById_
-                inset._ternaryNoDataIds_ = out._ternaryNoDataIds_
-                inset._ternaryCenter_ = out._ternaryCenter_
-                inset._ternaryData_ = out._ternaryData_
-            })
-        }
     }
 
     // ===============================
@@ -35524,18 +35556,18 @@ const decorateTrivariateChoroplethLayer = function (out, config) {
     //@override
     out.updateStyle = function () {
         if (out.insetTemplates_) {
-            (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(out.insetTemplates_, out.svgId_, styleRegions)
+            (0,_core_utils__WEBPACK_IMPORTED_MODULE_5__.executeForAllInsets)(out.insetTemplates_, out.svgId_, styleRegions)
         }
         styleRegions(out)
 
-        addMouseEventsToRegions(out, out.svg().selectAll((0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getRegionsSelector)(out)))
+        addMouseEventsToRegions(out, out.svg().selectAll((0,_core_utils__WEBPACK_IMPORTED_MODULE_5__.getRegionsSelector)(out)))
         return out
     }
 
     function styleRegions(map) {
         if (!map.svg() || !map._ternaryColorById_) return
 
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getRegionsSelector)(map)
+        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_5__.getRegionsSelector)(map)
         const regions = map.svg().selectAll(selector)
 
         // defined here so it closes over the correct map instance
@@ -35574,7 +35606,7 @@ const decorateTrivariateChoroplethLayer = function (out, config) {
                         .selectAll('.em-grid-text')
                         .each(function () {
                             const cellColor = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this.parentNode).style('fill')
-                            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('fill', getTextColorForBackground(cellColor))
+                            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('fill', (0,_core_utils__WEBPACK_IMPORTED_MODULE_5__.getTextColorForBackground)(cellColor))
                         })
                 }
             })
@@ -35590,7 +35622,7 @@ const decorateTrivariateChoroplethLayer = function (out, config) {
     // when mixing different NUTS levels (e.g. showing NUTS 1 and NUTS 2 data simultaneously)
     const styleMixedNUTS = function (map) {
         map.svg()
-            .selectAll((0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getRegionsSelector)(map))
+            .selectAll((0,_core_utils__WEBPACK_IMPORTED_MODULE_5__.getRegionsSelector)(map))
             .each(function () {
                 if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
                 const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
@@ -35640,15 +35672,15 @@ const decorateTrivariateChoroplethLayer = function (out, config) {
 
     //@override
     out.getLegendConstructor = function () {
-        return _legend_choropleth_legend_choropleth_trivariate__WEBPACK_IMPORTED_MODULE_3__.legend
+        return _legend_choropleth_legend_choropleth_trivariate__WEBPACK_IMPORTED_MODULE_4__.legend
     }
 
     return out
 }
 
-;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_2__.registerLayerType)('trivariateChoropleth', 'base', decorateTrivariateChoroplethLayer)
-;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_2__.registerLayerType)('ternary', 'base', decorateTrivariateChoroplethLayer)
-;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_2__.registerLayerType)('chtri', 'base', decorateTrivariateChoroplethLayer)
+;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_3__.registerLayerType)('trivariateChoropleth', 'base', decorateTrivariateChoroplethLayer)
+;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_3__.registerLayerType)('ternary', 'base', decorateTrivariateChoroplethLayer)
+;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_3__.registerLayerType)('chtri', 'base', decorateTrivariateChoroplethLayer)
 
 // ===============================
 // Tooltip
@@ -35665,7 +35697,7 @@ const tooltipTextFunctionTrivariate = function (rg, map) {
     const sv2 = map.statData(c2).get(id)
     const sv3 = map.statData(c3).get(id)
 
-    const fmt = (sv) => (sv?.value != null && sv.value !== ':' ? (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.spaceAsThousandSeparator)(sv.value) + unitText : '')
+    const fmt = (sv) => (sv?.value != null && sv.value !== ':' ? (0,_core_utils__WEBPACK_IMPORTED_MODULE_5__.spaceAsThousandSeparator)(sv.value) + unitText : '')
 
     //we assume all three stats have the same unit
     const unitText = map.statData(c1).unitText() || map.statData(c2).unit_ || map.statData(c3).unit_ || ''
@@ -36639,6 +36671,50 @@ const decorateValueByAlphaLayer = function (out, config) {
 
 ;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_8__.registerLayerType)('alpha', 'base', decorateValueByAlphaLayer)
 ;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_8__.registerLayerType)('valueByAlpha', 'base', decorateValueByAlphaLayer)
+
+
+/***/ },
+
+/***/ "./src/layers/choropleth/venn-utils.js"
+/*!*********************************************!*\
+  !*** ./src/layers/choropleth/venn-utils.js ***!
+  \*********************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   parseVennValue: () => (/* binding */ parseVennValue),
+/* harmony export */   vennCircleHits: () => (/* binding */ vennCircleHits),
+/* harmony export */   vennMask: () => (/* binding */ vennMask),
+/* harmony export */   vennPalette: () => (/* binding */ vennPalette)
+/* harmony export */ });
+/* harmony import */ var d3_color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-color */ "./node_modules/d3-color/src/color.js");
+
+
+/** Missing values are distinct from zero and signed observations. */
+function parseVennValue(value) {
+    if (typeof value !== 'number' && (typeof value !== 'string' || !value.trim())) return undefined
+    const number = Number(value)
+    return Number.isFinite(number) ? number : undefined
+}
+
+function vennMask(values, thresholds) {
+    return values.reduce((mask, value, index) => (value >= thresholds[index] ? mask | (1 << index) : mask), 0)
+}
+
+function vennPalette(colors, belowColor) {
+    const channels = colors.map((color) => (0,d3_color__WEBPACK_IMPORTED_MODULE_0__.rgb)(color))
+    return Array.from({ length: 8 }, (_, mask) => {
+        if (!mask) return belowColor
+        const selected = channels.filter((color, index) => mask & (1 << index))
+        const mix = (channel) => selected.reduce((value, color) => (value * color[channel]) / 255, 255)
+        return (0,d3_color__WEBPACK_IMPORTED_MODULE_0__.rgb)(mix('r'), mix('g'), mix('b')).formatHex()
+    })
+}
+
+function vennCircleHits(centres, radius, x, y) {
+    return centres.flatMap(([cx, cy], index) => (Math.hypot(x - cx, y - cy) <= radius ? [index] : []))
+}
 
 
 /***/ },
@@ -46123,161 +46199,6 @@ const tooltipTextFunPs = function (region, layerOrMap) {
 
 /***/ },
 
-/***/ "./src/layers/proportional-symbol/map-venn.js"
-/*!****************************************************!*\
-  !*** ./src/layers/proportional-symbol/map-venn.js ***!
-  \****************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   decorateVennLayer: () => (/* binding */ decorateVennLayer),
-/* harmony export */   map: () => (/* binding */ map)
-/* harmony export */ });
-/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/stat-map */ "./src/core/stat-map.js");
-/* harmony import */ var _core_layer_registry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/layer-registry */ "./src/core/layer-registry.js");
-/* harmony import */ var _core_geo_centroids__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/geo/centroids */ "./src/core/geo/centroids.js");
-/* harmony import */ var _core_scale__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/scale */ "./src/core/scale.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
-/* harmony import */ var _legend_proportional_symbol_legend_venn__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../legend/proportional-symbol/legend-venn */ "./src/legend/proportional-symbol/legend-venn.js");
-/* harmony import */ var _venn_utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./venn-utils */ "./src/layers/proportional-symbol/venn-utils.js");
-
-
-
-
-
-
-
-
-const map = (config) => (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_0__.buildSingleLayerMap)('venn', config)
-
-function decorateVennLayer(layer, config) {
-    layer.vennSettings_ = {
-        colors: ['#00c7dd', '#f4cf18', '#e94398'],
-        maxRadius: 18,
-        maxValue: undefined,
-        opacity: 0.85,
-        ...config?.vennSettings,
-    }
-    layer.vennSettings = function (settings) {
-        if (!arguments.length) return layer.vennSettings_
-        Object.assign(layer.vennSettings_, settings)
-        return layer
-    }
-    layer.vennSeries_ = []
-    layer.vennScale_ = null
-    layer.vennTargets_ = []
-    layer.tooltip_.textFunction ??= (region) => renderTooltip(region, layer)
-
-    layer.updateClassification = function () {
-        const settings = layer.vennSettings_
-        layer.vennSeries_ = (layer.getEncodingStats('color') || []).slice(0, 3).map((key, index) => {
-            const data = layer.statData(key)
-            return { data, index, label: data?.label_ || key, color: settings.colors[index], unit: data?.unitText() || '' }
-        })
-        const maxValue = (0,_venn_utils__WEBPACK_IMPORTED_MODULE_6__.parseVennValue)(settings.maxValue)
-        const values = maxValue > 0 ? [maxValue] : layer.vennSeries_.flatMap(({ data }) => data?.getArray() || []).map(_venn_utils__WEBPACK_IMPORTED_MODULE_6__.parseVennValue)
-        layer.vennScale_ = (0,_core_scale__WEBPACK_IMPORTED_MODULE_3__.createSqrtScale)(values, settings.maxRadius)
-        return layer
-    }
-
-    layer.updateStyle = function () {
-        layer.vennTargets_ = []
-        const map = layer.map
-        renderSymbols(map, layer)
-        if (map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(map.insetTemplates_, map.svgId_, (inset) => renderSymbols(inset, layer))
-        return layer
-    }
-
-    layer.getLegendConstructor = () => _legend_proportional_symbol_legend_venn__WEBPACK_IMPORTED_MODULE_5__.legend
-    return layer
-}
-
-function renderSymbols(map, layer) {
-    if (!map.svg() || map.gridCartogram_ || !layer.vennScale_) return
-    const target = map === layer.map ? layer : map
-    let centroids = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_2__.getCentroidsGroup)(target)
-    if (!centroids || centroids.selectAll('g.em-centroid').empty()) {
-        (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_2__.addCentroidsToMap)(target)
-        centroids = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_2__.getCentroidsGroup)(target)
-    }
-    if (!centroids) return
-
-    const groups = centroids
-        .selectAll('g.em-centroid')
-        .selectAll('g.em-venn-symbol')
-        .data((region) => {
-            const circles = layer.vennSeries_.flatMap((series) => {
-                const radius = layer.vennScale_((0,_venn_utils__WEBPACK_IMPORTED_MODULE_6__.parseVennValue)(series.data?.get(region.properties.id)?.value))
-                return radius > 0 ? [{ index: series.index, color: series.color, radius }] : []
-            })
-            return circles.length ? [{ region, circles }] : []
-        })
-        .join('g')
-        .attr('class', 'em-venn-symbol')
-        .style('isolation', 'isolate')
-        .style('cursor', 'pointer')
-    const circles = groups
-        .selectAll('circle')
-        .data(
-            ({ circles }) => circles,
-            (series) => series.index
-        )
-        .join('circle')
-        .attr('class', 'em-venn-circle')
-        .attr('r', (series) => series.radius)
-        .attr('fill', (series) => series.color)
-        .attr('fill-opacity', layer.vennSettings_.opacity)
-        .style('mix-blend-mode', 'multiply')
-        .style('opacity', null)
-    layer.vennTargets_.push(circles)
-
-    const tooltip = map._tooltip || layer.map._tooltip
-    groups
-        .on('mouseenter', function (event, { region }) {
-            if (layer.tooltip_.omitRegions?.includes(region.properties.id)) return
-            tooltip?.mouseover(layer.tooltip_.textFunction(region, map), event)
-            map.onRegionMouseOver_?.(event, region, this, map)
-        })
-        .on('mousemove', function (event, { region }) {
-            if (layer.tooltip_.omitRegions?.includes(region.properties.id)) return
-            tooltip?.mousemove(event)
-            map.onRegionMouseMove_?.(event, region, this, map)
-        })
-        .on('mouseleave', function (event, { region }) {
-            if (layer.tooltip_.omitRegions?.includes(region.properties.id)) return
-            tooltip?.mouseout()
-            map.onRegionMouseOut_?.(event, region, this, map)
-        })
-}
-
-function renderTooltip(region, layer) {
-    const container = document.createElement('div')
-    const heading = document.createElement('div')
-    heading.className = 'em-tooltip-bar'
-    const id = region.properties.id
-    heading.textContent = region.properties.na ? `${region.properties.na} (${id})` : id
-    container.append(heading)
-    const content = document.createElement('div')
-    content.className = 'em-tooltip-text'
-    for (const { data, label, unit, color } of layer.vennSeries_) {
-        const row = document.createElement('div')
-        const swatch = document.createElement('span')
-        Object.assign(swatch.style, { backgroundColor: color, display: 'inline-block', width: '0.75em', height: '0.75em', marginRight: '0.35em' })
-        const value = (0,_venn_utils__WEBPACK_IMPORTED_MODULE_6__.parseVennValue)(data?.get(id)?.value)
-        const formatted = value === undefined ? layer.map.noDataText_ : [(0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.spaceAsThousandSeparator)(value), unit].filter(Boolean).join(' ')
-        row.append(swatch, `${label}: ${formatted}`)
-        content.append(row)
-    }
-    container.append(content)
-    return container.innerHTML
-}
-
-(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_1__.registerLayerType)('venn', 'overlay', decorateVennLayer)
-
-
-/***/ },
-
 /***/ "./src/layers/proportional-symbol/mushrooms/map-mushroom-interactions.js"
 /*!*******************************************************************************!*\
   !*** ./src/layers/proportional-symbol/mushrooms/map-mushroom-interactions.js ***!
@@ -47643,31 +47564,6 @@ function appendSpikesToMap(map, sizeData, out, styleSource) {
 
 /***/ },
 
-/***/ "./src/layers/proportional-symbol/venn-utils.js"
-/*!******************************************************!*\
-  !*** ./src/layers/proportional-symbol/venn-utils.js ***!
-  \******************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   parseVennValue: () => (/* binding */ parseVennValue),
-/* harmony export */   vennCircleHits: () => (/* binding */ vennCircleHits)
-/* harmony export */ });
-/** Venn circles represent non-negative magnitudes. Missing values are distinct from zero. */
-function parseVennValue(value) {
-    if (typeof value !== 'number' && (typeof value !== 'string' || !value.trim())) return undefined
-    const number = Number(value)
-    return Number.isFinite(number) && number >= 0 ? number : undefined
-}
-
-function vennCircleHits(centres, radius, x, y) {
-    return centres.flatMap(([cx, cy], index) => (Math.hypot(x - cx, y - cy) <= radius ? [index] : []))
-}
-
-
-/***/ },
-
 /***/ "./src/legend/choropleth/legend-choropleth-bivariate.js"
 /*!**************************************************************!*\
   !*** ./src/legend/choropleth/legend-choropleth-bivariate.js ***!
@@ -48722,7 +48618,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var _lib_tricolore_src__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../lib/tricolore/src */ "./src/lib/tricolore/src/index.ts");
 /* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_venn__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./legend-venn */ "./src/legend/choropleth/legend-venn.js");
 // legend-choropleth-trivariate.js
+
 
 
 
@@ -48760,6 +48658,7 @@ const legend = function (map, /** @type {TrivariateLegendConfig} */ config = {})
     out.labelPosition = 'edge'
     out.colorTarget = 'points'
     out.showData = true
+    out.vennRadius = 26
     out.centerAnnotationOffsets = { labelX: 70, labelY: 10, curveX: -20, curveY: -20 }
 
     Object.assign(out, config)
@@ -48774,7 +48673,8 @@ const legend = function (map, /** @type {TrivariateLegendConfig} */ config = {})
         if (out.title) out.addTitle()
         if (out.subtitle) out.addSubtitle()
 
-        drawTricoloreLegend()
+        if (out.layer.vennSettings_) (0,_legend_venn__WEBPACK_IMPORTED_MODULE_4__.drawVennLegend)(out)
+        else drawTricoloreLegend()
 
         out.setBoxDimension()
         return out
@@ -49586,6 +49486,116 @@ function createAlphaLegend(out, baseX, baseY) {
         .attr('text-anchor', 'middle')
         .attr('class', 'em-legend-label')
         .text(alphaData.unitText?.() || 'Transparency')
+}
+
+
+/***/ },
+
+/***/ "./src/legend/choropleth/legend-venn.js"
+/*!**********************************************!*\
+  !*** ./src/legend/choropleth/legend-venn.js ***!
+  \**********************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   drawVennLegend: () => (/* binding */ drawVennLegend)
+/* harmony export */ });
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/pointer.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _layers_choropleth_venn_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../layers/choropleth/venn-utils */ "./src/layers/choropleth/venn-utils.js");
+
+
+
+
+function drawVennLegend(out) {
+    const layer = out.layer
+    const palette = layer._vennPalette_
+    if (!palette) return
+
+    const diagram = out.lgg.append('g').attr('class', 'em-venn-legend').attr('transform', `translate(${out.getBaseX()},${out.getBaseY()})`)
+    const radius = out.vennRadius
+    const separation = radius * 1.3
+    const labelSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-legend-label')
+    const yThird = radius + (separation * Math.sqrt(3)) / 2
+    const series = layer
+        .getTernaryStatCodes()
+        .slice(0, 3)
+        .map((key, index) => {
+            const stat = layer.statData(key)
+            const unit = stat.unitText()
+            const label = layer.legend_?.labels?.[index] ?? stat.label_ ?? key
+            const threshold = Number(layer._vennThresholds_[index].toPrecision(8)).toLocaleString(undefined, { maximumFractionDigits: 8 })
+            return { index, label: `${label} ≥ ${threshold}${unit ? ' ' + unit : ''}` }
+        })
+    const labels = diagram
+        .selectAll('text')
+        .data(series)
+        .join('text')
+        .attr('class', 'em-legend-label')
+        .text(({ label }) => label)
+    if (!labels.size()) return
+    const left = radius + labels.node().getBBox().width + 8
+    const centres = [
+        [left, radius],
+        [left + separation, radius],
+        [left + separation / 2, yThird],
+    ]
+
+    diagram
+        .insert('g', 'text')
+        .style('isolation', 'isolate')
+        .selectAll('circle')
+        .data(series)
+        .join('circle')
+        .attr('class', 'em-venn-legend-circle')
+        .attr('cx', ({ index }) => centres[index][0])
+        .attr('cy', ({ index }) => centres[index][1])
+        .attr('r', radius)
+        .attr('fill', ({ index }) => palette[1 << index])
+        .style('mix-blend-mode', 'multiply')
+    labels
+        .attr('text-anchor', ({ index }) => ['end', 'start', 'middle'][index])
+        .attr('x', ({ index }) => centres[index][0] + [-radius - 8, radius + 8, 0][index])
+        .attr('y', ({ index }) => (index === 2 ? yThird + radius + labelSize + 4 : radius + labelSize / 3))
+
+    const y = diagram.node().getBBox().height + 10
+    const below = diagram.append('g').attr('class', 'em-venn-below').attr('transform', `translate(0,${y})`)
+    below.append('rect').attr('width', 14).attr('height', 14).attr('fill', palette[0]).attr('stroke', '#777')
+    below.append('text').attr('class', 'em-legend-label').attr('x', 20).attr('y', 11).text('Below all thresholds')
+
+    function highlight(matches) {
+        const apply = (map) =>
+            map
+                .svg()
+                ?.selectAll((0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getRegionsSelector)(map))
+                .filter('[ecl]')
+                .style('opacity', function () {
+                    return matches && !matches(+this.getAttribute('ecl')) ? 0.2 : null
+                })
+        apply(out.map)
+        if (out.map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, apply)
+    }
+
+    diagram
+        .on('mousemove', (event) => {
+            if (event.target.closest('.em-venn-below') || event.target.classList.contains('em-legend-label')) return
+            const [x, y] = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(event, diagram.node())
+            const hits = (0,_layers_choropleth_venn_utils__WEBPACK_IMPORTED_MODULE_2__.vennCircleHits)(centres.slice(0, series.length), radius, x, y)
+            const mask = hits.reduce((value, index) => value | (1 << index), 0)
+            highlight(mask ? (value) => value === mask : null)
+        })
+        .on('mouseleave', () => highlight(null))
+    labels
+        .attr('tabindex', 0)
+        .style('cursor', 'pointer')
+        .on('mouseenter focus', (event, { index }) => highlight((mask) => mask & (1 << index)))
+        .on('blur', () => highlight(null))
+    below
+        .attr('tabindex', 0)
+        .style('cursor', 'pointer')
+        .on('mouseenter focus', () => highlight((mask) => mask === 0))
+        .on('blur', () => highlight(null))
 }
 
 
@@ -56220,168 +56230,6 @@ function unhighlightPsRegions(map) {
 
 /***/ },
 
-/***/ "./src/legend/proportional-symbol/legend-venn.js"
-/*!*******************************************************!*\
-  !*** ./src/legend/proportional-symbol/legend-venn.js ***!
-  \*******************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   legend: () => (/* binding */ legend)
-/* harmony export */ });
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/pointer.js");
-/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/ticks.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
-/* harmony import */ var _layers_proportional_symbol_venn_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../layers/proportional-symbol/venn-utils */ "./src/layers/proportional-symbol/venn-utils.js");
-/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../legend */ "./src/legend/legend.js");
-/* harmony import */ var _legend_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../legend-utils */ "./src/legend/legend-utils.js");
-
-
-
-
-
-
-
-function legend(layer, config) {
-    const out = _legend__WEBPACK_IMPORTED_MODULE_4__.legend(layer)
-    Object.assign(out, { radius: 26, labels: undefined, sizeValues: undefined, interactive: true }, config)
-
-    out.update = function () {
-        out.updateConfig()
-        out.updateContainer()
-        if (!out.lgg.node()) return out
-
-        out.makeBackgroundBox()
-        if (out.title) out.addTitle()
-        if (out.subtitle) out.addSubtitle()
-
-        const source = out.layer
-        const series = source.vennSeries_
-        if (series.length) {
-            const content = out.lgg.append('g').attr('transform', `translate(${out.getBaseX()},${out.getBaseY()})`)
-            drawDiagram(content, out, series)
-
-            const scale = source.vennScale_
-            if (scale) {
-                const automatic = (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(0, scale.domain()[1], 3)
-                    .filter((value) => value > 0)
-                    .reverse()
-                const values = out.sizeValues || automatic
-                if (values.length) {
-                    const bounds = content.node().getBBox()
-                    const size = content.append('g').attr('transform', `translate(0,${bounds.y + bounds.height + 12})`)
-                    drawSizeSamples(size, scale, values, series[0].unit)
-                }
-            }
-        }
-        out.setBoxDimension()
-        return out
-    }
-
-    return out
-}
-
-function drawSizeSamples(container, scale, values, unit) {
-    const titleSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-size-legend-title')
-    const labelSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-legend-label')
-    const samples = values.map((value) => ({ value, radius: scale(value) })).filter(({ radius }) => radius > 0)
-    if (!samples.length) return
-
-    container
-        .append('text')
-        .attr('class', 'em-size-legend-title')
-        .attr('y', titleSize)
-        .text(unit ? `Circle area (${unit})` : 'Circle area')
-
-    const maxRadius = Math.max(...samples.map(({ radius }) => radius))
-    const baseline = titleSize + 10 + maxRadius * 2
-    let x = 0
-    for (const { value, radius } of samples) {
-        const label = container
-            .append('text')
-            .attr('class', 'em-legend-label')
-            .attr('text-anchor', 'middle')
-            .attr('y', baseline + labelSize + 4)
-            .text((0,_legend_utils__WEBPACK_IMPORTED_MODULE_5__.formatSizeLabel)(value))
-        const halfWidth = Math.max(radius, label.node().getBBox().width / 2)
-        const centre = x + halfWidth
-        label.attr('x', centre)
-        container
-            .append('circle')
-            .attr('class', 'em-venn-size-circle')
-            .attr('cx', centre)
-            .attr('cy', baseline - radius)
-            .attr('r', radius)
-            .attr('fill', 'none')
-            .attr('stroke', 'currentColor')
-        x += 2 * halfWidth + 14
-    }
-}
-
-function drawDiagram(content, out, series) {
-    const radius = out.radius
-    const separation = radius * 1.3
-    const labelSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-legend-label')
-    const yThird = radius + (separation * Math.sqrt(3)) / 2
-    const diagram = content.append('g').attr('class', 'em-venn-legend')
-    const labels = diagram
-        .selectAll('text')
-        .data(series)
-        .join('text')
-        .attr('class', 'em-legend-label')
-        .text(({ label, index }) => out.labels?.[index] ?? label)
-    const left = radius + labels.nodes()[0].getBBox().width + 8
-    const centres = [
-        [left, radius],
-        [left + separation, radius],
-        [left + separation / 2, yThird],
-    ]
-
-    const circles = diagram
-        .insert('g', 'text')
-        .style('isolation', 'isolate')
-        .selectAll('circle')
-        .data(series)
-        .join('circle')
-        .attr('class', 'em-venn-legend-circle')
-        .attr('cx', ({ index }) => centres[index][0])
-        .attr('cy', ({ index }) => centres[index][1])
-        .attr('r', radius)
-        .attr('fill', ({ color }) => color)
-        .attr('fill-opacity', out.layer.vennSettings_.opacity)
-        .style('mix-blend-mode', 'multiply')
-    labels
-        .attr('text-anchor', ({ index }) => ['end', 'start', 'middle'][index])
-        .attr('x', ({ index }) => centres[index][0] + [-radius - 8, radius + 8, 0][index])
-        .attr('y', ({ index }) => (index === 2 ? yThird + radius + labelSize + 4 : radius + labelSize / 3))
-
-    if (!out.interactive) return
-
-    function highlight(indices) {
-        circles.style('opacity', ({ index }) => (indices.length && !indices.includes(index) ? 0.25 : null))
-        for (const symbols of out.layer.vennTargets_) {
-            symbols.style('opacity', ({ index }) => (indices.length && !indices.includes(index) ? 0 : null))
-        }
-    }
-
-    diagram
-        .style('cursor', 'pointer')
-        .on('mousemove', (event) => {
-            if (event.target.classList.contains('em-legend-label')) return
-            const [x, y] = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(event, diagram.node())
-            highlight((0,_layers_proportional_symbol_venn_utils__WEBPACK_IMPORTED_MODULE_3__.vennCircleHits)(centres.slice(0, series.length), radius, x, y))
-        })
-        .on('mouseleave', () => highlight([]))
-    labels
-        .attr('tabindex', 0)
-        .on('mouseenter focus', (event, { index }) => highlight([index]))
-        .on('blur', () => highlight([]))
-}
-
-
-/***/ },
-
 /***/ "./src/tooltip/placement.js"
 /*!**********************************!*\
   !*** ./src/tooltip/placement.js ***!
@@ -57112,6 +56960,31 @@ function maxIndex(values, valueof) {
     }
   }
   return maxIndex;
+}
+
+
+/***/ },
+
+/***/ "./node_modules/d3-array/src/median.js"
+/*!*********************************************!*\
+  !*** ./node_modules/d3-array/src/median.js ***!
+  \*********************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ median),
+/* harmony export */   medianIndex: () => (/* binding */ medianIndex)
+/* harmony export */ });
+/* harmony import */ var _quantile_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./quantile.js */ "./node_modules/d3-array/src/quantile.js");
+
+
+function median(values, valueof) {
+  return (0,_quantile_js__WEBPACK_IMPORTED_MODULE_0__["default"])(values, 0.5, valueof);
+}
+
+function medianIndex(values, valueof) {
+  return (0,_quantile_js__WEBPACK_IMPORTED_MODULE_0__.quantileIndex)(values, 0.5, valueof);
 }
 
 
@@ -77899,11 +77772,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getDefaultLabels: () => (/* binding */ getDefaultLabels),
 /* harmony export */   getFillPatternDefinitionFun: () => (/* binding */ getFillPatternDefinitionFun),
 /* harmony export */   getFillPatternDefinitionFunction: () => (/* binding */ getFillPatternDefinitionFunction),
-/* harmony export */   isLayerTypeRegistered: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__.isLayerTypeRegistered),
+/* harmony export */   isLayerTypeRegistered: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_19__.isLayerTypeRegistered),
 /* harmony export */   map: () => (/* binding */ map),
-/* harmony export */   projectFromMap: () => (/* reexport safe */ _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_19__.projectFromMap),
-/* harmony export */   projectToMap: () => (/* reexport safe */ _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_19__.projectToMap),
-/* harmony export */   registerLayerType: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__.registerLayerType),
+/* harmony export */   projectFromMap: () => (/* reexport safe */ _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__.projectFromMap),
+/* harmony export */   projectToMap: () => (/* reexport safe */ _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__.projectToMap),
+/* harmony export */   registerLayerType: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_19__.registerLayerType),
 /* harmony export */   version: () => (/* binding */ version)
 /* harmony export */ });
 /* harmony import */ var _css_index_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./css/index.css */ "./src/css/index.css");
@@ -77912,23 +77785,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _layers_map_categorical__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./layers/map-categorical */ "./src/layers/map-categorical.js");
 /* harmony import */ var _layers_choropleth_map_choropleth_bivariate__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./layers/choropleth/map-choropleth-bivariate */ "./src/layers/choropleth/map-choropleth-bivariate.js");
 /* harmony import */ var _layers_choropleth_map_choropleth_trivariate__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./layers/choropleth/map-choropleth-trivariate */ "./src/layers/choropleth/map-choropleth-trivariate.js");
-/* harmony import */ var _layers_proportional_symbol_map_venn__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./layers/proportional-symbol/map-venn */ "./src/layers/proportional-symbol/map-venn.js");
-/* harmony import */ var _layers_flow_map_flow__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./layers/flow/map-flow */ "./src/layers/flow/map-flow.js");
-/* harmony import */ var _layers_choropleth_map_value_by_alpha__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./layers/choropleth/map-value-by-alpha */ "./src/layers/choropleth/map-value-by-alpha.js");
-/* harmony import */ var _layers_proportional_symbol_mushrooms_map_mushroom_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./layers/proportional-symbol/mushrooms/map-mushroom.js */ "./src/layers/proportional-symbol/mushrooms/map-mushroom.js");
-/* harmony import */ var _layers_composition_map_pie__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./layers/composition/map-pie */ "./src/layers/composition/map-pie.js");
-/* harmony import */ var _layers_map_spark__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layers/map-spark */ "./src/layers/map-spark.js");
-/* harmony import */ var _layers_composition_map_bar_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./layers/composition/map-bar.js */ "./src/layers/composition/map-bar.js");
-/* harmony import */ var _layers_composition_map_waffle_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./layers/composition/map-waffle.js */ "./src/layers/composition/map-waffle.js");
-/* harmony import */ var _layers_composition_map_coxcomb_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./layers/composition/map-coxcomb.js */ "./src/layers/composition/map-coxcomb.js");
-/* harmony import */ var _layers_composition_map_stripe_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./layers/composition/map-stripe.js */ "./src/layers/composition/map-stripe.js");
-/* harmony import */ var _core_decoration_labels__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./core/decoration/labels */ "./src/core/decoration/labels.js");
-/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./core/stat-map */ "./src/core/stat-map.js");
-/* harmony import */ var d3_format__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! d3-format */ "./node_modules/d3-format/src/defaultLocale.js");
-/* harmony import */ var _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./core/geo/proj4.js */ "./src/core/geo/proj4.js");
-/* harmony import */ var _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./core/layer-registry.js */ "./src/core/layer-registry.js");
-/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../package.json */ "./package.json");
-
+/* harmony import */ var _layers_flow_map_flow__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./layers/flow/map-flow */ "./src/layers/flow/map-flow.js");
+/* harmony import */ var _layers_choropleth_map_value_by_alpha__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./layers/choropleth/map-value-by-alpha */ "./src/layers/choropleth/map-value-by-alpha.js");
+/* harmony import */ var _layers_proportional_symbol_mushrooms_map_mushroom_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./layers/proportional-symbol/mushrooms/map-mushroom.js */ "./src/layers/proportional-symbol/mushrooms/map-mushroom.js");
+/* harmony import */ var _layers_composition_map_pie__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./layers/composition/map-pie */ "./src/layers/composition/map-pie.js");
+/* harmony import */ var _layers_map_spark__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./layers/map-spark */ "./src/layers/map-spark.js");
+/* harmony import */ var _layers_composition_map_bar_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layers/composition/map-bar.js */ "./src/layers/composition/map-bar.js");
+/* harmony import */ var _layers_composition_map_waffle_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./layers/composition/map-waffle.js */ "./src/layers/composition/map-waffle.js");
+/* harmony import */ var _layers_composition_map_coxcomb_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./layers/composition/map-coxcomb.js */ "./src/layers/composition/map-coxcomb.js");
+/* harmony import */ var _layers_composition_map_stripe_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./layers/composition/map-stripe.js */ "./src/layers/composition/map-stripe.js");
+/* harmony import */ var _core_decoration_labels__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./core/decoration/labels */ "./src/core/decoration/labels.js");
+/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./core/stat-map */ "./src/core/stat-map.js");
+/* harmony import */ var d3_format__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! d3-format */ "./node_modules/d3-format/src/defaultLocale.js");
+/* harmony import */ var _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./core/geo/proj4.js */ "./src/core/geo/proj4.js");
+/* harmony import */ var _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./core/layer-registry.js */ "./src/core/layer-registry.js");
+/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../package.json */ "./package.json");
 
 
 
@@ -77952,7 +77823,7 @@ __webpack_require__.r(__webpack_exports__);
 
 // set default d3 locale
 
-(0,d3_format__WEBPACK_IMPORTED_MODULE_18__["default"])({
+(0,d3_format__WEBPACK_IMPORTED_MODULE_17__["default"])({
     decimal: '.',
     thousands: ' ',
     grouping: [3],
@@ -77961,7 +77832,7 @@ __webpack_require__.r(__webpack_exports__);
 
 // init proj4 with common projections and aliases
 ;
-(0,_core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_19__.initProj4)()
+(0,_core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__.initProj4)()
 
 //types
 /** @typedef {import('./types/core/MapInstance').MapInstance} MapInstance */
@@ -77984,7 +77855,7 @@ __webpack_require__.r(__webpack_exports__);
 const map = function (type, config) {
     try {
         if (!type) {
-            return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_17__.createStatMap)(config || {}, true, undefined)
+            return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_16__.createStatMap)(config || {}, true, undefined)
         }
         //choropleth map
         if (type == 'choropleth' || type == 'ch') return _layers_choropleth_map_choropleth__WEBPACK_IMPORTED_MODULE_1__.map(config)
@@ -77996,31 +77867,30 @@ const map = function (type, config) {
         if (type == 'bivariateChoropleth' || type == 'chbi') return _layers_choropleth_map_choropleth_bivariate__WEBPACK_IMPORTED_MODULE_4__.map(config)
         //trivariate choropleth
         if (type == 'trivariateChoropleth' || type == 'ternary' || type == 'chtri') return _layers_choropleth_map_choropleth_trivariate__WEBPACK_IMPORTED_MODULE_5__.map(config)
-        if (type === 'venn') return _layers_proportional_symbol_map_venn__WEBPACK_IMPORTED_MODULE_6__.map(config)
         //stripes composition
-        if (type == 'stripeComposition' || type == 'scomp' || type == 'stripe') return _layers_composition_map_stripe_js__WEBPACK_IMPORTED_MODULE_15__.map(config)
+        if (type == 'stripeComposition' || type == 'scomp' || type == 'stripe') return _layers_composition_map_stripe_js__WEBPACK_IMPORTED_MODULE_14__.map(config)
         //composition (e.g. pie) charts
-        if (type == 'pieChart' || type == 'pie' || type == 'composition') return _layers_composition_map_pie__WEBPACK_IMPORTED_MODULE_10__.map(config)
+        if (type == 'pieChart' || type == 'pie' || type == 'composition') return _layers_composition_map_pie__WEBPACK_IMPORTED_MODULE_9__.map(config)
         //sparkline maps
-        if (type == 'sparkline' || type == 'spark' || type == 'sparklines') return _layers_map_spark__WEBPACK_IMPORTED_MODULE_11__.map(config)
+        if (type == 'sparkline' || type == 'spark' || type == 'sparklines') return _layers_map_spark__WEBPACK_IMPORTED_MODULE_10__.map(config)
         //flow maps
-        if (type == 'flow' || type == 'flowmap') return _layers_flow_map_flow__WEBPACK_IMPORTED_MODULE_7__.map(config)
+        if (type == 'flow' || type == 'flowmap') return _layers_flow_map_flow__WEBPACK_IMPORTED_MODULE_6__.map(config)
         //coxcomb maps
-        if (type == 'coxcomb' || type == 'polar') return _layers_composition_map_coxcomb_js__WEBPACK_IMPORTED_MODULE_14__.map(config)
+        if (type == 'coxcomb' || type == 'polar') return _layers_composition_map_coxcomb_js__WEBPACK_IMPORTED_MODULE_13__.map(config)
         //value by alpha maps
-        if (type == 'alpha' || type == 'valueByAlpha') return _layers_choropleth_map_value_by_alpha__WEBPACK_IMPORTED_MODULE_8__.map(config)
+        if (type == 'alpha' || type == 'valueByAlpha') return _layers_choropleth_map_value_by_alpha__WEBPACK_IMPORTED_MODULE_7__.map(config)
         //mushroom (Cheysson )
-        if (type == 'mushroom') return _layers_proportional_symbol_mushrooms_map_mushroom_js__WEBPACK_IMPORTED_MODULE_9__.map(config)
+        if (type == 'mushroom') return _layers_proportional_symbol_mushrooms_map_mushroom_js__WEBPACK_IMPORTED_MODULE_8__.map(config)
         //waffle (Cheysson )
-        if (type == 'waffle') return _layers_composition_map_waffle_js__WEBPACK_IMPORTED_MODULE_13__.map(config)
+        if (type == 'waffle') return _layers_composition_map_waffle_js__WEBPACK_IMPORTED_MODULE_12__.map(config)
         //bar composition
-        if (type == 'bar' || type == 'barComposition') return _layers_composition_map_bar_js__WEBPACK_IMPORTED_MODULE_12__.map(config)
+        if (type == 'bar' || type == 'barComposition') return _layers_composition_map_bar_js__WEBPACK_IMPORTED_MODULE_11__.map(config)
 
         //add new map types here
         //if(type == "XX") return mapXX.map(config);
 
         console.warn(`[eurostat-map] Unknown map type: "${type}". See documentation for supported types.`)
-        return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_17__.createStatMap)(config, true, type)
+        return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_16__.createStatMap)(config, true, type)
     } catch (e) {
         console.error('Error in eurostat-map.map: ' + e.message)
         console.error(e)
@@ -78082,7 +77952,7 @@ const getFillPatternDefinitionFunction = function (opts) {
 const getFillPatternDefinitionFun = getFillPatternDefinitionFunction
 
 const getDefaultLabels = function () {
-    return _core_decoration_labels__WEBPACK_IMPORTED_MODULE_16__.DEFAULTLABELS
+    return _core_decoration_labels__WEBPACK_IMPORTED_MODULE_15__.DEFAULTLABELS
 }
 
 
@@ -78090,7 +77960,7 @@ const getDefaultLabels = function () {
 
 ;
 
-const version = _package_json__WEBPACK_IMPORTED_MODULE_21__.version
+const version = _package_json__WEBPACK_IMPORTED_MODULE_20__.version
 
 })();
 

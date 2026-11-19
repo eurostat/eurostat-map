@@ -3,6 +3,7 @@ import * as Legend from '../legend'
 import { select } from 'd3-selection'
 import { TricoloreViz } from '../../lib/tricolore/src'
 import { executeForAllInsets, getLegendRegionsSelector } from '../../core/utils'
+import { drawVennLegend } from './legend-venn'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/legend/TrivariateLegendConfig').TrivariateLegendConfig} TrivariateLegendConfig */
@@ -36,6 +37,7 @@ export const legend = function (map, /** @type {TrivariateLegendConfig} */ confi
     out.labelPosition = 'edge'
     out.colorTarget = 'points'
     out.showData = true
+    out.vennRadius = 26
     out.centerAnnotationOffsets = { labelX: 70, labelY: 10, curveX: -20, curveY: -20 }
 
     Object.assign(out, config)
@@ -50,7 +52,8 @@ export const legend = function (map, /** @type {TrivariateLegendConfig} */ confi
         if (out.title) out.addTitle()
         if (out.subtitle) out.addSubtitle()
 
-        drawTricoloreLegend()
+        if (out.layer.vennSettings_) drawVennLegend(out)
+        else drawTricoloreLegend()
 
         out.setBoxDimension()
         return out

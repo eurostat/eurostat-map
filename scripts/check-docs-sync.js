@@ -32,7 +32,6 @@ const SECTION_FOR_INTERFACE = [
     [/^Choropleth/, 'Choropleth legends'],
     [/^Bivariate/, 'Bivariate choropleth legends'],
     [/^Trivariate/, 'Trivariate choropleth legends'],
-    [/^Venn/, 'Venn legends'],
     [/^ProportionalSymbol/, 'Proportional symbol legends'],
     [/^PieChart/, 'Pie chart legends'],
     [/^Categorical/, 'Categorical legends'],

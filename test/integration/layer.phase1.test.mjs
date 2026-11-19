@@ -23,7 +23,7 @@ const { registerLayerType, isLayerTypeRegistered } = library
 {
     const types = [
         'choropleth', 'ch', 'categorical', 'ct', 'proportionalSymbol', 'proportionalSymbols', 'ps',
-        'bivariateChoropleth', 'chbi', 'trivariateChoropleth', 'ternary', 'chtri', 'venn',
+        'bivariateChoropleth', 'chbi', 'trivariateChoropleth', 'ternary', 'chtri',
         'stripeComposition', 'scomp', 'stripe', 'pieChart', 'pie', 'composition',
         'sparkline', 'spark', 'sparklines', 'flow', 'flowmap', 'coxcomb', 'polar',
         'alpha', 'valueByAlpha', 'mushroom', 'waffle', 'bar', 'barComposition'
@@ -37,10 +37,10 @@ const { registerLayerType, isLayerTypeRegistered } = library
         assert.strictEqual(layer.type, type)
     })
 
-    const venn = library.map('venn', { vennSettings: { maxRadius: 24 } })
-    assert.strictEqual(venn.layer(0).role, 'overlay')
-    assert.strictEqual(venn.vennSettings().maxRadius, 24)
-    assert.strictEqual(venn.vennSettings({ opacity: 0.6 }), venn)
+    const venn = library.map('trivariateChoropleth', { vennSettings: { thresholds: [10, 20, 30] } })
+    assert.strictEqual(venn.layer(0).role, 'base')
+    assert.deepStrictEqual(venn.vennSettings().thresholds, [10, 20, 30])
+    assert.strictEqual(venn.vennSettings(false), venn)
 }
 
 // 3) createLayer path via a dummy registered overlay: facade base retained, overlay pushed.

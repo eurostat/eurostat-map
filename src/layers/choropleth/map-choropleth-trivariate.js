@@ -1,9 +1,11 @@
 import { select } from 'd3-selection'
+import { median } from 'd3-array'
 import { buildSingleLayerMap } from '../../core/stat-map'
 import { registerLayerType } from '../../core/layer-registry'
 import * as TrivariateLegend from '../../legend/choropleth/legend-choropleth-trivariate'
-import { getRegionsSelector, executeForAllInsets, spaceAsThousandSeparator } from '../../core/utils'
+import { getRegionsSelector, executeForAllInsets, getTextColorForBackground, spaceAsThousandSeparator } from '../../core/utils'
 import { tricolore, tricoloreSextant, CompositionUtils } from '../../lib/tricolore/src'
+import { parseVennValue, vennMask, vennPalette } from './venn-utils'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/layers/choropleth/TrivariateChoroplethConfig').TrivariateChoroplethConfig} TrivariateChoroplethConfig */
@@ -46,6 +48,18 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
     out._ternaryColors_ = null
     out._ternaryData_ = null //stats composition data
     out._ternaryCenter_ = null
+    out.vennSettings_ = false
+    out.vennSettings = function (settings) {
+        if (!arguments.length) return out.vennSettings_
+        out.vennSettings_ = settings === false ? false : {
+            colors: ['#00c7dd', '#f4cf18', '#e94398'],
+            belowColor: '#eeeeee',
+            ...out.vennSettings_,
+            ...settings,
+        }
+        return out
+    }
+    if (config?.vennSettings) out.vennSettings(config.vennSettings)
 
     // ===============================
 
@@ -113,6 +127,7 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
         const statData1 = out.statData(c1)
         const statData2 = out.statData(c2)
         const statData3 = out.statData(c3)
+        const venn = out.vennSettings_
 
         // collect features from main map AND all insets
         const allMaps = [out]
@@ -142,11 +157,10 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
                 const sv1 = statData1.get(id)
                 const sv2 = statData2.get(id)
                 const sv3 = statData3.get(id)
-                const v1 = +sv1?.value
-                const v2 = +sv2?.value
-                const v3 = +sv3?.value
-                if (Number.isFinite(v1) && Number.isFinite(v2) && Number.isFinite(v3) && v1 + v2 + v3 > 0) {
-                    filtered.push({ id, values: [v1, v2, v3] })
+                const raw = [sv1?.value, sv2?.value, sv3?.value]
+                const values = venn ? raw.map(parseVennValue) : raw.map(Number)
+                if (values.every(Number.isFinite) && (venn || values[0] + values[1] + values[2] > 0)) {
+                    filtered.push({ id, values })
                 } else if (sv1 || sv2 || sv3) {
                     // region is part of the dataset (e.g. value ':') but has no usable composition -
                     // flag it explicitly so it's styled as "no data" rather than left as background
@@ -156,6 +170,33 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
         })
 
         out._ternaryData_ = filtered.map((d) => d.values)
+        if (venn) {
+            const thresholds = [0, 1, 2].map((index) => venn.thresholds?.[index] ?? median(filtered, ({ values }) => values[index]) ?? 0)
+            const palette = vennPalette(venn.colors, venn.belowColor)
+            out._vennThresholds_ = thresholds
+            out._vennPalette_ = palette
+            for (const { id, values } of filtered) {
+                const mask = vennMask(values, thresholds)
+                out._ternaryClassById_.set(id, mask)
+                out._ternaryColorById_.set(id, palette[mask])
+            }
+        } else {
+            classifyTernary(filtered)
+        }
+
+        // share lookup with all insets
+        if (out.insetTemplates_) {
+            executeForAllInsets(out.insetTemplates_, out.svgId_, (inset) => {
+                inset._ternaryColorById_ = out._ternaryColorById_
+                inset._ternaryClassById_ = out._ternaryClassById_
+                inset._ternaryNoDataIds_ = out._ternaryNoDataIds_
+                inset._ternaryCenter_ = out._ternaryCenter_
+                inset._ternaryData_ = out._ternaryData_
+            })
+        }
+    }
+
+    function classifyTernary(filtered) {
         out._ternaryCenter_ = out.ternarySettings_.meanCentering && out._ternaryData_.length > 0 ? CompositionUtils.centre(out._ternaryData_) : [1 / 3, 1 / 3, 1 / 3]
 
         const colors = out.ternarySettings_.sextant
@@ -181,16 +222,6 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
             }
         })
 
-        // share lookup with all insets
-        if (out.insetTemplates_) {
-            executeForAllInsets(out.insetTemplates_, out.svgId_, (inset) => {
-                inset._ternaryColorById_ = out._ternaryColorById_
-                inset._ternaryClassById_ = out._ternaryClassById_
-                inset._ternaryNoDataIds_ = out._ternaryNoDataIds_
-                inset._ternaryCenter_ = out._ternaryCenter_
-                inset._ternaryData_ = out._ternaryData_
-            })
-        }
     }
 
     // ===============================
