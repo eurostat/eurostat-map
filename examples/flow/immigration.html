@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Immigration flows within the EU</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            body {
+                font:
+                    1rem system-ui,
+                    sans-serif;
+                color: #203244;
+            }
+
+            .controls {
+                display: flex;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin: 0.5rem 0 0.75rem;
+            }
+
+            select {
+                font: inherit;
+                padding: 0.3rem 0.5rem;
+            }
+
+            .source {
+                font-size: 0.875rem;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="controls">
+            <label for="destination">Destination country</label>
+            <select id="destination" disabled>
+                <option value="DE">Germany</option>
+                <option value="NL">Netherlands</option>
+                <option value="ES">Spain</option>
+            </select>
+        </div>
+        <svg id="map"></svg>
+        <p class="source">
+            Origin refers to country of previous residence.
+            <a href="https://ec.europa.eu/eurostat/databrowser/view/migr_imm5prv/default/table?lang=en">Source: Eurostat (migr_imm5prv)</a>
+        </p>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Eurostat migr_imm5prv, 2024, all ages and sexes, age in completed years, number of people.
+            // The eight largest published flows from other EU Member States for each destination.
+            const originsByDestination = {
+                DE: { RO: 64325, PL: 44455, IT: 23184, BG: 22785, ES: 19201, HU: 14696, AT: 12701, FR: 12458 },
+                NL: { PL: 16153, DE: 12828, ES: 9731, RO: 8609, BE: 8386, IT: 7366, EL: 7257, BG: 6589 },
+                ES: { RO: 35747, FR: 29053, IT: 28945, DE: 26123, NL: 13130, PT: 12459, BE: 9492, PL: 7344 },
+            }
+            const countryNames = new Intl.DisplayNames('en', { type: 'region' })
+            const destination = document.querySelector('#destination')
+
+            function graphFor(target) {
+                const links = Object.entries(originsByDestination[target]).map(([source, value]) => ({ source, target, value }))
+                const nodes = [target, ...links.map(({ source }) => source)].map((id) => ({
+                    id,
+                    name: countryNames.of(id === 'EL' ? 'GR' : id),
+                }))
+                return { nodes, links }
+            }
+
+            const map = eurostatmap
+                .map('flow')
+                .nutsLevel(0)
+                .insets(false)
+                .scale('20M')
+                .title('Immigration flows within the EU')
+                .subtitle('Eight largest EU origins for the selected destination, 2024')
+                .position({ x: 4380000, y: 2920000, z: 5600 })
+                .drawCoastalMargin(false)
+                .flowGraph(graphFor(destination.value))
+                .flowSettings({
+                    lineType: 'straight',
+                    arrows: true,
+                    opacity: 0.8,
+                    color: '#176b87',
+                    regionColors: ['#c7e0e8', '#72a8bc'],
+                    maxWidth: 12,
+                    minWidth: 1,
+                })
+                .legend({
+                    position: 'top right',
+                    flowWidthLegend: { title: 'People moving', values: [5000, 10000, 15000] },
+                    regionColorLegend: { title: 'Country role', labels: ['Previous residence', 'Destination'] },
+                })
+                .onBuild(() => {
+                    destination.disabled = false
+                })
+
+            map.statData().unitText('people')
+            map.build()
+
+            destination.addEventListener('change', () => {
+                map.flowGraph(graphFor(destination.value)).updateStatValues()
+            })
+        </script>
+    </body>
+</html>

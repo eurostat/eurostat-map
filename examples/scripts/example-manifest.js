@@ -41,6 +41,7 @@
         'dot-density/population-dot-density.html',
         'flow/flights/flights.html',
         'flow/flowmap.html',
+        'flow/immigration.html',
         'misc/annotations.html',
         'misc/custom-geometries.html',
         'misc/custom-stats.html',
