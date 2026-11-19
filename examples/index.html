@@ -237,13 +237,6 @@
                 padding-left: 12px;
             }
 
-            .sidebar-chapter {
-                display: block;
-                padding: 6px 8px;
-                font-size: 13px;
-                font-weight: 700;
-            }
-
             .sidebar-nav li a {
                 display: block;
                 text-decoration: none;
@@ -254,6 +247,10 @@
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+            }
+
+            .sidebar-nav .sidebar-chapter {
+                font-weight: 700;
             }
 
             .sidebar-nav li a:hover {
@@ -407,8 +404,23 @@
             const layerTypes = [...new Set(showcasePaths.flatMap(typesForPath))]
                 .filter((type) => type !== 'Other' && !standaloneTypes.includes(type))
                 .sort()
-            const allTypes = ['All', ...layerTypes, ...standaloneTypes, 'Other', ...Object.keys(featureTopics)]
             const typeLabels = { Proportional: 'Proportional Symbols', Cartogram: 'Cartograms' }
+            const allTypes = ['All', 'Layer Types', ...layerTypes, ...standaloneTypes, 'Other', ...Object.keys(featureTopics)]
+            const chapterSlugs = new Map(
+                allTypes
+                    .filter((type) => type !== 'All')
+                    .map((type) => [type, (typeLabels[type] || type).toLowerCase().replace(/[^a-z0-9]+/g, '-')])
+            )
+            const typeFromUrl = () => {
+                const slug = new URLSearchParams(window.location.search).get('chapter')
+                return allTypes.find((type) => chapterSlugs.get(type) === slug) || 'All'
+            }
+            const urlForType = (type) => {
+                const url = new URL(window.location.href)
+                if (type === 'All') url.searchParams.delete('chapter')
+                else url.searchParams.set('chapter', chapterSlugs.get(type))
+                return url
+            }
             let activeType = 'All'
 
             const sidebarNav = document.getElementById('sidebar-nav')
@@ -421,14 +433,19 @@
                     else el.removeAttribute('aria-current')
                 })
             }
-            const addFilter = (list, type) => {
+            const addFilter = (list, type, className = '') => {
                 const li = document.createElement('li')
                 const a = document.createElement('a')
                 a.textContent = typeLabels[type] || type
                 a.dataset.type = type
-                a.href = '#'
+                a.className = className
+                a.href = urlForType(type)
                 a.addEventListener('click', (e) => {
+                    if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return
                     e.preventDefault()
+                    const url = urlForType(type)
+                    if (url.href === window.location.href) return
+                    history.pushState(null, '', url)
                     setActiveType(type)
                     renderExamples(search.value)
                 })
@@ -444,20 +461,18 @@
             }
 
             addFilter(sidebarNav, 'All')
-            const layerChapter = document.createElement('li')
-            const layerHeading = document.createElement('span')
-            layerHeading.className = 'sidebar-chapter'
-            layerHeading.textContent = 'Layer Types'
-            layerChapter.appendChild(layerHeading)
-            addSubchapters(layerChapter, layerTypes)
-            sidebarNav.appendChild(layerChapter)
+            addSubchapters(addFilter(sidebarNav, 'Layer Types', 'sidebar-chapter'), layerTypes)
             standaloneTypes.forEach((type) => addFilter(sidebarNav, type))
             addSubchapters(addFilter(sidebarNav, 'Other'), Object.keys(featureTopics))
-            setActiveType('All')
+            setActiveType(typeFromUrl())
 
             const grid = document.getElementById('grid')
             const stats = document.getElementById('stats')
             const search = document.getElementById('search')
+            window.addEventListener('popstate', () => {
+                setActiveType(typeFromUrl())
+                renderExamples(search.value)
+            })
 
             // Where the user was (the type, the search and the scroll), kept for when they come back from an example
             // (the button "Examples" of the viewer) so that they find the page as they left it.
@@ -470,21 +485,19 @@
                     // the storage may be refused: the page is then simply shown from the top
                 }
             })
-            // true when the page is shown again by the back button, or by a link from the viewer
-            const isReturning = () => {
-                const nav = performance.getEntriesByType('navigation')[0]
-                let fromViewer = false
+            const isFromViewer = () => {
                 try {
-                    fromViewer = new URL(document.referrer).pathname.endsWith('/view.html')
+                    return new URL(document.referrer).pathname.endsWith('/view.html')
                 } catch (e) {
-                    // no referrer
+                    return false
                 }
-                return (nav && nav.type === 'back_forward') || fromViewer
             }
             // the scroll to restore, once the examples are shown
             let scrollToRestore = null
             const restoreState = () => {
-                if (!isReturning()) return
+                const fromViewer = isFromViewer()
+                const [navigation] = performance.getEntriesByType('navigation')
+                if (navigation?.type !== 'back_forward' && !fromViewer) return
                 let s = null
                 try {
                     s = JSON.parse(sessionStorage.getItem(STATE_KEY))
@@ -493,7 +506,16 @@
                 }
                 if (!s) return
                 search.value = s.search || ''
-                if (allTypes.includes(s.type)) setActiveType(s.type)
+                // The viewer's fallback link points to the gallery root.
+                if (
+                    fromViewer &&
+                    navigation?.type === 'navigate' &&
+                    !new URLSearchParams(window.location.search).has('chapter') &&
+                    allTypes.includes(s.type)
+                ) {
+                    history.replaceState(null, '', urlForType(s.type))
+                    setActiveType(s.type)
+                }
                 scrollToRestore = s.scrollY || 0
             }
 
@@ -502,7 +524,6 @@
                     showcasePaths.map(async (path) => [path, await resolveTitle(path), detectDesc(path), previewPathFor(path), getTypes(path)])
                 )
                 examples = loaded
-                restoreState()
                 renderExamples(search.value)
                 // the thumbnails have a fixed ratio, so the page has its final height as soon as the cards are there
                 if (scrollToRestore !== null) window.scrollTo(0, scrollToRestore)
@@ -512,7 +533,8 @@
             const renderExamples = (query) => {
                 const q = (query || '').trim().toLowerCase()
                 const filtered = examples.filter(([file, title, desc, , types]) => {
-                    const matchesType = activeType === 'All' || types.includes(activeType)
+                    const matchesType =
+                        activeType === 'All' || (activeType === 'Layer Types' ? types.some((type) => layerTypes.includes(type)) : types.includes(activeType))
                     if (!matchesType) return false
                     if (!q) return true
                     return file.toLowerCase().includes(q) || title.toLowerCase().includes(q) || desc.toLowerCase().includes(q)
@@ -582,6 +604,7 @@
             }
 
             stats.textContent = 'Loading examples...'
+            restoreState()
             loadExamples()
             search.addEventListener('input', () => renderExamples(search.value))
         </script>
