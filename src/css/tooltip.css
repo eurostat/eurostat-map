@@ -40,6 +40,14 @@
     margin: 0px;
     max-width: 100%;
 }
+.em-venn-tooltip-swatch {
+    display: inline-block;
+    width: 0.75em;
+    height: 0.75em;
+    margin-inline-end: 0.4em;
+    border: 1px solid #0003;
+    box-sizing: border-box;
+}
 .em-tooltip-piechart-container {
     text-align: center;
     fill: #383838;

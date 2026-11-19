@@ -2591,6 +2591,14 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-tooltip {
     margin: 0px;
     max-width: 100%;
 }
+.em-venn-tooltip-swatch {
+    display: inline-block;
+    width: 0.75em;
+    height: 0.75em;
+    margin-inline-end: 0.4em;
+    border: 1px solid #0003;
+    box-sizing: border-box;
+}
 .em-tooltip-piechart-container {
     text-align: center;
     fill: #383838;
@@ -35702,11 +35710,16 @@ const tooltipTextFunctionTrivariate = function (rg, map) {
     //we assume all three stats have the same unit
     const unitText = map.statData(c1).unitText() || map.statData(c2).unit_ || map.statData(c3).unit_ || ''
 
+    const swatch = (index) => {
+        if (!map.vennSettings_ || !map._vennPalette_) return ''
+        return `<span class="em-venn-tooltip-swatch" aria-hidden="true" style="background-color:${map._vennPalette_[1 << index]}"></span>`
+    }
+
     buf.push(`<div class="em-tooltip-text" style="background:#fff;color:#171a22;padding:4px;font-size:15px;">
   <table class="em-tooltip-table"><tbody>
-    <tr><td>${map.statData(c1).label_ || c1}: ${fmt(sv1)}</td></tr>
-    <tr><td>${map.statData(c2).label_ || c2}: ${fmt(sv2)}</td></tr>
-    <tr><td>${map.statData(c3).label_ || c3}: ${fmt(sv3)}</td></tr>
+    <tr><td>${swatch(0)}${map.statData(c1).label_ || c1}: ${fmt(sv1)}</td></tr>
+    <tr><td>${swatch(1)}${map.statData(c2).label_ || c2}: ${fmt(sv2)}</td></tr>
+    <tr><td>${swatch(2)}${map.statData(c3).label_ || c3}: ${fmt(sv3)}</td></tr>
   </tbody></table></div>`)
 
     return buf.join('')
