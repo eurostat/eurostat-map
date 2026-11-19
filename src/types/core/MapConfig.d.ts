@@ -66,10 +66,18 @@ export interface MapConfig {
      */
     geo?: string
 
-    /** Map dimensions. */
+    /** Logical map width in pixels. */
     width?: number
-    /** Map height in pixels. */
+    /** Logical map height in pixels. */
     height?: number
+
+    /**
+     * Scale a standalone root SVG to its container width, preserving its aspect ratio and
+     * original coordinate viewBox without reprojecting. Width and height remain logical
+     * internal dimensions. Nested SVG or group maps, such as IMAGE, are not altered.
+     * @default false
+     */
+    responsive?: boolean
 
     /** Map texts. */
     /** Map title. */

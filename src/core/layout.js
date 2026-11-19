@@ -137,6 +137,24 @@ export const wrapMapSvg = function (svg) {
     return wrapper
 }
 
+export const updateResponsiveMap = function (out) {
+    const svg = out.svg_?.node()
+    const wrapper = out._wrapper_
+    const standalone = svg && wrapper && svg.parentNode === wrapper && svg.tagName.toLowerCase() === 'svg'
+    if (!standalone) return
+
+    wrapper.classList.toggle('em-map-wrapper--responsive', !!out.responsive_)
+    if (out.responsive_) {
+        if (!svg.hasAttribute('viewBox')) out._responsiveViewBoxNode = svg
+        if (out._responsiveViewBoxNode === svg) {
+            svg.setAttribute('viewBox', `0 0 ${svg.getAttribute('width')} ${svg.getAttribute('height')}`)
+        }
+    } else if (out._responsiveViewBoxNode === svg) {
+        svg.removeAttribute('viewBox')
+        out._responsiveViewBoxNode = undefined
+    }
+}
+
 export const recalculateLayout = function (out) {
     const svg = out.svg()
     const header = svg.select('#em-header-' + out.svgId_)
@@ -179,6 +197,7 @@ export const recalculateLayout = function (out) {
     // --- Resize entire SVG ---
     const totalHeight = out.height_ + headerHeight + footerHeight + footerMapPadding
     svg.attr('width', out.width_).attr('height', totalHeight)
+    updateResponsiveMap(out)
 
     if (out.zoomButtons_ && !out.gridCartogram_) updateZoomButtonsPosition(out)
     // Always attempt this (not gated on out.insetsButton_): the button may exist even when that

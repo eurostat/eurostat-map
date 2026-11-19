@@ -17,6 +17,16 @@
     display: block;
 }
 
+.em-map-wrapper--responsive {
+    display: block;
+    width: 100%;
+}
+
+.em-map-wrapper--responsive > svg.em-map {
+    width: 100%;
+    height: auto;
+}
+
 /* General text settings */
 text {
     pointer-events: none;

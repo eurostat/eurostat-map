@@ -19,7 +19,7 @@ import { appendCoastalMargin } from './decoration/coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './decoration/texts.js'
 import { addScalebarToMap, getDefaultScalebarConfig, mergeScalebarConfig, updateScalebar } from './decoration/scalebar.js'
 import { attachLocationsApi, updateLocations } from './locations.js'
-import { applyBorderModeClasses, createMapSVG, recalculateLayout, wrapMapSvg } from './layout'
+import { applyBorderModeClasses, createMapSVG, recalculateLayout, updateResponsiveMap, wrapMapSvg } from './layout'
 import { DEFAULT_FIT_ZOOM, defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
 import { addCentroidsToMap } from './geo/centroids'
 import { BOX_CORNER_RADIUS } from './buttons/corner-radius'
@@ -57,6 +57,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.width_ = Math.min(795, window.innerWidth)
     out.height_ = 0
     out.containerId_ = undefined
+    out.responsive_ = false
 
     //geographical focus
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
@@ -276,6 +277,13 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.geo = function (v) {
         if (!arguments.length) return out.geo_
         out.geo_ = v.toUpperCase()
+        return out
+    }
+
+    out.responsive = function (v) {
+        if (!arguments.length) return out.responsive_
+        out.responsive_ = !!v
+        updateResponsiveMap(out)
         return out
     }
 
@@ -604,6 +612,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             out.proj_ = 54030
         }
         svg.attr('width', out.width()).attr('height', out.height())
+        updateResponsiveMap(out)
 
         // define clipPath relative to the drawing group (map area)
         const defs = svg.append('defs').attr('class', 'em-defs')

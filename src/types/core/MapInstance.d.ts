@@ -39,13 +39,22 @@ export interface MapInstance {
 
     /** Dimensions. */
 
-    /** Map width in pixels. @default min(795, window.innerWidth) */
+    /** Logical map width in pixels. @default min(795, window.innerWidth) */
     width(): number
     width(w: number): this
 
-    /** Map height in pixels. 0 = auto (85% of width). */
+    /** Logical map height in pixels. 0 = auto (85% of width). */
     height(): number
     height(h: number): this
+
+    /**
+     * Scale a standalone root SVG to its container width, preserving its aspect ratio and
+     * original coordinate viewBox without reprojecting. Width and height remain logical
+     * internal dimensions. Nested SVG or group maps, such as IMAGE, are not altered.
+     * @default false
+     */
+    responsive(): boolean
+    responsive(enabled: boolean): this
 
     /** Geography. */
 

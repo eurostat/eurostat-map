@@ -107,6 +107,7 @@ Specify the map SVG element.
 | _map_.**containerId**([*value*]) | String   | _same as svgId_               | Optional container element used for tooltip bounds and (when explicitly set) height constraints.                                                                                                                                                       |
 | _map_.**width**([*value*])       | int      | _min(795, window.innerWidth)_ | The width of the map, in pixel.                                                                                                                                                                                                                        |
 | _map_.**height**([*value*])      | int      | _auto_                        | The height of the map, in pixel. If not specified, the height is set automatically as 85% of the width.                                                                                                                                                |
+| _map_.**responsive**([*value*])  | boolean  | _false_                       | Scale a standalone root SVG to its container width while preserving aspect ratio and its original coordinate viewBox, without reprojecting. Nested SVG/group maps such as IMAGE are not altered. |
 | _map_.**layers**([*value*])      | Array    | _[]_                          | Multi-layer stack declaration. Use only when `map()` is created without a map type. Each item is a layer config object (for example `{ type: 'choropleth', encoding: { fill: { stat: 'density' } } }`). See [Multi-layer guide](multi-layer-guide.md). |
 | _map_.**addLayer**([*value*])    | Function | _undefined_                   | Add one layer to a multi-layer map and return the layer instance for chaining. Example: `map.addLayer('choropleth').encoding('fill', { stat: 'density' })`. See [Multi-layer guide](multi-layer-guide.md).                                             |
 | _map_.**layer**([*ref*])         | Layer    | -                             | Returns a layer of a multi-layer map by index or id (the active layer if omitted).                                                                                                                                                                     |
@@ -114,6 +115,9 @@ Specify the map SVG element.
 | _map_.**activeLayer**()          | Layer    | -                             | Returns the active layer of a multi-layer map.                                                                                                                                                                                                         |
 | _map_.**activeLayerIndex**()     | number   | -                             | Returns the index of the active layer.                                                                                                                                                                                                                 |
 | _map_.**updateAllLayers**()      | _this_   | -                             | Update every layer of a multi-layer map.                                                                                                                                                                                                               |
+
+With `responsive: true` (or `.responsive(true)`), `width` and `height` remain the logical
+internal dimensions; only the displayed SVG scales.
 
 Height note:
 

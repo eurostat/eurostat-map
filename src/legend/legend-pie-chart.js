@@ -63,6 +63,7 @@ export const legend = function (map, config) {
         out.updateContainer()
 
         const map = out.map
+        const layer = out.layer
         const lgg = out.lgg
 
         //remove previous content
@@ -83,14 +84,14 @@ export const legend = function (map, config) {
         out._sizeLegendContainer = null
 
         // legend for sizes
-        if (map.classifierSize_ && out.sizeLegend) {
+        if (layer.classifierSize_ && out.sizeLegend) {
             //circle size legend
             out._sizeLegendContainer = lgg.append('g').attr('class', 'em-pie-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
             drawCircleSizeLegend(
                 out,
                 out._sizeLegendContainer,
                 out.sizeLegend.values,
-                map.classifierSize_,
+                layer.classifierSize_,
                 out.sizeLegend.title,
                 out.sizeLegend.titlePadding
             )
@@ -117,7 +118,7 @@ export const legend = function (map, config) {
      *
      */
     function buildColorLegend(out, baseX, baseY) {
-        const map = out.map
+        const layer = out.layer
         const config = out.colorLegend
         //container
         out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-pie-color-legend')
@@ -144,13 +145,11 @@ export const legend = function (map, config) {
 
         //draw legend elements for classes: rectangle + label
         let i = 0
-        const scs = map.catColors()
+        const scs = layer.catColors()
+        const labels = layer.catLabels()
         for (let code in scs) {
             //the vertical position of the legend element
             const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
-            //the color
-            const col = map.catColors()[code] || 'lightgray'
-
             //rectangle
             out._colorLegendContainer
                 .append('rect')
@@ -181,7 +180,7 @@ export const legend = function (map, config) {
                 .attr('x', config.shapeWidth + config.labelOffsets.x)
                 .attr('y', y + config.shapeHeight * 0.5)
                 .attr('dy', '0.35em') // ~vertical centering
-                .text(map.catLabels()[code] || code)
+                .text(labels?.[code] || code)
 
             i++
         }

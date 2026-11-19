@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Renewable electricity in the EU</title>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <p>
+            Source:
+            <a href="https://ec.europa.eu/eurostat/databrowser/view/nrg_bal_peh/default/table?lang=en">Eurostat (nrg_bal_peh)</a>
+            . Other renewables include biofuels and geothermal energy.
+        </p>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Eurostat nrg_bal_peh, 2024, gross electricity production (GEP), in GWh.
+            // Columns: all sources (TOTAL), renewables (RA000), hydro (RA100),
+            // wind (RA300), and solar (RA410 + RA420).
+            const generation = {
+                AT: [82406.732, 67778.709, 45707.084, 9257.422, 8143.267],
+                BE: [77156.8, 26537.9, 545.7, 13824.5, 8562.1],
+                BG: [38535.175, 11369.751, 2787.148, 1377.086, 5489.148],
+                CY: [5763.191, 1366.422, 0, 202.649, 1108.457],
+                CZ: [73900.393, 12347.563, 2662.82, 716.81, 3592.683],
+                DE: [514009, 289417, 23825, 138914, 75379],
+                DK: [35317.578, 31408.963, 22.562, 20552.836, 3776.202],
+                EE: [6367.833, 3597.019, 30.045, 1166.079, 1065.427],
+                EL: [57924.399, 27691.068, 3581.68, 12136.202, 11258.411],
+                ES: [287914.758, 160970.969, 34414.726, 62089.787, 58292.47],
+                FI: [83152.987, 46673.256, 14299.241, 21046.257, 939.941],
+                FR: [570904.315, 155682.569, 71115.895, 47499.378, 25062.942],
+                HR: [15360.4, 11128, 6727, 2576.6, 820],
+                HU: [37987.362, 11936.6, 231, 659, 9200],
+                IE: [31492.654, 14512.163, 766.112, 11649.561, 1093.092],
+                IT: [271007.173, 134357.398, 53130.8, 22321.895, 35993.103],
+                LT: [8091.9, 6261, 436.5, 3448.2, 1397.2],
+                LU: [2742.34, 1373.037, 105.181, 466.796, 359.596],
+                LV: [6321.62, 4642.451, 3208.793, 275.985, 536.379],
+                MT: [2185.877, 336.006, 0, 0.033, 326.676],
+                NL: [123843.947, 62099.275, 85.391, 33509.406, 21822.202],
+                PL: [172452.808, 52674.16, 2114.529, 24945.223, 17662.76],
+                PT: [51089.446, 40353.204, 14892.597, 14418.962, 7088.01],
+                RO: [53376.025, 24442.059, 14192.604, 6350.28, 3422.688],
+                SE: [172366.999, 119577.692, 64615, 40621, 4163],
+                SI: [16992.689, 6869.994, 5335.883, 6.55, 1268.145],
+                SK: [30070, 7108, 4826, 5, 694],
+            }
+
+            const renewableShare = {}
+            const renewableMix = {}
+            for (const [country, [total, renewable, hydro, wind, solar]] of Object.entries(generation)) {
+                renewableShare[country] = Number(((100 * renewable) / total).toFixed(1))
+                // The composition layer uses TWh to keep legend labels short.
+                renewableMix[country] = {
+                    hydro: hydro / 1000,
+                    wind: wind / 1000,
+                    solar: solar / 1000,
+                    other: (renewable - hydro - wind - solar) / 1000,
+                }
+            }
+
+            eurostatmap
+                .map()
+                .nutsLevel(0)
+                .scale('20M')
+                .insets(false)
+                .dorling(true)
+                .position({ x: 4500000, y: 3450000, z: 5900 })
+                .title('Renewable electricity in the EU')
+                .subtitle('Share, volume and sources of gross electricity generation, 2024')
+                .stat('share', { customData: renewableShare, unitText: '%' })
+                .stat('mix', {
+                    customData: renewableMix,
+                    unitText: 'TWh',
+                    categoryCodes: ['hydro', 'wind', 'solar', 'other'],
+                })
+                .layers([
+                    {
+                        type: 'choropleth',
+                        encoding: { fill: { stat: 'share' } },
+                        classificationMethod: 'threshold',
+                        thresholds: [20, 40, 60, 80],
+                        colors: ['#f2eef5', '#ded4e6', '#c8b6d4', '#a78dbb', '#80639a'],
+                        legend: { title: 'Renewable share (%)', x: 10, y: 85, noData: false },
+                    },
+                    {
+                        type: 'pie',
+                        encoding: {
+                            composition: { stat: 'mix' },
+                            color: {
+                                values: { hydro: '#2563a6', wind: '#168575', solar: '#e6a318', other: '#a65988' },
+                                labels: { hydro: 'Hydro', wind: 'Wind', solar: 'Solar', other: 'Other renewables' },
+                            },
+                        },
+                        compositionSettings: { minSize: 4, maxSize: 31, strokeFill: '#fff', strokeWidth: 0.8 },
+                        legend: {
+                            position: 'top right',
+                            sizeLegend: { title: 'Renewable output (TWh)', values: [250, 100, 25] },
+                            colorLegend: { title: 'Renewable sources', noData: false },
+                        },
+                    },
+                ])
+                .build()
+        </script>
+    </body>
+</html>

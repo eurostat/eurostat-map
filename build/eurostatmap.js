@@ -2070,6 +2070,16 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* wrapper DOM */
     display: block;
 }
 
+.em-map-wrapper--responsive {
+    display: block;
+    width: 100%;
+}
+
+.em-map-wrapper--responsive > svg.em-map {
+    width: 100%;
+    height: auto;
+}
+
 /* General text settings */
 text {
     pointer-events: none;
@@ -29464,6 +29474,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   applyBorderModeClasses: () => (/* binding */ applyBorderModeClasses),
 /* harmony export */   createMapSVG: () => (/* binding */ createMapSVG),
 /* harmony export */   recalculateLayout: () => (/* binding */ recalculateLayout),
+/* harmony export */   updateResponsiveMap: () => (/* binding */ updateResponsiveMap),
 /* harmony export */   wrapMapSvg: () => (/* binding */ wrapMapSvg)
 /* harmony export */ });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
@@ -29609,6 +29620,24 @@ const wrapMapSvg = function (svg) {
     return wrapper
 }
 
+const updateResponsiveMap = function (out) {
+    const svg = out.svg_?.node()
+    const wrapper = out._wrapper_
+    const standalone = svg && wrapper && svg.parentNode === wrapper && svg.tagName.toLowerCase() === 'svg'
+    if (!standalone) return
+
+    wrapper.classList.toggle('em-map-wrapper--responsive', !!out.responsive_)
+    if (out.responsive_) {
+        if (!svg.hasAttribute('viewBox')) out._responsiveViewBoxNode = svg
+        if (out._responsiveViewBoxNode === svg) {
+            svg.setAttribute('viewBox', `0 0 ${svg.getAttribute('width')} ${svg.getAttribute('height')}`)
+        }
+    } else if (out._responsiveViewBoxNode === svg) {
+        svg.removeAttribute('viewBox')
+        out._responsiveViewBoxNode = undefined
+    }
+}
+
 const recalculateLayout = function (out) {
     const svg = out.svg()
     const header = svg.select('#em-header-' + out.svgId_)
@@ -29651,6 +29680,7 @@ const recalculateLayout = function (out) {
     // --- Resize entire SVG ---
     const totalHeight = out.height_ + headerHeight + footerHeight + footerMapPadding
     svg.attr('width', out.width_).attr('height', totalHeight)
+    updateResponsiveMap(out)
 
     if (out.zoomButtons_ && !out.gridCartogram_) (0,_buttons_zoom_buttons__WEBPACK_IMPORTED_MODULE_3__.updateZoomButtonsPosition)(out)
     // Always attempt this (not gated on out.insetsButton_): the button may exist even when that
@@ -30136,6 +30166,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     out.width_ = Math.min(795, window.innerWidth)
     out.height_ = 0
     out.containerId_ = undefined
+    out.responsive_ = false
 
     //geographical focus
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
@@ -30355,6 +30386,13 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     out.geo = function (v) {
         if (!arguments.length) return out.geo_
         out.geo_ = v.toUpperCase()
+        return out
+    }
+
+    out.responsive = function (v) {
+        if (!arguments.length) return out.responsive_
+        out.responsive_ = !!v
+        ;(0,_layout__WEBPACK_IMPORTED_MODULE_21__.updateResponsiveMap)(out)
         return out
     }
 
@@ -30683,6 +30721,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             out.proj_ = 54030
         }
         svg.attr('width', out.width()).attr('height', out.height())
+        ;(0,_layout__WEBPACK_IMPORTED_MODULE_21__.updateResponsiveMap)(out)
 
         // define clipPath relative to the drawing group (map area)
         const defs = svg.append('defs').attr('class', 'em-defs')
@@ -53546,6 +53585,7 @@ const legend = function (map, config) {
         out.updateContainer()
 
         const map = out.map
+        const layer = out.layer
         const lgg = out.lgg
 
         //remove previous content
@@ -53566,14 +53606,14 @@ const legend = function (map, config) {
         out._sizeLegendContainer = null
 
         // legend for sizes
-        if (map.classifierSize_ && out.sizeLegend) {
+        if (layer.classifierSize_ && out.sizeLegend) {
             //circle size legend
             out._sizeLegendContainer = lgg.append('g').attr('class', 'em-pie-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
             ;(0,_legend_circle_size__WEBPACK_IMPORTED_MODULE_3__.drawCircleSizeLegend)(
                 out,
                 out._sizeLegendContainer,
                 out.sizeLegend.values,
-                map.classifierSize_,
+                layer.classifierSize_,
                 out.sizeLegend.title,
                 out.sizeLegend.titlePadding
             )
@@ -53600,7 +53640,7 @@ const legend = function (map, config) {
      *
      */
     function buildColorLegend(out, baseX, baseY) {
-        const map = out.map
+        const layer = out.layer
         const config = out.colorLegend
         //container
         out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-pie-color-legend')
@@ -53627,13 +53667,11 @@ const legend = function (map, config) {
 
         //draw legend elements for classes: rectangle + label
         let i = 0
-        const scs = map.catColors()
+        const scs = layer.catColors()
+        const labels = layer.catLabels()
         for (let code in scs) {
             //the vertical position of the legend element
             const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
-            //the color
-            const col = map.catColors()[code] || 'lightgray'
-
             //rectangle
             out._colorLegendContainer
                 .append('rect')
@@ -53664,7 +53702,7 @@ const legend = function (map, config) {
                 .attr('x', config.shapeWidth + config.labelOffsets.x)
                 .attr('y', y + config.shapeHeight * 0.5)
                 .attr('dy', '0.35em') // ~vertical centering
-                .text(map.catLabels()[code] || code)
+                .text(labels?.[code] || code)
 
             i++
         }
@@ -77663,7 +77701,7 @@ function applyProjectionDefaults(wkt) {
   \**********************/
 (module) {
 
-module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node --test test/e2e/flow-color-legend.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0","typedoc":{"minimatch":"6.2.3"}},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node --test test/e2e/flow-color-legend.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0","typedoc":{"minimatch":"6.2.3"}},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
 
 /***/ }
 

@@ -56,6 +56,7 @@
         'misc/stamp.html',
         'misc/story-map/index.html',
         'multi-layer/choropleth-with-proportional-symbols.html',
+        'multi-layer/renewable-electricity.html',
         'mushroom/mushroom.html',
         'mushroom/population-age-groups.html',
         'pie-charts/prop-piecharts.html',
