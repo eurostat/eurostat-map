@@ -20,24 +20,10 @@
                 font: inherit;
             }
 
-            .population-layout {
-                display: grid;
-                grid-template-columns: minmax(0, 795px) 285px;
-                align-items: start;
-                gap: 16px;
-                max-width: 1096px;
-            }
-
-            .population-layout svg {
+            #map {
                 display: block;
                 max-width: 100%;
                 height: auto;
-            }
-
-            @media (max-width: 680px) {
-                .population-layout {
-                    grid-template-columns: minmax(0, 1fr);
-                }
             }
         </style>
     </head>
@@ -50,12 +36,7 @@
                 <option value="naturalChange">Natural population change</option>
             </select>
         </div>
-        <div class="population-layout">
-            <div>
-                <svg id="map" aria-label="Population, share aged 65 and over, and life expectancy at age 65 by country"></svg>
-            </div>
-            <svg id="population-legend" width="285" height="330" viewBox="0 0 285 330" aria-label="Population map legend"></svg>
-        </div>
+        <svg id="map" aria-label="Population, share aged 65 and over, and life expectancy at age 65 by country"></svg>
         <script src="../../build/eurostatmap.js"></script>
         <script>
             const blues = ['#e1edf8', '#bed8ef', '#81b6db', '#4289bb', '#175583']
@@ -129,8 +110,9 @@
                     .encoding('color', { stat: key })
                     .psSettings({ thresholds, colors })
                     .legend({
-                        svgId: 'population-legend',
-                        boxOpacity: 0,
+                        position: 'top right',
+                        boxFill: '#fff',
+                        boxOpacity: 1,
                         sizeLegend: {
                             title: 'Total population',
                             values: [80_000_000, 20_000_000, 1_000_000],
