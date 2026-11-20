@@ -34,18 +34,26 @@
             .source {
                 font-size: 0.875rem;
             }
+
+            #map {
+                --route-color: #176b87;
+            }
+
+            #map marker path[fill='context-stroke'] {
+                fill: var(--route-color);
+            }
         </style>
     </head>
 
     <body>
         <form id="destination-form" class="controls" method="get">
             <label for="destination">Destination country</label>
-            <select id="destination" name="destination">
+            <select id="destination" name="destination" disabled>
                 <option value="DE">Germany</option>
                 <option value="NL">Netherlands</option>
                 <option value="ES">Spain</option>
             </select>
-            <button type="submit">Show routes</button>
+            <button type="submit" disabled>Show routes</button>
         </form>
         <p id="selection-summary" class="selection-summary" role="status"></p>
         <svg id="map"></svg>
@@ -67,6 +75,7 @@
             const form = document.querySelector('#destination-form')
             const destination = document.querySelector('#destination')
             const summary = document.querySelector('#selection-summary')
+            const routeColor = getComputedStyle(document.querySelector('#map')).getPropertyValue('--route-color').trim()
             const requestedCountry = new URLSearchParams(location.search).get('destination')
             const displayedCountry = Object.hasOwn(originsByDestination, requestedCountry) ? requestedCountry : 'DE'
 
@@ -77,7 +86,12 @@
             // Submit at most once if the browser emits both input and change.
             let submitting = false
             function submitDestination() {
-                if (!submitting && destination.value !== displayedCountry) form.requestSubmit()
+                if (submitting || destination.value === displayedCountry) return
+
+                const url = new URL(location.href)
+                url.searchParams.set('destination', destination.value)
+                submitting = true
+                location.assign(url.href)
             }
 
             form.addEventListener('submit', () => {
@@ -91,6 +105,8 @@
                     destination.value = displayedCountry
                 }
             })
+            destination.disabled = false
+            form.querySelector('button').disabled = false
 
             function graphFor(target) {
                 const links = Object.entries(originsByDestination[target]).map(([source, value]) => ({ source, target, value }))
@@ -103,6 +119,9 @@
 
             const map = eurostatmap
                 .map('flow')
+                .width(795)
+                .height(675)
+                .responsive(true)
                 .nutsLevel(0)
                 .insets(false)
                 .scale('20M')
@@ -115,7 +134,7 @@
                     lineType: 'straight',
                     arrows: true,
                     opacity: 1,
-                    color: '#176b87',
+                    color: routeColor,
                     regionColors: ['#c7e0e8', '#72a8bc'],
                     maxWidth: 9,
                     minWidth: 1,

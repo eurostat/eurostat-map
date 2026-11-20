@@ -260,6 +260,9 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   `examples/scripts/update-examples-manifest.js` and its generated
   `examples/scripts/example-manifest.js` output synchronized; `typeForPath()` is only the
   backward-compatible primary category.
+- Keep example controls disabled until their event handlers are installed. A browser can
+  interact with the gallery iframe while its external bundles are still loading. Check route
+  positions in narrow frames as well as counting the rendered SVG routes.
 
 ## Story-map interactions
 
