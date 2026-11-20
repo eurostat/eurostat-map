@@ -7,24 +7,56 @@
         <link rel="stylesheet" href="commuting-corridors.css" />
     </head>
     <body class="commuting-map">
-        <form id="dataset-form" class="dataset-controls" method="get">
-            <label for="area">Area</label>
-            <select id="area" name="area" data-default="dijon" disabled></select>
-            <label for="dataset">Dataset</label>
-            <select id="dataset" name="dataset" data-default="2022" disabled>
-                <option value="fictional">Fictional French–Swiss example</option>
-            </select>
-            <button type="submit" disabled>Show data</button>
-        </form>
         <svg id="map"></svg>
-        <p id="fictional-note" hidden>The towns are real, but the commuter counts are fictional.</p>
-        <p id="census-note" hidden>
-            Only flows within the selected groups of communes are shown. Source:
-            <a id="census-source">INSEE home-to-work flows</a>
-            . Estimates are rounded to the nearest person. Counts below 200 are approximate. Successive census estimates can share survey years.
-        </p>
+        <p>The towns are real, but the commuter counts are fictional.</p>
         <script src="../../build/eurostatmap.js"></script>
-        <script src="commuting-census-data.js"></script>
         <script src="commuting-corridors.js"></script>
+        <script>
+            // Illustrative commuter counts. Town coordinates are real; the flows are synthetic.
+            const fictionalTowns = [
+                { id: 'DIJ', name: 'Dijon', country: 'FR', lon: 5.04, lat: 47.32, local: 36000 },
+                { id: 'BES', name: 'Besançon', country: 'FR', lon: 6.02, lat: 47.24, local: 24000 },
+                { id: 'PON', name: 'Pontarlier', country: 'FR', lon: 6.35, lat: 46.9, local: 5800 },
+                { id: 'LAU', name: 'Lausanne', country: 'CH', lon: 6.63, lat: 46.52, local: 41000 },
+                { id: 'NEU', name: 'Neuchâtel', country: 'CH', lon: 6.93, lat: 46.99, local: 19000 },
+                { id: 'BER', name: 'Bern', country: 'CH', lon: 7.45, lat: 46.95, local: 49000 },
+                { id: 'BAS', name: 'Basel', country: 'CH', lon: 7.59, lat: 47.56, local: 46000 },
+            ]
+            const fictionalCorridors = [
+                ['DIJ', 'BES', 3200, 1300],
+                ['BES', 'PON', 1700, 950],
+                ['BES', 'NEU', 2300, 420],
+                ['PON', 'LAU', 900, 170],
+                ['PON', 'NEU', 4700, 600],
+                ['LAU', 'NEU', 1200, 2100],
+                ['NEU', 'BER', 3500, 1500],
+                ['BER', 'BAS', 2400, 1100],
+            ]
+
+            const fictionalView = {
+                center: [6.48, 47.04],
+                z: 465,
+                countries: [
+                    ['FRANCE', 5.38, 46.8],
+                    ['SWITZERLAND', 7.46, 46.58],
+                ],
+                regions: [['BOURGOGNE-FRANCHE-COMTÉ', 5.68, 47.63]],
+            }
+            const fictionalLinks = [
+                ...fictionalCorridors.flatMap(([source, target, outward, returnFlow]) => [
+                    { source, target, value: outward },
+                    { source: target, target: source, value: returnFlow },
+                ]),
+                ...fictionalTowns.map(({ id, local }) => ({ source: id, target: id, value: local })),
+            ]
+            renderCommutingMap({
+                towns: fictionalTowns,
+                links: fictionalLinks,
+                view: fictionalView,
+                title: document.title,
+                subtitle: 'Fictional commuter counts in the French–Swiss border region',
+                maxFlowWidth: 11,
+            })
+        </script>
     </body>
 </html>
