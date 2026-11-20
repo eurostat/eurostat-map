@@ -45,35 +45,6 @@ button {
     stroke: #334155;
 }
 
-.region-label,
-.country-label {
-    font:
-        600 12px system-ui,
-        sans-serif;
-    letter-spacing: 0.08em;
-    fill: #52606b;
-    paint-order: stroke;
-    stroke: #fff;
-    stroke-width: 2px;
-    pointer-events: none;
-}
-
-.country-label {
-    font-size: 14px;
-    letter-spacing: 0.14em;
-}
-
 body.census #map .em-flow-color-legend {
     display: none;
-}
-
-.town-label {
-    font:
-        600 12px system-ui,
-        sans-serif;
-    fill: #253548;
-    paint-order: stroke;
-    stroke: #fff;
-    stroke-width: 3px;
-    pointer-events: none;
 }

@@ -14,6 +14,8 @@ export interface FlowNode {
     y?: number
     /** Value. */
     value?: number
+    /** Where this node's label sits relative to its circle, overriding `flowSettings({ nodeLabelPosition })`. */
+    labelPosition?: 'top' | 'bottom' | 'left' | 'right'
     [key: string]: any
 }
 
@@ -120,6 +122,10 @@ export interface FlowMapConfig extends MapConfig {
         nodeType?: 'circle' | 'donut'
         /** Size circles by total traffic or by self-loop traffic. Defaults to total. */
         nodeSizeBy?: 'total' | 'internal'
+        /** Label each circle node with its `name` (or id). Style with `.em-flow-node-label-text`. @default false */
+        nodeLabels?: boolean
+        /** Where node labels sit relative to their circle. A node can override it with `labelPosition`. @default 'top' */
+        nodeLabelPosition?: 'top' | 'bottom' | 'left' | 'right'
         labelOffsets?: { x?: number; y?: number }
         lineType?: 'curved' | 'straight' | 'sankey'
         nodeSizeScale?: (value: number) => number

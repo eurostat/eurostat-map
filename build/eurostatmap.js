@@ -829,6 +829,15 @@ ___CSS_LOADER_EXPORT___.push([module.id, `#em-labels {
     stroke-width: 3px;
 }
 
+/* name labels on flow node circles (flowSettings({ nodeLabels: true })); stroke is the halo (paint-order: stroke fill) */
+.em-flow-node-label-text {
+    font-size: 12px;
+    font-weight: 600;
+    fill: #253548;
+    stroke: white;
+    stroke-width: 3px;
+}
+
 .em-circle-stat-label,
 .em-circle-stat-label-halo,
 .em-circle-stat-label-shadow {
@@ -21692,6 +21701,112 @@ function getCornerCoords(position, bbox, map, padding, buttonReserve = 0) {
 
 /***/ },
 
+/***/ "./src/core/decoration/label-layout.js"
+/*!*********************************************!*\
+  !*** ./src/core/decoration/label-layout.js ***!
+  \*********************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   chooseVisibleLabels: () => (/* binding */ chooseVisibleLabels),
+/* harmony export */   flowNodeLabelPlacement: () => (/* binding */ flowNodeLabelPlacement),
+/* harmony export */   hideCollidingLabels: () => (/* binding */ hideCollidingLabels)
+/* harmony export */ });
+// Layout helpers for map labels: where a flow node label sits relative to its symbol, and which labels
+// to hide when they collide. Pure functions are kept separate from the DOM pass so they can be unit tested.
+
+/** Elements a label must not overlap: they are drawn on top of the map and always win. */
+const OBSTACLE_SELECTOR = '.em-legend, .em-title, .em-subtitle, .em-scalebar, .em-footnote'
+
+/**
+ * Where to put a flow node label relative to the node's symbol. The label sits on the symbol edge
+ * (`x`/`y`, in the node's coordinate system) and is pushed away from it by `dx`/`dy` in `em`. Labels are
+ * rescaled to a constant screen size on zoom while the symbol grows with the map, and `em` offsets follow
+ * the font size, so the gap stays the same on screen. Text is vertically centred (`dominant-baseline: central`).
+ * @param {'top'|'bottom'|'left'|'right'} [position='top']
+ * @param {number} [radius=0] radius of the node symbol
+ * @returns {{x: number, y: number, dx: string, dy: string, anchor: 'start'|'middle'|'end'}}
+ */
+function flowNodeLabelPlacement(position = 'top', radius = 0) {
+    const r = radius || 0
+    switch (position) {
+        case 'bottom':
+            return { x: 0, y: r, dx: '0', dy: '0.8em', anchor: 'middle' }
+        case 'left':
+            return { x: -r, y: 0, dx: '-0.4em', dy: '0', anchor: 'end' }
+        case 'right':
+            return { x: r, y: 0, dx: '0.4em', dy: '0', anchor: 'start' }
+        default:
+            return { x: 0, y: -r, dx: '0', dy: '-0.8em', anchor: 'middle' }
+    }
+}
+
+const hasArea = (box) => box && box.right > box.left && box.bottom > box.top
+
+const intersects = (a, b) => a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
+
+/**
+ * Decides which labels stay visible. Labels are taken in priority order: a label is hidden when it lies
+ * (partly) outside the frame, or overlaps an obstacle or a label that was already kept.
+ * @param {Array<{left:number,right:number,top:number,bottom:number}|null>} boxes label boxes, highest priority first
+ * @param {Array<{left:number,right:number,top:number,bottom:number}>} obstacles boxes that labels may not overlap
+ * @param {{left:number,right:number,top:number,bottom:number}} frame area the labels have to stay inside
+ * @param {number} [padding=2] extra clearance around each label
+ * @returns {boolean[]} true where the label stays visible
+ */
+function chooseVisibleLabels(boxes, obstacles, frame, padding = 2) {
+    const taken = obstacles.filter(hasArea)
+    return boxes.map((box) => {
+        // nothing to draw, so nothing to hide
+        if (!hasArea(box)) return true
+        const inside = box.left >= frame.left && box.right <= frame.right && box.top >= frame.top && box.bottom <= frame.bottom
+        if (!inside) return false
+        const padded = { left: box.left - padding, right: box.right + padding, top: box.top - padding, bottom: box.bottom + padding }
+        if (taken.some((other) => intersects(padded, other))) return false
+        taken.push(box)
+        return true
+    })
+}
+
+/**
+ * Hides the labels of a map that collide with each other, with the legend / title / subtitle / scale bar, or
+ * that fall outside the map. Enabled with `labels({ hideOverlapping: true })`. Flow node labels have priority
+ * over geographic labels (larger nodes first), then geographic labels keep their array order.
+ *
+ * It measures what is on screen, so it has to run after the zoom transform has been applied.
+ * @param {Object} map eurostat-map instance (or a layer of it)
+ */
+function hideCollidingLabels(map) {
+    if (!map.labels_?.hideOverlapping || !map.svg_) return
+    const svgNode = map.svg_.node()
+    const zoomGroup = svgNode?.querySelector('#em-zoom-group-' + map.svgId_)
+    if (!zoomGroup) return
+    const frame = svgNode.getBoundingClientRect()
+    if (!frame.width || !frame.height) return // not displayed
+
+    const labels = [...zoomGroup.querySelectorAll('#em-labels .em-flow-node-label'), ...zoomGroup.querySelectorAll('#em-labels .em-geographic-label')]
+    const haloById = new Map([...zoomGroup.querySelectorAll('.em-label-halos text')].map((halo) => [halo.id, halo]))
+    const obstacles = [...svgNode.querySelectorAll(OBSTACLE_SELECTOR)].map((element) => element.getBoundingClientRect())
+
+    const visible = chooseVisibleLabels(
+        labels.map((label) => label.getBoundingClientRect()),
+        obstacles,
+        frame
+    )
+    labels.forEach((label, i) => {
+        const visibility = visible[i] ? '' : 'hidden'
+        label.style.visibility = visibility
+        // geographic label halos are drawn in a separate group
+        const text = label.querySelector('text')
+        const halo = text && haloById.get(text.id.replace('em-label-', 'em-label-halo-'))
+        if (halo) halo.style.visibility = visibility
+    })
+}
+
+
+/***/ },
+
 /***/ "./src/core/decoration/labels.js"
 /*!***************************************!*\
   !*** ./src/core/decoration/labels.js ***!
@@ -21701,6 +21816,7 @@ function getCornerCoords(position, bbox, map, padding, buttonReserve = 0) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   DEFAULTLABELS: () => (/* binding */ DEFAULTLABELS),
+/* harmony export */   addFlowNodeLabels: () => (/* binding */ addFlowNodeLabels),
 /* harmony export */   addFlowValueLabels: () => (/* binding */ addFlowValueLabels),
 /* harmony export */   addLabelsToMap: () => (/* binding */ addLabelsToMap),
 /* harmony export */   appendLabelsToSymbols: () => (/* binding */ appendLabelsToSymbols),
@@ -21715,6 +21831,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_force__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! d3-force */ "./node_modules/d3-force/src/x.js");
 /* harmony import */ var d3_force__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! d3-force */ "./node_modules/d3-force/src/y.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils */ "./src/core/utils.js");
+/* harmony import */ var _label_layout__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./label-layout */ "./src/core/decoration/label-layout.js");
+
 
 
 
@@ -21859,6 +21977,8 @@ const addLabelsToMap = function (map, zg) {
         // Labels rebuilt while the map is zoomed must match the zoom scale straight away
         (0,_zoom__WEBPACK_IMPORTED_MODULE_1__.applyZoomToLabels)(map)
     }
+
+    (0,_label_layout__WEBPACK_IMPORTED_MODULE_7__.hideCollidingLabels)(map)
 }
 
 /**
@@ -22152,13 +22272,58 @@ function addFlowValueLabels(out, svg) {
 }
 
 /**
+ * Add a label to each circle node of a flow map, named after the node (`node.name`, else its id).
+ * Labels sit in `#em-labels`, so they get the same constant-screen-size zoom scaling as the other labels, and
+ * `labels({ hideOverlapping: true })` can hide the ones that collide. Bigger nodes come first, so they win.
+ * @param {Object} out flow layer
+ * @param {Map<string, {x: number, y: number, radius: number}>} stats screen position and radius of each drawn node
+ */
+function addFlowNodeLabels(out, stats) {
+    const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
+    let labelsContainer = zoomGroup.select('#em-labels')
+    if (labelsContainer.empty()) labelsContainer = zoomGroup.append('g').attr('id', 'em-labels').attr('class', 'em-labels')
+    const container = (0,_utils__WEBPACK_IMPORTED_MODULE_6__.ensureGroup)(labelsContainer, 'em-flow-node-labels')
+
+    const nodeById = out._nodeById || new Map()
+    const labelled = [...stats]
+        .filter(([, s]) => s.radius > 0)
+        .sort(([, a], [, b]) => b.radius - a.radius)
+        .map(([id, s]) => ({ id, s, text: nodeById.get(id)?.name || id, position: nodeById.get(id)?.labelPosition || out.flowNodeLabelPosition_ }))
+
+    const groups = container
+        .selectAll('g')
+        .data(labelled)
+        .join('g')
+        .attr('class', 'em-flow-node-label')
+        .attr('data-id', (d) => d.id)
+        .attr('transform', (d) => `translate(${d.s.x},${d.s.y})`)
+
+    groups.each(function (d) {
+        const place = (0,_label_layout__WEBPACK_IMPORTED_MODULE_7__.flowNodeLabelPlacement)(d.position, d.s.radius)
+        ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+            .append('text')
+            .attr('class', 'em-flow-node-label-text')
+            .attr('x', place.x)
+            .attr('y', place.y)
+            .attr('dx', place.dx) // in em, so it follows the font size when labels are rescaled on zoom
+            .attr('dy', place.dy)
+            .attr('text-anchor', place.anchor)
+            .text(d.text)
+    })
+
+    // Nodes drawn while the map is zoomed must match the zoom scale straight away
+    ;(0,_zoom__WEBPACK_IMPORTED_MODULE_1__.applyZoomToLabels)(out)
+    ;(0,_label_layout__WEBPACK_IMPORTED_MODULE_7__.hideCollidingLabels)(out)
+}
+
+/**
  * @function updateLabels
  * @description update existing map labels
  */
 const updateLabels = function (map) {
     if (map.svg_) {
-        // Clear previous labels
-        let prevLabels = map.svg_.selectAll('#em-labels > *')
+        // Clear previous labels (flow node labels belong to the flow layer, which redraws them)
+        let prevLabels = map.svg_.selectAll('#em-labels > *:not(.em-flow-node-labels)')
         if (prevLabels) prevLabels.remove()
 
         // Main map
@@ -32048,12 +32213,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var _tooltip_tooltip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../tooltip/tooltip */ "./src/tooltip/tooltip.js");
 /* harmony import */ var _decoration_spinner__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./decoration/spinner */ "./src/core/decoration/spinner.js");
-/* harmony import */ var _map_instance__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./map-instance */ "./src/core/map-instance.js");
-/* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
-/* harmony import */ var _export__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./export */ "./src/core/export.js");
-/* harmony import */ var _cartograms__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./cartograms */ "./src/core/cartograms.js");
-/* harmony import */ var _layer__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./layer */ "./src/core/layer.js");
-/* harmony import */ var _layer_registry__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layer-registry */ "./src/core/layer-registry.js");
+/* harmony import */ var _decoration_label_layout__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./decoration/label-layout */ "./src/core/decoration/label-layout.js");
+/* harmony import */ var _map_instance__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./map-instance */ "./src/core/map-instance.js");
+/* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var _export__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./export */ "./src/core/export.js");
+/* harmony import */ var _cartograms__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./cartograms */ "./src/core/cartograms.js");
+/* harmony import */ var _layer__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layer */ "./src/core/layer.js");
+/* harmony import */ var _layer_registry__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./layer-registry */ "./src/core/layer-registry.js");
+
 
 
 
@@ -32081,7 +32248,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 const createStatMap = function (config, withCenterPoints, mapType) {
     //build stat map from map template
-    const out = (0,_map_instance__WEBPACK_IMPORTED_MODULE_6__.createMapInstance)(config, withCenterPoints, mapType)
+    const out = (0,_map_instance__WEBPACK_IMPORTED_MODULE_7__.createMapInstance)(config, withCenterPoints, mapType)
 
     // build-completion latch
     out._geoDone_ = false
@@ -32092,6 +32259,8 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         if (out._finalized_) return
         if (!out._geoDone_ || !out._statDone_) return
         out._finalized_ = true
+        // the title, subtitle and legend are drawn after the labels, so only now can collisions with them be judged
+        ;(0,_decoration_label_layout__WEBPACK_IMPORTED_MODULE_6__.hideCollidingLabels)(out)
         if (out.onBuild()) out.onBuild()(out)
     }
 
@@ -32289,7 +32458,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
     // ── Layer 0 facade + thematic API ─────────────────────────────────────────────
     // The map is its own layer 0 until its type is migrated to a real Layer (Phase 3+).
     // makeMapSelfLayer installs the (relocated) encoding API onto the map.
-    ;(0,_layer__WEBPACK_IMPORTED_MODULE_10__.makeMapSelfLayer)(out)
+    ;(0,_layer__WEBPACK_IMPORTED_MODULE_11__.makeMapSelfLayer)(out)
 
     // ── Layer stack ───────────────────────────────────────────────────────────────
     out.layers_ = mapType ? [out] : [] // facade: the map is its own layer 0 if type specified, empty stack if not
@@ -32311,7 +32480,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
 
     out.addLayer = function (typeOrConfig, config) {
         const cfg = typeof typeOrConfig === 'string' ? { type: typeOrConfig, ...(config || {}) } : { ...typeOrConfig }
-        const role = cfg.role || (0,_layer_registry__WEBPACK_IMPORTED_MODULE_11__.getRole)(cfg.type)
+        const role = cfg.role || (0,_layer_registry__WEBPACK_IMPORTED_MODULE_12__.getRole)(cfg.type)
         const addingBase = role === 'base'
         const onlyFacade = out.layers_.length === 1 && out.layers_[0] === out
 
@@ -32325,7 +32494,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         }
 
         // Real Layer path is only available for REGISTERED types (Phase 3+).
-        if (!(0,_layer_registry__WEBPACK_IMPORTED_MODULE_11__.isLayerTypeRegistered)(cfg.type)) {
+        if (!(0,_layer_registry__WEBPACK_IMPORTED_MODULE_12__.isLayerTypeRegistered)(cfg.type)) {
             console.error(
                 `[eurostat-map] Layer type "${cfg.type}" is not yet available as a layer. ` +
                     `Use eurostatmap.map('${cfg.type}') for a standalone single-type map for now.`
@@ -32333,8 +32502,8 @@ const createStatMap = function (config, withCenterPoints, mapType) {
             return out.activeLayer()
         }
 
-        const layer = (0,_layer__WEBPACK_IMPORTED_MODULE_10__.createLayer)(out, cfg)
-        ;(0,_layer_registry__WEBPACK_IMPORTED_MODULE_11__.getLayerType)(cfg.type).decorate(layer, cfg)
+        const layer = (0,_layer__WEBPACK_IMPORTED_MODULE_11__.createLayer)(out, cfg)
+        ;(0,_layer_registry__WEBPACK_IMPORTED_MODULE_12__.getLayerType)(cfg.type).decorate(layer, cfg)
 
         if (addingBase) out.layers_.unshift(layer)
         else out.layers_.push(layer)
@@ -32894,7 +33063,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         let remaining = targets
         _geoTargetsPending = targets
 
-        ;(0,_map_instance__WEBPACK_IMPORTED_MODULE_6__.updateGeoMapTemplate)(() => {
+        ;(0,_map_instance__WEBPACK_IMPORTED_MODULE_7__.updateGeoMapTemplate)(() => {
             out._loadingGeoCount_ = Math.max(0, out._loadingGeoCount_ - 1)
             out.updateLoader()
 
@@ -32996,17 +33165,17 @@ const createStatMap = function (config, withCenterPoints, mapType) {
                 .select('#em-zoom-group-' + out.svgId_)
                 .selectAll('*')
                 .remove()
-            ;(0,_cartograms__WEBPACK_IMPORTED_MODULE_9__.buildGridCartogramBase)(out)
+            ;(0,_cartograms__WEBPACK_IMPORTED_MODULE_10__.buildGridCartogramBase)(out)
         }
 
         // filter out centroids without stat data
         if (withCenterPoints) {
             // insets
             if (out.insetTemplates_) {
-                (0,_utils__WEBPACK_IMPORTED_MODULE_0__.executeForAllInsets)(out.insetTemplates_, out.svgId_, _geo_centroids__WEBPACK_IMPORTED_MODULE_7__.refreshCentroids)
+                (0,_utils__WEBPACK_IMPORTED_MODULE_0__.executeForAllInsets)(out.insetTemplates_, out.svgId_, _geo_centroids__WEBPACK_IMPORTED_MODULE_8__.refreshCentroids)
             }
             //main map
-            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_7__.refreshCentroids)(out)
+            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_8__.refreshCentroids)(out)
         }
 
         out.updateAllLayers()
@@ -33102,11 +33271,11 @@ const createStatMap = function (config, withCenterPoints, mapType) {
     }
 
     out.exportMapToPNG = function (width, height, filename) {
-        return (0,_export__WEBPACK_IMPORTED_MODULE_8__.exportMapToPNG)(out, width, height, filename)
+        return (0,_export__WEBPACK_IMPORTED_MODULE_9__.exportMapToPNG)(out, width, height, filename)
     }
 
     out.exportMapToSVG = function (filename) {
-        return (0,_export__WEBPACK_IMPORTED_MODULE_8__.exportMapToSVG)(out, filename)
+        return (0,_export__WEBPACK_IMPORTED_MODULE_9__.exportMapToSVG)(out, filename)
     }
 
     return out
@@ -33133,7 +33302,7 @@ const getURLParameters = function () {
  * @returns {MapInstance}
  */
 const buildSingleLayerMap = function (type, config) {
-    const role = (0,_layer_registry__WEBPACK_IMPORTED_MODULE_11__.getRole)(type)
+    const role = (0,_layer_registry__WEBPACK_IMPORTED_MODULE_12__.getRole)(type)
     const withCenterPoints = role === 'overlay' || type === 'bar' || type === 'barComposition'
     const CANONICAL_MAP_TYPES = {
         choropleth: 'ch',
@@ -33308,11 +33477,11 @@ const buildSingleLayerMap = function (type, config) {
     typeFields = [...new Set(typeFields)]
     typeMethods = [...new Set(typeMethods)]
 
-    ;(0,_layer__WEBPACK_IMPORTED_MODULE_10__.forwardFieldsToActiveLayer)(out, [...baseFields, ...typeFields])
+    ;(0,_layer__WEBPACK_IMPORTED_MODULE_11__.forwardFieldsToActiveLayer)(out, [...baseFields, ...typeFields])
 
     const allMethods = [...baseMethods, ...typeMethods]
     for (const method of allMethods) {
-        ;(0,_layer__WEBPACK_IMPORTED_MODULE_10__.forwardChainableMethod)(out, method)
+        ;(0,_layer__WEBPACK_IMPORTED_MODULE_11__.forwardChainableMethod)(out, method)
     }
 
     return out
@@ -34381,6 +34550,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_zoom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-zoom */ "./node_modules/d3-zoom/src/index.js");
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var _layers_flow_sankey__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../layers/flow/sankey */ "./src/layers/flow/sankey.js");
+/* harmony import */ var _decoration_label_layout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./decoration/label-layout */ "./src/core/decoration/label-layout.js");
+
 
 
 
@@ -34479,10 +34650,12 @@ const defineGeographicZoom = function (map) {
                 if (map.lockPanUntilZoom_) panUnlocked = true
                 zoomHandler(e, previousT, map)
                 zoomGroup.attr('data-zoom', t.k).attr('transform', t)
+                ;(0,_decoration_label_layout__WEBPACK_IMPORTED_MODULE_3__.hideCollidingLabels)(map) // measures the screen, so it needs the new transform
                 previousT = t
             } else if (!map.lockPanUntilZoom_ || panUnlocked) {
                 panHandler(e, map)
                 zoomGroup.attr('transform', t)
+                ;(0,_decoration_label_layout__WEBPACK_IMPORTED_MODULE_3__.hideCollidingLabels)(map)
                 previousT = t
             } else {
                 snappingBack = true
@@ -42498,6 +42671,8 @@ const decorateFlowLayer = function (out, config) {
     out.flowBidirectional_ = true // Whether flows should be bidirectional (true) or unidirectional (false). If there are flows to and from 2 nodes and flowBidirectional is set to false, then these flows will be merged into one line.
     out.flowBidirectionalLayout_ = 'midpoint'
     out.flowNodeSizeBy_ = 'total'
+    out.flowNodeLabels_ = false // name each circle node (node.name, else its id)
+    out.flowNodeLabelPosition_ = 'top' // 'top' | 'bottom' | 'left' | 'right' of the node circle. A node can override it with node.labelPosition
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowEdgeBundling_ = false // whether to use edge bundling for curved flow lines
     out.flowCurvatureSettings_ = {
@@ -42627,6 +42802,8 @@ const decorateFlowLayer = function (out, config) {
             nodes: out.flowNodes_,
             nodeType: out.flowNodeType_,
             nodeSizeBy: out.flowNodeSizeBy_,
+            nodeLabels: out.flowNodeLabels_,
+            nodeLabelPosition: out.flowNodeLabelPosition_,
             labelOffsets: out.flowLabelOffsets_,
             lineType: out.flowLineType_,
             nodeSizeScale: out.flowNodeSizeScale_,
@@ -42662,6 +42839,8 @@ const decorateFlowLayer = function (out, config) {
         if (v.nodes !== undefined) out.flowNodes_ = v.nodes
         if (v.nodeType !== undefined) out.flowNodeType_ = v.nodeType
         if (v.nodeSizeBy !== undefined) out.flowNodeSizeBy_ = v.nodeSizeBy
+        if (v.nodeLabels !== undefined) out.flowNodeLabels_ = v.nodeLabels
+        if (v.nodeLabelPosition !== undefined) out.flowNodeLabelPosition_ = v.nodeLabelPosition
         if (v.labelOffsets !== undefined) out.flowLabelOffsets_ = v.labelOffsets
         if (v.lineType !== undefined) out.flowLineType_ = v.lineType
         if (v.nodeSizeScale !== undefined) out.flowNodeSizeScale_ = v.nodeSizeScale
@@ -42794,6 +42973,7 @@ const decorateFlowLayer = function (out, config) {
                 (0,_donuts__WEBPACK_IMPORTED_MODULE_11__.drawNodeDonuts)(out, flowContainer)
             } else {
                 (0,_circles__WEBPACK_IMPORTED_MODULE_12__.drawNodeCircles)(out, flowContainer, circleNodes)
+                if (out.flowNodeLabels_) (0,_core_decoration_labels__WEBPACK_IMPORTED_MODULE_15__.addFlowNodeLabels)(out, circleNodes)
             }
         }
 

@@ -1,6 +1,6 @@
 import { forceSimulation, forceManyBody, forceLink } from 'd3-force'
 import { curveBundle, line } from 'd3-shape'
-import { scaleLinear, scaleSqrt } from 'd3-scale'
+import { scaleLinear } from 'd3-scale'
 import { applyArrow } from './arrows.js'
 import { select } from 'd3-selection'
 import { getFlowStroke, computeColorKey, onFlowLineMouseOver, onFlowLineMouseOut } from './straight.js' // reuse your helpers
@@ -11,13 +11,12 @@ export function drawEdgeBundleLines(out, lineGroup) {
     const height = out.height_ || out.innerHeight_ || 800
     const hypotenuse = Math.sqrt(width * width + height * height)
 
-    const scales = {
-        segments: scaleLinear().domain([0, hypotenuse]).range([1, 10]),
-        nodes: out._nodeSizeScale || scaleSqrt().range([getResponsiveSymbolSize(4, 2), getResponsiveSymbolSize(18, 4)]),
-    }
+    const segmentScale = scaleLinear().domain([0, hypotenuse]).range([1, 10])
+    const bundleSettings = out.flowBundleSettings_
+    const distanceMax = bundleSettings.distanceMax ?? 2 * getResponsiveSymbolSize(18, 4)
 
     // Build the bundled network
-    const bundle = generateSegments(out.flowGraph_.nodes, out.flowGraph_.links, scales)
+    const bundle = generateSegments(out.flowGraph_.nodes, out.flowGraph_.links, segmentScale)
 
     // --- Style setup: compute stroke, width, and colors for each path ---
     const arrowIds = out.flowArrows_
@@ -91,14 +90,9 @@ export function drawEdgeBundleLines(out, lineGroup) {
 
     // --- Animate (edge bundling simulation) ---
     const layout = forceSimulation()
-        .alphaDecay(out.flowBundleSettings_.alphaDecay)
-        .force(
-            'charge',
-            forceManyBody()
-                .strength(out.flowBundleSettings_.chargeStrength)
-                .distanceMax(out.flowBundleSettings_.distanceMax ? out.flowBundleSettings_.distanceMax : scales.nodes.range()[1] * 2)
-        )
-        .force('link', forceLink().strength(out.flowBundleSettings_.linkStrength).distance(0).iterations(out.flowBundleSettings_.linkIterations))
+        .alphaDecay(bundleSettings.alphaDecay)
+        .force('charge', forceManyBody().strength(bundleSettings.chargeStrength).distanceMax(distanceMax))
+        .force('link', forceLink().strength(bundleSettings.linkStrength).distance(0).iterations(bundleSettings.linkIterations))
         .on('tick', () => paths.attr('d', lineFunction))
 
     layout.nodes(bundle.nodes)
@@ -106,7 +100,7 @@ export function drawEdgeBundleLines(out, lineGroup) {
 }
 
 // --- same segment generator as before ---
-function generateSegments(nodes, links, scales) {
+function generateSegments(nodes, links, segmentScale) {
     const bundle = { nodes: [], links: [], paths: [] }
 
     bundle.nodes = nodes.map((d) => {
@@ -117,7 +111,7 @@ function generateSegments(nodes, links, scales) {
 
     links.forEach((d) => {
         const len = distance(d.source, d.target)
-        const total = Math.round(scales.segments(len))
+        const total = Math.round(segmentScale(len))
         const xscale = scaleLinear()
             .domain([0, total + 1])
             .range([d.source.x, d.target.x])

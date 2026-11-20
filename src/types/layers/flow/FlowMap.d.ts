@@ -24,6 +24,8 @@ export interface FlowMap extends MapInstance {
         nodes: boolean
         nodeType: 'circle' | 'donut'
         nodeSizeBy: 'total' | 'internal'
+        nodeLabels: boolean
+        nodeLabelPosition: 'top' | 'bottom' | 'left' | 'right'
         labelOffsets: { x: number; y: number }
         lineType: 'curved' | 'straight' | 'sankey'
         nodeSizeScale: ((value: number) => number) | null
@@ -57,6 +59,8 @@ export interface FlowMap extends MapInstance {
         nodes?: boolean
         nodeType?: 'circle' | 'donut'
         nodeSizeBy?: 'total' | 'internal'
+        nodeLabels?: boolean
+        nodeLabelPosition?: 'top' | 'bottom' | 'left' | 'right'
         labelOffsets?: { x: number; y: number }
         lineType?: 'curved' | 'straight' | 'sankey'
         nodeSizeScale?: (value: number) => number

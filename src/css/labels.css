@@ -109,6 +109,15 @@
     stroke-width: 3px;
 }
 
+/* name labels on flow node circles (flowSettings({ nodeLabels: true })); stroke is the halo (paint-order: stroke fill) */
+.em-flow-node-label-text {
+    font-size: 12px;
+    font-weight: 600;
+    fill: #253548;
+    stroke: white;
+    stroke-width: 3px;
+}
+
 .em-circle-stat-label,
 .em-circle-stat-label-halo,
 .em-circle-stat-label-shadow {

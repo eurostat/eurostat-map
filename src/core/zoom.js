@@ -1,6 +1,7 @@
 import { zoom, zoomIdentity } from 'd3-zoom'
 import { select } from 'd3-selection'
 import { taperedPolygonForLink } from '../layers/flow/sankey'
+import { hideCollidingLabels } from './decoration/label-layout'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -96,10 +97,12 @@ export const defineGeographicZoom = function (map) {
                 if (map.lockPanUntilZoom_) panUnlocked = true
                 zoomHandler(e, previousT, map)
                 zoomGroup.attr('data-zoom', t.k).attr('transform', t)
+                hideCollidingLabels(map) // measures the screen, so it needs the new transform
                 previousT = t
             } else if (!map.lockPanUntilZoom_ || panUnlocked) {
                 panHandler(e, map)
                 zoomGroup.attr('transform', t)
+                hideCollidingLabels(map)
                 previousT = t
             } else {
                 snappingBack = true

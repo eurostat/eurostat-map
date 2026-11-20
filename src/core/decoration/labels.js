@@ -2,6 +2,7 @@ import { select } from 'd3-selection'
 import { applyZoomToLabels } from '../zoom'
 import { forceSimulation, forceX, forceY, forceCollide } from 'd3-force'
 import { spaceAsThousandSeparator, executeForAllInsets, ensureGroup, getTextColorForBackground, compactFormatter } from '../utils'
+import { flowNodeLabelPlacement, hideCollidingLabels } from './label-layout'
 
 // handles all map labels e.g. stat values, or labels specified in map.labels({labels:[text:'myLabel', x:123, y: 123]})
 
@@ -142,6 +143,8 @@ export const addLabelsToMap = function (map, zg) {
         // Labels rebuilt while the map is zoomed must match the zoom scale straight away
         applyZoomToLabels(map)
     }
+
+    hideCollidingLabels(map)
 }
 
 /**
@@ -435,13 +438,58 @@ export function addFlowValueLabels(out, svg) {
 }
 
 /**
+ * Add a label to each circle node of a flow map, named after the node (`node.name`, else its id).
+ * Labels sit in `#em-labels`, so they get the same constant-screen-size zoom scaling as the other labels, and
+ * `labels({ hideOverlapping: true })` can hide the ones that collide. Bigger nodes come first, so they win.
+ * @param {Object} out flow layer
+ * @param {Map<string, {x: number, y: number, radius: number}>} stats screen position and radius of each drawn node
+ */
+export function addFlowNodeLabels(out, stats) {
+    const zoomGroup = out.svg_.select('#em-zoom-group-' + out.svgId_)
+    let labelsContainer = zoomGroup.select('#em-labels')
+    if (labelsContainer.empty()) labelsContainer = zoomGroup.append('g').attr('id', 'em-labels').attr('class', 'em-labels')
+    const container = ensureGroup(labelsContainer, 'em-flow-node-labels')
+
+    const nodeById = out._nodeById || new Map()
+    const labelled = [...stats]
+        .filter(([, s]) => s.radius > 0)
+        .sort(([, a], [, b]) => b.radius - a.radius)
+        .map(([id, s]) => ({ id, s, text: nodeById.get(id)?.name || id, position: nodeById.get(id)?.labelPosition || out.flowNodeLabelPosition_ }))
+
+    const groups = container
+        .selectAll('g')
+        .data(labelled)
+        .join('g')
+        .attr('class', 'em-flow-node-label')
+        .attr('data-id', (d) => d.id)
+        .attr('transform', (d) => `translate(${d.s.x},${d.s.y})`)
+
+    groups.each(function (d) {
+        const place = flowNodeLabelPlacement(d.position, d.s.radius)
+        select(this)
+            .append('text')
+            .attr('class', 'em-flow-node-label-text')
+            .attr('x', place.x)
+            .attr('y', place.y)
+            .attr('dx', place.dx) // in em, so it follows the font size when labels are rescaled on zoom
+            .attr('dy', place.dy)
+            .attr('text-anchor', place.anchor)
+            .text(d.text)
+    })
+
+    // Nodes drawn while the map is zoomed must match the zoom scale straight away
+    applyZoomToLabels(out)
+    hideCollidingLabels(out)
+}
+
+/**
  * @function updateLabels
  * @description update existing map labels
  */
 export const updateLabels = function (map) {
     if (map.svg_) {
-        // Clear previous labels
-        let prevLabels = map.svg_.selectAll('#em-labels > *')
+        // Clear previous labels (flow node labels belong to the flow layer, which redraws them)
+        let prevLabels = map.svg_.selectAll('#em-labels > *:not(.em-flow-node-labels)')
         if (prevLabels) prevLabels.remove()
 
         // Main map

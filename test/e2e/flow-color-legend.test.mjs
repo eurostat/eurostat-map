@@ -6,6 +6,58 @@ import { chromium } from 'playwright'
 const bundle = new URL('../../build/eurostatmap.js', import.meta.url)
 const world = new URL('../../src/assets/topojson/WORLD_4326.json', import.meta.url)
 
+test('bundled routes and proportional circles render together with the default charge distance', async () => {
+    const browser = await chromium.launch()
+    try {
+        const page = await browser.newPage({ viewport: { width: 1200, height: 900 } })
+        const errors = []
+        page.on('pageerror', (error) => errors.push(error.message))
+        await page.route('**/WORLD_4326.json', (route) => route.fulfill({ path: fileURLToPath(world) }))
+        await page.setContent('<svg id="map"></svg>')
+        await page.addScriptTag({ path: fileURLToPath(bundle) })
+        await page.evaluate(() => {
+            new MutationObserver((records) => {
+                if (records.some(({ target, oldValue }) => oldValue && target.matches('path.em-flow-link'))) window.bundleTicked = true
+            }).observe(document.getElementById('map'), {
+                subtree: true,
+                attributes: true,
+                attributeOldValue: true,
+                attributeFilter: ['d'],
+            })
+            eurostatmap
+                .map('flow')
+                .geo('WORLD')
+                .proj('4326')
+                .worldTopojsonURL('https://map.test/WORLD_4326.json')
+                .width(800)
+                .height(500)
+                .insets(false)
+                .flowGraph({
+                    nodes: [
+                        { id: 'FR', x: 2, y: 45 },
+                        { id: 'DE', x: 10, y: 52 },
+                        { id: 'ES', x: -4, y: 40 },
+                    ],
+                    links: [
+                        { source: 'FR', target: 'DE', value: 400 },
+                        { source: 'ES', target: 'DE', value: 100 },
+                    ],
+                })
+                .flowSettings({ lineType: 'straight', bidirectional: false, edgeBundling: true, nodes: true, nodeType: 'circle' })
+                .build()
+        })
+        const paths = page.locator('path.em-flow-link')
+        const circles = page.locator('.em-node-circle')
+        await circles.last().waitFor()
+        assert.equal(await circles.count(), 3)
+        assert.equal(await paths.count(), 2)
+        await page.waitForFunction(() => window.bundleTicked === true)
+        assert.deepEqual(errors, [])
+    } finally {
+        await browser.close()
+    }
+})
+
 test('flow colour legend highlights the matching routes on its own map', async () => {
     const browser = await chromium.launch()
     try {

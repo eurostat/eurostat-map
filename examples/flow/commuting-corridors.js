@@ -7,9 +7,15 @@ function renderCommutingMap({ towns, links, view, title, subtitle, overview = fa
         .nutsLevel(overview ? 2 : 3)
         .insets(false)
         .scale('03M')
-    const nodes = towns.map(({ id, name, country = 'FR', lon, lat }) => {
+
+    // Town, country and region positions are given as lon/lat; the map works in its own CRS.
+    const nodes = towns.map(({ id, name, country = 'FR', lon, lat, labelPosition }) => {
         const [x, y] = eurostatmap.projectToMap(map, lon, lat)
-        return { id, name, country, x, y }
+        return { id, name, country, x, y, labelPosition }
+    })
+    const placeLabels = [...(view?.countries || []), ...(view?.regions || [])].map(([text, lon, lat]) => {
+        const [x, y] = eurostatmap.projectToMap(map, lon, lat)
+        return { text, x, y, class: 'countries' }
     })
 
     const domestic = '#256982'
@@ -20,8 +26,7 @@ function renderCommutingMap({ towns, links, view, title, subtitle, overview = fa
     const nodeSizeScale = (value) => (overview ? 2.3 : 15) * Math.sqrt(value / largestLocalFlow)
     nodeSizeScale.domain = () => [0, largestLocalFlow]
     const counts = new Intl.NumberFormat('en')
-    const countries = view?.countries || []
-    const regions = view?.regions || []
+
     const eastings = nodes.map(({ x }) => x)
     const northings = nodes.map(({ y }) => y)
     const [minX, maxX] = [Math.min(...eastings), Math.max(...eastings)]
@@ -29,36 +34,6 @@ function renderCommutingMap({ towns, links, view, title, subtitle, overview = fa
     const [x, y] = view ? eurostatmap.projectToMap(map, ...view.center) : [(minX + maxX) / 2, (minY + maxY) / 2]
     const z = view?.z || Math.max((maxX - minX) / 475, (maxY - minY) / 330)
 
-    // The labels live inside the zoom group, so they would grow with the map. Divide their font size by the zoom
-    // factor to keep them at a constant size on screen (the library already rescales their halo stroke width).
-    function keepLabelsConstantSize() {
-        const k = map.__lastTransform?.k || 1
-        map.svg()
-            .selectAll('.town-label, .country-label, .region-label')
-            .each(function () {
-                if (!this.dataset.fs) this.dataset.fs = parseFloat(window.getComputedStyle(this).fontSize)
-                this.style.fontSize = `${this.dataset.fs / k}px`
-            })
-    }
-
-    function avoidLabelCollisions() {
-        keepLabelsConstantSize()
-        const svg = map.svg().node()
-        const frame = svg.getBoundingClientRect()
-        const occupied = [...svg.querySelectorAll('.em-legend, [id^="title"], [id^="subtitle"]')]
-            .map((element) => element.getBoundingClientRect())
-            .filter(({ width, height }) => width && height)
-        const labels = [...svg.querySelectorAll('.town-label'), ...svg.querySelectorAll('.country-label'), ...svg.querySelectorAll('.region-label')]
-        for (const label of labels) {
-            const box = label.getBoundingClientRect()
-            const outside = box.left < frame.left || box.right > frame.right || box.top < frame.top || box.bottom > frame.bottom
-            const overlaps = occupied.some(
-                (other) => box.left < other.right && box.right > other.left && box.top < other.bottom && box.bottom > other.top
-            )
-            label.style.visibility = outside || overlaps ? 'hidden' : 'visible'
-            if (!outside && !overlaps) occupied.push(box)
-        }
-    }
     map.title(title)
         .subtitle(subtitle)
         .position({ x, y, z })
@@ -76,7 +51,9 @@ function renderCommutingMap({ towns, links, view, title, subtitle, overview = fa
             nodeType: 'circle',
             nodeSizeBy: 'internal',
             nodeSizeScale,
+            nodeLabels: true,
         })
+        .labels({ labels: placeLabels, halos: true, hideOverlapping: true })
         .legend({
             position: 'top right',
             flowWidthLegend: {
@@ -97,41 +74,6 @@ function renderCommutingMap({ towns, links, view, title, subtitle, overview = fa
                     { label: 'Cross-border', color: crossBorder },
                 ],
             },
-        })
-        .onZoom(avoidLabelCollisions)
-        .onBuild((map) => {
-            const geographicLabels = map.svg().select('#em-zoom-group-map').append('g')
-            for (const [places, className] of [
-                [countries, 'country-label'],
-                [regions, 'region-label'],
-            ]) {
-                geographicLabels
-                    .selectAll(`.${className}`)
-                    .data(places)
-                    .join('text')
-                    .attr('class', className)
-                    .attr('text-anchor', 'middle')
-                    .attr('transform', ([, lon, lat]) => `translate(${map._projection(eurostatmap.projectToMap(map, lon, lat))})`)
-                    .text(([name]) => name)
-            }
-
-            const townById = new Map(towns.map((town) => [town.id, town]))
-            map.svg()
-                .selectAll('.em-node-circle-group')
-                .each(function () {
-                    const { name, label } = townById.get(this.getAttribute('data-id'))
-                    const radius = Number(this.querySelector('circle').getAttribute('r'))
-                    const x = label === 'left' ? -radius - 5 : 0
-                    const y = label === 'below' ? radius + 14 : label === 'left' ? 4 : -radius - 5
-                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
-                    text.setAttribute('class', 'town-label')
-                    text.setAttribute('text-anchor', label === 'left' ? 'end' : 'middle')
-                    text.setAttribute('x', x)
-                    text.setAttribute('y', y)
-                    text.textContent = name
-                    this.append(text)
-                })
-            avoidLabelCollisions()
         })
 
     map.statData().unitText('commuters')

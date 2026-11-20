@@ -53,8 +53,8 @@ const source = document.querySelector('#census-source')
 source.href = `https://www.insee.fr/fr/statistiques/${commutingCensusSources[dataset]}`
 source.textContent = `INSEE ${dataset} census, home-to-work flows`
 
-const townLabelPositions = { 39198: 'below', 70285: 'left', 25388: 'below' }
-const towns = areas.flatMap(({ places }) => places.map(([id, name, lon, lat]) => ({ id, name, lon, lat, label: townLabelPositions[id] })))
+const townLabelPositions = { 39198: 'bottom', 70285: 'left', 25388: 'bottom' }
+const towns = areas.flatMap(({ places }) => places.map(([id, name, lon, lat]) => ({ id, name, lon, lat, labelPosition: townLabelPositions[id] })))
 const links = areas
     .flatMap(({ places, flows }) =>
         flows[dataset].flatMap((row, i) => row.map((value, j) => ({ source: places[i][0], target: places[j][0], value })))

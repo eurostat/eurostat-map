@@ -15,7 +15,7 @@ import { drawNodeDonuts } from './donuts'
 import { drawNodeCircles, prepareCircleNodes } from './circles'
 import { buildBidirectionalRouteMap } from './flow-bidirectional'
 import { scaleOrdinal } from 'd3-scale'
-import { addFlowValueLabels } from '../../core/decoration/labels'
+import { addFlowValueLabels, addFlowNodeLabels } from '../../core/decoration/labels'
 import { getResponsiveSymbolSize } from '../../core/responsive'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
@@ -43,6 +43,8 @@ export const decorateFlowLayer = function (out, config) {
     out.flowBidirectional_ = true // Whether flows should be bidirectional (true) or unidirectional (false). If there are flows to and from 2 nodes and flowBidirectional is set to false, then these flows will be merged into one line.
     out.flowBidirectionalLayout_ = 'midpoint'
     out.flowNodeSizeBy_ = 'total'
+    out.flowNodeLabels_ = false // name each circle node (node.name, else its id)
+    out.flowNodeLabelPosition_ = 'top' // 'top' | 'bottom' | 'left' | 'right' of the node circle. A node can override it with node.labelPosition
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowEdgeBundling_ = false // whether to use edge bundling for curved flow lines
     out.flowCurvatureSettings_ = {
@@ -107,7 +109,7 @@ export const decorateFlowLayer = function (out, config) {
     out.flowBundleSettings_ = {
         alphaDecay: 0.1,
         chargeStrength: 10,
-        distanceMax: null, // if null, will default to twice the max dimension of the map
+        distanceMax: null, // defaults to a zoom-independent, responsive distance
         linkStrength: 0.7,
         linkIterations: 1,
     }
@@ -172,6 +174,8 @@ export const decorateFlowLayer = function (out, config) {
             nodes: out.flowNodes_,
             nodeType: out.flowNodeType_,
             nodeSizeBy: out.flowNodeSizeBy_,
+            nodeLabels: out.flowNodeLabels_,
+            nodeLabelPosition: out.flowNodeLabelPosition_,
             labelOffsets: out.flowLabelOffsets_,
             lineType: out.flowLineType_,
             nodeSizeScale: out.flowNodeSizeScale_,
@@ -207,6 +211,8 @@ export const decorateFlowLayer = function (out, config) {
         if (v.nodes !== undefined) out.flowNodes_ = v.nodes
         if (v.nodeType !== undefined) out.flowNodeType_ = v.nodeType
         if (v.nodeSizeBy !== undefined) out.flowNodeSizeBy_ = v.nodeSizeBy
+        if (v.nodeLabels !== undefined) out.flowNodeLabels_ = v.nodeLabels
+        if (v.nodeLabelPosition !== undefined) out.flowNodeLabelPosition_ = v.nodeLabelPosition
         if (v.labelOffsets !== undefined) out.flowLabelOffsets_ = v.labelOffsets
         if (v.lineType !== undefined) out.flowLineType_ = v.lineType
         if (v.nodeSizeScale !== undefined) out.flowNodeSizeScale_ = v.nodeSizeScale
@@ -333,12 +339,16 @@ export const decorateFlowLayer = function (out, config) {
             createFlowMap(out, flowContainer, circleNodes)
         }
 
+        // node labels from a previous draw go away if nodeLabels was switched off
+        if (!out.flowNodeLabels_) out.svg().selectAll('.em-flow-node-labels').remove()
+
         // draw nodes
         if (out.flowNodes_) {
             if (out.flowNodeType_ === 'donut') {
                 drawNodeDonuts(out, flowContainer)
             } else {
                 drawNodeCircles(out, flowContainer, circleNodes)
+                if (out.flowNodeLabels_) addFlowNodeLabels(out, circleNodes)
             }
         }
 

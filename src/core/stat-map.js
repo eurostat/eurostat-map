@@ -4,6 +4,7 @@ import * as Legend from '../legend/legend'
 import { select } from 'd3-selection'
 import * as tp from '../tooltip/tooltip'
 import { hideSpinner, showSpinner } from './decoration/spinner'
+import { hideCollidingLabels } from './decoration/label-layout'
 import { createMapInstance, updateGeoMapTemplate } from './map-instance'
 import { refreshCentroids } from './geo/centroids'
 import { exportMapToPNG, exportMapToSVG } from './export'
@@ -36,6 +37,8 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         if (out._finalized_) return
         if (!out._geoDone_ || !out._statDone_) return
         out._finalized_ = true
+        // the title, subtitle and legend are drawn after the labels, so only now can collisions with them be judged
+        hideCollidingLabels(out)
         if (out.onBuild()) out.onBuild()(out)
     }
 
