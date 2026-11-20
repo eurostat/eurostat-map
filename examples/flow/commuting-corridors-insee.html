@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Commuting between Dijon, Dole and Besançon</title>
+        <style>
+            .em-node-circles .em-node-circle {
+                fill: #f8fafc;
+                stroke: #334155;
+            }
+
+            .commune-label {
+                font:
+                    600 14px system-ui,
+                    sans-serif;
+                fill: #253548;
+                paint-order: stroke;
+                stroke: #fff;
+                stroke-width: 3px;
+                pointer-events: none;
+            }
+
+            .em-flow-color-legend {
+                display: none;
+            }
+
+            .source {
+                font:
+                    0.875rem system-ui,
+                    sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <p class="source">
+            Source:
+            <a href="https://www.insee.fr/fr/statistiques/8582949">INSEE, 2022 population census, home-to-work flows</a>
+            . Estimates are rounded to the nearest person. INSEE treats flows below 200 as approximate.
+        </p>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // INSEE 2022 CSV, NBFLUX_C22_ACTOCC15P. Node IDs are INSEE commune codes.
+            // Same-commune residence/workplace rows supply the circle sizes.
+            const communes = [
+                { id: '21231', name: 'Dijon', lon: 5.04, lat: 47.32, local: 48880 },
+                { id: '39198', name: 'Dole', lon: 5.49, lat: 47.09, local: 5485 },
+                { id: '25056', name: 'Besançon', lon: 6.02, lat: 47.24, local: 36825 },
+            ]
+            // Residence, workplace, and a count for each direction.
+            const corridors = [
+                ['21231', '39198', 180, 340],
+                ['21231', '25056', 242, 215],
+                ['25056', '39198', 268, 325],
+            ]
+
+            const map = eurostatmap.map('flow').width(795).height(540).responsive(true).nutsLevel(3).insets(false).scale('03M')
+            const [x, y] = eurostatmap.projectToMap(map, 5.54, 47.25)
+            const nodes = communes.map(({ id, name, lon, lat }) => {
+                const [x, y] = eurostatmap.projectToMap(map, lon, lat)
+                return { id, name, x, y }
+            })
+            const links = corridors.flatMap(([a, b, forward, reverse]) => [
+                { source: a, target: b, value: forward },
+                { source: b, target: a, value: reverse },
+            ])
+            for (const { id, local } of communes) links.push({ source: id, target: id, value: local })
+
+            const communeNames = new Map(communes.map(({ id, name }) => [id, name]))
+            const counts = new Intl.NumberFormat('en')
+            const flowValues = [100, 200, 340]
+
+            map.title('Commuting between Dijon, Dole and Besançon')
+                .subtitle('From commune of residence to commune of work, 2022')
+                .position({ x, y, z: 155 })
+                .drawCoastalMargin(false)
+                .flowGraph({ nodes, links })
+                .flowSettings({
+                    lineType: 'straight',
+                    bidirectionalLayout: 'parallel',
+                    arrows: true,
+                    color: '#256982',
+                    opacity: 1,
+                    maxWidth: 8,
+                    nodes: true,
+                    nodeType: 'circle',
+                    nodeSizeBy: 'internal',
+                })
+                .legend({
+                    position: 'top right',
+                    flowWidthLegend: {
+                        title: 'Between communes',
+                        titlePadding: 38,
+                        values: flowValues,
+                        labels: flowValues.map((n) => counts.format(n)),
+                    },
+                    nodeSizeLegend: { title: 'Within each commune', values: [48880, 10000] },
+                })
+                .onBuild((map) => {
+                    map.svg()
+                        .selectAll('.em-node-circle-group')
+                        .append('text')
+                        .attr('class', 'commune-label')
+                        .attr('text-anchor', 'middle')
+                        .attr('y', function () {
+                            return -Number(this.parentNode.querySelector('circle').getAttribute('r')) - 5
+                        })
+                        .text(function () {
+                            return communeNames.get(this.parentNode.getAttribute('data-id'))
+                        })
+                })
+
+            map.statData().unitText('people')
+            map.build()
+        </script>
+    </body>
+</html>

@@ -24,6 +24,10 @@
     </head>
     <body>
         <svg id="map"></svg>
+        <p>
+            The towns are real, but the commuter counts are fictional.
+            <a href="commuting-corridors-insee.html">See the example using INSEE census data</a>.
+        </p>
         <script src="../../build/eurostatmap.js"></script>
         <script>
             // Illustrative commuter counts. Town coordinates are real; the flows are synthetic.
@@ -66,7 +70,7 @@
             const crossBorder = '#a14927'
 
             map.title('Two-way commuting corridors')
-                .subtitle('Illustrative commuter counts in the French–Swiss border region')
+                .subtitle('Fictional commuter counts in the French–Swiss border region')
                 .position({ x, y, z: 465 })
                 .drawCoastalMargin(false)
                 .flowGraph({ nodes, links })
