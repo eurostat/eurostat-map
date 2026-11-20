@@ -127,6 +127,8 @@ the regions that end up with a classified/sized value from whatever data was jus
 - Flow rendering writes projected coordinates into graph nodes. On redraw, project from the original
   coordinates rather than reprojecting the previous screen positions. In parallel layouts, use the
   same rendered circle radii for connector clearance and for the node symbols.
+- A custom flow `nodeSizeScale` used with a size legend needs a `domain()` method, including when
+  the example supplies explicit legend values.
 - `stat()` and `statData()` remain map-owned to avoid map-to-layer forwarding recursion. A layer
   that needs to expand a special one-object stat config (spark's `dates`, for example) must expose
   an own `handleStatConfig` hook; do not override `layer.stat()` and expect the public map facade
