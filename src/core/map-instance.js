@@ -57,7 +57,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.width_ = Math.min(795, window.innerWidth)
     out.height_ = 0
     out.containerId_ = undefined
-    out.responsive_ = false
+    out.responsive_ = true
 
     //geographical focus
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'

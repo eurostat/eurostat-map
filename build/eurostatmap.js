@@ -2071,8 +2071,9 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* wrapper DOM */
 }
 
 .em-map-wrapper--responsive {
-    display: block;
-    width: 100%;
+    display: inline-block;
+    width: fit-content;
+    max-width: 100%;
 }
 
 .em-map-wrapper--responsive > svg.em-map {
@@ -30166,7 +30167,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     out.width_ = Math.min(795, window.innerWidth)
     out.height_ = 0
     out.containerId_ = undefined
-    out.responsive_ = false
+    out.responsive_ = true
 
     //geographical focus
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'

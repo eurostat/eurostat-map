@@ -22,7 +22,6 @@ const choroplethConfig: ChoroplethConfig = {
     title: 'Population Density Test',
     width: 800,
     height: 600,
-    responsive: true,
     nutsLevel: 2,
     stat: {
         eurostatDatasetCode: 'demo_r_d3dens',
@@ -41,7 +40,7 @@ const map1 = eurostatmap.map('choropleth', choroplethConfig)
 const typedMap1: MapInstance = map1
 
 // Test builder pattern methods
-map1.width(900).height(700).responsive(true).scale('20M').nutsLevel(3).title('Updated Title').build()
+map1.width(900).height(700).scale('20M').nutsLevel(3).title('Updated Title').build()
 const responsiveEnabled: boolean = typedMap1.responsive()
 typedMap1.responsive(false).width(800)
 const responsiveConfig: MapConfig = { responsive: false }

@@ -18,8 +18,9 @@
 }
 
 .em-map-wrapper--responsive {
-    display: block;
-    width: 100%;
+    display: inline-block;
+    width: fit-content;
+    max-width: 100%;
 }
 
 .em-map-wrapper--responsive > svg.em-map {

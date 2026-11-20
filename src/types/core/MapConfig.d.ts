@@ -72,10 +72,10 @@ export interface MapConfig {
     height?: number
 
     /**
-     * Scale a standalone root SVG to its container width, preserving its aspect ratio and
-     * original coordinate viewBox without reprojecting. Width and height remain logical
-     * internal dimensions. Nested SVG or group maps, such as IMAGE, are not altered.
-     * @default false
+     * Scale a standalone root SVG down to its container width, preserving its aspect ratio and
+     * original coordinate viewBox without reprojecting. It never grows beyond its configured
+     * dimensions. Nested SVG or group maps, such as IMAGE, are not altered.
+     * @default true
      */
     responsive?: boolean
 

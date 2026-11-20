@@ -72,6 +72,8 @@ test('responsive maps scale their display without changing their layout or expor
         assert.deepEqual(await exportFile('svg'), svgBefore)
         assert.deepEqual(await exportFile('png'), pngBefore)
 
+        await page.locator('#host').evaluate((host) => { host.style.width = '1200px' })
+        assert.equal((await dimensions()).renderedWidth, 800)
         await swatch.hover()
         assert.equal(await svg.locator('.em-flow-link.highlighted').count(), 1)
         await page.locator('#host').evaluate((host) => { host.style.width = '300px' })
@@ -112,7 +114,7 @@ test('responsive sizing leaves nested IMAGE-style SVG maps and existing viewBoxe
     }
 })
 
-test('a map created in a narrow viewport grows when the viewport widens', async () => {
+test('a responsive map scales down to fit but does not grow beyond its configured size', async () => {
     const browser = await chromium.launch()
     try {
         const page = await browser.newPage({ viewport: { width: 600, height: 900 } })
@@ -120,10 +122,10 @@ test('a map created in a narrow viewport grows when the viewport widens', async 
         await page.addScriptTag({ path: bundle })
         await page.evaluate(() => {
             const map = eurostatmap.map('choropleth', {
-                responsive: true,
                 insetsVisibilityBreakpoint: 0,
                 insets: [{ geo: 'WORLD', proj: '4326', svgId: 'test-inset', width: 100, height: 80 }],
             })
+            if (!map.responsive()) throw new Error('responsive sizing should be enabled by default')
             map.buildMapTemplateBase()
         })
         const svg = page.locator('#map')
@@ -133,12 +135,22 @@ test('a map created in a narrow viewport grows when the viewport widens', async 
         assert.ok(insetWidth > 100)
         assert.equal(await svg.getAttribute('width'), '600')
         await page.setViewportSize({ width: 1100, height: 900 })
-        assert.equal((await svg.boundingBox()).width, 1100)
-        assert.ok(Math.abs((await inset.boundingBox()).width / insetWidth - 1100 / 600) < 0.001)
+        assert.equal((await svg.boundingBox()).width, 600)
+        assert.ok(Math.abs((await inset.boundingBox()).width / insetWidth - 1) < 0.001)
         assert.equal(await inset.getAttribute('width'), '100')
         assert.equal(await svg.getAttribute('width'), '600')
         await page.setViewportSize({ width: 350, height: 900 })
         assert.equal((await svg.boundingBox()).width, 350)
+        await page.setViewportSize({ width: 1100, height: 900 })
+        assert.equal((await svg.boundingBox()).width, 600)
+
+        const fixed = await page.evaluate(() => {
+            const map = eurostatmap.map('choropleth', { svgId: 'fixed', width: 800, height: 500, responsive: false, insets: false })
+            map.buildMapTemplateBase()
+            const svg = document.querySelector('#fixed')
+            return { responsive: map.responsive(), wrapperClass: svg.parentElement.className, renderedWidth: svg.getBoundingClientRect().width }
+        })
+        assert.deepEqual(fixed, { responsive: false, wrapperClass: 'em-map-wrapper', renderedWidth: 800 })
     } finally {
         await browser.close()
     }

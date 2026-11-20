@@ -13,8 +13,7 @@ or dimensions.
    both growing and shrinking.
 2. Prefer display-only scaling that preserves the SVG's internal coordinates,
    aspect ratio and existing map layout. Avoid rebuilding the map or
-   recalculating the projection, legends and insets on resize. If existing
-   library consumers could be affected, make the behavior opt-in.
+   recalculating the projection, legends and insets on resize.
 3. If the issue is specific to IMAGE's preview container, fix it there rather
    than changing the library. Keep preview sizing separate from the exported
    SVG; if necessary, remove preview-only styles from export clones.
@@ -44,10 +43,21 @@ or dimensions.
   styles, while PNG export derives its output size from the template viewBox.
   Any library behavior must avoid changing nested IMAGE map coordinates or
   leaking preview-only sizing into the exported document.
-- Implemented opt-in `responsive: true` / `.responsive(true)` for standalone
-  root SVG maps. The wrapper supplies display-only sizing; logical dimensions
-  remain fixed, and a generated viewBox tracks the final header/footer layout.
-  Existing viewBoxes are preserved. Nested SVG/group maps are not changed.
+- Implemented `responsive: true` / `.responsive(true)` by default for
+  standalone root SVG maps. Set it to false to opt out. The wrapper supplies
+  display-only sizing; maps shrink to fit their container but are not enlarged
+  beyond their configured width. Logical dimensions remain fixed, and a
+  generated viewBox tracks the final header/footer layout. Existing viewBoxes
+  are preserved. Nested SVG/group maps, including IMAGE's, are not changed and
+  do not need an explicit opt-out.
+- The immigration example explicitly enables responsive mode and exposed that
+  filling every wide parent made its 795px map grow after a redraw. The
+  responsive wrapper now uses its intrinsic map width up to the available
+  container width, so it only shrinks when needed and remains at its configured
+  size on wider screens.
+- On the published example viewer at a 1600px viewport, changing the
+  destination from Germany to the Netherlands kept the 795px SVG at 795px
+  before and after navigation with the updated wrapper sizing.
 - A Chromium regression test covers the original viewport-growth scenario,
   container growth and shrinkage, legend interaction, toggle behavior, a
   header, inset scaling, and unchanged SVG/PNG downloads at different
