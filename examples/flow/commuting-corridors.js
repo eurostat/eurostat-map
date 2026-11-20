@@ -29,7 +29,20 @@ function renderCommutingMap({ towns, links, view, title, subtitle, overview = fa
     const [x, y] = view ? eurostatmap.projectToMap(map, ...view.center) : [(minX + maxX) / 2, (minY + maxY) / 2]
     const z = view?.z || Math.max((maxX - minX) / 475, (maxY - minY) / 330)
 
+    // The labels live inside the zoom group, so they would grow with the map. Divide their font size by the zoom
+    // factor to keep them at a constant size on screen (the library already rescales their halo stroke width).
+    function keepLabelsConstantSize() {
+        const k = map.__lastTransform?.k || 1
+        map.svg()
+            .selectAll('.town-label, .country-label, .region-label')
+            .each(function () {
+                if (!this.dataset.fs) this.dataset.fs = parseFloat(window.getComputedStyle(this).fontSize)
+                this.style.fontSize = `${this.dataset.fs / k}px`
+            })
+    }
+
     function avoidLabelCollisions() {
+        keepLabelsConstantSize()
         const svg = map.svg().node()
         const frame = svg.getBoundingClientRect()
         const occupied = [...svg.querySelectorAll('.em-legend, [id^="title"], [id^="subtitle"]')]
