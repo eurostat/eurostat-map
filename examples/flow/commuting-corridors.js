@@ -19,101 +19,30 @@ const fictionalCorridors = [
     ['BER', 'BAS', 2400, 1100],
 ]
 
-const censusSources = { 2019: '6454112', 2020: '7630376', 2021: '8201899', 2022: '8582949' }
-
-// INSEE NBFLUX_Cxx_ACTOCC15P. Each matrix uses the listed commune order for
-// residence (rows) and workplace (columns). Diagonal counts size the circles.
-const censusAreas = {
-    dijon: {
-        name: 'Dijon, Dole and Besançon',
-        communes: [
-            { id: '21231', name: 'Dijon', lon: 5.04, lat: 47.32 },
-            { id: '39198', name: 'Dole', lon: 5.49, lat: 47.09, label: 'below' },
-            { id: '25056', name: 'Besançon', lon: 6.02, lat: 47.24 },
-        ],
-        center: [5.55, 47.23],
-        zoom: 158,
-        countries: [['FRANCE', 5.54, 47.56]],
-        regions: [
-            ['CÔTE-D’OR', 5.05, 47.48],
-            ['JURA', 5.66, 47.0],
-            ['DOUBS', 6.08, 47.13],
-        ],
-        flows: {
-            2019: [
-                [44835, 160, 206],
-                [308, 5264, 298],
-                [226, 255, 34409],
-            ],
-            2020: [
-                [45808, 148, 204],
-                [342, 5183, 311],
-                [220, 255, 34858],
-            ],
-            2021: [
-                [47566, 182, 211],
-                [357, 5401, 311],
-                [207, 298, 36027],
-            ],
-            2022: [
-                [48880, 180, 242],
-                [340, 5485, 325],
-                [215, 268, 36825],
-            ],
-        },
-    },
-    belfort: {
-        name: 'Belfort, Héricourt and Montbéliard',
-        communes: [
-            { id: '90010', name: 'Belfort', lon: 6.841, lat: 47.6458 },
-            { id: '70285', name: 'Héricourt', lon: 6.7594, lat: 47.5666, label: 'left' },
-            { id: '25388', name: 'Montbéliard', lon: 6.7834, lat: 47.5168, label: 'below' },
-        ],
-        center: [6.83, 47.566],
-        zoom: 55,
-        countries: [
-            ['FRANCE', 6.75, 47.68],
-            ['SWITZERLAND', 7.025, 47.439],
-        ],
-        regions: [
-            ['HAUTE-SAÔNE', 6.64, 47.616],
-            ['TERRITOIRE DE BELFORT', 6.94, 47.574],
-            ['DOUBS', 6.74, 47.467],
-        ],
-        flows: {
-            2019: [
-                [9359, 242, 855],
-                [467, 1224, 464],
-                [365, 102, 3955],
-            ],
-            2020: [
-                [9017, 264, 780],
-                [452, 1221, 467],
-                [330, 110, 3894],
-            ],
-            2021: [
-                [9021, 231, 843],
-                [402, 1236, 501],
-                [428, 149, 3764],
-            ],
-            2022: [
-                [9393, 210, 796],
-                [384, 1245, 486],
-                [419, 144, 3781],
-            ],
-        },
-    },
-}
-
 const form = document.querySelector('#dataset-form')
 const picker = document.querySelector('#dataset')
 const areaPicker = document.querySelector('#area')
+const years = Object.keys(commutingCensusSources).reverse()
+const areaNames = new Map(
+    Object.entries(commutingCensusAreas).map(([key, { places }]) => [
+        key,
+        new Intl.ListFormat('en', { style: 'long' }).format(places.map(([, name]) => name)),
+    ])
+)
+picker.prepend(...years.map((year) => new Option(`INSEE census ${year}`, year)))
+areaPicker.add(new Option('All selected networks in France', 'france'))
+for (const [key, name] of areaNames) areaPicker.add(new Option(name, key))
+
 const query = new URLSearchParams(location.search)
-const requested = query.get('dataset')
-const dataset = [...picker.options].some(({ value }) => value === requested) ? requested : '2022'
-const area = Object.hasOwn(censusAreas, query.get('area')) ? query.get('area') : 'dijon'
-const selectedArea = censusAreas[area]
+const selectedOption = (select, fallback) => {
+    const requested = query.get(select.name)
+    return [...select.options].some(({ value }) => value === requested) ? requested : fallback
+}
+const dataset = selectedOption(picker, picker.dataset.default || years[0])
+const area = selectedOption(areaPicker, areaPicker.dataset.default)
 const fictional = dataset === 'fictional'
+const overview = !fictional && area === 'france'
+const areas = overview ? Object.values(commutingCensusAreas) : [commutingCensusAreas[fictional ? 'dijon' : area]]
 picker.value = dataset
 areaPicker.value = area
 let navigating = false
@@ -146,14 +75,23 @@ if (fictional) {
     document.body.classList.add('census')
     document.querySelector('#census-note').hidden = false
     const source = document.querySelector('#census-source')
-    source.href = `https://www.insee.fr/fr/statistiques/${censusSources[dataset]}`
+    source.href = `https://www.insee.fr/fr/statistiques/${commutingCensusSources[dataset]}`
     source.textContent = `INSEE ${dataset} census, home-to-work flows`
 }
 
-const map = eurostatmap.map('flow').width(795).height(620).responsive(true).nutsLevel(3).insets(false).scale('03M')
-const [x, y] = eurostatmap.projectToMap(map, ...(fictional ? [6.48, 47.04] : selectedArea.center))
+const map = eurostatmap
+    .map('flow')
+    .width(795)
+    .height(620)
+    .responsive(true)
+    .nutsLevel(overview ? 2 : 3)
+    .insets(false)
+    .scale('03M')
 
-const towns = fictional ? fictionalTowns : selectedArea.communes
+const townLabelPositions = { 39198: 'below', 70285: 'left', 25388: 'below' }
+const towns = fictional
+    ? fictionalTowns
+    : areas.flatMap(({ places }) => places.map(([id, name, lon, lat]) => ({ id, name, lon, lat, label: townLabelPositions[id] })))
 const nodes = towns.map(({ id, name, country = 'FR', lon, lat }) => {
     const [x, y] = eurostatmap.projectToMap(map, lon, lat)
     return { id, name, country, x, y }
@@ -166,7 +104,11 @@ const links = fictional
           ]),
           ...fictionalTowns.map(({ id, local }) => ({ source: id, target: id, value: local })),
       ]
-    : selectedArea.flows[dataset].flatMap((row, i) => row.map((value, j) => ({ source: towns[i].id, target: towns[j].id, value })))
+    : areas
+          .flatMap(({ places, flows }) =>
+              flows[dataset].flatMap((row, i) => row.map((value, j) => ({ source: places[i][0], target: places[j][0], value })))
+          )
+          .filter(({ value }) => value > 0)
 
 const domestic = '#256982'
 const crossBorder = '#a14927'
@@ -174,19 +116,59 @@ const crossBorder = '#a14927'
 // Preserve width and circle area scales when changing year within one census area.
 const largestFlow = Math.max(...links.filter(({ source, target }) => source !== target).map(({ value }) => value))
 const flowValues = [0.25, 0.5].map((share) => Math.round((largestFlow * share) / 10) * 10).concat(largestFlow)
-const matrices = Object.values(selectedArea.flows)
+const matrices = areas.flatMap(({ flows }) => Object.values(flows))
 const largestCensusFlow = Math.max(...matrices.flatMap((matrix) => matrix.flatMap((row, i) => row.filter((_, j) => i !== j))))
 const largestLocalFlow = fictional ? 49000 : Math.max(...matrices.flatMap((matrix) => matrix.map((row, i) => row[i])))
-const nodeSizeScale = (value) => 15 * Math.sqrt(value / largestLocalFlow)
+const nodeSizeScale = (value) => (overview ? 2.3 : 15) * Math.sqrt(value / largestLocalFlow)
 nodeSizeScale.domain = () => [0, largestLocalFlow]
 const counts = new Intl.NumberFormat('en')
-const countries = fictional
-    ? [
-          ['FRANCE', 5.38, 46.8],
-          ['SWITZERLAND', 7.46, 46.58],
-      ]
-    : selectedArea.countries
-const regions = fictional ? [['BOURGOGNE-FRANCHE-COMTÉ', 5.68, 47.63]] : selectedArea.regions
+const views = {
+    fictional: {
+        center: [6.48, 47.04],
+        z: 465,
+        countries: [
+            ['FRANCE', 5.38, 46.8],
+            ['SWITZERLAND', 7.46, 46.58],
+        ],
+        regions: [['BOURGOGNE-FRANCHE-COMTÉ', 5.68, 47.63]],
+    },
+    france: { center: [2.48, 46.64], z: 1940, countries: [['FRANCE', 2.35, 46.49]], regions: [] },
+    dijon: {
+        center: [5.55, 47.23],
+        z: 158,
+        countries: [['FRANCE', 5.54, 47.56]],
+        regions: [
+            ['CÔTE-D’OR', 5.05, 47.48],
+            ['JURA', 5.66, 47.0],
+            ['DOUBS', 6.08, 47.13],
+        ],
+    },
+    belfort: {
+        center: [6.83, 47.566],
+        z: 55,
+        countries: [
+            ['FRANCE', 6.75, 47.68],
+            ['SWITZERLAND', 7.025, 47.439],
+        ],
+        regions: [
+            ['HAUTE-SAÔNE', 6.64, 47.616],
+            ['TERRITOIRE DE BELFORT', 6.94, 47.574],
+            ['DOUBS', 6.74, 47.467],
+        ],
+    },
+}
+const view = views[fictional ? 'fictional' : area]
+const countries = view?.countries || []
+const regions = view?.regions || []
+const eastings = nodes.map(({ x }) => x)
+const northings = nodes.map(({ y }) => y)
+const [minX, maxX] = [Math.min(...eastings), Math.max(...eastings)]
+const [minY, maxY] = [Math.min(...northings), Math.max(...northings)]
+const [x, y] = view ? eurostatmap.projectToMap(map, ...view.center) : [(minX + maxX) / 2, (minY + maxY) / 2]
+const z = view?.z || Math.max((maxX - minX) / 475, (maxY - minY) / 330)
+const subtitle = fictional
+    ? 'Fictional commuter counts in the French–Swiss border region'
+    : `${overview ? `${areas.length} selected local networks` : areas[0].region} · INSEE census ${dataset}`
 
 function avoidLabelCollisions() {
     const svg = map.svg().node()
@@ -206,9 +188,9 @@ function avoidLabelCollisions() {
     }
 }
 
-map.title(document.title)
-    .subtitle(fictional ? 'Fictional commuter counts in the French–Swiss border region' : `${selectedArea.name} · INSEE census ${dataset}`)
-    .position({ x, y, z: fictional ? 465 : selectedArea.zoom })
+map.title(fictional || overview ? document.title : areaNames.get(area))
+    .subtitle(subtitle)
+    .position({ x, y, z })
     .drawCoastalMargin(false)
     .flowGraph({ nodes, links })
     .flowSettings({
@@ -217,7 +199,8 @@ map.title(document.title)
         arrows: true,
         color: ({ source, target }) => (source.country === target.country ? domestic : crossBorder),
         opacity: 1,
-        maxWidth: fictional ? 11 : (8 * largestFlow) / largestCensusFlow,
+        maxWidth: fictional ? 11 : ((overview ? 4 : 8) * largestFlow) / largestCensusFlow,
+        minWidth: overview ? 0.35 : 1,
         nodes: true,
         nodeType: 'circle',
         nodeSizeBy: 'internal',
@@ -231,7 +214,10 @@ map.title(document.title)
             values: flowValues,
             labels: flowValues.map((value) => counts.format(value)),
         },
-        nodeSizeLegend: { title: 'Within each town', values: [largestLocalFlow, Math.round(largestLocalFlow / 1000) * 100] },
+        nodeSizeLegend: {
+            title: 'Within each town',
+            values: overview ? [largestLocalFlow] : [largestLocalFlow, Math.round(largestLocalFlow / 1000) * 100],
+        },
         flowColorLegend: {
             title: 'Corridor type',
             marginTop: 30,

@@ -9,16 +9,9 @@
     <body class="commuting-map">
         <form id="dataset-form" class="dataset-controls" method="get">
             <label for="area">Area</label>
-            <select id="area" name="area" disabled>
-                <option value="dijon">Dijon, Dole and Besançon</option>
-                <option value="belfort">Belfort, Héricourt and Montbéliard</option>
-            </select>
+            <select id="area" name="area" data-default="dijon" disabled></select>
             <label for="dataset">Dataset</label>
-            <select id="dataset" name="dataset" disabled>
-                <option value="2022">INSEE census 2022</option>
-                <option value="2021">INSEE census 2021</option>
-                <option value="2020">INSEE census 2020</option>
-                <option value="2019">INSEE census 2019</option>
+            <select id="dataset" name="dataset" data-default="2022" disabled>
                 <option value="fictional">Fictional French–Swiss example</option>
             </select>
             <button type="submit" disabled>Show data</button>
@@ -26,11 +19,12 @@
         <svg id="map"></svg>
         <p id="fictional-note" hidden>The towns are real, but the commuter counts are fictional.</p>
         <p id="census-note" hidden>
-            Source:
+            Only flows within the selected groups of communes are shown. Source:
             <a id="census-source">INSEE home-to-work flows</a>
             . Estimates are rounded to the nearest person. Counts below 200 are approximate. Successive census estimates can share survey years.
         </p>
         <script src="../../build/eurostatmap.js"></script>
+        <script src="commuting-census-data.js"></script>
         <script src="commuting-corridors.js"></script>
     </body>
 </html>
