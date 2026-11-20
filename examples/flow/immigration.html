@@ -25,6 +25,11 @@
                 padding: 0.3rem 0.5rem;
             }
 
+            .selection-summary {
+                margin: 0 0 0.75rem;
+                font-size: 0.875rem;
+            }
+
             .source {
                 font-size: 0.875rem;
             }
@@ -40,6 +45,7 @@
                 <option value="ES">Spain</option>
             </select>
         </div>
+        <p id="selection-summary" class="selection-summary" role="status"></p>
         <svg id="map"></svg>
         <p class="source">
             Origin refers to country of previous residence.
@@ -55,7 +61,15 @@
                 ES: { RO: 35747, FR: 29053, IT: 28945, DE: 26123, NL: 13130, PT: 12459, BE: 9492, PL: 7344 },
             }
             const countryNames = new Intl.DisplayNames('en', { type: 'region' })
+            const counts = new Intl.NumberFormat('en')
             const destination = document.querySelector('#destination')
+            const summary = document.querySelector('#selection-summary')
+            let displayedCountry = destination.value
+
+            function showSelection(country) {
+                const [[origin, count]] = Object.entries(originsByDestination[country])
+                summary.textContent = `Largest flow to ${countryNames.of(country)}: ${counts.format(count)} people from ${countryNames.of(origin)}.`
+            }
 
             function graphFor(target) {
                 const links = Object.entries(originsByDestination[target]).map(([source, value]) => ({ source, target, value }))
@@ -71,11 +85,11 @@
                 .nutsLevel(0)
                 .insets(false)
                 .scale('20M')
-                .title(`EU immigration to ${countryNames.of(destination.value)}`)
+                .title(`EU immigration to ${countryNames.of(displayedCountry)}`)
                 .subtitle('Eight largest flows by country of previous residence, 2024')
                 .position({ x: 4380000, y: 2920000, z: 5600 })
                 .drawCoastalMargin(false)
-                .flowGraph(graphFor(destination.value))
+                .flowGraph(graphFor(displayedCountry))
                 .flowSettings({
                     lineType: 'straight',
                     arrows: true,
@@ -91,18 +105,28 @@
                     regionColorLegend: { title: 'Country role', labels: ['Previous residence', 'Destination'] },
                 })
                 .onBuild(() => {
+                    showSelection(displayedCountry)
                     destination.disabled = false
+                    updateDestination()
                 })
 
             map.statData().unitText('people')
             map.build()
 
-            destination.addEventListener('change', () => {
+            function updateDestination() {
                 const country = destination.value
+                if (destination.disabled || country === displayedCountry) return
+
                 map.title(`EU immigration to ${countryNames.of(country)}`)
                     .flowGraph(graphFor(country))
                     .updateStatValues()
-            })
+                displayedCountry = country
+                showSelection(country)
+            }
+
+            destination.addEventListener('input', updateDestination)
+            destination.addEventListener('change', updateDestination)
+            window.addEventListener('pageshow', updateDestination)
         </script>
     </body>
 </html>
