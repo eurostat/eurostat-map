@@ -265,6 +265,8 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
 - Keep example controls disabled until their event handlers are installed. A browser can
   interact with the gallery iframe while its external bundles are still loading. Check route
   positions in narrow frames as well as counting the rendered SVG routes.
+- Keep the viewer's Examples button as a direct gallery link. Navigating inside an example
+  iframe adds browser history entries, so `history.back()` can revisit the example instead.
 
 ## Story-map interactions
 

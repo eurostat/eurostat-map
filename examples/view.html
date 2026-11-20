@@ -323,22 +323,15 @@
                 load()
             }
 
-            // The button to go back to the list of the examples: when the viewer was opened from the list, in this tab, it goes back
-            // in the history, so that the list is as it was left (the same type, search and scroll).
-            $('back').addEventListener('click', (e) => {
-                let fromList = false
-                try {
-                    const ref = new URL(document.referrer)
-                    const list = new URL('./', location.href)
-                    fromList = ref.origin === list.origin && (ref.pathname === list.pathname || ref.pathname === list.pathname + 'index.html')
-                } catch (err) {
-                    // no referrer: the list is opened
+            // An example can add iframe entries to the viewer's browser history.
+            // Link directly to the gallery so its saved search and scroll can be restored.
+            if (document.referrer) {
+                const ref = new URL(document.referrer)
+                const list = new URL('./', location.href)
+                if (ref.origin === list.origin && (ref.pathname === list.pathname || ref.pathname === list.pathname + 'index.html')) {
+                    $('back').href = ref.href
                 }
-                if (fromList && history.length > 1) {
-                    e.preventDefault()
-                    history.back()
-                }
-            })
+            }
 
             // the source code
             let page = ''
