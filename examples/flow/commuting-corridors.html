@@ -4,320 +4,33 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Two-way commuting corridors</title>
-        <style>
-            body {
-                font:
-                    0.9rem system-ui,
-                    sans-serif;
-                color: #253548;
-            }
-
-            .dataset-controls {
-                display: flex;
-                flex-wrap: wrap;
-                align-items: center;
-                gap: 0.5rem;
-                margin-bottom: 0.75rem;
-            }
-
-            select,
-            button {
-                font: inherit;
-                padding: 0.25rem 0.5rem;
-            }
-
-            #map .em-cntbn {
-                stroke: #52606b;
-                stroke-width: 1.5px;
-            }
-
-            #map .em-cntbn-halo:not(.em-bn-co) {
-                stroke-width: 2.6px;
-            }
-
-            #map .em-kosovo-bn {
-                stroke: #68757e;
-                stroke-width: 1px;
-            }
-
-            #map .em-bn-1,
-            #map .em-bn-2,
-            #map .em-bn-3 {
-                stroke: #77838c;
-                stroke-width: 0.55px;
-            }
-
-            .em-node-circles .em-node-circle {
-                fill: #f8fafc;
-                stroke: #334155;
-            }
-
-            .region-label {
-                font:
-                    600 13px system-ui,
-                    sans-serif;
-                letter-spacing: 0.08em;
-                fill: #52606b;
-                paint-order: stroke;
-                stroke: #fff;
-                stroke-width: 2px;
-                pointer-events: none;
-            }
-
-            body.census #map .em-flow-color-legend {
-                display: none;
-            }
-
-            .town-label {
-                font:
-                    600 12px system-ui,
-                    sans-serif;
-                fill: #253548;
-                paint-order: stroke;
-                stroke: #fff;
-                stroke-width: 3px;
-                pointer-events: none;
-            }
-        </style>
+        <link rel="stylesheet" href="commuting-corridors.css" />
     </head>
-    <body>
+    <body class="commuting-map">
         <form id="dataset-form" class="dataset-controls" method="get">
+            <label for="area">Area</label>
+            <select id="area" name="area" disabled>
+                <option value="dijon">Dijon, Dole and Besançon</option>
+                <option value="belfort">Belfort, Héricourt and Montbéliard</option>
+            </select>
             <label for="dataset">Dataset</label>
             <select id="dataset" name="dataset" disabled>
                 <option value="2022">INSEE census 2022</option>
                 <option value="2021">INSEE census 2021</option>
                 <option value="2020">INSEE census 2020</option>
+                <option value="2019">INSEE census 2019</option>
                 <option value="fictional">Fictional French–Swiss example</option>
             </select>
             <button type="submit" disabled>Show data</button>
         </form>
         <svg id="map"></svg>
-        <p id="fictional-note" hidden>
-            The towns are real, but the commuter counts are fictional.
-            <a href="commuting-corridors-insee.html">See the example using INSEE census data</a>
-            .
-        </p>
+        <p id="fictional-note" hidden>The towns are real, but the commuter counts are fictional.</p>
         <p id="census-note" hidden>
             Source:
             <a id="census-source">INSEE home-to-work flows</a>
-            . Estimates are rounded to the nearest person. Values below 200 are approximate.
+            . Estimates are rounded to the nearest person. Counts below 200 are approximate. Successive census estimates can share survey years.
         </p>
         <script src="../../build/eurostatmap.js"></script>
-        <script>
-            // Illustrative commuter counts. Town coordinates are real; the flows are synthetic.
-            const fictionalTowns = [
-                { id: 'DIJ', name: 'Dijon', country: 'FR', lon: 5.04, lat: 47.32, local: 36000 },
-                { id: 'BES', name: 'Besançon', country: 'FR', lon: 6.02, lat: 47.24, local: 24000 },
-                { id: 'PON', name: 'Pontarlier', country: 'FR', lon: 6.35, lat: 46.9, local: 5800 },
-                { id: 'LAU', name: 'Lausanne', country: 'CH', lon: 6.63, lat: 46.52, local: 41000 },
-                { id: 'NEU', name: 'Neuchâtel', country: 'CH', lon: 6.93, lat: 46.99, local: 19000 },
-                { id: 'BER', name: 'Bern', country: 'CH', lon: 7.45, lat: 46.95, local: 49000 },
-                { id: 'BAS', name: 'Basel', country: 'CH', lon: 7.59, lat: 47.56, local: 46000 },
-            ]
-            const fictionalCorridors = [
-                ['DIJ', 'BES', 3200, 1300],
-                ['BES', 'PON', 1700, 950],
-                ['BES', 'NEU', 2300, 420],
-                ['PON', 'LAU', 900, 170],
-                ['PON', 'NEU', 4700, 600],
-                ['LAU', 'NEU', 1200, 2100],
-                ['NEU', 'BER', 3500, 1500],
-                ['BER', 'BAS', 2400, 1100],
-            ]
-
-            const communes = [
-                { id: '21231', name: 'Dijon', country: 'FR', lon: 5.04, lat: 47.32 },
-                { id: '39198', name: 'Dole', country: 'FR', lon: 5.49, lat: 47.09 },
-                { id: '25056', name: 'Besançon', country: 'FR', lon: 6.02, lat: 47.24 },
-            ]
-            // INSEE NBFLUX_Cxx_ACTOCC15P. Rows are residence and columns are workplace,
-            // both in Dijon, Dole, Besançon order. Diagonal values size the circles.
-            const census = {
-                2020: {
-                    source: '7630376',
-                    flows: [
-                        [45808, 148, 204],
-                        [342, 5183, 311],
-                        [220, 255, 34858],
-                    ],
-                },
-                2021: {
-                    source: '8201899',
-                    flows: [
-                        [47566, 182, 211],
-                        [357, 5401, 311],
-                        [207, 298, 36027],
-                    ],
-                },
-                2022: {
-                    source: '8582949',
-                    flows: [
-                        [48880, 180, 242],
-                        [340, 5485, 325],
-                        [215, 268, 36825],
-                    ],
-                },
-            }
-
-            const form = document.querySelector('#dataset-form')
-            const picker = document.querySelector('#dataset')
-            const requested = new URLSearchParams(location.search).get('dataset')
-            const dataset = requested === 'fictional' || Object.hasOwn(census, requested) ? requested : '2022'
-            const fictional = dataset === 'fictional'
-            picker.value = dataset
-            let navigating = false
-            function showDataset() {
-                if (navigating || picker.value === dataset) return
-                const url = new URL(location.href)
-                url.searchParams.set('dataset', picker.value)
-                navigating = true
-                location.assign(url.href)
-            }
-            picker.addEventListener('input', showDataset)
-            picker.addEventListener('change', showDataset)
-            window.addEventListener('pageshow', (event) => {
-                if (event.persisted) {
-                    navigating = false
-                    picker.value = dataset
-                }
-            })
-            picker.disabled = false
-            form.querySelector('button').disabled = false
-
-            if (fictional) {
-                document.querySelector('#fictional-note').hidden = false
-            } else {
-                document.body.classList.add('census')
-                document.querySelector('#census-note').hidden = false
-                const source = document.querySelector('#census-source')
-                source.href = `https://www.insee.fr/fr/statistiques/${census[dataset].source}`
-                source.textContent = `INSEE ${dataset} census, home-to-work flows`
-            }
-
-            const map = eurostatmap.map('flow').width(795).height(620).responsive(true).nutsLevel(3).insets(false).scale('03M')
-            const [x, y] = eurostatmap.projectToMap(map, ...(fictional ? [6.48, 47.04] : [5.55, 47.23]))
-
-            const towns = fictional ? fictionalTowns : communes
-            const nodes = towns.map(({ id, name, country, lon, lat }) => {
-                const [x, y] = eurostatmap.projectToMap(map, lon, lat)
-                return { id, name, country, x, y }
-            })
-            const links = fictional
-                ? [
-                      ...fictionalCorridors.flatMap(([a, b, forward, reverse]) => [
-                          { source: a, target: b, value: forward },
-                          { source: b, target: a, value: reverse },
-                      ]),
-                      ...fictionalTowns.map(({ id, local }) => ({ source: id, target: id, value: local })),
-                  ]
-                : census[dataset].flows.flatMap((row, i) => row.map((value, j) => ({ source: communes[i].id, target: communes[j].id, value })))
-
-            const domestic = '#256982'
-            const crossBorder = '#a14927'
-
-            // Use a common width and area scale across all three census years.
-            const largestFlow = Math.max(...links.filter(({ source, target }) => source !== target).map(({ value }) => value))
-            const flowValues = fictional ? [500, 2500, largestFlow] : [100, 200, 330]
-            const largestLocalFlow = fictional ? 49000 : 48880
-            const nodeSizeScale = (value) => 15 * Math.sqrt(value / largestLocalFlow)
-            nodeSizeScale.domain = () => [0, largestLocalFlow]
-            const counts = new Intl.NumberFormat('en')
-            const regions = fictional
-                ? [
-                      ['BOURGOGNE-FRANCHE-COMTÉ', 5.68, 47.63],
-                      ['SWITZERLAND', 7.46, 46.58],
-                  ]
-                : [
-                      ['CÔTE-D’OR', 5.05, 47.48],
-                      ['JURA', 5.66, 47.0],
-                      ['DOUBS', 6.08, 47.13],
-                  ]
-
-            function avoidLabelCollisions() {
-                const svg = map.svg().node()
-                const frame = svg.getBoundingClientRect()
-                const occupied = [...svg.querySelectorAll('.em-legend, [id^="title"], [id^="subtitle"]')]
-                    .map((element) => element.getBoundingClientRect())
-                    .filter(({ width, height }) => width && height)
-                const labels = [...svg.querySelectorAll('.town-label'), ...svg.querySelectorAll('.region-label')]
-                for (const label of labels) {
-                    const box = label.getBoundingClientRect()
-                    const outside = box.left < frame.left || box.right > frame.right || box.top < frame.top || box.bottom > frame.bottom
-                    const overlaps = occupied.some(
-                        (other) => box.left < other.right && box.right > other.left && box.top < other.bottom && box.bottom > other.top
-                    )
-                    label.style.visibility = outside || overlaps ? 'hidden' : 'visible'
-                    if (!outside && !overlaps) occupied.push(box)
-                }
-            }
-
-            map.title('Two-way commuting corridors')
-                .subtitle(
-                    fictional ? 'Fictional commuter counts in the French–Swiss border region' : `Dijon, Dole and Besançon · INSEE census ${dataset}`
-                )
-                .position({ x, y, z: fictional ? 465 : 158 })
-                .drawCoastalMargin(false)
-                .flowGraph({ nodes, links })
-                .flowSettings({
-                    lineType: 'straight',
-                    bidirectionalLayout: 'parallel',
-                    arrows: true,
-                    color: ({ source, target }) => (source.country === target.country ? domestic : crossBorder),
-                    opacity: 1,
-                    maxWidth: fictional ? 11 : (8 * largestFlow) / 357,
-                    nodes: true,
-                    nodeType: 'circle',
-                    nodeSizeBy: 'internal',
-                    nodeSizeScale,
-                })
-                .legend({
-                    position: 'top right',
-                    flowWidthLegend: {
-                        title: 'Between towns',
-                        titlePadding: 40,
-                        values: flowValues,
-                        labels: flowValues.map((value) => counts.format(value)),
-                    },
-                    nodeSizeLegend: { title: 'Within each town', values: [48000, 5000] },
-                    flowColorLegend: {
-                        title: 'Corridor type',
-                        marginTop: 30,
-                        items: [
-                            { label: 'Domestic', color: domestic },
-                            { label: 'Cross-border', color: crossBorder },
-                        ],
-                    },
-                })
-                .onZoom(avoidLabelCollisions)
-                .onBuild((map) => {
-                    map.svg()
-                        .select('#em-zoom-group-map')
-                        .append('g')
-                        .selectAll('text')
-                        .data(regions)
-                        .join('text')
-                        .attr('class', 'region-label')
-                        .attr('text-anchor', 'middle')
-                        .attr('transform', ([, lon, lat]) => `translate(${map._projection(eurostatmap.projectToMap(map, lon, lat))})`)
-                        .text(([name]) => name)
-
-                    const townNames = new Map(nodes.map(({ id, name }) => [id, name]))
-                    map.svg()
-                        .selectAll('.em-node-circle-group')
-                        .append('text')
-                        .attr('class', 'town-label')
-                        .attr('text-anchor', 'middle')
-                        .attr('y', function () {
-                            return -Number(this.parentNode.querySelector('circle').getAttribute('r')) - 5
-                        })
-                        .text(function () {
-                            return townNames.get(this.parentNode.getAttribute('data-id'))
-                        })
-                    avoidLabelCollisions()
-                })
-
-            map.statData().unitText('commuters')
-            map.build()
-        </script>
+        <script src="commuting-corridors.js"></script>
     </body>
 </html>

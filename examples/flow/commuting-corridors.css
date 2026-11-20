@@ -1,0 +1,79 @@
+.commuting-map {
+    font:
+        0.9rem system-ui,
+        sans-serif;
+    color: #253548;
+}
+
+.dataset-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+select,
+button {
+    font: inherit;
+    padding: 0.25rem 0.5rem;
+}
+
+.commuting-map #map .em-cntbn {
+    stroke: #52606b;
+    stroke-width: 1.5px;
+}
+
+.commuting-map #map .em-cntbn-halo:not(.em-bn-co) {
+    stroke-width: 2.6px;
+}
+
+.commuting-map #map .em-kosovo-bn {
+    stroke: #68757e;
+    stroke-width: 1px;
+}
+
+.commuting-map #map .em-bn-1,
+.commuting-map #map .em-bn-2,
+.commuting-map #map .em-bn-3 {
+    stroke: #77838c;
+    stroke-width: 0.55px;
+}
+
+.em-node-circles .em-node-circle {
+    fill: #f8fafc;
+    stroke: #334155;
+}
+
+.region-label,
+.country-label {
+    font:
+        600 12px system-ui,
+        sans-serif;
+    letter-spacing: 0.08em;
+    fill: #52606b;
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 2px;
+    pointer-events: none;
+}
+
+.country-label {
+    font-size: 14px;
+    letter-spacing: 0.14em;
+}
+
+body.census #map .em-flow-color-legend {
+    display: none;
+}
+
+.town-label {
+    font:
+        600 12px system-ui,
+        sans-serif;
+    fill: #253548;
+    paint-order: stroke;
+    stroke: #fff;
+    stroke-width: 3px;
+    pointer-events: none;
+}
