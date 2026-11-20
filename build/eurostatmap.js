@@ -41400,105 +41400,88 @@ function createMarker(defs, id, { markerUnits = 'strokeWidth', scale = 1, fill =
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   drawNodeCircles: () => (/* binding */ drawNodeCircles)
+/* harmony export */   drawNodeCircles: () => (/* binding */ drawNodeCircles),
+/* harmony export */   prepareCircleNodes: () => (/* binding */ prepareCircleNodes)
 /* harmony export */ });
-/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/max.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/selectAll.js");
-/* harmony import */ var _core_scale__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../core/scale */ "./src/core/scale.js");
-/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _core_scale__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/scale */ "./src/core/scale.js");
+/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
 
 
 
 
 
-
-
-function computeCircleLocationStats(out) {
-    const statsByLoc = {}
+function prepareCircleNodes(out) {
+    const statsByLoc = new Map()
 
     for (const node of out.flowGraph_.nodes) {
-        statsByLoc[node.id] = {
+        statsByLoc.set(node.id, {
             x: node.x,
             y: node.y,
             incoming: 0,
             outgoing: 0,
-            internal: 0
-        }
+            internal: 0,
+        })
     }
 
     for (const link of out.flowGraph_.links) {
         const src = link.source.id
         const tgt = link.target.id
-        const v = link.value || 0
+        const v = Number(link.value) || 0
 
-        // regular flows
-        if (statsByLoc[src]) statsByLoc[src].outgoing += v
-        if (statsByLoc[tgt]) statsByLoc[tgt].incoming += v
-
-        // internal flow (self-loop)
         if (src === tgt) {
-            statsByLoc[src].internal += v
+            statsByLoc.get(src).internal += v
+        } else {
+            statsByLoc.get(src).outgoing += v
+            statsByLoc.get(tgt).incoming += v
         }
     }
 
-    out.locationStats = statsByLoc
-}
-
-
-function drawNodeCircles(out, container) {
-    // make sure stats exist
-    if (!out.locationStats) computeCircleLocationStats(out)
-
-    const stats = out.locationStats
-    const includeInternal = out.flowInternal_
-
-    // compute totals per node
-    const totals = Object.values(stats).map(s =>
-        includeInternal
-            ? s.incoming + s.outgoing + s.internal
-            : s.incoming + s.outgoing
-    )
-
-    const maxValue = (0,d3_array__WEBPACK_IMPORTED_MODULE_0__["default"])(totals.length ? totals : [0])
+    const internalOnly = out.flowNodeSizeBy_ === 'internal'
+    for (const stats of statsByLoc.values()) {
+        stats.total = stats.incoming + stats.outgoing + (out.flowInternal_ ? stats.internal : 0)
+        stats.size = internalOnly ? stats.internal : stats.total
+    }
 
     // size scale
     out._nodeSizeScale =
         out.flowNodeSizeScale_ ||
-        (0,_core_scale__WEBPACK_IMPORTED_MODULE_4__.createSqrtScale)(
-            totals,
-            (0,_core_responsive__WEBPACK_IMPORTED_MODULE_5__.getResponsiveSymbolSize)(out.flowMaxNodeSize_ || 20, 3),
-            (0,_core_responsive__WEBPACK_IMPORTED_MODULE_5__.getResponsiveSymbolSize)(out.flowMinNodeSize_ || 0, 0)
+        (0,_core_scale__WEBPACK_IMPORTED_MODULE_2__.createSqrtScale)(
+            Array.from(statsByLoc.values(), (stats) => stats.size),
+            (0,_core_responsive__WEBPACK_IMPORTED_MODULE_3__.getResponsiveSymbolSize)(out.flowMaxNodeSize_ || 20, 3),
+            (0,_core_responsive__WEBPACK_IMPORTED_MODULE_3__.getResponsiveSymbolSize)(out.flowMinNodeSize_ || 0, 0)
         )
 
-    const circlesContainer = container
-        .append("g")
-        .attr("class", "em-node-circles")
+    for (const stats of statsByLoc.values()) {
+        stats.radius = stats.size > 0 ? out._nodeSizeScale(stats.size) : 0
+    }
+    return statsByLoc
+}
+
+function drawNodeCircles(out, container, stats) {
+    const includeInternal = out.flowInternal_ || out.flowNodeSizeBy_ === 'internal'
+    const circlesContainer = container.append('g').attr('class', 'em-node-circles')
 
     // simple tooltip
     function makeTooltip(locKey) {
-        const s = stats[locKey]
+        const s = stats.get(locKey)
         const incoming = s.incoming
         const outgoing = s.outgoing
         const internal = s.internal
-        const total = includeInternal ? incoming + outgoing + internal : incoming + outgoing
 
-        const unit = out.statData?.()?.unitText?.() || ""
+        const unit = out.statData?.()?.unitText?.() || ''
 
         return `
             <div class="em-tooltip-bar"><b>${out.nodeNameMap?.get(locKey) || locKey}</b></div>
             <div class="em-tooltip-text">
                 <table class="em-tooltip-table"><tbody>
-                    <tr><td>Incoming:</td><td style="text-align:right">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.spaceAsThousandSeparator)(incoming)}</td></tr>
-                    <tr><td>Outgoing:</td><td style="text-align:right">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.spaceAsThousandSeparator)(outgoing)}</td></tr>
-                    ${includeInternal
-                ? `<tr><td>Internal:</td><td style="text-align:right">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.spaceAsThousandSeparator)(internal)}</td></tr>`
-                : ""
-            }
+                    <tr><td>Incoming:</td><td style="text-align:right">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_0__.spaceAsThousandSeparator)(incoming)}</td></tr>
+                    <tr><td>Outgoing:</td><td style="text-align:right">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_0__.spaceAsThousandSeparator)(outgoing)}</td></tr>
+                    ${includeInternal ? `<tr><td>Internal:</td><td style="text-align:right">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_0__.spaceAsThousandSeparator)(internal)}</td></tr>` : ''}
                     <tr class="em-tooltip-total">
                         <td colspan="2" style="padding-top:4px;font-weight:bold;">
-                            Total: ${(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.spaceAsThousandSeparator)(total)} ${unit}
+                            Total: ${(0,_core_utils__WEBPACK_IMPORTED_MODULE_0__.spaceAsThousandSeparator)(s.incoming + s.outgoing + (includeInternal ? s.internal : 0))} ${unit}
                         </td>
                     </tr>
                 </tbody></table>
@@ -41512,70 +41495,59 @@ function drawNodeCircles(out, container) {
             return out.topLocationColorScale(id)
         }
         // fallback: global flow color or blue
-        if (typeof out.flowColor_ === "string") return out.flowColor_
-        return "#2d50a0"
+        if (typeof out.flowColor_ === 'string') return out.flowColor_
+        return '#2d50a0'
     }
 
     // draw circles
-    Object.entries(stats).forEach(([locKey, s]) => {
-        const total = includeInternal
-            ? s.incoming + s.outgoing + s.internal
-            : s.incoming + s.outgoing
-
-        if (!total) return
+    stats.forEach((s, locKey) => {
+        if (!(s.radius > 0)) return
 
         const g = circlesContainer
-            .append("g")
-            .attr("class", "em-node-circle-group")
-            .attr("transform", `translate(${s.x},${s.y})`)
-            .attr("data-id", locKey)
-
-        const r = out._nodeSizeScale(total)
+            .append('g')
+            .attr('class', 'em-node-circle-group')
+            .attr('transform', `translate(${s.x},${s.y})`)
+            .attr('data-id', locKey)
 
         // main circle
-        g.append("circle")
-            .attr("r", r).attr("class", "em-node-circle")
-            .attr("fill", nodeFill(locKey))
-            .attr("stroke", "white")
-            .attr("stroke-width", 0.5)
-            .style("cursor", "pointer")
-            .on("mouseover", function (event) {
-                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_2__["default"])(this).attr("stroke-width", 1.5)
+        g.append('circle')
+            .attr('r', s.radius)
+            .attr('class', 'em-node-circle')
+            .attr('fill', nodeFill(locKey))
+            .attr('stroke', 'white')
+            .attr('stroke-width', 0.5)
+            .style('cursor', 'pointer')
+            .on('mouseover', function (event) {
+                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).attr('stroke-width', 1.5)
                 if (out.map._tooltip) out.map._tooltip.mouseover(makeTooltip(locKey))
-                highlightLines(locKey)
+                highlightLines(container, locKey)
             })
-            .on("mouseout", function(event)  {
-                (0,d3_selection__WEBPACK_IMPORTED_MODULE_2__["default"])(this).attr("stroke-width", 0.5)
+            .on('mouseout', function (event) {
+                (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).attr('stroke-width', 0.5)
                 if (out.map._tooltip) out.map._tooltip.mouseout(event)
-                unhighlightLines()
+                container.selectAll('.em-flow-link, .em-flow-link-bundled').classed('highlighted dimmed', false)
             })
-            .on("mousemove", event => {
+            .on('mousemove', (event) => {
                 if (out.map._tooltip) out.map._tooltip.mousemove(event)
             })
-
     })
 }
 
-function highlightLines(nodeId) {
-  if (!nodeId) return;
+function highlightLines(container, nodeId) {
+    if (!nodeId) return
 
-  (0,d3_selection__WEBPACK_IMPORTED_MODULE_3__["default"])('.em-flow-link, .em-flow-link-bundled')
-    .classed('highlighted', function () {
-      const o = this.getAttribute('data-origin');
-      const d = this.getAttribute('data-dest');
-      return o === nodeId || d === nodeId;
-    })
-    .classed('dimmed', function () {
-      const o = this.getAttribute('data-origin');
-      const d = this.getAttribute('data-dest');
-      return !(o === nodeId || d === nodeId);
-    });
-}
-
-function unhighlightLines() {
-  (0,d3_selection__WEBPACK_IMPORTED_MODULE_3__["default"])('.em-flow-link, .em-flow-link-bundled')
-    .classed('highlighted', false)
-    .classed('dimmed', false);
+    container
+        .selectAll('.em-flow-link, .em-flow-link-bundled')
+        .classed('highlighted', function () {
+            const o = this.getAttribute('data-origin')
+            const d = this.getAttribute('data-dest')
+            return o === nodeId || d === nodeId
+        })
+        .classed('dimmed', function () {
+            const o = this.getAttribute('data-origin')
+            const d = this.getAttribute('data-dest')
+            return !(o === nodeId || d === nodeId)
+        })
 }
 
 
@@ -42261,10 +42233,30 @@ function distance(a, b) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   buildBidirectionalRouteMap: () => (/* binding */ buildBidirectionalRouteMap),
-/* harmony export */   expandRoutesToSankeyMidpointGraph: () => (/* binding */ expandRoutesToSankeyMidpointGraph)
+/* harmony export */   expandRoutesToSankeyMidpointGraph: () => (/* binding */ expandRoutesToSankeyMidpointGraph),
+/* harmony export */   parallelFlowPath: () => (/* binding */ parallelFlowPath)
 /* harmony export */ });
 // flow-bidirectional.js
 // Shared helpers for bidirectional flow aggregation.
+
+// Draw each direction to the same side of its own heading, so the reverse direction
+// occupies the opposite side of the shared corridor.
+function parallelFlowPath({ x1, y1, x2, y2, width }, arrowLength) {
+    const length = Math.hypot(x2 - x1, y2 - y1)
+    if (!(length > 0 && width > 0)) return null
+
+    const dx = (x2 - x1) / length
+    const dy = (y2 - y1) / length
+    const gap = 0.75
+    const point = (along, across) => `${x1 + dx * along - dy * across},${y1 + dy * along + dx * across}`
+    const outer = gap + width
+    if (!(arrowLength > 0)) {
+        return `M${point(0, gap)}L${point(length, gap)}L${point(length, outer)}L${point(0, outer)}Z`
+    }
+
+    const shoulder = length - Math.min(arrowLength, length * 0.45)
+    return `M${point(0, gap)}L${point(length, gap)}L${point(shoulder, gap + width * 1.65)}L${point(shoulder, outer)}L${point(0, outer)}Z`
+}
 
 /**
  * Build a bidirectional route map:
@@ -42445,11 +42437,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _straight__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./straight */ "./src/layers/flow/straight.js");
 /* harmony import */ var _donuts__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./donuts */ "./src/layers/flow/donuts.js");
 /* harmony import */ var _circles__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./circles */ "./src/layers/flow/circles.js");
-/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/ordinal.js");
-/* harmony import */ var _core_decoration_labels__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../core/decoration/labels */ "./src/core/decoration/labels.js");
-/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
+/* harmony import */ var _flow_bidirectional__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./flow-bidirectional */ "./src/layers/flow/flow-bidirectional.js");
+/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/ordinal.js");
+/* harmony import */ var _core_decoration_labels__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../core/decoration/labels */ "./src/core/decoration/labels.js");
+/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
 // Import required D3 modules
 // import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
+
 
 
 
@@ -42490,6 +42484,8 @@ const decorateFlowLayer = function (out, config) {
     // flow type settings
     out.flowLineType_ = 'curved' // type of flow map values: curved || straight
     out.flowBidirectional_ = true // Whether flows should be bidirectional (true) or unidirectional (false). If there are flows to and from 2 nodes and flowBidirectional is set to false, then these flows will be merged into one line.
+    out.flowBidirectionalLayout_ = 'midpoint'
+    out.flowNodeSizeBy_ = 'total'
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowEdgeBundling_ = false // whether to use edge bundling for curved flow lines
     out.flowCurvatureSettings_ = {
@@ -42618,6 +42614,7 @@ const decorateFlowLayer = function (out, config) {
             stack: out.flowStack_,
             nodes: out.flowNodes_,
             nodeType: out.flowNodeType_,
+            nodeSizeBy: out.flowNodeSizeBy_,
             labelOffsets: out.flowLabelOffsets_,
             lineType: out.flowLineType_,
             nodeSizeScale: out.flowNodeSizeScale_,
@@ -42631,6 +42628,7 @@ const decorateFlowLayer = function (out, config) {
             opacityGradient: out.flowOpacityGradient_,
             widthGradientSettings: out.flowWidthGradientSettings_,
             bidirectional: out.flowBidirectional_,
+            bidirectionalLayout: out.flowBidirectionalLayout_,
             edgeBundling: out.flowEdgeBundling_,
             bundleSettings: out.flowBundleSettings_,
         }
@@ -42651,6 +42649,7 @@ const decorateFlowLayer = function (out, config) {
         if (v.stack !== undefined) out.flowStack_ = v.stack
         if (v.nodes !== undefined) out.flowNodes_ = v.nodes
         if (v.nodeType !== undefined) out.flowNodeType_ = v.nodeType
+        if (v.nodeSizeBy !== undefined) out.flowNodeSizeBy_ = v.nodeSizeBy
         if (v.labelOffsets !== undefined) out.flowLabelOffsets_ = v.labelOffsets
         if (v.lineType !== undefined) out.flowLineType_ = v.lineType
         if (v.nodeSizeScale !== undefined) out.flowNodeSizeScale_ = v.nodeSizeScale
@@ -42664,6 +42663,7 @@ const decorateFlowLayer = function (out, config) {
         if (v.opacityGradient !== undefined) out.flowOpacityGradient_ = v.opacityGradient
         if (v.widthGradientSettings !== undefined) out.flowWidthGradientSettings_ = v.widthGradientSettings
         if (v.bidirectional !== undefined) out.flowBidirectional_ = v.bidirectional
+        if (v.bidirectionalLayout !== undefined) out.flowBidirectionalLayout_ = v.bidirectionalLayout
         if (v.edgeBundling !== undefined) out.flowEdgeBundling_ = v.edgeBundling
         if (v.bundleSettings !== undefined) out.flowBundleSettings_ = v.bundleSettings
     }
@@ -42767,12 +42767,13 @@ const decorateFlowLayer = function (out, config) {
         // Show importer/exporter regions by coloring them
         addOverlayPolygons(out)
 
+        const circleNodes = out.flowNodes_ && out.flowNodeType_ === 'circle' ? (0,_circles__WEBPACK_IMPORTED_MODULE_12__.prepareCircleNodes)(out) : null
         if (out.flowLineType_ === 'curved' || out.flowLineType_ === 'sankey') {
             // Create the sankey layout
             (0,_sankey__WEBPACK_IMPORTED_MODULE_8__.createSankeyFlowMap)(out, flowContainer)
         } else {
             // Draw straight lines by flow
-            (0,_straight__WEBPACK_IMPORTED_MODULE_10__.createFlowMap)(out, flowContainer)
+            (0,_straight__WEBPACK_IMPORTED_MODULE_10__.createFlowMap)(out, flowContainer, circleNodes)
         }
 
         // draw nodes
@@ -42780,14 +42781,14 @@ const decorateFlowLayer = function (out, config) {
             if (out.flowNodeType_ === 'donut') {
                 (0,_donuts__WEBPACK_IMPORTED_MODULE_11__.drawNodeDonuts)(out, flowContainer)
             } else {
-                (0,_circles__WEBPACK_IMPORTED_MODULE_12__.drawNodeCircles)(out, flowContainer)
+                (0,_circles__WEBPACK_IMPORTED_MODULE_12__.drawNodeCircles)(out, flowContainer, circleNodes)
             }
         }
 
         // Add labels to nodes
         if (out.labels_?.values) {
             const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
-            ;(0,_core_decoration_labels__WEBPACK_IMPORTED_MODULE_14__.addFlowValueLabels)(out, zoomGroup)
+            ;(0,_core_decoration_labels__WEBPACK_IMPORTED_MODULE_15__.addFlowValueLabels)(out, zoomGroup)
         }
     }
 
@@ -42806,15 +42807,11 @@ const decorateFlowLayer = function (out, config) {
 ;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_5__.registerLayerType)('flowmap', 'overlay', decorateFlowLayer)
 
 function defineWidthScale(out) {
-    const data = out.flowGraph_.links
-    // data: array of links with .value
-    const positives = data.map((d) => d.value).filter((v) => v > 0)
-    const upper = (0,d3_array__WEBPACK_IMPORTED_MODULE_0__["default"])(positives)
-    const smallestPositive = (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(positives)
+    const upper = out.maxFlowCount
 
     // visual params
-    const minW = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_15__.getResponsiveSymbolSize)(Math.max(0, out.flowMinWidth_ || 0), 0) // visible floor (px)
-    const maxW = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_15__.getResponsiveSymbolSize)(out.flowMaxWidth_, 2) // max stroke width (px)
+    const minW = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_16__.getResponsiveSymbolSize)(Math.max(0, out.flowMinWidth_ || 0), 0) // visible floor (px)
+    const maxW = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_16__.getResponsiveSymbolSize)(out.flowMaxWidth_, 2) // max stroke width (px)
 
     // Base linear scale for positives only
     const base = (0,d3_scale__WEBPACK_IMPORTED_MODULE_2__["default"])().domain([0, upper]).range([0, maxW]).clamp(true)
@@ -42848,10 +42845,18 @@ function prepareFlowGraph(out) {
     computeMaxMinFlowCounts(out)
 
     out.nodeNameMap = new Map(out.flowGraph_.nodes.map((n) => [n.id, n.name || n.id]))
+    out._nodeById = new Map(out.flowGraph_.nodes.map((node) => [node.id, node]))
 }
 
 function computeMaxMinFlowCounts(out) {
-    const values = out.flowGraph_.links.map((l) => l.value).filter((v) => v > 0)
+    const { nodes, links } = out.flowGraph_
+    const parallel = out.flowLineType_ === 'straight' && out.flowBidirectional_ && out.flowBidirectionalLayout_ === 'parallel' && !out.flowEdgeBundling_
+    const values = (parallel
+        ? Array.from((0,_flow_bidirectional__WEBPACK_IMPORTED_MODULE_13__.buildBidirectionalRouteMap)(nodes, links).values())
+              .filter(({ idA, idB }) => idA !== idB)
+              .flatMap(({ flowAB, flowBA }) => [flowAB, flowBA])
+        : links.map((link) => link.value)
+    ).filter((value) => value > 0)
     out.maxFlowCount = values.length ? (0,d3_array__WEBPACK_IMPORTED_MODULE_0__["default"])(values) : 0
     out.minFlowCount = values.length ? (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(values) : 0
 }
@@ -42892,7 +42897,7 @@ function computeTopFlowLocations(out) {
     out.topLocationKeys = new Set(topLocations.map((loc) => loc.id))
 
     // Assign colors to top locations
-    out.topLocationColorScale = (0,d3_scale__WEBPACK_IMPORTED_MODULE_13__["default"])()
+    out.topLocationColorScale = (0,d3_scale__WEBPACK_IMPORTED_MODULE_14__["default"])()
         .domain(topLocations.map((d) => d.id))
         .range([
             '#00B3E3', // bright turquoise
@@ -42941,8 +42946,12 @@ function addCoordinatesToGraph(out) {
 
 function projectAllNodeCoordinates(out) {
     const nodes = out.flowGraph_.nodes
+    out._flowNodeCoordinates ||= new WeakMap()
     for (const node of nodes) {
-        const screenCoords = out.map._projection([node.x, node.y])
+        const previous = out._flowNodeCoordinates.get(node)
+        const raw = previous && node.x === previous.screen[0] && node.y === previous.screen[1] ? previous.raw : [node.x, node.y]
+        const screenCoords = out.map._projection(raw)
+        out._flowNodeCoordinates.set(node, { raw, screen: screenCoords })
         node.x = screenCoords[0]
         node.y = screenCoords[1]
     }
@@ -42960,9 +42969,8 @@ function computeNodeLinks(out) {
     const nodeById = new Map(nodes.map((d, i) => [id(d, i, nodes), d]))
     for (const [i, link] of links.entries()) {
         link.index = i
-        let { source, target } = link
-        if (typeof source !== 'object') source = link.source = find(nodeById, source)
-        if (typeof target !== 'object') target = link.target = find(nodeById, target)
+        const source = (link.source = find(nodeById, link.source?.id ?? link.source))
+        const target = (link.target = find(nodeById, link.target?.id ?? link.target))
         source.sourceLinks.push(link)
         target.targetLinks.push(link)
     }
@@ -43860,12 +43868,12 @@ __webpack_require__.r(__webpack_exports__);
  *   links:[{source:'FR',target:'DE',value:82018369.72}],
  * }
  */
-function createFlowMap(out, flowMapContainer) {
-    drawStraightLinesByFlow(out, flowMapContainer)
+function createFlowMap(out, flowMapContainer, circleNodes) {
+    drawStraightLinesByFlow(out, flowMapContainer, circleNodes)
 }
 
 // ------------- orchestrator -------------
-function drawStraightLinesByFlow(out, container) {
+function drawStraightLinesByFlow(out, container, circleNodes) {
     // minimal guard
     if (!out?.flowGraph_) return
 
@@ -43886,6 +43894,11 @@ function drawStraightLinesByFlow(out, container) {
     const segments = buildSegments(out)
 
     assignWidths(out, segments)
+    if (out.flowBidirectional_ && out.flowBidirectionalLayout_ === 'parallel' && !out.flowEdgeBundling_) {
+        for (const segment of segments) {
+            trimAgainstCircles(segment, circleNodes)
+        }
+    }
     const gradientIds = prepareGradients(out, container, segments)
     drawSegments(out, container, segments, gradientIds, arrowIds)
 }
@@ -43901,10 +43914,11 @@ function buildSegments(out) {
     const segs = []
 
     if (out.flowBidirectional_) {
-        // Original bidirectional handling remains the same
+        const parallel = out.flowBidirectionalLayout_ === 'parallel' && !out.flowEdgeBundling_
         const routeMap = (0,_flow_bidirectional_js__WEBPACK_IMPORTED_MODULE_2__.buildBidirectionalRouteMap)(nodes, links)
         for (const route of routeMap.values()) {
             const { idA, idB, nodeA, nodeB, flowAB, flowBA } = route
+            if (parallel && idA === idB) continue
             const midX = (nodeA.x + nodeB.x) / 2
             const midY = (nodeA.y + nodeB.y) / 2
 
@@ -43912,28 +43926,28 @@ function buildSegments(out) {
                 segs.push({
                     originId: idA,
                     destId: idB,
-                    x1: midX,
-                    y1: midY,
+                    x1: parallel ? nodeA.x : midX,
+                    y1: parallel ? nodeA.y : midY,
                     x2: nodeB.x,
                     y2: nodeB.y,
                     value: flowAB,
                     route,
                     nodeA,
                     nodeB,
-                    isHalf: true,
+                    parallel,
                 })
                 segs.push({
                     originId: idB,
                     destId: idA,
-                    x1: midX,
-                    y1: midY,
+                    x1: parallel ? nodeB.x : midX,
+                    y1: parallel ? nodeB.y : midY,
                     x2: nodeA.x,
                     y2: nodeA.y,
                     value: flowBA,
                     route,
                     nodeA,
                     nodeB,
-                    isHalf: true,
+                    parallel,
                 })
             } else if (flowAB > 0) {
                 segs.push({
@@ -44024,6 +44038,25 @@ function assignWidths(out, segments) {
     }
 }
 
+function trimAgainstCircles(segment, circles) {
+    if (!circles) return
+    const { x1, y1, x2, y2, originId, destId } = segment
+    const length = Math.hypot(x2 - x1, y2 - y1)
+    if (!(length > 0)) return
+    const startRadius = circles.get(originId)?.radius || 0
+    const endRadius = circles.get(destId)?.radius || 0
+    const start = startRadius ? startRadius + 1 : 0
+    const end = endRadius ? endRadius + 1 : 0
+    if (start + end >= length) {
+        segment.hidden = true
+        return
+    }
+    segment.x1 += ((x2 - x1) * start) / length
+    segment.y1 += ((y2 - y1) * start) / length
+    segment.x2 -= ((x2 - x1) * end) / length
+    segment.y2 -= ((y2 - y1) * end) / length
+}
+
 // create deduped gradients, return array of gradientId per segment (index aligned)
 function prepareGradients(out, container, segments) {
     const usesGradient = out.flowColorGradient_ || out.flowOpacityGradient_
@@ -44036,6 +44069,7 @@ function prepareGradients(out, container, segments) {
 
     for (let i = 0; i < segments.length; i++) {
         const s = segments[i]
+        if (s.hidden) continue
         const baseColor = getFlowStroke(out, s.originId, s.destId, s.route, s.value)
         // key: rounded coords + color + opacity flag. Adjust bucketing if necessary.
         const key = `${Math.round(s.x1)}:${Math.round(s.y1)}:${Math.round(s.x2)}:${Math.round(s.y2)}:${baseColor}:${out.flowOpacityGradient_ ? 1 : 0}`
@@ -44082,26 +44116,46 @@ function drawSegments(out, container, segments, gradientIds, arrowIds) {
     // draw each segment
     for (let i = 0; i < segments.length; i++) {
         const s = segments[i]
+        if (s.hidden) continue
         const baseColor = getFlowStroke(out, s.originId, s.destId, s.route, s.value)
         const colorKey = computeColorKey(out, s.originId, s.destId)
         const paint = usesGradient && gradientIds[i] ? `url(#${gradientIds[i]})` : baseColor
         let paths
 
-        if (out.flowWidthGradient_) {
+        if (s.parallel) {
+            paths = drawParallelSegment(out, lineGroup, s, paint, colorKey, baseColor)
+        } else if (out.flowWidthGradient_) {
             paths = drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor)
         } else {
             paths = drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor)
         }
 
         //mouse events
+        const markers = s.parallel ? null : arrowIds
         paths
-            .on('mouseover', onFlowLineMouseOver(out, s.originId, s.destId, s.value, arrowIds))
+            .on('mouseover', onFlowLineMouseOver(out, s.originId, s.destId, s.value, markers))
             .on('mousemove', onFlowLineMouseMove(out))
-            .on('mouseout', onFlowLineMouseOut(out, baseColor, arrowIds))
+            .on('mouseout', onFlowLineMouseOut(out, s.parallel ? paint : baseColor, markers))
 
         //arrows
-        if (out.flowArrows_) (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.applyArrow)(paths, arrowIds, 'normal')
+        if (markers) (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.applyArrow)(paths, markers, 'normal')
     }
+}
+
+function drawParallelSegment(out, lineGroup, segment, paint, colorKey, baseColor) {
+    const scale = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_5__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35)
+    return lineGroup
+        .append('path')
+        .datum(segment)
+        .attr('d', (0,_flow_bidirectional_js__WEBPACK_IMPORTED_MODULE_2__.parallelFlowPath)(segment, out.flowArrows_ ? (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.arrowHeadLength)(segment.width, scale) : 0))
+        .attr('class', 'em-flow-link em-flow-link-parallel')
+        .attr('fill', paint)
+        .attr('data-nb', segment.value)
+        .attr('data-origin', segment.originId)
+        .attr('data-dest', segment.destId)
+        .attr('data-color', baseColor)
+        .attr('data-color-key', colorKey)
+        .attr('opacity', out.flowOpacity_ ?? 1)
 }
 function drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor) {
     const dx = s.x2 - s.x1,
@@ -44177,9 +44231,9 @@ function getFlowStroke(out, originId, destId, route, halfValue) {
     const nodeById = out._nodeById || new Map(out.flowGraph_.nodes.map((n) => [n.id, n]))
     const source = nodeById.get(originId) || { id: originId }
     const target = nodeById.get(destId) || { id: destId }
-    const linkLike = { source, target, value: halfValue, route }
-
     if (typeof out.flowColor_ === 'function') {
+        const sample = route && (originId === route.idA ? route.sampleAB : route.sampleBA)
+        const linkLike = { ...sample, source, target, value: halfValue, route }
         let color
         let error
         try {
@@ -44240,7 +44294,9 @@ function computeColorKey(out, originId, destId) {
 function onFlowLineMouseOver(out, sourceId, targetId, flow, arrowIds) {
     return function (e) {
         const hoveredColor = out.hoverColor_ || 'black'
-        ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('stroke', hoveredColor).attr('stroke-opacity', 1) // highlight with solid hover color
+        const link = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+        if (link.classed('em-flow-link-parallel')) link.attr('fill', hoveredColor).attr('opacity', 1)
+        else link.attr('stroke', hoveredColor).attr('stroke-opacity', 1)
         if (out.flowArrows_) (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.setHoverArrow)((0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this), arrowIds, true)
 
         if (out.map._tooltip) {
@@ -44260,7 +44316,9 @@ function onFlowLineMouseMove(out) {
 
 function onFlowLineMouseOut(out, baseColor, arrowIds) {
     return function () {
-        (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('stroke', baseColor).attr('stroke-opacity', out.flowOpacity_) // restore solid base color
+        const link = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+        if (link.classed('em-flow-link-parallel')) link.attr('fill', baseColor).attr('opacity', out.flowOpacity_)
+        else link.attr('stroke', baseColor).attr('stroke-opacity', out.flowOpacity_)
         if (out.flowArrows_) (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.setHoverArrow)((0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this), arrowIds, false)
         if (out.map._tooltip) out.map._tooltip.mouseout()
     }

@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { arrowHeadLength, ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js'
-import { buildBidirectionalRouteMap } from './flow-bidirectional.js'
+import { buildBidirectionalRouteMap, parallelFlowPath } from './flow-bidirectional.js'
 import { generateUniqueId } from '../../core/utils.js'
 import { drawEdgeBundleLines } from './edge-bundling.js'
 import { getResponsiveSymbolSize } from '../../core/responsive'
@@ -12,12 +12,12 @@ import { getResponsiveSymbolSize } from '../../core/responsive'
  *   links:[{source:'FR',target:'DE',value:82018369.72}],
  * }
  */
-export function createFlowMap(out, flowMapContainer) {
-    drawStraightLinesByFlow(out, flowMapContainer)
+export function createFlowMap(out, flowMapContainer, circleNodes) {
+    drawStraightLinesByFlow(out, flowMapContainer, circleNodes)
 }
 
 // ------------- orchestrator -------------
-function drawStraightLinesByFlow(out, container) {
+function drawStraightLinesByFlow(out, container, circleNodes) {
     // minimal guard
     if (!out?.flowGraph_) return
 
@@ -38,6 +38,11 @@ function drawStraightLinesByFlow(out, container) {
     const segments = buildSegments(out)
 
     assignWidths(out, segments)
+    if (out.flowBidirectional_ && out.flowBidirectionalLayout_ === 'parallel' && !out.flowEdgeBundling_) {
+        for (const segment of segments) {
+            trimAgainstCircles(segment, circleNodes)
+        }
+    }
     const gradientIds = prepareGradients(out, container, segments)
     drawSegments(out, container, segments, gradientIds, arrowIds)
 }
@@ -53,10 +58,11 @@ function buildSegments(out) {
     const segs = []
 
     if (out.flowBidirectional_) {
-        // Original bidirectional handling remains the same
+        const parallel = out.flowBidirectionalLayout_ === 'parallel' && !out.flowEdgeBundling_
         const routeMap = buildBidirectionalRouteMap(nodes, links)
         for (const route of routeMap.values()) {
             const { idA, idB, nodeA, nodeB, flowAB, flowBA } = route
+            if (parallel && idA === idB) continue
             const midX = (nodeA.x + nodeB.x) / 2
             const midY = (nodeA.y + nodeB.y) / 2
 
@@ -64,28 +70,28 @@ function buildSegments(out) {
                 segs.push({
                     originId: idA,
                     destId: idB,
-                    x1: midX,
-                    y1: midY,
+                    x1: parallel ? nodeA.x : midX,
+                    y1: parallel ? nodeA.y : midY,
                     x2: nodeB.x,
                     y2: nodeB.y,
                     value: flowAB,
                     route,
                     nodeA,
                     nodeB,
-                    isHalf: true,
+                    parallel,
                 })
                 segs.push({
                     originId: idB,
                     destId: idA,
-                    x1: midX,
-                    y1: midY,
+                    x1: parallel ? nodeB.x : midX,
+                    y1: parallel ? nodeB.y : midY,
                     x2: nodeA.x,
                     y2: nodeA.y,
                     value: flowBA,
                     route,
                     nodeA,
                     nodeB,
-                    isHalf: true,
+                    parallel,
                 })
             } else if (flowAB > 0) {
                 segs.push({
@@ -176,6 +182,25 @@ function assignWidths(out, segments) {
     }
 }
 
+function trimAgainstCircles(segment, circles) {
+    if (!circles) return
+    const { x1, y1, x2, y2, originId, destId } = segment
+    const length = Math.hypot(x2 - x1, y2 - y1)
+    if (!(length > 0)) return
+    const startRadius = circles.get(originId)?.radius || 0
+    const endRadius = circles.get(destId)?.radius || 0
+    const start = startRadius ? startRadius + 1 : 0
+    const end = endRadius ? endRadius + 1 : 0
+    if (start + end >= length) {
+        segment.hidden = true
+        return
+    }
+    segment.x1 += ((x2 - x1) * start) / length
+    segment.y1 += ((y2 - y1) * start) / length
+    segment.x2 -= ((x2 - x1) * end) / length
+    segment.y2 -= ((y2 - y1) * end) / length
+}
+
 // create deduped gradients, return array of gradientId per segment (index aligned)
 function prepareGradients(out, container, segments) {
     const usesGradient = out.flowColorGradient_ || out.flowOpacityGradient_
@@ -188,6 +213,7 @@ function prepareGradients(out, container, segments) {
 
     for (let i = 0; i < segments.length; i++) {
         const s = segments[i]
+        if (s.hidden) continue
         const baseColor = getFlowStroke(out, s.originId, s.destId, s.route, s.value)
         // key: rounded coords + color + opacity flag. Adjust bucketing if necessary.
         const key = `${Math.round(s.x1)}:${Math.round(s.y1)}:${Math.round(s.x2)}:${Math.round(s.y2)}:${baseColor}:${out.flowOpacityGradient_ ? 1 : 0}`
@@ -234,26 +260,46 @@ function drawSegments(out, container, segments, gradientIds, arrowIds) {
     // draw each segment
     for (let i = 0; i < segments.length; i++) {
         const s = segments[i]
+        if (s.hidden) continue
         const baseColor = getFlowStroke(out, s.originId, s.destId, s.route, s.value)
         const colorKey = computeColorKey(out, s.originId, s.destId)
         const paint = usesGradient && gradientIds[i] ? `url(#${gradientIds[i]})` : baseColor
         let paths
 
-        if (out.flowWidthGradient_) {
+        if (s.parallel) {
+            paths = drawParallelSegment(out, lineGroup, s, paint, colorKey, baseColor)
+        } else if (out.flowWidthGradient_) {
             paths = drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor)
         } else {
             paths = drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor)
         }
 
         //mouse events
+        const markers = s.parallel ? null : arrowIds
         paths
-            .on('mouseover', onFlowLineMouseOver(out, s.originId, s.destId, s.value, arrowIds))
+            .on('mouseover', onFlowLineMouseOver(out, s.originId, s.destId, s.value, markers))
             .on('mousemove', onFlowLineMouseMove(out))
-            .on('mouseout', onFlowLineMouseOut(out, baseColor, arrowIds))
+            .on('mouseout', onFlowLineMouseOut(out, s.parallel ? paint : baseColor, markers))
 
         //arrows
-        if (out.flowArrows_) applyArrow(paths, arrowIds, 'normal')
+        if (markers) applyArrow(paths, markers, 'normal')
     }
+}
+
+function drawParallelSegment(out, lineGroup, segment, paint, colorKey, baseColor) {
+    const scale = getResponsiveSymbolSize(out.flowArrowScale_ || 1, 0.35)
+    return lineGroup
+        .append('path')
+        .datum(segment)
+        .attr('d', parallelFlowPath(segment, out.flowArrows_ ? arrowHeadLength(segment.width, scale) : 0))
+        .attr('class', 'em-flow-link em-flow-link-parallel')
+        .attr('fill', paint)
+        .attr('data-nb', segment.value)
+        .attr('data-origin', segment.originId)
+        .attr('data-dest', segment.destId)
+        .attr('data-color', baseColor)
+        .attr('data-color-key', colorKey)
+        .attr('opacity', out.flowOpacity_ ?? 1)
 }
 function drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor) {
     const dx = s.x2 - s.x1,
@@ -329,9 +375,9 @@ export function getFlowStroke(out, originId, destId, route, halfValue) {
     const nodeById = out._nodeById || new Map(out.flowGraph_.nodes.map((n) => [n.id, n]))
     const source = nodeById.get(originId) || { id: originId }
     const target = nodeById.get(destId) || { id: destId }
-    const linkLike = { source, target, value: halfValue, route }
-
     if (typeof out.flowColor_ === 'function') {
+        const sample = route && (originId === route.idA ? route.sampleAB : route.sampleBA)
+        const linkLike = { ...sample, source, target, value: halfValue, route }
         let color
         let error
         try {
@@ -392,7 +438,9 @@ export function computeColorKey(out, originId, destId) {
 export function onFlowLineMouseOver(out, sourceId, targetId, flow, arrowIds) {
     return function (e) {
         const hoveredColor = out.hoverColor_ || 'black'
-        select(this).attr('stroke', hoveredColor).attr('stroke-opacity', 1) // highlight with solid hover color
+        const link = select(this)
+        if (link.classed('em-flow-link-parallel')) link.attr('fill', hoveredColor).attr('opacity', 1)
+        else link.attr('stroke', hoveredColor).attr('stroke-opacity', 1)
         if (out.flowArrows_) setHoverArrow(select(this), arrowIds, true)
 
         if (out.map._tooltip) {
@@ -412,7 +460,9 @@ export function onFlowLineMouseMove(out) {
 
 export function onFlowLineMouseOut(out, baseColor, arrowIds) {
     return function () {
-        select(this).attr('stroke', baseColor).attr('stroke-opacity', out.flowOpacity_) // restore solid base color
+        const link = select(this)
+        if (link.classed('em-flow-link-parallel')) link.attr('fill', baseColor).attr('opacity', out.flowOpacity_)
+        else link.attr('stroke', baseColor).attr('stroke-opacity', out.flowOpacity_)
         if (out.flowArrows_) setHoverArrow(select(this), arrowIds, false)
         if (out.map._tooltip) out.map._tooltip.mouseout()
     }

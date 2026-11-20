@@ -12,7 +12,8 @@ import { createSankeyFlowMap } from './sankey'
 import { getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { createFlowMap } from './straight'
 import { drawNodeDonuts } from './donuts'
-import { drawNodeCircles } from './circles'
+import { drawNodeCircles, prepareCircleNodes } from './circles'
+import { buildBidirectionalRouteMap } from './flow-bidirectional'
 import { scaleOrdinal } from 'd3-scale'
 import { addFlowValueLabels } from '../../core/decoration/labels'
 import { getResponsiveSymbolSize } from '../../core/responsive'
@@ -40,6 +41,8 @@ export const decorateFlowLayer = function (out, config) {
     // flow type settings
     out.flowLineType_ = 'curved' // type of flow map values: curved || straight
     out.flowBidirectional_ = true // Whether flows should be bidirectional (true) or unidirectional (false). If there are flows to and from 2 nodes and flowBidirectional is set to false, then these flows will be merged into one line.
+    out.flowBidirectionalLayout_ = 'midpoint'
+    out.flowNodeSizeBy_ = 'total'
     out.flowStack_ = true // stack flows at origin/destination for sankeys (set to false for flows to be drawn on top of each other at origin/destination)
     out.flowEdgeBundling_ = false // whether to use edge bundling for curved flow lines
     out.flowCurvatureSettings_ = {
@@ -168,6 +171,7 @@ export const decorateFlowLayer = function (out, config) {
             stack: out.flowStack_,
             nodes: out.flowNodes_,
             nodeType: out.flowNodeType_,
+            nodeSizeBy: out.flowNodeSizeBy_,
             labelOffsets: out.flowLabelOffsets_,
             lineType: out.flowLineType_,
             nodeSizeScale: out.flowNodeSizeScale_,
@@ -181,6 +185,7 @@ export const decorateFlowLayer = function (out, config) {
             opacityGradient: out.flowOpacityGradient_,
             widthGradientSettings: out.flowWidthGradientSettings_,
             bidirectional: out.flowBidirectional_,
+            bidirectionalLayout: out.flowBidirectionalLayout_,
             edgeBundling: out.flowEdgeBundling_,
             bundleSettings: out.flowBundleSettings_,
         }
@@ -201,6 +206,7 @@ export const decorateFlowLayer = function (out, config) {
         if (v.stack !== undefined) out.flowStack_ = v.stack
         if (v.nodes !== undefined) out.flowNodes_ = v.nodes
         if (v.nodeType !== undefined) out.flowNodeType_ = v.nodeType
+        if (v.nodeSizeBy !== undefined) out.flowNodeSizeBy_ = v.nodeSizeBy
         if (v.labelOffsets !== undefined) out.flowLabelOffsets_ = v.labelOffsets
         if (v.lineType !== undefined) out.flowLineType_ = v.lineType
         if (v.nodeSizeScale !== undefined) out.flowNodeSizeScale_ = v.nodeSizeScale
@@ -214,6 +220,7 @@ export const decorateFlowLayer = function (out, config) {
         if (v.opacityGradient !== undefined) out.flowOpacityGradient_ = v.opacityGradient
         if (v.widthGradientSettings !== undefined) out.flowWidthGradientSettings_ = v.widthGradientSettings
         if (v.bidirectional !== undefined) out.flowBidirectional_ = v.bidirectional
+        if (v.bidirectionalLayout !== undefined) out.flowBidirectionalLayout_ = v.bidirectionalLayout
         if (v.edgeBundling !== undefined) out.flowEdgeBundling_ = v.edgeBundling
         if (v.bundleSettings !== undefined) out.flowBundleSettings_ = v.bundleSettings
     }
@@ -317,12 +324,13 @@ export const decorateFlowLayer = function (out, config) {
         // Show importer/exporter regions by coloring them
         addOverlayPolygons(out)
 
+        const circleNodes = out.flowNodes_ && out.flowNodeType_ === 'circle' ? prepareCircleNodes(out) : null
         if (out.flowLineType_ === 'curved' || out.flowLineType_ === 'sankey') {
             // Create the sankey layout
             createSankeyFlowMap(out, flowContainer)
         } else {
             // Draw straight lines by flow
-            createFlowMap(out, flowContainer)
+            createFlowMap(out, flowContainer, circleNodes)
         }
 
         // draw nodes
@@ -330,7 +338,7 @@ export const decorateFlowLayer = function (out, config) {
             if (out.flowNodeType_ === 'donut') {
                 drawNodeDonuts(out, flowContainer)
             } else {
-                drawNodeCircles(out, flowContainer)
+                drawNodeCircles(out, flowContainer, circleNodes)
             }
         }
 
@@ -356,11 +364,7 @@ registerLayerType('flow', 'overlay', decorateFlowLayer)
 registerLayerType('flowmap', 'overlay', decorateFlowLayer)
 
 function defineWidthScale(out) {
-    const data = out.flowGraph_.links
-    // data: array of links with .value
-    const positives = data.map((d) => d.value).filter((v) => v > 0)
-    const upper = max(positives)
-    const smallestPositive = min(positives)
+    const upper = out.maxFlowCount
 
     // visual params
     const minW = getResponsiveSymbolSize(Math.max(0, out.flowMinWidth_ || 0), 0) // visible floor (px)
@@ -398,10 +402,18 @@ function prepareFlowGraph(out) {
     computeMaxMinFlowCounts(out)
 
     out.nodeNameMap = new Map(out.flowGraph_.nodes.map((n) => [n.id, n.name || n.id]))
+    out._nodeById = new Map(out.flowGraph_.nodes.map((node) => [node.id, node]))
 }
 
 function computeMaxMinFlowCounts(out) {
-    const values = out.flowGraph_.links.map((l) => l.value).filter((v) => v > 0)
+    const { nodes, links } = out.flowGraph_
+    const parallel = out.flowLineType_ === 'straight' && out.flowBidirectional_ && out.flowBidirectionalLayout_ === 'parallel' && !out.flowEdgeBundling_
+    const values = (parallel
+        ? Array.from(buildBidirectionalRouteMap(nodes, links).values())
+              .filter(({ idA, idB }) => idA !== idB)
+              .flatMap(({ flowAB, flowBA }) => [flowAB, flowBA])
+        : links.map((link) => link.value)
+    ).filter((value) => value > 0)
     out.maxFlowCount = values.length ? max(values) : 0
     out.minFlowCount = values.length ? min(values) : 0
 }
@@ -491,8 +503,12 @@ function addCoordinatesToGraph(out) {
 
 function projectAllNodeCoordinates(out) {
     const nodes = out.flowGraph_.nodes
+    out._flowNodeCoordinates ||= new WeakMap()
     for (const node of nodes) {
-        const screenCoords = out.map._projection([node.x, node.y])
+        const previous = out._flowNodeCoordinates.get(node)
+        const raw = previous && node.x === previous.screen[0] && node.y === previous.screen[1] ? previous.raw : [node.x, node.y]
+        const screenCoords = out.map._projection(raw)
+        out._flowNodeCoordinates.set(node, { raw, screen: screenCoords })
         node.x = screenCoords[0]
         node.y = screenCoords[1]
     }
@@ -510,9 +526,8 @@ export function computeNodeLinks(out) {
     const nodeById = new Map(nodes.map((d, i) => [id(d, i, nodes), d]))
     for (const [i, link] of links.entries()) {
         link.index = i
-        let { source, target } = link
-        if (typeof source !== 'object') source = link.source = find(nodeById, source)
-        if (typeof target !== 'object') target = link.target = find(nodeById, target)
+        const source = (link.source = find(nodeById, link.source?.id ?? link.source))
+        const target = (link.target = find(nodeById, link.target?.id ?? link.target))
         source.sourceLinks.push(link)
         target.targetLinks.push(link)
     }

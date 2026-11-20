@@ -992,7 +992,7 @@ const map = eurostatmap
 | Method                                         | Type            | Default                                                                                            | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | ---------------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**flowGraph**([*value*])                 | Object          | _undefined_                                                                                        | Graph object with `nodes` and `links` defining flow data.                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| _map_.**flowSettings**([*value*])              | object          | _auto_                                                                                             | Grouped flow settings object. Keys: `color`, `regionColors`, `regionLabels`, `arrows`, `arrowScale`, `maxWidth`, `minWidth`, `outlines`, `outlineWidth`, `outlineColor`, `colorGradient`, `opacityGradient`, `widthGradient`, `stack`, `nodes`, `nodeType`, `labelOffsets`, `lineType`, `nodeSizeScale`, `opacity`, `internal`, `topLocations`, `topLocationsType`, `curvatureSettings`, `order`, `widthGradientSettings`, `bidirectional`, `edgeBundling`, `bundleSettings`. |
+| _map_.**flowSettings**([*value*])              | object          | _auto_                                                                                             | Grouped flow settings object. Keys: `color`, `regionColors`, `regionLabels`, `arrows`, `arrowScale`, `maxWidth`, `minWidth`, `outlines`, `outlineWidth`, `outlineColor`, `colorGradient`, `opacityGradient`, `widthGradient`, `stack`, `nodes`, `nodeType`, `nodeSizeBy`, `labelOffsets`, `lineType`, `nodeSizeScale`, `opacity`, `internal`, `topLocations`, `topLocationsType`, `curvatureSettings`, `order`, `widthGradientSettings`, `bidirectional`, `bidirectionalLayout`, `edgeBundling`, `bundleSettings`. |
 | _map_.**flowColor**([*value*])                 | string/function | `'#848484ff'`                                                                                      | Deprecated alias of `flowSettings({ color })`.                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | _map_.**flowArrows**([*value*])                | boolean         | _false_                                                                                            | Deprecated alias of `flowSettings({ arrows })`.                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | _map_.**flowOutlines**([*value*])              | boolean         | _true_                                                                                             | Deprecated alias of `flowSettings({ outlines })`.                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -1020,6 +1020,42 @@ const map = eurostatmap
 | _map_.**flowBundleSettings**([*value*])        | object          | _{ alphaDecay: 0.1, chargeStrength: 10, distanceMax: null, linkStrength: 0.7, linkIterations: 1 }_ | Deprecated alias of `flowSettings({ bundleSettings })`.                                                                                                                                                                                                                                                                                                                                                                                                                       |
 
 `flowDonuts()` remains available as a deprecated alias. Prefer `flowSettings({ nodes: true, nodeType: 'donut' })`.
+
+For reciprocal routes, use `flowSettings({ lineType: 'straight', bidirectional: true, bidirectionalLayout: 'parallel', arrows: true })`. Each direction occupies one side of the shared corridor, and its width represents its own value. The default `'midpoint'` layout splits reciprocal routes at their midpoint. Parallel routes support colour and opacity gradients and use uniform shaft widths. Edge bundling uses its own layout.
+
+Set `flowSettings({ color: (link) => ... })` to colour each direction. For parallel routes, the callback gets the summed value and the custom properties of the first input link in that direction.
+
+Use `flowSettings({ nodes: true, nodeType: 'circle', nodeSizeBy: 'internal' })` to size circles by within-location traffic. Pass that traffic as self-links with the same `source` and `target`. The default `nodeSizeBy: 'total'` counts incoming and outgoing traffic and includes self-links once when `internal: true`.
+
+```js
+// Example values for a corridor with traffic in both directions.
+eurostatmap
+    .map('flow')
+    .nutsLevel(0)
+    .insets(false)
+    .flowGraph({
+        nodes: [{ id: 'FR' }, { id: 'BE' }],
+        links: [
+            { source: 'FR', target: 'BE', value: 8000 },
+            { source: 'BE', target: 'FR', value: 3500 },
+            { source: 'FR', target: 'FR', value: 49000 },
+            { source: 'BE', target: 'BE', value: 22000 },
+        ],
+    })
+    .flowSettings({
+        lineType: 'straight',
+        bidirectionalLayout: 'parallel',
+        arrows: true,
+        nodes: true,
+        nodeType: 'circle',
+        nodeSizeBy: 'internal',
+    })
+    .legend({
+        flowWidthLegend: { title: 'Between locations' },
+        nodeSizeLegend: { title: 'Within each location' },
+    })
+    .build()
+```
 
 ### Coxcomb map
 

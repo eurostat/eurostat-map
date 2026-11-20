@@ -1,6 +1,25 @@
 // flow-bidirectional.js
 // Shared helpers for bidirectional flow aggregation.
 
+// Draw each direction to the same side of its own heading, so the reverse direction
+// occupies the opposite side of the shared corridor.
+export function parallelFlowPath({ x1, y1, x2, y2, width }, arrowLength) {
+    const length = Math.hypot(x2 - x1, y2 - y1)
+    if (!(length > 0 && width > 0)) return null
+
+    const dx = (x2 - x1) / length
+    const dy = (y2 - y1) / length
+    const gap = 0.75
+    const point = (along, across) => `${x1 + dx * along - dy * across},${y1 + dy * along + dx * across}`
+    const outer = gap + width
+    if (!(arrowLength > 0)) {
+        return `M${point(0, gap)}L${point(length, gap)}L${point(length, outer)}L${point(0, outer)}Z`
+    }
+
+    const shoulder = length - Math.min(arrowLength, length * 0.45)
+    return `M${point(0, gap)}L${point(length, gap)}L${point(shoulder, gap + width * 1.65)}L${point(shoulder, outer)}L${point(0, outer)}Z`
+}
+
 /**
  * Build a bidirectional route map:
  *   key = unordered "A|B"

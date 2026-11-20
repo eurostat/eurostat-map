@@ -124,6 +124,9 @@ the regions that end up with a classified/sized value from whatever data was jus
 - Discrete colour legends share the SVG swatch and label renderer in `src/legend/legend-swatch.js`.
   Scope flow legend highlights to the owning SVG and match custom colour entries against the stable
   `data-color` on each route. Route hover and gradients can change the visible fill or stroke.
+- Flow rendering writes projected coordinates into graph nodes. On redraw, project from the original
+  coordinates rather than reprojecting the previous screen positions. In parallel layouts, use the
+  same rendered circle radii for connector clearance and for the node symbols.
 - `stat()` and `statData()` remain map-owned to avoid map-to-layer forwarding recursion. A layer
   that needs to expand a special one-object stat config (spark's `dates`, for example) must expose
   an own `handleStatConfig` hook; do not override `layer.stat()` and expect the public map facade

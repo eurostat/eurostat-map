@@ -1,5 +1,5 @@
 import type { MapInstance } from '../../core/MapInstance'
-import type { FlowGraph, FlowCurvatureSettings, FlowWidthGradientSettings, FlowBundleSettings } from './FlowMapConfig'
+import type { FlowGraph, FlowColor, FlowCurvatureSettings, FlowWidthGradientSettings, FlowBundleSettings } from './FlowMapConfig'
 
 /**
  * Flow map type.
@@ -9,7 +9,7 @@ export interface FlowMap extends MapInstance {
     flowGraph(v: FlowGraph): this
 
     flowSettings(): {
-        color: string
+        color: FlowColor
         regionColors: string[]
         regionLabels: string[]
         arrows: boolean
@@ -23,6 +23,7 @@ export interface FlowMap extends MapInstance {
         stack: boolean
         nodes: boolean
         nodeType: 'circle' | 'donut'
+        nodeSizeBy: 'total' | 'internal'
         labelOffsets: { x: number; y: number }
         lineType: 'curved' | 'straight' | 'sankey'
         nodeSizeScale: ((value: number) => number) | null
@@ -36,11 +37,12 @@ export interface FlowMap extends MapInstance {
         opacityGradient: boolean
         widthGradientSettings: FlowWidthGradientSettings
         bidirectional: boolean
+        bidirectionalLayout: 'midpoint' | 'parallel'
         edgeBundling: boolean
         bundleSettings: FlowBundleSettings
     }
     flowSettings(v: {
-        color?: string
+        color?: FlowColor
         regionColors?: string[]
         regionLabels?: string[]
         arrows?: boolean
@@ -54,6 +56,7 @@ export interface FlowMap extends MapInstance {
         stack?: boolean
         nodes?: boolean
         nodeType?: 'circle' | 'donut'
+        nodeSizeBy?: 'total' | 'internal'
         labelOffsets?: { x: number; y: number }
         lineType?: 'curved' | 'straight' | 'sankey'
         nodeSizeScale?: (value: number) => number
@@ -67,14 +70,15 @@ export interface FlowMap extends MapInstance {
         opacityGradient?: boolean
         widthGradientSettings?: FlowWidthGradientSettings
         bidirectional?: boolean
+        bidirectionalLayout?: 'midpoint' | 'parallel'
         edgeBundling?: boolean
         bundleSettings?: FlowBundleSettings
     }): this
 
     /** @deprecated Use flowSettings({ color }) */
-    flowColor(): string
+    flowColor(): FlowColor
     /** @deprecated Use flowSettings({ color }) */
-    flowColor(v: string): this
+    flowColor(v: FlowColor): this
 
     /** @deprecated Use flowSettings({ regionColors }) */
     flowRegionColors(): string[]

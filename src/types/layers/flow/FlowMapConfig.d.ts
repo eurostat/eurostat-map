@@ -44,6 +44,9 @@ export interface FlowGraph {
     links: FlowLink[]
 }
 
+/** A CSS color or a function that chooses a color for each direction. */
+export type FlowColor = string | ((link: FlowLink & { source: FlowNode; target: FlowNode }) => string)
+
 /**
  * Curvature settings used for curved/sankey flow rendering.
  */
@@ -101,7 +104,7 @@ export interface FlowMapConfig extends MapConfig {
 
     /** Grouped flow settings object. */
     flowSettings?: {
-        color?: string
+        color?: FlowColor
         regionColors?: string[]
         regionLabels?: string[]
         arrows?: boolean
@@ -115,6 +118,8 @@ export interface FlowMapConfig extends MapConfig {
         stack?: boolean
         nodes?: boolean
         nodeType?: 'circle' | 'donut'
+        /** Size circles by total traffic or by self-loop traffic. Defaults to total. */
+        nodeSizeBy?: 'total' | 'internal'
         labelOffsets?: { x?: number; y?: number }
         lineType?: 'curved' | 'straight' | 'sankey'
         nodeSizeScale?: (value: number) => number
@@ -128,13 +133,15 @@ export interface FlowMapConfig extends MapConfig {
         opacityGradient?: boolean
         widthGradientSettings?: FlowWidthGradientSettings
         bidirectional?: boolean
+        /** Layout for reciprocal straight flows. Defaults to midpoint. */
+        bidirectionalLayout?: 'midpoint' | 'parallel'
         edgeBundling?: boolean
         bundleSettings?: FlowBundleSettings
     }
 
     /** @deprecated Use flowSettings.color */
     /** Flow color. */
-    flowColor?: string
+    flowColor?: FlowColor
     /** @deprecated Use flowSettings.regionColors */
     /** Flow region colors. */
     flowRegionColors?: string[]
