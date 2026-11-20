@@ -12,20 +12,6 @@
                 color: #203244;
             }
 
-            .controls {
-                display: flex;
-                align-items: center;
-                flex-wrap: wrap;
-                gap: 0.5rem;
-                margin: 0.5rem 0 0.75rem;
-            }
-
-            select,
-            button {
-                font: inherit;
-                padding: 0.3rem 0.5rem;
-            }
-
             .selection-summary {
                 margin: 0 0 0.75rem;
                 font-size: 0.875rem;
@@ -46,15 +32,6 @@
     </head>
 
     <body>
-        <form id="destination-form" class="controls" method="get">
-            <label for="destination">Destination country</label>
-            <select id="destination" name="destination" disabled>
-                <option value="DE">Germany</option>
-                <option value="NL">Netherlands</option>
-                <option value="ES">Spain</option>
-            </select>
-            <button type="submit" disabled>Show routes</button>
-        </form>
         <p id="selection-summary" class="selection-summary" role="status"></p>
         <svg id="map"></svg>
         <p class="source">
@@ -72,42 +49,39 @@
             }
             const countryNames = new Intl.DisplayNames('en', { type: 'region' })
             const counts = new Intl.NumberFormat('en')
-            const form = document.querySelector('#destination-form')
-            const destination = document.querySelector('#destination')
             const summary = document.querySelector('#selection-summary')
             const routeColor = getComputedStyle(document.querySelector('#map')).getPropertyValue('--route-color').trim()
             const requestedCountry = new URLSearchParams(location.search).get('destination')
-            const displayedCountry = Object.hasOwn(originsByDestination, requestedCountry) ? requestedCountry : 'DE'
+            let displayedCountry = Object.hasOwn(originsByDestination, requestedCountry) ? requestedCountry : 'DE'
+            const destinationNames = Object.keys(originsByDestination).map((id) => countryNames.of(id))
+            const destinationList = new Intl.ListFormat('en', { style: 'long', type: 'disjunction' }).format(destinationNames)
 
-            destination.value = displayedCountry
-            const [[origin, count]] = Object.entries(originsByDestination[displayedCountry])
-            summary.textContent = `Largest flow to ${countryNames.of(displayedCountry)}: ${counts.format(count)} people from ${countryNames.of(origin)}.`
-            const legendValues = [0.25, 0.5].map((share) => Math.round((count * share) / 1000) * 1000).concat(count)
-
-            // Submit at most once if the browser emits both input and change.
-            let submitting = false
-            function submitDestination() {
-                if (submitting || destination.value === displayedCountry) return
-
-                const url = new URL(location.href)
-                url.searchParams.set('destination', destination.value)
-                submitting = true
-                location.assign(url.href)
+            function largestFlow(target) {
+                const [[origin, count]] = Object.entries(originsByDestination[target])
+                return { origin, count }
             }
 
-            form.addEventListener('submit', () => {
-                submitting = true
-            })
-            destination.addEventListener('input', submitDestination)
-            destination.addEventListener('change', submitDestination)
-            window.addEventListener('pageshow', (event) => {
-                if (event.persisted) {
-                    submitting = false
-                    destination.value = displayedCountry
+            function describe(target) {
+                const { origin, count } = largestFlow(target)
+                return `Largest flow to ${countryNames.of(target)}: ${counts.format(count)} people from ${countryNames.of(origin)}. Click ${destinationList} to change the destination.`
+            }
+
+            function legendFor(target) {
+                const { count } = largestFlow(target)
+                const values = [0.25, 0.5].map((share) => Math.round((count * share) / 1000) * 1000).concat(count)
+                return {
+                    position: 'top right',
+                    flowWidthLegend: {
+                        title: 'People moving',
+                        titlePadding: 40,
+                        values,
+                        labels: values.map((value) => counts.format(value)),
+                    },
+                    regionColorLegend: { title: 'Country role', labels: ['Previous residence', 'Destination'] },
                 }
-            })
-            destination.disabled = false
-            form.querySelector('button').disabled = false
+            }
+
+            summary.textContent = describe(displayedCountry)
 
             function graphFor(target) {
                 const links = Object.entries(originsByDestination[target]).map(([source, value]) => ({ source, target, value }))
@@ -140,16 +114,21 @@
                     maxWidth: 9,
                     minWidth: 1,
                 })
-                .legend({
-                    position: 'top right',
-                    flowWidthLegend: {
-                        title: 'People moving',
-                        titlePadding: 40,
-                        values: legendValues,
-                        labels: legendValues.map((value) => counts.format(value)),
-                    },
-                    regionColorLegend: { title: 'Country role', labels: ['Previous residence', 'Destination'] },
-                })
+                .legend(legendFor(displayedCountry))
+                .onRegionClick((event, region) => showDestination(region.properties.id))
+
+            // Clicking a country that has data makes it the destination; other countries are ignored.
+            function showDestination(target) {
+                if (!Object.hasOwn(originsByDestination, target) || target === displayedCountry) return
+                displayedCountry = target
+                const url = new URL(location.href)
+                url.searchParams.set('destination', target)
+                history.replaceState(null, '', url)
+                summary.textContent = describe(target)
+                map.title(`EU immigration to ${countryNames.of(target)}`)
+                map.flowGraph(graphFor(target))
+                map.legend(legendFor(target))
+            }
 
             map.statData().unitText('people')
             map.build()
