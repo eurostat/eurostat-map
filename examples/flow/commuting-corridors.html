@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Two-way commuting corridors</title>
+        <style>
+            .em-node-circles .em-node-circle {
+                fill: #f8fafc;
+                stroke: #334155;
+            }
+
+            .town-label {
+                font:
+                    600 12px system-ui,
+                    sans-serif;
+                fill: #253548;
+                paint-order: stroke;
+                stroke: #fff;
+                stroke-width: 3px;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // Illustrative commuter counts. Town coordinates are real; the flows are synthetic.
+            const towns = [
+                { id: 'DIJ', name: 'Dijon', country: 'FR', lon: 5.04, lat: 47.32, local: 36000 },
+                { id: 'BES', name: 'Besançon', country: 'FR', lon: 6.02, lat: 47.24, local: 24000 },
+                { id: 'PON', name: 'Pontarlier', country: 'FR', lon: 6.35, lat: 46.9, local: 5800 },
+                { id: 'LAU', name: 'Lausanne', country: 'CH', lon: 6.63, lat: 46.52, local: 41000 },
+                { id: 'NEU', name: 'Neuchâtel', country: 'CH', lon: 6.93, lat: 46.99, local: 19000 },
+                { id: 'BER', name: 'Bern', country: 'CH', lon: 7.45, lat: 46.95, local: 49000 },
+                { id: 'BAS', name: 'Basel', country: 'CH', lon: 7.59, lat: 47.56, local: 46000 },
+            ]
+            const corridors = [
+                ['DIJ', 'BES', 3200, 1300],
+                ['BES', 'PON', 1700, 950],
+                ['BES', 'NEU', 2300, 420],
+                ['PON', 'LAU', 900, 170],
+                ['PON', 'NEU', 4700, 600],
+                ['LAU', 'NEU', 1200, 2100],
+                ['NEU', 'BER', 3500, 1500],
+                ['BER', 'BAS', 2400, 1100],
+            ]
+
+            const map = eurostatmap.map('flow').nutsLevel(0).insets(false).scale('03M')
+            const [x, y] = eurostatmap.projectToMap(map, 6.48, 47.04)
+
+            const nodes = towns.map(({ id, name, country, lon, lat }) => {
+                const [x, y] = eurostatmap.projectToMap(map, lon, lat)
+                return { id, name, country, x, y }
+            })
+            const links = corridors.flatMap(([a, b, forward, reverse]) => [
+                { source: a, target: b, value: forward },
+                { source: b, target: a, value: reverse },
+            ])
+            for (const { id, local } of towns) {
+                links.push({ source: id, target: id, value: local })
+            }
+
+            const domestic = '#256982'
+            const crossBorder = '#a14927'
+
+            map.title('Two-way commuting corridors')
+                .subtitle('Illustrative commuter counts in the French–Swiss border region')
+                .position({ x, y, z: 465 })
+                .drawCoastalMargin(false)
+                .flowGraph({ nodes, links })
+                .flowSettings({
+                    lineType: 'straight',
+                    bidirectionalLayout: 'parallel',
+                    arrows: true,
+                    color: ({ source, target }) => (source.country === target.country ? domestic : crossBorder),
+                    opacity: 1,
+                    maxWidth: 11,
+                    nodes: true,
+                    nodeType: 'circle',
+                    nodeSizeBy: 'internal',
+                })
+                .legend({
+                    position: 'top right',
+                    flowWidthLegend: { title: 'Between towns', values: [500, 2500, 4500] },
+                    nodeSizeLegend: { title: 'Within each town', values: [45000, 10000] },
+                    flowColorLegend: {
+                        title: 'Corridor type',
+                        marginTop: 30,
+                        items: [
+                            { label: 'Domestic', color: domestic },
+                            { label: 'Cross-border', color: crossBorder },
+                        ],
+                    },
+                })
+                .onBuild((map) => {
+                    const townNames = new Map(nodes.map(({ id, name }) => [id, name]))
+                    map.svg()
+                        .selectAll('.em-node-circle-group')
+                        .append('text')
+                        .attr('class', 'town-label')
+                        .attr('text-anchor', 'middle')
+                        .attr('y', function () {
+                            return -Number(this.parentNode.querySelector('circle').getAttribute('r')) - 5
+                        })
+                        .text(function () {
+                            return townNames.get(this.parentNode.getAttribute('data-id'))
+                        })
+                })
+
+            map.statData().unitText('commuters')
+            map.build()
+        </script>
+    </body>
+</html>

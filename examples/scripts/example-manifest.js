@@ -39,6 +39,7 @@
         'composition/composition.html',
         'coxcomb/coxcomb.html',
         'dot-density/population-dot-density.html',
+        'flow/commuting-corridors.html',
         'flow/flights/flights.html',
         'flow/flowmap.html',
         'flow/immigration.html',
