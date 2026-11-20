@@ -22972,6 +22972,7 @@ function appendPlacenameLabels(out) {
         .text((d) => d.name)
         .attr('class', 'em-placename')
         // Font-size scaled immediately based on zoom
+        .attr('data-fs', (d) => 13 * d.sizeFactor) // base size, used by the live counter-scaling in zoom.js
         .attr('font-size', (d) => `${(13 * d.sizeFactor) / zoomFactor}px`)
         .attr('font-weight', (d) => (d.sizeFactor > 1 ? 'bold' : 'normal'))
         .attr('dy', '-0.35em')
@@ -22982,6 +22983,7 @@ function appendPlacenameLabels(out) {
         .clone(true)
         .lower()
         .attr('class', 'em-placename-halo')
+        .attr('data-sw', baseStrokeWidth) // base width, used by scaleStrokeWidths in zoom.js
         .attr('stroke-width', baseStrokeWidth / zoomFactor)
 
     out.placenameGroup_ = group
@@ -34628,6 +34630,7 @@ const zoomHandler = (event, previousT, map) => {
     }
     if (map.labels_?.backgrounds) scaleLabelBackgrounds(t, map)
     scaleLocations(t, map)
+    scalePlacenames(t, map)
 
     window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))
     if (typeof map.onZoom_ === 'function') map.onZoom_(event, map) // <--- new hook. user defined
@@ -34733,6 +34736,21 @@ const scaleLabelTexts = function (transform, map) {
         if (dy === null || !/^-?\d*\.?\d+$/.test(dy.trim())) return
         if (!element.attr('data-dy')) element.attr('data-dy', dy)
         element.attr('dy', parseFloat(dy) / zoomFactor)
+    })
+}
+
+/**
+ * Keep placename labels at a constant screen size while the map zooms. They live inside the zoom group, so their
+ * font size is divided by the zoom factor (the halo stroke is handled by scaleStrokeWidths via data-sw).
+ * Positions are untouched, so labels stay anchored to their places.
+ */
+const scalePlacenames = function (transform, map) {
+    const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
+    const k = transform.k || 1
+    zoomGroup.selectAll('#em-placenames text').each(function () {
+        const element = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
+        const base = parseFloat(element.attr('data-fs'))
+        if (base > 0) element.attr('font-size', `${base / k}px`)
     })
 }
 
@@ -42067,11 +42085,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/line.js");
 /* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/curve/bundle.js");
 /* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/linear.js");
-/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/pow.js");
-/* harmony import */ var _arrows_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./arrows.js */ "./src/layers/flow/arrows.js");
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var _straight_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./straight.js */ "./src/layers/flow/straight.js");
-/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
+/* harmony import */ var _arrows_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./arrows.js */ "./src/layers/flow/arrows.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _straight_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./straight.js */ "./src/layers/flow/straight.js");
+/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
 
 
 
@@ -42085,13 +42102,12 @@ function drawEdgeBundleLines(out, lineGroup) {
     const height = out.height_ || out.innerHeight_ || 800
     const hypotenuse = Math.sqrt(width * width + height * height)
 
-    const scales = {
-        segments: (0,d3_scale__WEBPACK_IMPORTED_MODULE_5__["default"])().domain([0, hypotenuse]).range([1, 10]),
-        nodes: out._nodeSizeScale || (0,d3_scale__WEBPACK_IMPORTED_MODULE_6__.sqrt)().range([(0,_core_responsive__WEBPACK_IMPORTED_MODULE_10__.getResponsiveSymbolSize)(4, 2), (0,_core_responsive__WEBPACK_IMPORTED_MODULE_10__.getResponsiveSymbolSize)(18, 4)]),
-    }
+    const segmentScale = (0,d3_scale__WEBPACK_IMPORTED_MODULE_5__["default"])().domain([0, hypotenuse]).range([1, 10])
+    const bundleSettings = out.flowBundleSettings_
+    const distanceMax = bundleSettings.distanceMax ?? 2 * (0,_core_responsive__WEBPACK_IMPORTED_MODULE_9__.getResponsiveSymbolSize)(18, 4)
 
     // Build the bundled network
-    const bundle = generateSegments(out.flowGraph_.nodes, out.flowGraph_.links, scales)
+    const bundle = generateSegments(out.flowGraph_.nodes, out.flowGraph_.links, segmentScale)
 
     // --- Style setup: compute stroke, width, and colors for each path ---
     const arrowIds = out.flowArrows_
@@ -42123,12 +42139,12 @@ function drawEdgeBundleLines(out, lineGroup) {
             const destId = target.id || target.code || target.iata
             const val = out.flowGraph_.links?.[i]?.value ?? 1
 
-            const baseColor = (0,_straight_js__WEBPACK_IMPORTED_MODULE_9__.getFlowStroke)(out, originId, destId, null, val)
-            const colorKey = (0,_straight_js__WEBPACK_IMPORTED_MODULE_9__.computeColorKey)(out, originId, destId)
+            const baseColor = (0,_straight_js__WEBPACK_IMPORTED_MODULE_8__.getFlowStroke)(out, originId, destId, null, val)
+            const colorKey = (0,_straight_js__WEBPACK_IMPORTED_MODULE_8__.computeColorKey)(out, originId, destId)
             const paint = baseColor
             const strokeW = out.strokeWidthScale(val)
 
-            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_8__["default"])(this)
+            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_7__["default"])(this)
                 .attr('data-nb', val)
                 .attr('data-origin', originId)
                 .attr('data-dest', destId)
@@ -42138,7 +42154,7 @@ function drawEdgeBundleLines(out, lineGroup) {
                 .attr('stroke-width', strokeW)
                 .attr('stroke-dasharray', out.flowArrows_ ? '5 5' : null)
 
-            if (out.flowArrows_) (0,_arrows_js__WEBPACK_IMPORTED_MODULE_7__.applyArrow)((0,d3_selection__WEBPACK_IMPORTED_MODULE_8__["default"])(this), arrowIds, 'normal')
+            if (out.flowArrows_) (0,_arrows_js__WEBPACK_IMPORTED_MODULE_6__.applyArrow)((0,d3_selection__WEBPACK_IMPORTED_MODULE_7__["default"])(this), arrowIds, 'normal')
         })
 
     //mouse events
@@ -42153,26 +42169,21 @@ function drawEdgeBundleLines(out, lineGroup) {
                 1
 
             // Call imported hover handler
-            ;(0,_straight_js__WEBPACK_IMPORTED_MODULE_9__.onFlowLineMouseOver)(out, originId, destId, val, arrowIds).call(this, event)
+            ;(0,_straight_js__WEBPACK_IMPORTED_MODULE_8__.onFlowLineMouseOver)(out, originId, destId, val, arrowIds).call(this, event)
         })
         .on('mousemove', function (event) {
             if (out.map._tooltip) out.map._tooltip.mousemove(event)
         })
         .on('mouseout', function (event, d) {
-            const baseColor = (0,d3_selection__WEBPACK_IMPORTED_MODULE_8__["default"])(this).attr('data-color')
-            ;(0,_straight_js__WEBPACK_IMPORTED_MODULE_9__.onFlowLineMouseOut)(out, baseColor, arrowIds).call(this, event)
+            const baseColor = (0,d3_selection__WEBPACK_IMPORTED_MODULE_7__["default"])(this).attr('data-color')
+            ;(0,_straight_js__WEBPACK_IMPORTED_MODULE_8__.onFlowLineMouseOut)(out, baseColor, arrowIds).call(this, event)
         })
 
     // --- Animate (edge bundling simulation) ---
     const layout = (0,d3_force__WEBPACK_IMPORTED_MODULE_2__["default"])()
-        .alphaDecay(out.flowBundleSettings_.alphaDecay)
-        .force(
-            'charge',
-            (0,d3_force__WEBPACK_IMPORTED_MODULE_1__["default"])()
-                .strength(out.flowBundleSettings_.chargeStrength)
-                .distanceMax(out.flowBundleSettings_.distanceMax ? out.flowBundleSettings_.distanceMax : scales.nodes.range()[1] * 2)
-        )
-        .force('link', (0,d3_force__WEBPACK_IMPORTED_MODULE_0__["default"])().strength(out.flowBundleSettings_.linkStrength).distance(0).iterations(out.flowBundleSettings_.linkIterations))
+        .alphaDecay(bundleSettings.alphaDecay)
+        .force('charge', (0,d3_force__WEBPACK_IMPORTED_MODULE_1__["default"])().strength(bundleSettings.chargeStrength).distanceMax(distanceMax))
+        .force('link', (0,d3_force__WEBPACK_IMPORTED_MODULE_0__["default"])().strength(bundleSettings.linkStrength).distance(0).iterations(bundleSettings.linkIterations))
         .on('tick', () => paths.attr('d', lineFunction))
 
     layout.nodes(bundle.nodes)
@@ -42180,7 +42191,7 @@ function drawEdgeBundleLines(out, lineGroup) {
 }
 
 // --- same segment generator as before ---
-function generateSegments(nodes, links, scales) {
+function generateSegments(nodes, links, segmentScale) {
     const bundle = { nodes: [], links: [], paths: [] }
 
     bundle.nodes = nodes.map((d) => {
@@ -42191,7 +42202,7 @@ function generateSegments(nodes, links, scales) {
 
     links.forEach((d) => {
         const len = distance(d.source, d.target)
-        const total = Math.round(scales.segments(len))
+        const total = Math.round(segmentScale(len))
         const xscale = (0,d3_scale__WEBPACK_IMPORTED_MODULE_5__["default"])()
             .domain([0, total + 1])
             .range([d.source.x, d.target.x])
@@ -42551,7 +42562,7 @@ const decorateFlowLayer = function (out, config) {
     out.flowBundleSettings_ = {
         alphaDecay: 0.1,
         chargeStrength: 10,
-        distanceMax: null, // if null, will default to twice the max dimension of the map
+        distanceMax: null, // defaults to a zoom-independent, responsive distance
         linkStrength: 0.7,
         linkIterations: 1,
     }

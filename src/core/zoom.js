@@ -247,6 +247,7 @@ const zoomHandler = (event, previousT, map) => {
     }
     if (map.labels_?.backgrounds) scaleLabelBackgrounds(t, map)
     scaleLocations(t, map)
+    scalePlacenames(t, map)
 
     window.dispatchEvent(new CustomEvent('estatmap:zoomed-' + map.svgId_, { detail: map }))
     if (typeof map.onZoom_ === 'function') map.onZoom_(event, map) // <--- new hook. user defined
@@ -352,6 +353,21 @@ const scaleLabelTexts = function (transform, map) {
         if (dy === null || !/^-?\d*\.?\d+$/.test(dy.trim())) return
         if (!element.attr('data-dy')) element.attr('data-dy', dy)
         element.attr('dy', parseFloat(dy) / zoomFactor)
+    })
+}
+
+/**
+ * Keep placename labels at a constant screen size while the map zooms. They live inside the zoom group, so their
+ * font size is divided by the zoom factor (the halo stroke is handled by scaleStrokeWidths via data-sw).
+ * Positions are untouched, so labels stay anchored to their places.
+ */
+const scalePlacenames = function (transform, map) {
+    const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
+    const k = transform.k || 1
+    zoomGroup.selectAll('#em-placenames text').each(function () {
+        const element = select(this)
+        const base = parseFloat(element.attr('data-fs'))
+        if (base > 0) element.attr('font-size', `${base / k}px`)
     })
 }
 

@@ -58,6 +58,7 @@ export function appendPlacenameLabels(out) {
         .text((d) => d.name)
         .attr('class', 'em-placename')
         // Font-size scaled immediately based on zoom
+        .attr('data-fs', (d) => 13 * d.sizeFactor) // base size, used by the live counter-scaling in zoom.js
         .attr('font-size', (d) => `${(13 * d.sizeFactor) / zoomFactor}px`)
         .attr('font-weight', (d) => (d.sizeFactor > 1 ? 'bold' : 'normal'))
         .attr('dy', '-0.35em')
@@ -68,6 +69,7 @@ export function appendPlacenameLabels(out) {
         .clone(true)
         .lower()
         .attr('class', 'em-placename-halo')
+        .attr('data-sw', baseStrokeWidth) // base width, used by scaleStrokeWidths in zoom.js
         .attr('stroke-width', baseStrokeWidth / zoomFactor)
 
     out.placenameGroup_ = group
