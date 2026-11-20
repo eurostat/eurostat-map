@@ -1,5 +1,5 @@
 import { select } from 'd3-selection'
-import { ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js'
+import { arrowHeadLength, ensureArrowMarkers, applyArrow, setHoverArrow } from './arrows.js'
 import { buildBidirectionalRouteMap } from './flow-bidirectional.js'
 import { generateUniqueId } from '../../core/utils.js'
 import { drawEdgeBundleLines } from './edge-bundling.js'
@@ -25,8 +25,9 @@ function drawStraightLinesByFlow(out, container) {
     const svgRoot = out.svg_ || container
     const arrowIds = out.flowArrows_
         ? ensureArrowMarkers(svgRoot, {
-              cacheKey: 'straight',
+              cacheKey: out.flowWidthGradient_ ? 'straight-tapered' : 'straight',
               scale: getResponsiveSymbolSize(out.flowArrowScale_ || 1, 0.35),
+              joinAtBase: !out.flowWidthGradient_,
               markerUnits: 'strokeWidth',
               hoverColor: out.hoverColor_ || 'black',
               outlineColor: out.flowOutlineColor_ || '#ffffff',
@@ -291,7 +292,8 @@ function drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor) {
 }
 
 function drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor) {
-    const backoff = out.flowArrows_ ? arrowBackoffPxForStroke(s.width, out) : 0
+    // Leave room for the entire head plus clearance where routes converge on a node.
+    const backoff = out.flowArrows_ ? 1.6 * arrowHeadLength(s.width, getResponsiveSymbolSize(out.flowArrowScale_ || 1, 0.35)) : 0
 
     let x2 = s.x2,
         y2 = s.y2
@@ -320,13 +322,6 @@ function drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor) {
         .attr('stroke-linecap', 'butt')
         .attr('data-color', baseColor)
         .attr('data-color-key', colorKey)
-}
-
-// estimate arrow length (px) for a given stroke width (px), matched to arrows.js createMarker()
-function arrowBackoffPxForStroke(strokePx, out) {
-    // match arrows.js createMarker(): markerWidth = 3 * scale, tip at ~90% of viewBox
-    const arrowLenPx = strokePx * (3 * getResponsiveSymbolSize(out.flowArrowScale_ || 1, 0.35)) * 0.9
-    return arrowLenPx * 0.7 // slightly less so the base tucks under cleanly
 }
 
 export function getFlowStroke(out, originId, destId, route, halfValue) {

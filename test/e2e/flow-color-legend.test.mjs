@@ -46,7 +46,7 @@ test('flow colour legend highlights the matching routes on its own map', async (
                 { label: 'Empty class', color: '#afa' },
             ])
             buildMap('by-key', { lineType: 'curved', color: () => '#369' }, [{ label: 'Germany', color: '#369', key: 'DE' }])
-            buildMap('top-origin', { lineType: 'straight', nodes: true, topLocations: 1, topLocationsType: 'origin' })
+            buildMap('top-origin', { lineType: 'straight', arrows: true, nodes: true, topLocations: 1, topLocationsType: 'origin' })
         })
 
         for (const [id, rows] of [
@@ -76,6 +76,10 @@ test('flow colour legend highlights the matching routes on its own map', async (
                 assert.equal(await page.locator('.em-flow-link.highlighted, .em-flow-link.dimmed').count(), 0)
             }
         }
+
+        const straightRoute = page.locator('#top-origin .em-flow-link').first()
+        const markerId = (await straightRoute.getAttribute('marker-end')).slice(5, -1)
+        assert.equal(await page.locator('#' + markerId).getAttribute('refX'), '0')
     } finally {
         await browser.close()
     }

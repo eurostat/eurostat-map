@@ -41252,12 +41252,18 @@ const decorateWaffleLayer = function (out, config) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   applyArrow: () => (/* binding */ applyArrow),
+/* harmony export */   arrowHeadLength: () => (/* binding */ arrowHeadLength),
 /* harmony export */   ensureArrowMarkers: () => (/* binding */ ensureArrowMarkers),
 /* harmony export */   ensureDefs: () => (/* binding */ ensureDefs),
 /* harmony export */   setHoverArrow: () => (/* binding */ setHoverArrow)
 /* harmony export */ });
 // arrows.js — shared arrow utilities for straight + sankey
 const uid = (prefix = 'arrow') => `${prefix}-${Math.random().toString(36).slice(2)}`
+const markerSize = 3
+const viewBoxSize = 10
+const tipX = 9.9
+
+const arrowHeadLength = (strokeWidth, scale) => (strokeWidth * scale * markerSize * tipX) / viewBoxSize
 
 /**
  * Ensure <defs> exists on the given SVG root/selection.
@@ -41292,6 +41298,7 @@ function ensureArrowMarkers(svgRoot, opts = {}) {
         outlineColor = '#ffffff',
         idBase = uid('arrow'),
         useContextStroke = true,
+        joinAtBase = false,
     } = opts
 
     // stash on the svg node so both renderers can reuse
@@ -41312,6 +41319,7 @@ function ensureArrowMarkers(svgRoot, opts = {}) {
         createMarker(defs, ids.normal, {
             markerUnits,
             scale,
+            joinAtBase,
             fill: useContextStroke ? 'context-stroke' : hoverColor,
             out: opts.out, // 👈 add this
         })
@@ -41320,6 +41328,7 @@ function ensureArrowMarkers(svgRoot, opts = {}) {
         createMarker(defs, ids.hover, {
             markerUnits,
             scale,
+            joinAtBase,
             fill: hoverColor,
             out: opts.out,
         })
@@ -41328,6 +41337,7 @@ function ensureArrowMarkers(svgRoot, opts = {}) {
         createMarker(defs, ids.outline, {
             markerUnits,
             scale,
+            joinAtBase,
             fill: opts.out?.flowOutlineColor_ || outlineColor,
             out: opts.out,
         })
@@ -41358,12 +41368,9 @@ function setHoverArrow(selection, ids, on) {
  * Internal: create a compact, rounded arrow head.
  * You can tweak geometry here and it’ll propagate everywhere.
  */
-function createMarker(defs, id, { markerUnits = 'strokeWidth', scale = 1, fill = 'context-stroke' }) {
-    const VB = 10,
-        PAD = 0.1
-    const TIP_X = VB - PAD,
-        MID_Y = VB / 2
-    const size = 3.0 * scale
+function createMarker(defs, id, { markerUnits = 'strokeWidth', scale = 1, fill = 'context-stroke', joinAtBase }) {
+    const midY = viewBoxSize / 2
+    const size = markerSize * scale
 
     const m = defs
         .append('marker')
@@ -41371,15 +41378,15 @@ function createMarker(defs, id, { markerUnits = 'strokeWidth', scale = 1, fill =
         .attr('markerUnits', markerUnits) // scales with line/outline width
         .attr('markerWidth', size)
         .attr('markerHeight', size)
-        .attr('viewBox', `0 0 ${VB} ${VB}`)
-        .attr('refX', TIP_X) // tip exactly at line end
-        .attr('refY', MID_Y)
+        .attr('viewBox', `0 0 ${viewBoxSize} ${viewBoxSize}`)
+        .attr('refX', joinAtBase ? 0 : tipX)
+        .attr('refY', midY)
         .attr('orient', 'auto')
 
     // single filled arrow; outline comes from the *outline line*'s own marker
     m.append('path')
         .attr('fill', fill)
-        .attr('d', `M0,0 L${TIP_X},${MID_Y} L0,${VB} L${VB * 0.22},${MID_Y} Z`)
+        .attr('d', `M0,0 L${tipX},${midY} L0,${viewBoxSize}${joinAtBase ? '' : ` L${viewBoxSize * 0.22},${midY}`} Z`)
 }
 
 
@@ -43866,8 +43873,9 @@ function drawStraightLinesByFlow(out, container) {
     const svgRoot = out.svg_ || container
     const arrowIds = out.flowArrows_
         ? (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.ensureArrowMarkers)(svgRoot, {
-              cacheKey: 'straight',
+              cacheKey: out.flowWidthGradient_ ? 'straight-tapered' : 'straight',
               scale: (0,_core_responsive__WEBPACK_IMPORTED_MODULE_5__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35),
+              joinAtBase: !out.flowWidthGradient_,
               markerUnits: 'strokeWidth',
               hoverColor: out.hoverColor_ || 'black',
               outlineColor: out.flowOutlineColor_ || '#ffffff',
@@ -44132,7 +44140,8 @@ function drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor) {
 }
 
 function drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor) {
-    const backoff = out.flowArrows_ ? arrowBackoffPxForStroke(s.width, out) : 0
+    // Leave room for the entire head plus clearance where routes converge on a node.
+    const backoff = out.flowArrows_ ? 1.6 * (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.arrowHeadLength)(s.width, (0,_core_responsive__WEBPACK_IMPORTED_MODULE_5__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35)) : 0
 
     let x2 = s.x2,
         y2 = s.y2
@@ -44161,13 +44170,6 @@ function drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor) {
         .attr('stroke-linecap', 'butt')
         .attr('data-color', baseColor)
         .attr('data-color-key', colorKey)
-}
-
-// estimate arrow length (px) for a given stroke width (px), matched to arrows.js createMarker()
-function arrowBackoffPxForStroke(strokePx, out) {
-    // match arrows.js createMarker(): markerWidth = 3 * scale, tip at ~90% of viewBox
-    const arrowLenPx = strokePx * (3 * (0,_core_responsive__WEBPACK_IMPORTED_MODULE_5__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35)) * 0.9
-    return arrowLenPx * 0.7 // slightly less so the base tucks under cleanly
 }
 
 function getFlowStroke(out, originId, destId, route, halfValue) {

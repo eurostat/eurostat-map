@@ -71,18 +71,18 @@
                 .nutsLevel(0)
                 .insets(false)
                 .scale('20M')
-                .title('Immigration flows within the EU')
-                .subtitle('Eight largest EU origins for the selected destination, 2024')
+                .title(`EU immigration to ${countryNames.of(destination.value)}`)
+                .subtitle('Eight largest flows by country of previous residence, 2024')
                 .position({ x: 4380000, y: 2920000, z: 5600 })
                 .drawCoastalMargin(false)
                 .flowGraph(graphFor(destination.value))
                 .flowSettings({
                     lineType: 'straight',
                     arrows: true,
-                    opacity: 0.8,
+                    opacity: 1,
                     color: '#176b87',
                     regionColors: ['#c7e0e8', '#72a8bc'],
-                    maxWidth: 12,
+                    maxWidth: 9,
                     minWidth: 1,
                 })
                 .legend({
@@ -98,7 +98,10 @@
             map.build()
 
             destination.addEventListener('change', () => {
-                map.flowGraph(graphFor(destination.value)).updateStatValues()
+                const country = destination.value
+                map.title(`EU immigration to ${countryNames.of(country)}`)
+                    .flowGraph(graphFor(country))
+                    .updateStatValues()
             })
         </script>
     </body>

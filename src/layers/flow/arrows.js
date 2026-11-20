@@ -1,5 +1,10 @@
 // arrows.js — shared arrow utilities for straight + sankey
 const uid = (prefix = 'arrow') => `${prefix}-${Math.random().toString(36).slice(2)}`
+const markerSize = 3
+const viewBoxSize = 10
+const tipX = 9.9
+
+export const arrowHeadLength = (strokeWidth, scale) => (strokeWidth * scale * markerSize * tipX) / viewBoxSize
 
 /**
  * Ensure <defs> exists on the given SVG root/selection.
@@ -34,6 +39,7 @@ export function ensureArrowMarkers(svgRoot, opts = {}) {
         outlineColor = '#ffffff',
         idBase = uid('arrow'),
         useContextStroke = true,
+        joinAtBase = false,
     } = opts
 
     // stash on the svg node so both renderers can reuse
@@ -54,6 +60,7 @@ export function ensureArrowMarkers(svgRoot, opts = {}) {
         createMarker(defs, ids.normal, {
             markerUnits,
             scale,
+            joinAtBase,
             fill: useContextStroke ? 'context-stroke' : hoverColor,
             out: opts.out, // 👈 add this
         })
@@ -62,6 +69,7 @@ export function ensureArrowMarkers(svgRoot, opts = {}) {
         createMarker(defs, ids.hover, {
             markerUnits,
             scale,
+            joinAtBase,
             fill: hoverColor,
             out: opts.out,
         })
@@ -70,6 +78,7 @@ export function ensureArrowMarkers(svgRoot, opts = {}) {
         createMarker(defs, ids.outline, {
             markerUnits,
             scale,
+            joinAtBase,
             fill: opts.out?.flowOutlineColor_ || outlineColor,
             out: opts.out,
         })
@@ -100,12 +109,9 @@ export function setHoverArrow(selection, ids, on) {
  * Internal: create a compact, rounded arrow head.
  * You can tweak geometry here and it’ll propagate everywhere.
  */
-function createMarker(defs, id, { markerUnits = 'strokeWidth', scale = 1, fill = 'context-stroke' }) {
-    const VB = 10,
-        PAD = 0.1
-    const TIP_X = VB - PAD,
-        MID_Y = VB / 2
-    const size = 3.0 * scale
+function createMarker(defs, id, { markerUnits = 'strokeWidth', scale = 1, fill = 'context-stroke', joinAtBase }) {
+    const midY = viewBoxSize / 2
+    const size = markerSize * scale
 
     const m = defs
         .append('marker')
@@ -113,13 +119,13 @@ function createMarker(defs, id, { markerUnits = 'strokeWidth', scale = 1, fill =
         .attr('markerUnits', markerUnits) // scales with line/outline width
         .attr('markerWidth', size)
         .attr('markerHeight', size)
-        .attr('viewBox', `0 0 ${VB} ${VB}`)
-        .attr('refX', TIP_X) // tip exactly at line end
-        .attr('refY', MID_Y)
+        .attr('viewBox', `0 0 ${viewBoxSize} ${viewBoxSize}`)
+        .attr('refX', joinAtBase ? 0 : tipX)
+        .attr('refY', midY)
         .attr('orient', 'auto')
 
     // single filled arrow; outline comes from the *outline line*'s own marker
     m.append('path')
         .attr('fill', fill)
-        .attr('d', `M0,0 L${TIP_X},${MID_Y} L0,${VB} L${VB * 0.22},${MID_Y} Z`)
+        .attr('d', `M0,0 L${tipX},${midY} L0,${viewBoxSize}${joinAtBase ? '' : ` L${viewBoxSize * 0.22},${midY}`} Z`)
 }
