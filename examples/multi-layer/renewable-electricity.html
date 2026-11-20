@@ -68,9 +68,9 @@
                 .dorling(true)
                 .position({ x: 4500000, y: 3450000, z: 5900 })
                 .title('Renewable electricity in the EU')
-                .subtitle('Share, volume and sources of gross electricity generation, 2024')
+                .subtitle('Renewable share, output and mix, 2024')
                 .stat('share', { customData: renewableShare, unitText: '%' })
-                .stat('mix', {
+                .stat('composition', {
                     customData: renewableMix,
                     unitText: 'TWh',
                     categoryCodes: ['hydro', 'wind', 'solar', 'other'],
@@ -86,13 +86,10 @@
                     },
                     {
                         type: 'pie',
-                        encoding: {
-                            composition: { stat: 'mix' },
-                            color: {
-                                values: { hydro: '#2563a6', wind: '#168575', solar: '#e6a318', other: '#a65988' },
-                                labels: { hydro: 'Hydro', wind: 'Wind', solar: 'Solar', other: 'Other renewables' },
-                            },
-                        },
+                        encoding: { composition: { stat: 'composition' } },
+                        statCodes: ['hydro', 'wind', 'solar', 'other'],
+                        catColors: { hydro: '#2563a6', wind: '#168575', solar: '#e6a318', other: '#a65988' },
+                        catLabels: { hydro: 'Hydro', wind: 'Wind', solar: 'Solar', other: 'Other renewables' },
                         compositionSettings: { minSize: 4, maxSize: 31, strokeFill: '#fff', strokeWidth: 0.8 },
                         legend: {
                             position: 'top right',
