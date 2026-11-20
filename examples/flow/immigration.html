@@ -20,7 +20,8 @@
                 margin: 0.5rem 0 0.75rem;
             }
 
-            select {
+            select,
+            button {
                 font: inherit;
                 padding: 0.3rem 0.5rem;
             }
@@ -37,14 +38,15 @@
     </head>
 
     <body>
-        <div class="controls">
+        <form id="destination-form" class="controls" method="get">
             <label for="destination">Destination country</label>
-            <select id="destination" disabled>
+            <select id="destination" name="destination">
                 <option value="DE">Germany</option>
                 <option value="NL">Netherlands</option>
                 <option value="ES">Spain</option>
             </select>
-        </div>
+            <button type="submit">Show routes</button>
+        </form>
         <p id="selection-summary" class="selection-summary" role="status"></p>
         <svg id="map"></svg>
         <p class="source">
@@ -62,14 +64,33 @@
             }
             const countryNames = new Intl.DisplayNames('en', { type: 'region' })
             const counts = new Intl.NumberFormat('en')
+            const form = document.querySelector('#destination-form')
             const destination = document.querySelector('#destination')
             const summary = document.querySelector('#selection-summary')
-            let displayedCountry = destination.value
+            const requestedCountry = new URLSearchParams(location.search).get('destination')
+            const displayedCountry = Object.hasOwn(originsByDestination, requestedCountry) ? requestedCountry : 'DE'
 
-            function showSelection(country) {
-                const [[origin, count]] = Object.entries(originsByDestination[country])
-                summary.textContent = `Largest flow to ${countryNames.of(country)}: ${counts.format(count)} people from ${countryNames.of(origin)}.`
+            destination.value = displayedCountry
+            const [[origin, count]] = Object.entries(originsByDestination[displayedCountry])
+            summary.textContent = `Largest flow to ${countryNames.of(displayedCountry)}: ${counts.format(count)} people from ${countryNames.of(origin)}.`
+
+            // Submit at most once if the browser emits both input and change.
+            let submitting = false
+            function submitDestination() {
+                if (!submitting && destination.value !== displayedCountry) form.requestSubmit()
             }
+
+            form.addEventListener('submit', () => {
+                submitting = true
+            })
+            destination.addEventListener('input', submitDestination)
+            destination.addEventListener('change', submitDestination)
+            window.addEventListener('pageshow', (event) => {
+                if (event.persisted) {
+                    submitting = false
+                    destination.value = displayedCountry
+                }
+            })
 
             function graphFor(target) {
                 const links = Object.entries(originsByDestination[target]).map(([source, value]) => ({ source, target, value }))
@@ -104,29 +125,9 @@
                     flowWidthLegend: { title: 'People moving', values: [5000, 10000, 15000] },
                     regionColorLegend: { title: 'Country role', labels: ['Previous residence', 'Destination'] },
                 })
-                .onBuild(() => {
-                    showSelection(displayedCountry)
-                    destination.disabled = false
-                    updateDestination()
-                })
 
             map.statData().unitText('people')
             map.build()
-
-            function updateDestination() {
-                const country = destination.value
-                if (destination.disabled || country === displayedCountry) return
-
-                map.title(`EU immigration to ${countryNames.of(country)}`)
-                    .flowGraph(graphFor(country))
-                    .updateStatValues()
-                displayedCountry = country
-                showSelection(country)
-            }
-
-            destination.addEventListener('input', updateDestination)
-            destination.addEventListener('change', updateDestination)
-            window.addEventListener('pageshow', updateDestination)
         </script>
     </body>
 </html>
