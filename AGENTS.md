@@ -149,6 +149,8 @@ the regions that end up with a classified/sized value from whatever data was jus
 
 ## GitHub etiquette and history
 
+- Include the relevant GitHub issue number in every commit message for work tied to an issue
+  (for example, `Refs #183`). Use `owner/repo#123` for issues in another repository.
 - **Never post a comment on an issue or PR (or close one with a comment) without showing the user the
   draft and getting approval first.** These go out publicly under the user's account.
 - Don't rewrite or force-push `master` unless explicitly asked. If you must (e.g. scrubbing a commit message),
