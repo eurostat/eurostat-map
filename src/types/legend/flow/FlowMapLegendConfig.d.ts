@@ -74,6 +74,9 @@ export interface FlowColorLegendConfig {
     /** Top margin for the flow color legend in pixels. @default 50 */
     marginTop?: number
 
+    /** Vertical gap between swatches in pixels (0 = contiguous, like the discrete choropleth legend). @default 0 */
+    shapePadding?: number
+
     /** User-defined entries for a custom flow color function. Hover matches the destination ID if key is supplied, or the rendered color otherwise. */
     items?: Array<{ label: string; color: string; key?: string }>
 

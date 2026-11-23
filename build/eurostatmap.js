@@ -42967,6 +42967,9 @@ const decorateFlowLayer = function (out, config) {
             (0,_straight__WEBPACK_IMPORTED_MODULE_10__.createFlowMap)(out, flowContainer, circleNodes)
         }
 
+        // node labels from a previous draw go away if nodeLabels was switched off
+        if (!out.flowNodeLabels_) out.svg().selectAll('.em-flow-node-labels').remove()
+
         // draw nodes
         if (out.flowNodes_) {
             if (out.flowNodeType_ === 'donut') {
@@ -50454,7 +50457,8 @@ function drawFlowColorLegend(out, x, y) {
     const titlePadding = out.flowColorLegend.titlePadding ?? 10
     const shapeWidth = out.shapeWidth || 18
     const shapeHeight = out.shapeHeight || 18
-    const rowGap = out.shapePadding ?? 2
+    // Contiguous swatches by default, like the discrete choropleth legend (not the 5px categorical gap)
+    const rowGap = out.flowColorLegend.shapePadding ?? 0
     const labelOffsetX = out.labelOffsets?.x ?? 5
     const titleOffset = titleBoxHeight + titlePadding
 
