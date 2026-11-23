@@ -117,3 +117,43 @@ export function thresholdsDecorator({ count, sepLength, tickLength, labelX, shap
         }
     }
 }
+
+/**
+ * Where a swatch stack or bar starts below its title: the one place that adds the pieces up, so the vertical
+ * discrete, categorical and flow colour legends (and the horizontal bar) cannot drift apart. Callers measure
+ * what they have (a title drawn inside the legend container, a subtitle line) and pass it in.
+ *
+ * @param {Object} [o]
+ * @param {number} [o.titleHeight=0] height of a title drawn inside the same container (0 if the legend box draws it)
+ * @param {number} [o.subtitleHeight=0] height of a subtitle line, including its own spacing
+ * @param {number} [o.titlePadding=0] the configured gap between the title block and the first swatch
+ * @param {number} [o.extraPadding=0] anything else that must sit above the first swatch (e.g. the max label)
+ * @returns {number}
+ */
+export function swatchStackStart({ titleHeight = 0, subtitleHeight = 0, titlePadding = 0, extraPadding = 0 } = {}) {
+    return titleHeight + subtitleHeight + titlePadding + extraPadding
+}
+
+/**
+ * Geometry of a horizontal swatch bar: `count` equal swatches spanning `width`, optionally with a gap opened before
+ * class `breakAt` (the point of divergence). Horizontal counterpart of swatchStackLayout.
+ *
+ * @param {Object} o
+ * @param {number} o.count number of swatches
+ * @param {number} o.width total bar width, break included
+ * @param {number|null} [o.breakAt=null] index of the first swatch after the break (null: no break)
+ * @param {number} [o.breakSize=0] width of the break
+ * @returns {{itemWidth:number, itemX:(j:number)=>number, seamX:(j:number)=>number, breakX:number|null}}
+ */
+export function swatchBarLayout({ count, width, breakAt = null, breakSize = 0 }) {
+    const size = breakAt === null ? 0 : breakSize
+    const itemWidth = (width - size) / count
+    return {
+        itemWidth,
+        itemX: (j) => j * itemWidth + (size && j >= breakAt ? size : 0),
+        // x of the seam between swatch j and j + 1
+        seamX: (j) => (j + 1) * itemWidth + (size && j + 1 > breakAt ? size : 0),
+        // middle of the break
+        breakX: breakAt === null ? null : breakAt * itemWidth + size / 2,
+    }
+}

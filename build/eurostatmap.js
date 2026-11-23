@@ -50996,10 +50996,8 @@ function createHorizontalLegend(out, config) {
     }
     // in 'ranges' mode the classes after the divergence seam shift right to leave a gap for the line
     const gap = s !== null && ranges ? (config.pointOfDivergencePadding ?? 0) : 0
-    const itemWidth = (barWidth - gap) / n
-    const itemX = (j) => j * itemWidth + (gap && j >= s ? gap : 0)
-    // x of the seam between class j and j+1
-    const seamX = (j) => (j + 1) * itemWidth + (gap && j + 1 > s ? gap : 0)
+    const bar = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.swatchBarLayout)({ count: n, width: barWidth, breakAt: s, breakSize: gap })
+    const { itemWidth, itemX, seamX } = bar
 
     // low -> high from left to right, whichever way the vertical legend would be ordered
     for (let j = 0; j < n; j++) {
@@ -51076,7 +51074,7 @@ function createHorizontalLegend(out, config) {
 
     // Point of divergence line + labels (drawn last so it can see the label sizes)
     if (hasDivergence && s !== null) {
-        const xSeam = s * itemWidth + gap / 2
+        const xSeam = bar.breakX
         ;(0,_divergence__WEBPACK_IMPORTED_MODULE_5__.drawHorizontalDivergence)(out, config, { xSeam, barWidth, titlePadding, tickLength, labelFontSize })
     }
 }
@@ -51360,12 +51358,13 @@ function classStackBottom(out, config) {
 }
 
 function getTitlePadding(out) {
-    // Calculate the padding between the title and the first legend item
+    // gap between the title and the first legend item
     const map = out.map
-    let p = map._mapType == 'ps' ? out.colorLegend.titlePadding : out.titlePadding || 0
-    if (out.maxMin) p += 10 // extra padding if max/min labels are shown
-    if (out.colorLegend?.subtitle) p += (0,_core_utils__WEBPACK_IMPORTED_MODULE_0__.getFontSizeFromClass)('em-legend-subtitle') + 2
-    return p
+    return (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_1__.swatchStackStart)({
+        titlePadding: map._mapType == 'ps' ? out.colorLegend.titlePadding : out.titlePadding || 0,
+        extraPadding: out.maxMin ? 10 : 0, // room for the max label
+        subtitleHeight: out.colorLegend?.subtitle ? (0,_core_utils__WEBPACK_IMPORTED_MODULE_0__.getFontSizeFromClass)('em-legend-subtitle') + 2 : 0,
+    })
 }
 
 
@@ -51550,7 +51549,7 @@ function drawFlowColorLegend(out, x, y) {
     // Contiguous swatches by default, like the discrete choropleth legend (not the 5px categorical gap)
     const rowGap = out.flowColorLegend.shapePadding ?? 0
     const labelOffsetX = out.labelOffsets?.x ?? 5
-    const titleOffset = titleBoxHeight + titlePadding
+    const titleOffset = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_1__.swatchStackStart)({ titleHeight: titleBoxHeight, titlePadding })
 
     const scopedLinks = () => out.map.svg().selectAll('.em-flow-container .em-flow-link, .em-flow-container .em-flow-link-bundled')
 
@@ -52155,7 +52154,7 @@ const legend = function (map, config) {
         ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_3__.appendLegendSwatchRows)(container, items, {
             shapeWidth: out.shapeWidth,
             shapeHeight: out.shapeHeight,
-            startY: out.titlePadding,
+            startY: (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_3__.swatchStackStart)({ titlePadding: out.titlePadding }),
             gap: out.shapePadding,
             labelX: out.shapeWidth + out.labelOffsets.x,
             labelDy: '0.35em',
@@ -54869,7 +54868,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   appendLegendSwatchLabel: () => (/* binding */ appendLegendSwatchLabel),
 /* harmony export */   appendLegendSwatchRows: () => (/* binding */ appendLegendSwatchRows),
 /* harmony export */   rangesDecorator: () => (/* binding */ rangesDecorator),
+/* harmony export */   swatchBarLayout: () => (/* binding */ swatchBarLayout),
 /* harmony export */   swatchStackLayout: () => (/* binding */ swatchStackLayout),
+/* harmony export */   swatchStackStart: () => (/* binding */ swatchStackStart),
 /* harmony export */   thresholdsDecorator: () => (/* binding */ thresholdsDecorator)
 /* harmony export */ });
 /** Draw an SVG colour swatch at the position chosen by the legend layout. */
@@ -54989,6 +54990,46 @@ function thresholdsDecorator({ count, sepLength, tickLength, labelX, shapeHeight
             const label = appendLegendSwatchLabel(row, { x: labelX, y: y + shapeHeight, dy: '0.3em', text: () => labelText(i, item) })
             onLabel?.(label, i)
         }
+    }
+}
+
+/**
+ * Where a swatch stack or bar starts below its title: the one place that adds the pieces up, so the vertical
+ * discrete, categorical and flow colour legends (and the horizontal bar) cannot drift apart. Callers measure
+ * what they have (a title drawn inside the legend container, a subtitle line) and pass it in.
+ *
+ * @param {Object} [o]
+ * @param {number} [o.titleHeight=0] height of a title drawn inside the same container (0 if the legend box draws it)
+ * @param {number} [o.subtitleHeight=0] height of a subtitle line, including its own spacing
+ * @param {number} [o.titlePadding=0] the configured gap between the title block and the first swatch
+ * @param {number} [o.extraPadding=0] anything else that must sit above the first swatch (e.g. the max label)
+ * @returns {number}
+ */
+function swatchStackStart({ titleHeight = 0, subtitleHeight = 0, titlePadding = 0, extraPadding = 0 } = {}) {
+    return titleHeight + subtitleHeight + titlePadding + extraPadding
+}
+
+/**
+ * Geometry of a horizontal swatch bar: `count` equal swatches spanning `width`, optionally with a gap opened before
+ * class `breakAt` (the point of divergence). Horizontal counterpart of swatchStackLayout.
+ *
+ * @param {Object} o
+ * @param {number} o.count number of swatches
+ * @param {number} o.width total bar width, break included
+ * @param {number|null} [o.breakAt=null] index of the first swatch after the break (null: no break)
+ * @param {number} [o.breakSize=0] width of the break
+ * @returns {{itemWidth:number, itemX:(j:number)=>number, seamX:(j:number)=>number, breakX:number|null}}
+ */
+function swatchBarLayout({ count, width, breakAt = null, breakSize = 0 }) {
+    const size = breakAt === null ? 0 : breakSize
+    const itemWidth = (width - size) / count
+    return {
+        itemWidth,
+        itemX: (j) => j * itemWidth + (size && j >= breakAt ? size : 0),
+        // x of the seam between swatch j and j + 1
+        seamX: (j) => (j + 1) * itemWidth + (size && j + 1 > breakAt ? size : 0),
+        // middle of the break
+        breakX: breakAt === null ? null : breakAt * itemWidth + size / 2,
     }
 }
 

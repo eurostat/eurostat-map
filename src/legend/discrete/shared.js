@@ -1,6 +1,6 @@
 // Helpers shared by the vertical and horizontal discrete colour legends
 import { executeForAllInsets, getFontSizeFromClass } from '../../core/utils'
-import { swatchStackLayout } from '../legend-swatch'
+import { swatchStackLayout, swatchStackStart } from '../legend-swatch'
 
 export function highlightClass(map, callback, ecl) {
     callback(map, ecl)
@@ -13,10 +13,11 @@ export function classStackBottom(out, config) {
 }
 
 export function getTitlePadding(out) {
-    // Calculate the padding between the title and the first legend item
+    // gap between the title and the first legend item
     const map = out.map
-    let p = map._mapType == 'ps' ? out.colorLegend.titlePadding : out.titlePadding || 0
-    if (out.maxMin) p += 10 // extra padding if max/min labels are shown
-    if (out.colorLegend?.subtitle) p += getFontSizeFromClass('em-legend-subtitle') + 2
-    return p
+    return swatchStackStart({
+        titlePadding: map._mapType == 'ps' ? out.colorLegend.titlePadding : out.titlePadding || 0,
+        extraPadding: out.maxMin ? 10 : 0, // room for the max label
+        subtitleHeight: out.colorLegend?.subtitle ? getFontSizeFromClass('em-legend-subtitle') + 2 : 0,
+    })
 }

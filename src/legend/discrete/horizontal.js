@@ -1,7 +1,7 @@
 // Horizontal variant of the discrete colour legend
 import { select } from 'd3-selection'
 import { getFontSizeFromClass } from '../../core/utils'
-import { appendLegendSwatch, appendLegendSwatchLabel } from '../legend-swatch'
+import { appendLegendSwatch, appendLegendSwatchLabel, swatchBarLayout } from '../legend-swatch'
 import { highlightClass, getTitlePadding } from './shared'
 import { appendExtraSwatchRow, extraSwatchRows } from './extras'
 import { drawHorizontalDivergence } from './divergence'
@@ -43,10 +43,8 @@ export function createHorizontalLegend(out, config) {
     }
     // in 'ranges' mode the classes after the divergence seam shift right to leave a gap for the line
     const gap = s !== null && ranges ? (config.pointOfDivergencePadding ?? 0) : 0
-    const itemWidth = (barWidth - gap) / n
-    const itemX = (j) => j * itemWidth + (gap && j >= s ? gap : 0)
-    // x of the seam between class j and j+1
-    const seamX = (j) => (j + 1) * itemWidth + (gap && j + 1 > s ? gap : 0)
+    const bar = swatchBarLayout({ count: n, width: barWidth, breakAt: s, breakSize: gap })
+    const { itemWidth, itemX, seamX } = bar
 
     // low -> high from left to right, whichever way the vertical legend would be ordered
     for (let j = 0; j < n; j++) {
@@ -123,7 +121,7 @@ export function createHorizontalLegend(out, config) {
 
     // Point of divergence line + labels (drawn last so it can see the label sizes)
     if (hasDivergence && s !== null) {
-        const xSeam = s * itemWidth + gap / 2
+        const xSeam = bar.breakX
         drawHorizontalDivergence(out, config, { xSeam, barWidth, titlePadding, tickLength, labelFontSize })
     }
 }

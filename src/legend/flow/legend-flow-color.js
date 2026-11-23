@@ -1,5 +1,5 @@
 import { color } from 'd3-color'
-import { appendLegendSwatchRows } from '../legend-swatch'
+import { appendLegendSwatchRows, swatchStackStart } from '../legend-swatch'
 
 // explain flow line colors
 export function drawFlowColorLegend(out, x, y) {
@@ -46,7 +46,7 @@ export function drawFlowColorLegend(out, x, y) {
     // Contiguous swatches by default, like the discrete choropleth legend (not the 5px categorical gap)
     const rowGap = out.flowColorLegend.shapePadding ?? 0
     const labelOffsetX = out.labelOffsets?.x ?? 5
-    const titleOffset = titleBoxHeight + titlePadding
+    const titleOffset = swatchStackStart({ titleHeight: titleBoxHeight, titlePadding })
 
     const scopedLinks = () => out.map.svg().selectAll('.em-flow-container .em-flow-link, .em-flow-container .em-flow-link-bundled')
 

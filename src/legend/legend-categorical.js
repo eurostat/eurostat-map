@@ -3,7 +3,7 @@ import * as Legend from './legend'
 import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
 import { appendPatternFillLegend } from './legend-pattern-fill'
 import { highlightRegions, unhighlightRegions } from './legend'
-import { appendLegendSwatchRows } from './legend-swatch'
+import { appendLegendSwatchRows, swatchStackStart } from './legend-swatch'
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 
@@ -97,7 +97,7 @@ export const legend = function (map, config) {
         appendLegendSwatchRows(container, items, {
             shapeWidth: out.shapeWidth,
             shapeHeight: out.shapeHeight,
-            startY: out.titlePadding,
+            startY: swatchStackStart({ titlePadding: out.titlePadding }),
             gap: out.shapePadding,
             labelX: out.shapeWidth + out.labelOffsets.x,
             labelDy: '0.35em',
