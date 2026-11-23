@@ -27,6 +27,7 @@
         'choropleth/basic.html',
         'choropleth/continuous.html',
         'choropleth/EU_only.html',
+        'choropleth/eurostat-colour-palettes.html',
         'choropleth/gdp-per-inhabitant.html',
         'choropleth/labelling.html',
         'choropleth/labels.html',

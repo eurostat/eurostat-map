@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Eurostat colour palettes</title>
+        <style>
+            body {
+                margin: 0;
+                font: 14px Arial, sans-serif;
+                color: #383838;
+            }
+
+            .controls {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px 24px;
+                padding: 8px;
+            }
+
+            .controls label {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            #swatches {
+                display: flex;
+                height: 14px;
+                margin: 0 8px 4px;
+                max-width: 800px;
+            }
+
+            #swatches span {
+                flex: 1;
+            }
+
+            #map {
+                display: block;
+                max-width: 100%;
+                height: auto;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="controls">
+            <label>
+                Colour palette
+                <select id="palette"></select>
+            </label>
+            <label>
+                Classes
+                <select id="classes"></select>
+            </label>
+        </div>
+        <div id="swatches" aria-hidden="true"></div>
+        <svg id="map"></svg>
+
+        <script src="../../build/eurostatmap.js"></script>
+        <script>
+            // The single-hue palettes of the Eurostat visual style guide, usable by name: map.colors('teal')
+            const palettes = {
+                cornflower: 'Cornflower',
+                cobalt: 'Cobalt',
+                darkOrchid: 'Dark orchid',
+                fuchsia: 'Fuchsia',
+                berry: 'Berry',
+                sunsetRed: 'Sunset red',
+                sienna: 'Sienna',
+                darkGold: 'Dark gold',
+                forestGreen: 'Forest green',
+                teal: 'Teal',
+                plum: 'Plum',
+            }
+
+            const paletteSelect = document.getElementById('palette')
+            const classesSelect = document.getElementById('classes')
+            Object.entries(palettes).forEach(([value, label]) => paletteSelect.add(new Option(label, value)))
+            for (let n = 3; n <= 9; n++) classesSelect.add(new Option(n, n))
+            paletteSelect.value = 'teal'
+            classesSelect.value = '6'
+
+            let map
+
+            function showSwatches() {
+                document.getElementById('swatches').replaceChildren(
+                    ...map.colors().map((color) => {
+                        const swatch = document.createElement('span')
+                        swatch.style.background = color
+                        swatch.title = color
+                        return swatch
+                    })
+                )
+            }
+
+            // build the map with the chosen palette and number of classes
+            function render() {
+                document.getElementById('map').replaceChildren()
+                map = eurostatmap
+                    .map('choropleth')
+                    .title('Population density in Europe')
+                    .width(800)
+                    .subtitle('2021')
+                    .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: ' people/km²', filters: { TIME: '2021' } })
+                    .encoding('fill', { stat: 'value' })
+                    .legend({ x: 10, y: 130, title: 'Density, people/km²', boxOpacity: 0 })
+                    .nutsLevel(2)
+                    .numberOfClasses(+classesSelect.value)
+                    .colors(paletteSelect.value) // a palette name, e.g. 'teal' or 'plum'
+                    .build()
+                showSwatches()
+            }
+
+            paletteSelect.addEventListener('change', render)
+            classesSelect.addEventListener('change', render)
+            render()
+        </script>
+    </body>
+</html>
