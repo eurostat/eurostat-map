@@ -114,6 +114,15 @@ export interface LabelsConfig {
     preventOverlap?: boolean
 
     /**
+     * Hide labels that collide with each other, with the legend, title, subtitle or scale bar, or that fall
+     * outside the map. Applies to geographic labels and to flow node labels (`flowSettings({ nodeLabels: true })`),
+     * and is re-evaluated on every zoom and pan. Flow node labels take priority over geographic labels, larger
+     * nodes over smaller ones, and geographic labels keep their array order.
+     * @default false
+     */
+    hideOverlapping?: boolean
+
+    /**
      * Custom formatter function for statistical value labels.
      * @example (value) => value.toFixed(1) + '%'
      */

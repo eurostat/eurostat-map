@@ -4,6 +4,7 @@ import { min, max } from 'd3-array'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { interpolateYlGnBu } from 'd3-scale-chromatic'
 import { piecewise, interpolateLab } from 'd3-interpolate'
+import { EUROSTAT_SINGLE_HUES, isSingleHueName, singleHuePalette } from '../../core/color-palettes'
 import { createStatMap, buildSingleLayerMap } from '../../core/stat-map'
 import { registerLayerType } from '../../core/layer-registry'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
@@ -105,6 +106,25 @@ export const decorateChoroplethLayer = function (layer, config) {
         }
     })
 
+    /**
+     * colors(['#fff', ...]) sets explicit class colours; colors('teal') picks a Eurostat single-hue
+     * palette (see EUROSTAT_SINGLE_HUES), generated for the current number of classes.
+     */
+    layer.colors = function (v) {
+        if (!arguments.length) return resolveNamedColors()
+        layer.colorsName_ = typeof v === 'string' ? v : null
+        if (layer.colorsName_ && !isSingleHueName(layer.colorsName_)) {
+            throw new Error('Unknown colour palette: ' + layer.colorsName_ + '. Available: ' + Object.keys(EUROSTAT_SINGLE_HUES).join(', '))
+        }
+        layer.colors_ = layer.colorsName_ ? null : v
+        return layer
+    }
+    // regenerate a named palette for the current number of classes
+    function resolveNamedColors() {
+        if (layer.colorsName_) layer.colors_ = singleHuePalette(layer.colorsName_, layer.numberOfClasses_)
+        return layer.colors_
+    }
+
     //override attribute values with config values
     if (config) {
         paramNames.forEach(function (key) {
@@ -122,7 +142,7 @@ export const decorateChoroplethLayer = function (layer, config) {
             layer.classToFillStyle(getFillPatternLegend())
         } else {
             // update color function
-            const newFunction = getColorFunction(layer.colorFunction_, layer.colors_, layer.colorSchemeType_)
+            const newFunction = getColorFunction(layer.colorFunction_, resolveNamedColors(), layer.colorSchemeType_)
             layer.classToFillStyle(newFunction)
         }
 
@@ -349,7 +369,7 @@ export const decorateChoroplethLayer = function (layer, config) {
             layer.classToFillStyle(getFillPatternLegend())
         } else {
             // Color legend style
-            layer.classToFillStyle(getColorFunction(layer.colorFunction_, layer.colors_))
+            layer.classToFillStyle(getColorFunction(layer.colorFunction_, resolveNamedColors()))
         }
 
         // Apply color and events to regions if SVG exists
