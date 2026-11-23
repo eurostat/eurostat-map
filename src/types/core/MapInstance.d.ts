@@ -56,6 +56,21 @@ export interface MapInstance {
     responsive(): boolean
     responsive(enabled: boolean): this
 
+    /**
+     * How the layout adapts to the room the map has. The room is the width of the map's container, not the
+     * device: a map in a small iframe is as compact as one on a phone. `'auto'` follows the container (and
+     * rebuilds the map when it is resized across the breakpoint, 768 px); `'desktop'` and `'compact'` fix the
+     * profile. The compact layout draws the map at its real size (readable text, bigger buttons), puts the
+     * legends under the map, and lets a single finger scroll the page. See docs/responsive.md.
+     * @default 'auto'
+     */
+    layout(): 'auto' | 'desktop' | 'compact'
+    layout(profile: 'auto' | 'desktop' | 'compact'): this
+
+    /** Where the legends go in the compact layout: `'below'` the map (default), or `'keep'` where `legend()` puts them. */
+    legendCompactPosition(): 'below' | 'keep'
+    legendCompactPosition(position: 'below' | 'keep'): this
+
     /** Geography. */
 
     /**

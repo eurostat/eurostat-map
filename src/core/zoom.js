@@ -1,6 +1,7 @@
 import { zoom, zoomIdentity } from 'd3-zoom'
 import { select } from 'd3-selection'
 import { taperedPolygonForLink } from '../layers/flow/sankey'
+import { isCompact } from './layout-profile'
 import { hideCollidingLabels } from './decoration/label-layout'
 
 //types
@@ -126,6 +127,9 @@ export const defineGeographicZoom = function (map) {
     }
 
     svg.call(map.__zoomBehavior)
+    // In the compact layout a single finger scrolls the page (d3-zoom would otherwise claim every touch, trapping
+    // the page under the map); a horizontal drag still pans and two fingers pinch or pan the map.
+    if (isCompact(map)) svg.style('touch-action', 'pan-y')
 }
 
 export function setMapView(map, pos) {

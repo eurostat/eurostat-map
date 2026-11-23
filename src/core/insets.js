@@ -3,7 +3,7 @@ import { createMapInstance } from './map-instance'
 import { getDefaultScalebarConfig, mergeScalebarConfig, normalizeLegacyScalebarFields } from './decoration/scalebar'
 import { BOX_CORNER_RADIUS } from './buttons/corner-radius'
 import { getButtonPadding, getButtonSize } from './buttons/button-utils'
-import { isMobile } from './utils'
+import { isCompact } from './layout-profile'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -23,12 +23,12 @@ export const buildInsets = function (out, withCenterPoints, mapType) {
     // On mobile, insets are hidden by default to save space (see the display:none below), and the
     // toggle button is auto-shown so they can still be revealed (see map-instance.js) unless the
     // user has explicitly configured insetsButton themselves.
-    const mobile = isMobile(out.insetsVisibilityBreakpoint_)
+    const mobile = isCompact(out, out.insetsVisibilityBreakpoint_)
     const showsInsetsButton = out.insetsButton_ || (!out._insetsButtonExplicit_ && mobile)
     const presetName = typeof out.insets_ === 'string' ? out.insets_ : null
 
     if (!out.insetBoxPosition_) {
-        const buttonClearanceY = showsInsetsButton ? getButtonSize() + getButtonPadding() : 0
+        const buttonClearanceY = showsInsetsButton ? getButtonSize(out) + getButtonPadding(out) : 0
         const insetBoxWidth = presetName === 'image' ? OVERSEAS_BOX_WIDTH : out.insetBoxWidth_
         out.insetBoxPosition_ = [out.width_ - insetBoxWidth - 2 * out.insetBoxPadding_, 2 * out.insetBoxPadding_ + buttonClearanceY]
     }

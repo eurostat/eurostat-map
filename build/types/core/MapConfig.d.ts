@@ -79,6 +79,22 @@ export interface MapConfig {
      */
     responsive?: boolean
 
+    /**
+     * How the layout adapts to the room the map has. The room is the width of the map's container, not the
+     * device: a map in a small iframe is as compact as one on a phone. `'auto'` follows the container (and
+     * rebuilds the map when it is resized across the breakpoint, 768 px); `'desktop'` and `'compact'` fix the
+     * profile. The compact layout draws the map at its real size (readable text, bigger buttons), puts the
+     * legends under the map, and lets a single finger scroll the page. See docs/responsive.md.
+     * @default 'auto'
+     */
+    layout?: 'auto' | 'desktop' | 'compact'
+
+    /**
+     * Where the legends go in the compact layout: `'below'` the map, or `'keep'` where `legend()` puts them.
+     * @default 'below'
+     */
+    legendCompactPosition?: 'below' | 'keep'
+
     /** Map texts. */
     /** Map title. */
     title?: string
@@ -296,8 +312,8 @@ export interface MapConfig {
     insetsButtonPosition?: [number, number]
 
     /**
-     * Viewport width (px) at/below which insets start hidden (behind the insets button) unless
-     * insetsButton was set explicitly. @default 768
+     * Container width (px) at/below which insets start hidden (behind the insets button) unless
+     * insetsButton was set explicitly. @default 480
      */
     insetsVisibilityBreakpoint?: number
 
@@ -305,8 +321,8 @@ export interface MapConfig {
     legendButtonPosition?: [number, number]
 
     /**
-     * Viewport width (px) at/below which the legend starts hidden (behind the legend button)
-     * when legendButton is enabled. @default 768
+     * Container width (px) at/below which the legend starts hidden (behind the legend button)
+     * when legendButton is enabled. @default 480
      */
     legendVisibilityBreakpoint?: number
 

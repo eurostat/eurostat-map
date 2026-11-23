@@ -4,7 +4,7 @@ import { getButtonPadding, getButtonSize, getMapDrawingExtent } from './button-u
 export const appendInsetsButton = (map) => {
     const svg = select('#' + map.svgId())
 
-    const buttonSize = getButtonSize()
+    const buttonSize = getButtonSize(map)
 
     const insetButton = svg.append('g').attr('class', 'em-insets-button em-button').attr('id', 'em-insets-button')
 
@@ -57,11 +57,11 @@ export function updateInsetsButtonPosition(map) {
     const insetButton = svg.select('#em-insets-button')
     if (insetButton.empty()) return
 
-    positionInsetsButton(map, insetButton, getButtonSize())
+    positionInsetsButton(map, insetButton, getButtonSize(map))
 }
 
 function positionInsetsButton(map, insetButton, buttonSize) {
-    const padding = getButtonPadding()
+    const padding = getButtonPadding(map)
     const extent = getMapDrawingExtent(map)
     const legendButtonPosition = getCornerPosition(map.legendObj_?.position) || 'top left'
     const reserveLegendButton = map.legendButton_ && !map.legendButtonPosition_ && legendButtonPosition === 'top right'

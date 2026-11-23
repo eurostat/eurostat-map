@@ -1,17 +1,20 @@
 import { scaleLinear } from 'd3-scale'
 import { color } from 'd3-color'
+import { isCompact } from './layout-profile'
 
 export const MOBILE_BREAKPOINT = 768
 
 /**
- * Determine whether the current viewport is at or below the mobile breakpoint.
+ * Determine whether the compact layout applies: the container of the map (the last laid out map when none is
+ * given, the window when the container cannot be measured) is at or below the breakpoint, see layout-profile.js.
  * Returns false when no browser window is available (for example during SSR).
  *
  * @param {number} breakpoint
+ * @param {*} [out] the map instance, when known
  * @returns {boolean}
  */
-export function isMobile(breakpoint = MOBILE_BREAKPOINT) {
-    return typeof window !== 'undefined' && window.innerWidth <= breakpoint
+export function isMobile(breakpoint = MOBILE_BREAKPOINT, out) {
+    return typeof window !== 'undefined' && isCompact(out, breakpoint)
 }
 
 //types
