@@ -15,7 +15,7 @@
 //       panel.checkbox({ id: 'bundle', label: 'Edge bundling', checked: true, onChange: (v) => {} })
 //   </script>
 //
-// Every control method returns { el, get(), set(value), show(), hide() } and the panel keeps them by id:
+// Every control method returns { el, get(), set(value), show(), hide() } (a range also has configure()) and the panel keeps them by id:
 // panel.get('palette'), panel.show('width', false). panel.add(node) appends custom content (a legend, a note).
 import './ewc-singleselect.js'
 
@@ -141,28 +141,55 @@ export function createPanel({ map = '#map', title = 'Settings', width = 280 } = 
             })
         },
 
-        /** Slider. onInput fires while dragging, onChange when released. */
-        range({ id, label, min, max, step = 1, value, unit = '', onChange, onInput }) {
+        /**
+         * Slider. onInput fires while dragging, onChange when released. With `steps` (an array of values) the
+         * slider snaps to those values, e.g. the class breaks of a map; get() and the callbacks then give the
+         * step's value, not its position. `format` turns a value into the text shown under the slider.
+         * The control's configure({ min, max, step, steps, value, format }) changes any of these later.
+         */
+        range({ id, label, min, max, step = 1, steps, value, unit = '', format, onChange, onInput }) {
             const inputId = 'ex-range-' + ++uid
             const row = el('div', 'ex-control ecl-form-group')
             row.innerHTML = `<label class="ex-label" for="${inputId}">${escapeHtml(label)}</label>
-                <input id="${inputId}" class="ecl-range" type="range" min="${min}" max="${max}" step="${step}" />
+                <input id="${inputId}" class="ecl-range" type="range" />
                 <div class="ecl-range__value"><span class="ecl-range__value-current"></span> ${escapeHtml(unit)}</div>`
             const input = row.querySelector('input')
             const out = row.querySelector('.ecl-range__value-current')
-            input.value = value ?? min
-            out.textContent = input.value
+            const cfg = { min, max, step, steps, format: format || ((v) => String(v)) }
+
+            const valueOf = () => (cfg.steps ? cfg.steps[+input.value] : +input.value)
+            const show = () => (out.textContent = cfg.format(valueOf()))
+            // the position of a value on the slider: the nearest step, or the value itself
+            const positionOf = (v) => {
+                if (!cfg.steps) return v
+                let best = 0
+                cfg.steps.forEach((x, i) => {
+                    if (Math.abs(x - v) < Math.abs(cfg.steps[best] - v)) best = i
+                })
+                return best
+            }
+            function configure(next = {}) {
+                const current = next.value !== undefined ? next.value : valueOf()
+                Object.assign(cfg, next)
+                delete cfg.value
+                if (next.steps === null) cfg.steps = undefined
+                input.min = cfg.steps ? 0 : cfg.min
+                input.max = cfg.steps ? cfg.steps.length - 1 : cfg.max
+                input.step = cfg.steps ? 1 : cfg.step
+                input.value = positionOf(current ?? cfg.min)
+                show()
+            }
+            configure({ value })
+
             input.addEventListener('input', () => {
-                out.textContent = input.value
-                if (onInput) onInput(+input.value)
+                show()
+                if (onInput) onInput(valueOf())
             })
-            input.addEventListener('change', () => onChange && onChange(+input.value))
+            input.addEventListener('change', () => onChange && onChange(valueOf()))
             return register(id, row, {
-                get: () => +input.value,
-                set: (v) => {
-                    input.value = v
-                    out.textContent = input.value
-                },
+                get: valueOf,
+                set: (v) => configure({ value: v }),
+                configure,
             })
         },
 

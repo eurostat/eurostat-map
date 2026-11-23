@@ -34,6 +34,25 @@
             const isDiverging = () => state.palette.includes('-')
             let map
 
+            // single hues suit a measure that only increases (density); diverging schemes need a midpoint (change)
+            const datasets = {
+                sequential: {
+                    title: 'Population density in Europe',
+                    subtitle: '2021',
+                    stat: { eurostatDatasetCode: 'demo_r_d3dens', unitText: ' people/km²', filters: { TIME: '2021' } },
+                    legendTitle: 'Density, people/km²',
+                    unit: 'people/km²',
+                },
+                diverging: {
+                    title: 'Population change in Europe',
+                    subtitle: 'Crude rate of total population change, 2024',
+                    nutsYear: 2024,
+                    stat: { eurostatDatasetCode: 'demo_r_gind3', filters: { indic_de: 'GROWRT', time: 2024 }, unitText: ' ‰' },
+                    legendTitle: 'Per 1 000 persons',
+                    unit: '‰',
+                },
+            }
+
             const panel = createPanel({ map: '#map', title: 'Colour palette settings' })
             panel.select({
                 id: 'palette',
@@ -112,6 +131,30 @@
                 },
             })
 
+            const oneDecimal = (v) => v.toLocaleString('en', { maximumFractionDigits: 1 })
+
+            // Once the data is in: in discrete mode the slider steps through the class breaks, so the point of
+            // divergence is always one of them (it is then exactly the break shown in the legend); in
+            // continuous mode it is any value in the range of the data.
+            function updatePivotSlider() {
+                const slider = panel.control('pivot')
+                if (state.type === 'continuous') {
+                    const data = map.statData('value')
+                    slider.configure({ steps: null, min: Math.floor(data.getMin()), max: Math.ceil(data.getMax()), step: 0.5, value: state.pivot, format: oneDecimal })
+                    return
+                }
+                const classifier = map.classifier()
+                const breaks = Array.from({ length: state.classes - 1 }, (_, i) => classifier.invertExtent(i)[1])
+                // the break nearest to the current choice (0 at first)
+                const nearest = breaks.reduce((best, b) => (Math.abs(b - state.pivot) < Math.abs(best - state.pivot) ? b : best))
+                slider.configure({ steps: breaks, value: nearest, format: oneDecimal })
+                if (nearest !== state.pivot && isDiverging()) {
+                    // draw again with the point of divergence on a break
+                    state.pivot = nearest
+                    render()
+                }
+            }
+
             function showSwatches() {
                 const strip = document.getElementById('swatches')
                 if (state.type === 'continuous') {
@@ -138,26 +181,27 @@
                 panel.show('classes', state.type === 'discrete')
                 panel.show('pivot', isDiverging())
 
+                const dataset = isDiverging() ? datasets.diverging : datasets.sequential
                 document.getElementById('map').replaceChildren()
                 map = eurostatmap
                     .map('choropleth')
-                    .title('Population change in Europe')
+                    .title(dataset.title)
                     .width(800)
-                    .subtitle('Crude rate of total population change, 2024')
+                    .subtitle(dataset.subtitle)
                     .nutsLevel(2)
-                    .nutsYear(2024)
-                    .stat('value', {
-                        eurostatDatasetCode: 'demo_r_gind3',
-                        filters: { indic_de: 'GROWRT', time: 2024 },
-                        unitText: ' ‰',
-                    })
+                    .stat('value', dataset.stat)
                     .encoding('fill', { stat: 'value' })
-                    .legend({ x: 10, y: 130, title: 'Per 1 000 persons', boxOpacity: 0 })
+                    .legend({ x: 10, y: 130, title: dataset.legendTitle, boxOpacity: 0 })
                     .colorSchemeType(state.type)
                     .numberOfClasses(state.classes)
                     .colors(state.palette) // a palette name, e.g. 'teal' or 'cobalt-plum'
+                if (dataset.nutsYear) map.nutsYear(dataset.nutsYear)
                 if (isDiverging()) map.pointOfDivergence(state.pivot) // where the neutral colour sits
-                map.callback(showSwatches) // once the data has arrived and the classes are known
+                map.callback(() => {
+                    // once the data has arrived and the classes are known
+                    if (isDiverging()) updatePivotSlider()
+                    showSwatches()
+                })
                 map.build()
             }
 
