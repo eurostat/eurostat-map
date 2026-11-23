@@ -11,6 +11,34 @@
                 margin: 0;
             }
 
+            .flight-controls {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 8px 16px;
+                max-width: 1042px;
+                padding: 8px;
+                font: 13px Arial, sans-serif;
+                color: #383838;
+            }
+
+            .flight-controls label {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .flight-controls label.toggle {
+                flex-direction: row;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .flight-controls select,
+            .flight-controls input[type='range'] {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
             .flight-layout {
                 display: grid;
                 grid-template-columns: minmax(0, 795px) 235px;
@@ -57,6 +85,21 @@
                 border-radius: 6px;
             }
 
+            #empty-legend {
+                margin-top: 12px;
+            }
+
+            #empty-legend .ramp {
+                height: 10px;
+                border: 1px solid #d5d5d5;
+                background: linear-gradient(to right, var(--ramp));
+            }
+
+            #empty-legend .ramp-labels {
+                display: flex;
+                justify-content: space-between;
+            }
+
             .flight-tooltip-hint {
                 margin: 0;
                 padding: 10px;
@@ -86,10 +129,36 @@
                 opacity: 0.6;
                 stroke: #252525;
             }
+
+            .voronoi-cell {
+                fill: none;
+                stroke: grey;
+                stroke-width: 1px;
+                vector-effect: non-scaling-stroke;
+                pointer-events: none;
+            }
         </style>
     </head>
 
     <body>
+        <form class="flight-controls" id="controls" onsubmit="return false">
+            <label>Airport <select id="airport"></select></label>
+            <label>
+                Line width means...
+                <select id="theme">
+                    <option>Passengers carried</option>
+                    <option>Empty seats</option>
+                </select>
+            </label>
+            <label>Show top N flights: <output id="topN-out"></output><input id="topN" type="range" min="0" max="1600" step="10" value="800" /></label>
+            <label>Max line width: <output id="maxWidth-out"></output><input id="maxWidth" type="range" min="0.5" max="20" step="0.5" value="10" /></label>
+            <label>Line opacity: <output id="opacity-out"></output><input id="opacity" type="range" min="0.1" max="1" step="0.1" value="0.2" /></label>
+            <label class="toggle"><input id="emptySeats" type="checkbox" /> Colour lines by empty seats</label>
+            <label class="toggle"><input id="bundling" type="checkbox" checked /> Edge bundling</label>
+            <label class="toggle"><input id="merge" type="checkbox" checked /> Merge flows (to and from)</label>
+            <label class="toggle"><input id="voronoi" type="checkbox" /> Voronoi</label>
+            <label class="toggle"><input id="animate" type="checkbox" /> Animate</label>
+        </form>
         <div class="flight-layout">
             <div id="flight-map"><svg id="map"></svg></div>
             <aside class="flight-details" aria-labelledby="flight-details-title">
@@ -97,98 +166,287 @@
                 <div id="flight-tooltip">
                     <p class="flight-tooltip-hint">Hover over a route or airport to see passenger counts.</p>
                 </div>
+                <div id="empty-legend" hidden>
+                    Share of seats that are empty (%)
+                    <div class="ramp"></div>
+                    <div class="ramp-labels"><span id="empty-min"></span><span id="empty-max"></span></div>
+                </div>
             </aside>
         </div>
 
         <script src="../../../build/eurostatmap.js"></script>
         <script src="https://unpkg.com/proj4@2.19.10/dist/proj4.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
 
         <!-- use a module so `await` works at top level -->
         <script type="module">
             import { toFlowGraph } from './parse.js'
 
-            // load JSON (parse the response)
+            // load JSON (parse the response). Each flight has `count` (passengers carried) and
+            // `availableCount` (seats offered); see fetch-seats.mjs.
             const data = await fetch('eurostat-flight-data.json').then((r) => r.json())
-            const graph = toFlowGraph(data)
+            const airportByCode = new Map(data.airports.map((a) => [a.code, a]))
+            const $ = (id) => document.getElementById(id)
+            const fmt = (n) => Math.round(n).toLocaleString('en').replace(/,/g, ' ')
+            const nameOf = (code) => airportByCode.get(code)?.name || code
 
-            // Build the map (assumes eurostatmap is available globally from your bundle)
-            const map = eurostatmap
-                .map('flow')
-                .width(document.getElementById('flight-map').clientWidth)
-                .title('Passenger flights, 2024')
-                .header(true)
-                .footer(true)
-                .position({ x: 3900000, y: 2900000, z: 6400 })
+            // ---- controls (same settings as the Observable notebook "EU flights map") ----
+            const airportSelect = $('airport')
+            airportSelect.add(new Option('All airports', ''))
+            data.airports.forEach((a) => airportSelect.add(new Option(`${a.iata || a.code} — ${a.name}`, a.code)))
 
-                .flowGraph(graph)
+            function readSettings() {
+                return {
+                    airport: $('airport').value,
+                    theme: $('theme').value, // 'Passengers carried' | 'Empty seats'
+                    topN: +$('topN').value, // 0 = all flights
+                    maxWidth: +$('maxWidth').value,
+                    opacity: +$('opacity').value,
+                    emptySeats: $('emptySeats').checked, // colour lines by share of empty seats
+                    bundling: $('bundling').checked,
+                    merge: $('merge').checked, // merge both directions of a route
+                    voronoi: $('voronoi').checked,
+                    animate: $('animate').checked,
+                }
+            }
 
-                // line type
-                .flowSettings({ lineType: 'straight', bidirectional: false, edgeBundling: true })
-                .flowSettings({
-                    bundleSettings: {
-                        alphaDecay: 0.1,
-                        chargeStrength: 10,
-                        distanceMax: null, // use the default bundling distance
-                        linkStrength: 0.7,
-                        linkIterations: 1,
-                    },
+            /** The flights to draw: filter by airport, optionally merge both directions, sort, keep the top N. */
+            function selectFlights(s) {
+                let flights = data.flights.filter((d) => d.count && d.availableCount && (!s.airport || d.origin === s.airport || d.destination === s.airport))
+
+                if (s.merge) {
+                    const merged = new Map()
+                    for (const d of flights) {
+                        const [a, b] = d.origin < d.destination ? [d.origin, d.destination] : [d.destination, d.origin]
+                        const m = merged.get(a + '|' + b) || { origin: a, destination: b, count: 0, availableCount: 0 }
+                        m.count += d.count
+                        m.availableCount += d.availableCount
+                        merged.set(a + '|' + b, m)
+                    }
+                    flights = [...merged.values()]
+                }
+
+                flights = flights
+                    .map((d) => {
+                        const empty = d.availableCount - d.count
+                        return {
+                            ...d,
+                            empty,
+                            emptyPct: (empty / d.availableCount) * 100,
+                            value: s.theme === 'Passengers carried' ? d.count : empty,
+                        }
+                    })
+                    .filter((d) => d.value > 0)
+                    .sort((a, b) => b.value - a.value)
+
+                return s.topN > 0 ? flights.slice(0, s.topN) : flights
+            }
+
+            // ---- tooltip ----
+            function flowTooltip(flightsByKey, merged) {
+                return (link) => {
+                    const originId = link.originId ?? link.source.id
+                    const destId = link.destId ?? link.target.id
+                    const f = flightsByKey.get(originId + '|' + destId)
+                    const rows = f
+                        ? `<tr><td>${fmt(f.count)} passengers</td></tr>
+                           <tr><td>${fmt(f.availableCount)} seats</td></tr>
+                           <tr><td>${fmt(f.empty)} empty seats (${f.emptyPct.toFixed()}%)</td></tr>`
+                        : `<tr><td>${fmt(link.value)} passengers</td></tr>`
+                    const title = merged ? `${nameOf(originId)} – ${nameOf(destId)}` : `${nameOf(originId)} to ${nameOf(destId)}`
+                    return `<div class="em-tooltip-bar"><b>${title}</b></div>
+                        <div class="em-tooltip-text"><table class="em-tooltip-table"><tbody>${rows}</tbody></table></div>`
+                }
+            }
+
+            // ---- overlays drawn on top of the built map ----
+            function drawVoronoi(svg) {
+                const container = svg.select('#em-flow-container')
+                const points = []
+                container.selectAll('.em-node-circle-group').each(function () {
+                    const m = /translate\(([-\d.e]+),\s*([-\d.e]+)\)/.exec(this.getAttribute('transform') || '')
+                    if (m) points.push([+m[1], +m[2]])
                 })
-                .flowSettings({ maxWidth: 10, minWidth: 0.1, internal: false })
+                if (points.length < 2) return
+                const voronoi = d3.Delaunay.from(points).voronoi([-5000, -5000, 5000, 5000])
+                const g = container.insert('g', ':first-child').attr('class', 'em-voronoi')
+                points.forEach((_, i) => g.append('path').attr('class', 'voronoi-cell').attr('d', voronoi.renderCell(i)))
+            }
 
-                // flow accessories
-                .flowSettings({ arrows: false, outlines: false })
-
-                //nodes
-                .flowSettings({ nodes: true })
-                .flowSettings({ nodeType: 'circle' }) // donut or circle
-
-                // gradients
-                .flowSettings({ colorGradient: false, widthGradient: false, opacityGradient: false })
-
-                // sankey-only
-                // .flowStack(false)
-
-                // color
-                //.flowRegionColors(['#bbd7ee', '#c7e3c6']) // no regions here
-                .flowSettings({ topLocations: 0 }) // Top N locations by flow volume
-                .flowSettings({ opacity: 0.1, color: '#000' })
-
-                .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
-
-                .tooltip({ id: 'flight-tooltip' })
-                .labels({
-                    values: false,
-                    backgrounds: true,
-                    shadows: true,
+            // dots travelling along every route, more often on busier ones
+            function startAnimation(svg, flightsByKey) {
+                const container = svg.select('#em-flow-container')
+                const layer = container.append('g').attr('class', 'em-particles').style('pointer-events', 'none')
+                const routes = []
+                container.selectAll('.em-flow-lines .em-flow-link').each(function () {
+                    const f = flightsByKey.get(this.dataset.origin + '|' + this.dataset.dest)
+                    if (f && this.getTotalLength) routes.push({ el: this, length: this.getTotalLength(), value: f.value })
                 })
-                .nutsLevel(0)
-                .legend({
-                    //svgId: 'legend',
-                    width: 220,
-                    x: 20,
-                    y: 150,
-                    //title: 'Main legend title',
-                    boxOpacity: 0,
-                    flowWidthLegend: {
-                        title: 'Passengers (flights)',
-                        segments: 4,
-                        width: 150,
-                        titlePadding: 30, // FIXME
-                        maxMin: true,
-                        orientation: 'horizontal',
-                    },
-                    nodeSizeLegend: { title: 'Passengers (airports)', values: [60000000, 1000000], labels: ['60M', '1M'] },
-                    flowColorLegend: false,
-                    regionColorLegend: { title: 'Region colors' },
+                if (!routes.length) return () => {}
+                const rate = d3
+                    .scaleSqrt()
+                    .domain(d3.extent(routes, (r) => r.value))
+                    .range([0.05, 2.5]) // dots per second
+                const SPEED = 140 // px per second
+                const particles = []
+                let last = performance.now()
+                let frame
+                const tick = (now) => {
+                    const dt = Math.min((now - last) / 1000, 0.1)
+                    last = now
+                    for (const r of routes) {
+                        if (r.length && Math.random() < rate(r.value) * dt) {
+                            particles.push({ route: r, dist: 0, dot: layer.append('circle').attr('r', 1.5).attr('fill', 'rgba(0,0,0,0.7)').node() })
+                        }
+                    }
+                    for (let i = particles.length - 1; i >= 0; i--) {
+                        const p = particles[i]
+                        p.dist += SPEED * dt
+                        if (p.dist >= p.route.length) {
+                            p.dot.remove()
+                            particles.splice(i, 1)
+                            continue
+                        }
+                        const pt = p.route.el.getPointAtLength(p.dist)
+                        p.dot.setAttribute('cx', pt.x)
+                        p.dot.setAttribute('cy', pt.y)
+                    }
+                    frame = requestAnimationFrame(tick)
+                }
+                frame = requestAnimationFrame(tick)
+                return () => cancelAnimationFrame(frame)
+            }
+
+            // ---- build / rebuild the map from the current settings ----
+            let stopAnimation = () => {}
+
+            function render() {
+                stopAnimation()
+                stopAnimation = () => {}
+                const s = readSettings()
+                $('topN-out').textContent = s.topN || 'all'
+                $('maxWidth-out').textContent = s.maxWidth
+                $('opacity-out').textContent = s.opacity
+
+                const flights = selectFlights(s)
+                const flightsByKey = new Map(flights.map((f) => [f.origin + '|' + f.destination, f]))
+                const graph = toFlowGraph({
+                    airports: data.airports,
+                    flights: flights.map((f) => ({ origin: f.origin, destination: f.destination, count: f.value })),
                 })
-                .drawCoastalMargin(false)
-                .insets(false)
-                .zoomExtent([0.03, 1000])
-                .onBuild((map) => {
-                    const svg = map.svg()
-                    svg.attr('viewBox', `0 0 ${svg.attr('width')} ${svg.attr('height')}`)
-                })
-                .build()
+
+                // colour lines by the share of empty seats (white-to-dark red, like d3.interpolateReds)
+                const pcts = flights.map((f) => f.emptyPct)
+                const [lo, hi] = [Math.min(...pcts), Math.max(...pcts)]
+                const reds = (pct) => d3.interpolateReds(hi > lo ? Math.min(1, Math.max(0, (pct - lo) / (hi - lo))) : 1)
+                const legend = $('empty-legend')
+                legend.hidden = !s.emptySeats || !flights.length
+                if (!legend.hidden) {
+                    legend.querySelector('.ramp').style.setProperty('--ramp', d3.range(0, 1.01, 0.1).map(d3.interpolateReds).join(','))
+                    $('empty-min').textContent = lo.toFixed() + '%'
+                    $('empty-max').textContent = hi.toFixed() + '%'
+                }
+
+                // reset the svg (and its zoom state) before drawing the new map into it
+                const svg = d3.select('#map')
+                svg.selectAll('*').remove()
+                svg.property('__zoom', d3.zoomIdentity)
+
+                const label = s.airport ? `Flights from ${nameOf(s.airport)} (${s.airport})` : `Top ${s.topN || 'all'} flights by ${s.theme.toLowerCase()}`
+
+                eurostatmap
+                    .map('flow')
+                    .width(document.getElementById('flight-map').clientWidth)
+                    .title('Passenger flights, 2024')
+                    .subtitle(label)
+                    .header(true)
+                    .footer(true)
+                    .position({ x: 3900000, y: 2900000, z: 6400 })
+
+                    .flowGraph(graph)
+
+                    // line type
+                    .flowSettings({ lineType: 'straight', bidirectional: false, edgeBundling: s.bundling })
+                    .flowSettings({
+                        bundleSettings: {
+                            alphaDecay: 0.1,
+                            chargeStrength: 10,
+                            distanceMax: null, // use the default bundling distance
+                            linkStrength: 0.7,
+                            linkIterations: 1,
+                        },
+                    })
+                    .flowSettings({ maxWidth: s.maxWidth, minWidth: 0.6, internal: false })
+
+                    // flow accessories
+                    .flowSettings({ arrows: false, outlines: false })
+
+                    //nodes
+                    .flowSettings({ nodes: true })
+                    .flowSettings({ nodeType: 'circle' }) // donut or circle
+
+                    // gradients
+                    .flowSettings({ colorGradient: false, widthGradient: false, opacityGradient: false })
+
+                    // color: black, or the share of empty seats
+                    .flowSettings({ topLocations: 0 }) // Top N locations by flow volume
+                    .flowSettings({
+                        opacity: s.opacity,
+                        color: s.emptySeats
+                            ? (d) => {
+                                  const f = flightsByKey.get((d.originId ?? d.source.id) + '|' + (d.destId ?? d.target.id))
+                                  return f ? reds(f.emptyPct) : '#000'
+                              }
+                            : '#000',
+                    })
+
+                    .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
+
+                    .tooltip({ id: 'flight-tooltip', textFunction: flowTooltip(flightsByKey, s.merge) })
+                    .labels({
+                        values: false,
+                        backgrounds: true,
+                        shadows: true,
+                    })
+                    .nutsLevel(0)
+                    .legend({
+                        width: 220,
+                        x: 20,
+                        y: 150,
+                        boxOpacity: 0,
+                        flowWidthLegend: {
+                            title: s.theme === 'Passengers carried' ? 'Passengers (flights)' : 'Empty seats (flights)',
+                            segments: 4,
+                            width: 150,
+                            titlePadding: 30, // FIXME
+                            maxMin: true,
+                            orientation: 'horizontal',
+                        },
+                        nodeSizeLegend: { title: 'Passengers (airports)', values: [60000000, 1000000], labels: ['60M', '1M'] },
+                        flowColorLegend: false,
+                        regionColorLegend: { title: 'Region colors' },
+                    })
+                    .drawCoastalMargin(false)
+                    .insets(false)
+                    .zoomExtent([0.03, 1000])
+                    .onBuild((map) => {
+                        const svg = map.svg()
+                        svg.attr('viewBox', `0 0 ${svg.attr('width')} ${svg.attr('height')}`)
+                        if (s.voronoi) drawVoronoi(svg)
+                        if (s.animate) {
+                            svg.select('.em-flow-lines').style('opacity', 0) // dots only; hover still works
+                            stopAnimation = startAnimation(svg, flightsByKey)
+                        }
+                    })
+                    .build()
+            }
+
+            let timer
+            $('controls').addEventListener('input', () => {
+                clearTimeout(timer)
+                timer = setTimeout(render, 150)
+            })
+            render()
         </script>
     </body>
 </html>
