@@ -329,6 +329,22 @@ hand-rolling markup in an example. Not every older example has been converted ye
 - Maritime partner labels (`maritime/flows/partner-labels.js`) are placed by hand through `positions`; a label must sit
   at its own flow's end, and overlapping a neighbouring flow a little is the accepted cost (Türkiye, `TR`).
 
+## Responsive layout (read `docs/responsive.md`)
+
+- Never decide "mobile" from `window.innerWidth`: ask `isCompact(map)` (`core/layout-profile.js`), which follows the width the
+  map is drawn at (its container, or an explicit `width()`). A small iframe on a desktop is compact; IMAGE exports set an
+  explicit width, so they keep the desktop layout. New features with a layout difference hang off that one function.
+- Fixed pixel layout constants designed for ~800px (grid cartogram margins, legend x/y, symbol sizes) are the usual cause of
+  an example looking bad on a phone: give them a compact variant (see `getGridCartogramMargins`, `legend-below.js`) and keep
+  caller-set values untouched.
+- An example that rebuilds with a new `map()` into the same svg (settings change) reuses the svg: anything the library leaves
+  on it (viewBox, layout observer) must be keyed to the svg, not to the map instance (the `data-em-viewbox` marker).
+- Examples: settings go in the shared panel (bottom sheet on phones); drop fixed `.width(...)`; on a phone fill the screen with
+  `.height(() => ...)`. `view.html` hides the code panel by default on phones so the example has the whole screen.
+- Check an example on a phone with Playwright (`isMobile`, 390x844) and its desktop layout, not only one of them.
+- In this shell, heredocs/commands containing non-ASCII characters or quotes can fail with exit 127: write scripts with the
+  Write tool and run them.
+
 ## Keep this file current for the next agent
 
 Different agents and sessions (potentially different providers entirely) work in this repo over

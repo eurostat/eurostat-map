@@ -250,6 +250,10 @@
                 .stage {
                     flex: 0 0 56%;
                 }
+                /* without the code the example has the whole screen */
+                body.no-code .stage {
+                    flex: 1;
+                }
                 .code {
                     flex: 1;
                     padding: 10px;
@@ -410,13 +414,16 @@
             })
 
             // show or hide the code
-            const setCode = (on) => {
+            const setCode = (on, remember = true) => {
                 document.body.classList.toggle('no-code', !on)
                 $('toggle').setAttribute('aria-pressed', on)
-                localStorage.setItem('eurostat-map-code-panel', on ? 'on' : 'off')
+                if (remember) localStorage.setItem('eurostat-map-code-panel', on ? 'on' : 'off')
             }
             $('toggle').addEventListener('click', () => setCode(document.body.classList.contains('no-code')))
-            if (localStorage.getItem('eurostat-map-code-panel') === 'off') setCode(false)
+            // on a phone the example comes first, with the whole screen, unless the code was asked for before
+            const savedCode = localStorage.getItem('eurostat-map-code-panel')
+            if (savedCode === 'off') setCode(false)
+            else if (!savedCode && window.matchMedia('(max-width: 820px)').matches) setCode(false, false)
 
             // the width of the code, which can be changed by dragging the splitter (or with the arrow keys)
             const root = document.documentElement
