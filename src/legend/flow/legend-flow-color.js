@@ -1,5 +1,5 @@
 import { color } from 'd3-color'
-import { appendLegendSwatch, appendLegendSwatchLabel } from '../legend-swatch'
+import { appendLegendSwatchRows } from '../legend-swatch'
 
 // explain flow line colors
 export function drawFlowColorLegend(out, x, y) {
@@ -50,20 +50,18 @@ export function drawFlowColorLegend(out, x, y) {
 
     const scopedLinks = () => out.map.svg().selectAll('.em-flow-container .em-flow-link, .em-flow-container .em-flow-link-bundled')
 
-    legendItems.forEach((item, i) => {
-        const rowY = titleOffset + i * (shapeHeight + rowGap)
-        const row = out._flowColorContainer
-            .append('g')
-            .attr('class', 'em-color-legend-item em-legend-item')
-            .attr('transform', `translate(0, ${rowY})`)
+    const rows = appendLegendSwatchRows(out._flowColorContainer, legendItems, {
+        shapeWidth,
+        shapeHeight,
+        startY: titleOffset,
+        gap: rowGap,
+        labelX: shapeWidth + labelOffsetX,
+        rowClass: 'em-color-legend-item em-legend-item',
+        labelDy: '0.35em',
+    })
 
-        const swatch = appendLegendSwatch(row, { x: 0, y: 0, width: shapeWidth, height: shapeHeight, color: item.color })
-        const label = appendLegendSwatchLabel(row, {
-            x: shapeWidth + labelOffsetX,
-            y: shapeHeight / 2,
-            dy: '0.35em',
-            text: item.label,
-        })
+    legendItems.forEach((item, i) => {
+        const { row, swatch, label } = rows[i]
         const colorKey = normalizeColor(item.color)
         const matches = (link) => {
             if (!customColors) return link.getAttribute('data-color-key') === String(item.key)

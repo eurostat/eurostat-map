@@ -1,7 +1,7 @@
 // legends for discrete color scales
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
-import { appendLegendSwatch, appendLegendSwatchLabel } from './legend-swatch'
+import { appendLegendSwatch, appendLegendSwatchLabel, appendLegendSwatchRows } from './legend-swatch'
 import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator, getFontSizeFromClass, toCategoryEcl } from '../core/utils'
 import { highlightRegions, getDimmedFill } from './legend.js'
 import { getCentroidsGroup } from '../core/geo/centroids'
@@ -758,41 +758,25 @@ function createRangesLegend(out, config) {
     const titlePadding = getTitlePadding(out)
     const sepLineLength = config.sepLineLength ?? config.shapeWidth
 
-    // for each class
+    const items = []
     for (let i = 0; i < numberOfClasses; i++) {
-        let y = i * config.shapeHeight + titlePadding
-        const x = 0
         const ecl = out.ascending ? numberOfClasses - i - 1 : i
-        const fillColor = classToFillStyle(ecl, numberOfClasses)
-        const itemContainer = container.append('g').attr('class', 'em-legend-item')
-
-        // shift legend items down after point of divergence if applicable
-        if (config.pointOfDivergenceLabel && i >= config.pointOfDivergence) y += config.pointOfDivergencePadding
-
-        // Append rectangle
-        appendLegendSwatch(itemContainer, {
-            x,
-            y,
-            width: config.shapeWidth,
-            height: config.shapeHeight,
-            color: fillColor,
+        items.push({
+            color: classToFillStyle(ecl, numberOfClasses),
+            // shift legend items down after point of divergence if applicable
+            yOffset: config.pointOfDivergenceLabel && i >= config.pointOfDivergence ? config.pointOfDivergencePadding : 0,
             onEnter: () => highlightClass(map, highlightFunction, ecl),
             onLeave: () => highlightClass(map, unhighlightFunction, ecl),
-        })
-
-        // Append separation line
-        if (i > 0) {
-            itemContainer.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', sepLineLength).attr('y2', y)
-        }
-
-        // Append labels
-        appendLegendSwatchLabel(itemContainer, {
-            x: Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0),
-            y: y + config.shapeHeight / 2,
-            dy: '0.3em',
-            text: config.labels ? config.labels[i] : labelFormatter(colorClassifier.invertExtent(ecl)[out.ascending ? 0 : 1], i),
+            label: config.labels ? config.labels[i] : labelFormatter(colorClassifier.invertExtent(ecl)[out.ascending ? 0 : 1], i),
         })
     }
+    appendLegendSwatchRows(container, items, {
+        shapeWidth: config.shapeWidth,
+        shapeHeight: config.shapeHeight,
+        startY: titlePadding,
+        labelX: Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0),
+        separatorLength: sepLineLength,
+    })
 
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them
     if (config.pointOfDivergenceLabel) {
