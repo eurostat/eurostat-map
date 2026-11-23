@@ -22,29 +22,17 @@
     <script src="../../../../d3.v7.min.js"></script>
     <script src="../../../../proj4-src.js"></script>
     <script src="./maritimeFlowGraph.js"></script>
+    <script src="../partner-labels.js"></script>
 
     <script id="our-map-code">
         const width = 1080
         const height = width / 1.7
-        const euCoords = [12, 49];
         const worldProjection = d3
             .geoAzimuthalEquidistant()
             .rotate([10, -10])
             //.center([10, 52])       // center on Europe
             .scale(350)
             .translate([width / 2.4, width / 2.3])
-        const spaceAsThousandSeparator = function (number) {
-            return number.toLocaleString("en").replace(/,/gi, " ");
-        }
-        const getRegionLabels = function (graph) {
-            let labs = [];
-            let offsets = { x: -2, y: 0 };
-            graph.nodes.forEach((d) => {
-                labs.push({ text: d.name, x: d.x + offsets.x, y: d.y + offsets.y });
-            });
-            return labs;
-        }
-
 
         const map = eurostatmap
             .map("flow")
@@ -101,11 +89,6 @@
                 },
             })
             .flowSettings({ order: flowOrderFunction })
-            .labels({
-                labels: getRegionLabels(maritimeFlowGraph),
-                shadows: true,
-                // values: true
-            })
 
             // legend
             .legend({
@@ -133,7 +116,7 @@
             .lockPanUntilZoom(false)
             //.flowRegionColors(["#2171b5", "#51824f"])
             .flowSettings({ regionColors: ['#007243', '#104F99'] }) // Eurostat green and blue
-            .callback(() => {
+            .onBuild(() => {
                 const euCodes = ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "EL"]
                 // set fill of regions
                 const countries = d3.selectAll("#maritime-flow-map .em-worldrg path");
@@ -159,8 +142,7 @@
                     .attr('id', 'em-footnote-2')
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
 
-                //annotations were causing z-index issues with labels
-                d3.selectAll("#em-labels").raise()
+                labelMaritimePartners(map, maritimeFlowGraph)
 
             })
             .annotations({

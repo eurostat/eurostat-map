@@ -51,20 +51,19 @@ circle {
     stroke: #3a3a3a;
 }
 
+.annotation-note-title,
+.annotation-note-label {
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
+
 .annotation-note-title {
-    font-family: Arial;
-    font-size: 14px !important;
-    font-weight: normal;
-    transform: translate(10px, 5px);
-    fill: #4c4b4b;
+    fill: #373737;
 }
 
-.center-vertically .annotation-note-title {
-    transform: translate(0px, -10px);
-}
-
-.shift-left .annotation-note-title {
-    transform: translate(-10px, 5px);
+.annotation-note-label {
+    font-weight: 700;
+    fill: #007243;
 }
 
 .em-insets .em-frame {

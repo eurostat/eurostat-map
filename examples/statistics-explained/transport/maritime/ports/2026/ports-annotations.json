@@ -2,200 +2,182 @@
   {
     "note": {
       "title": "Rotterdam",
-      "wrap": 150,
-      "align": "middle"
+      "wrap": 150
     },
-    "className": "rotterdam",
-    "x": 346,
-    "y": 442,
-    "dy": -9,
-    "dx": -11
+    "x": 379,
+    "y": 494,
+    "dy": 12,
+    "dx": 8,
+    "portCode": "NL00NLRTM"
   },
   {
     "note": {
-      "title": "Antwerp-Bruges",
-      "align": "left"
+      "title": "Antwerp-Bruges"
     },
-    "className": "center-vertically",
-    "x": 370,
-    "y": 498,
+    "x": 348,
+    "y": 506,
+    "dy": 40,
+    "dx": -14,
+    "portCode": "BE00BE003"
+  },
+  {
+    "note": {
+      "title": "Hamburg"
+    },
+    "x": 454,
+    "y": 446,
     "dy": 9,
-    "dx": 11
+    "dx": 8,
+    "portCode": "DE01DEHAM"
   },
   {
     "note": {
-      "title": "Hamburg",
-      "align": "left"
+      "title": "Aliaga"
     },
-    "className": "center-vertically",
-    "x": 447,
-    "y": 444,
+    "x": 734,
+    "y": 726,
+    "dy": -24,
+    "dx": -27,
+    "portCode": "TR02TRALI"
+  },
+  {
+    "note": {
+      "title": "Izmit"
+    },
+    "x": 799,
+    "y": 690,
+    "dy": 7,
+    "dx": 10,
+    "portCode": "TR02TRIZT"
+  },
+  {
+    "note": {
+      "title": "Algeciras"
+    },
+    "x": 162,
+    "y": 789,
+    "dy": -20,
+    "dx": 10,
+    "portCode": "ES02ESALG"
+  },
+  {
+    "note": {
+      "title": "Amsterdam"
+    },
+    "x": 372,
+    "y": 436,
+    "dy": -12,
+    "dx": 1,
+    "portCode": "NL00NLAMS"
+  },
+  {
+    "note": {
+      "title": "HAROPA"
+    },
+    "x": 291,
+    "y": 514,
+    "dy": -7,
+    "dx": -10,
+    "portCode": "FR01FR001"
+  },
+  {
+    "note": {
+      "title": "Gdańsk"
+    },
+    "x": 571,
+    "y": 416,
     "dy": 8,
-    "dx": 10
+    "dx": 9,
+    "portCode": "PL00PLGDN"
   },
   {
     "note": {
-      "title": "Aliaga",
-      "align": "left"
+      "title": "İskenderun"
     },
-    "className": "center-vertically",
-    "x": 764,
-    "y": 740,
-    "dy": 0,
-    "dx": 10
-  },
-  {
-    "note": {
-      "title": "Izmit",
-      "align": "left"
-    },
-    "className": "center-vertically",
-    "x": 804,
-    "y": 686,
-    "dy": 0,
-    "dx": 12
-  },
-  {
-    "note": {
-      "title": "Algeciras",
-      "align": "left"
-    },
-    "className": "center-vertically",
-    "x": 157,
-    "y": 818,
-    "dy": 6,
-    "dx": 9
-  },
-  {
-    "note": {
-      "title": "Amsterdam",
-      "align": "left"
-    },
-    "className": "center-vertically",
-    "x": 385,
-    "y": 471,
-    "dy": 9,
-    "dx": 11
-  },
-  {
-    "note": {
-      "title": "HAROPA",
-      "align": "right"
-    },
-    "className": "",
-    "x": 296,
-    "y": 516,
-    "dy": -6,
-    "dx": -11
-  },
-  {
-    "note": {
-      "title": "Gdańsk",
-      "align": "left"
-    },
-    "className": "center-vertically",
-    "x": 569,
-    "y": 414,
-    "dy": 7,
-    "dx": 9
-  },
-  {
-    "note": {
-      "title": "İskenderun",
-      "align": "left"
-    },
-    "className": "center-vertically",
-    "x": 939,
-    "y": 749,
-    "dy": 2,
-    "dx": 12
-  },
-  {
-    "note": {
-      "title": "Bergen",
-      "align": "right"
-    },
-    "className": "",
-    "x": 376,
-    "y": 266,
-    "dy": -3,
-    "dx": -11
-  },
-  {
-    "note": {
-      "title": "Marseille ",
-      "align": "left"
-    },
-    "className": "center-vertically",
-    "x": 359,
-    "y": 677,
-    "dy": 7,
-    "dx": 9
-  },
-  {
-    "note": {
-      "title": "Valencia",
-      "align": "left"
-    },
-    "className": "center-vertically",
-    "x": 262,
-    "y": 758,
-    "dy": 7,
-    "dx": 9
-  },
-  {
-    "note": {
-      "title": "Constanța",
-      "align": "left"
-    },
-    "className": "center-vertically",
-    "x": 763,
-    "y": 616,
-    "dy": 0,
-    "dx": 10
-  },
-  {
-    "note": {
-      "title": "Barcelona",
-      "align": "left"
-    },
-    "className": "center-vertically",
-    "x": 309,
-    "y": 720,
-    "dy": 6,
-    "dx": 7
-  },
-  {
-    "note": {
-      "title": "Trieste",
-      "align": "left"
-    },
-    "className": "center-vertically",
-    "x": 513,
-    "y": 614,
-    "dy": 0,
-    "dx": 10
-  },
-  {
-    "note": {
-      "title": "Tekirdağ",
-      "align": "right"
-    },
-    "className": "",
-    "x": 741,
-    "y": 693,
-    "dy": -5,
-    "dx": -14
-  },
-  {
-    "note": {
-      "title": "Botaş",
-      "align": "right"
-    },
-    "className": "center-vertically",
     "x": 918,
-    "y": 735,
-    "dy": -22,
-    "dx": -19
+    "y": 723,
+    "dy": -12,
+    "dx": -2,
+    "portCode": "TR02TRISK"
+  },
+  {
+    "note": {
+      "title": "Bergen"
+    },
+    "x": 376,
+    "y": 278,
+    "dy": 6,
+    "dx": -19,
+    "portCode": "NO00NOBGO"
+  },
+  {
+    "note": {
+      "title": "Marseille"
+    },
+    "x": 368,
+    "y": 672,
+    "dy": 8,
+    "dx": 9,
+    "portCode": "FR02FRMRS"
+  },
+  {
+    "note": {
+      "title": "Valencia"
+    },
+    "x": 251,
+    "y": 732,
+    "dy": -10,
+    "dx": -7,
+    "portCode": "ES02ESVLC"
+  },
+  {
+    "note": {
+      "title": "Constanța"
+    },
+    "x": 738,
+    "y": 604,
+    "dy": -7,
+    "dx": -10,
+    "portCode": "RO00ROCND"
+  },
+  {
+    "note": {
+      "title": "Barcelona"
+    },
+    "x": 299,
+    "y": 694,
+    "dy": -10,
+    "dx": -7,
+    "portCode": "ES02ESBCN"
+  },
+  {
+    "note": {
+      "title": "Trieste"
+    },
+    "x": 493,
+    "y": 606,
+    "dy": -7,
+    "dx": -10,
+    "portCode": "IT00ITTRS"
+  },
+  {
+    "note": {
+      "title": "Tekirdağ"
+    },
+    "x": 754,
+    "y": 677,
+    "dy": -44,
+    "dx": 38,
+    "portCode": "TR02TRTEK"
+  },
+  {
+    "note": {
+      "title": "Botaş"
+    },
+    "x": 937,
+    "y": 737,
+    "dy": 2,
+    "dx": 24,
+    "portCode": "TR02TRBOT"
   }
 ]

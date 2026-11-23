@@ -296,7 +296,9 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   Statistics Explained index and regenerate the example manifest when moving map pages.
 - The archived maritime world-flow pages use the main `build/eurostatmap.js` bundle. The old
   Statistics Explained bundle can fail on current world geometry with an undefined `features`
-  error. Apply label offsets to the matching `em-label-halo-*` IDs too, so the white halos stay aligned in PNG exports.
+  error. Flow labels use the rendered ribbons as placement obstacles. Port callouts key their
+  values by port code. Check their fixed positions with real GISCO geometry, since mocked geometry
+  changes the projected symbol positions.
 - The 2026 extra-EU air maps share a muted regional palette in `examples/statistics-explained/transport/air/regional-palette.js`.
   When changing country groups or fills, check for duplicate country assignments and verify that groups sharing
   a border arc in the GISCO world geometry have distinct fills.

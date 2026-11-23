@@ -39,7 +39,6 @@
 
         <script type="module" id="our-map">
             const portsAnnotations = await (await fetch('./ports-annotations.json')).json()
-            window.portsAnnotations = portsAnnotations
             const portsWidth = 1080 //social media size
             const portsHeight = 850
             const insetsX = portsWidth - 120
@@ -54,6 +53,11 @@
 
             const portsProjection = d3.geoIdentity().reflectY(true).fitSize([portsWidth, portsHeight], getBBOXAsGeoJSON(getApproxCurrentGeoBbox()))
             const portsSizeData = indexByCode([...portsData])
+            for (const annotation of portsAnnotations) {
+                const tonnes = portsSizeData[annotation.portCode]
+                annotation.note.label = (tonnes / 1e6).toFixed(1) + ' Mt'
+            }
+            window.portsAnnotations = portsAnnotations
             let editMode = false
             const map = eurostatmap
                 .map('ps')
