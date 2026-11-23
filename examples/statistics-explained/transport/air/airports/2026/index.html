@@ -20,7 +20,7 @@
                 opacity: 0.5;
             }
 
-            /* value written on each flow: dark text on a white halo reads on every flow colour */
+            /* passengers and change since 2024, written on each flow: dark text on a white halo reads on every flow colour */
             #airport-pairs-map .flow-value-label {
                 font:
                     bold 11px Arial,
@@ -92,6 +92,9 @@
                     .translate([width / 2.4, width / 2.3])
                 const formatPassengers = new Intl.NumberFormat('en')
                 const millions = (value) => `${(value / 1e6).toFixed(2)}M`
+                // "1.77M" over "−13.2%": passengers carried, then the change since 2024, so the colour classes are not all a reader has
+                const signedChange = (link) => formatChange.format(link.changePct / 100).replace('-', '−')
+                const flowLabel = (link) => [millions(link.value), signedChange(link)]
                 const flowValues = graph.links.map((link) => link.value)
                 const smallestFlow = Math.min(...flowValues)
                 const largestFlow = Math.max(...flowValues)
@@ -254,7 +257,16 @@
                     })
                     .footnote("Intra-EU flights only. <tspan font-style='italic'>Source</tspan>: Eurostat (avia_pa)")
                     .onBuild((map) => {
-                        // write each flow's value on the flow, half way along its centre line
+                        // write each flow's passengers and change on the flow, half way along its centre line unless that would put
+                        // two labels on top of each other: the fraction of the way along the flow, by index in the graph's links
+                        // (each fraction is measured from the flow's source, the first airport of its pair in the graph)
+                        const labelPosition = {
+                            2: 0.3, // Madrid to Rome, above Barcelona to Rome
+                            9: 0.7,
+                            6: 0.3, // Tenerife North to Madrid, apart from Madrid to Gran Canaria
+                            3: 0.3,
+                            5: 0.7, // Madrid to Lisbon, clear of the Madrid circle
+                        }
                         const flowLabels = map.svg().select('#em-flow-lines').append('g').attr('class', 'flow-value-labels')
                         map.svg()
                             .selectAll('#em-flow-lines .em-flow-link')
@@ -263,13 +275,12 @@
                                 centre.setAttribute('d', this.getAttribute('data-center-path'))
                                 // a flow too short to hold its label (Barcelona to Palma) is read from the 'Busiest route' note instead
                                 if (centre.getTotalLength() < 70) return
-                                const middle = centre.getPointAtLength(centre.getTotalLength() / 2)
-                                flowLabels
-                                    .append('text')
-                                    .attr('class', 'flow-value-label')
-                                    .attr('x', middle.x)
-                                    .attr('y', middle.y)
-                                    .text(millions(graph.links[+this.getAttribute('data-link-index')].value))
+                                const linkIndex = +this.getAttribute('data-link-index')
+                                const middle = centre.getPointAtLength(centre.getTotalLength() * (labelPosition[linkIndex] ?? 0.5))
+                                const label = flowLabels.append('text').attr('class', 'flow-value-label').attr('x', middle.x).attr('y', middle.y)
+                                const [passengers, change] = flowLabel(graph.links[linkIndex])
+                                label.append('tspan').attr('x', middle.x).attr('dy', '-0.55em').text(passengers)
+                                label.append('tspan').attr('x', middle.x).attr('dy', '1.1em').text(change)
                             })
                         map.svg().select('.em-annotations').raise()
                         map.svg().select('#em-labels').raise()
