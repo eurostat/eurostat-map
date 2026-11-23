@@ -243,26 +243,48 @@
             snapWhenDrawn()
 
             /**
-             * Anchor every callout on the edge of its port's circle, so the line touches it.
-             * The note keeps the place it was given; only the end of the line moves, to the point of the
-             * circle that faces the note. Positions come from the drawn circle (insets included), so this
-             * stays right when the data, the symbol sizes or the map position change.
+             * Anchor every callout on the edge of its port's circle, so the line touches it, and touches only it.
+             * The note keeps the place it was given; only the end of the line moves, to the point of the circle's edge
+             * nearest the direction of the note that no other port circle is drawn over (the big ports overlap their
+             * neighbours: Rotterdam's edge is largely covered by Antwerp-Bruges and the smaller ports around it, and a
+             * line ending there would look like it belonged to them). Positions come from the drawn circles (insets
+             * included), so this stays right when the data, the symbol sizes or the map position change.
              */
             function snapAnnotationsToPorts(annotations) {
                 const svg = document.getElementById('ports-map')
-                const zoomGroup = svg.querySelector('#em-zoom-group-ports-map')
-                const toGroup = zoomGroup.getScreenCTM().inverse()
-                for (const a of annotations) {
-                    const circle = svg.querySelector(`[id="ps${a.portCode}"] circle`)
-                    if (!circle) continue
+                const toGroup = svg.querySelector('#em-zoom-group-ports-map').getScreenCTM().inverse()
+                const measure = (circle) => {
                     const toScreen = circle.getScreenCTM()
                     const centre = new DOMPoint(0, 0).matrixTransform(toScreen).matrixTransform(toGroup)
-                    const radius = Number(circle.getAttribute('r')) * toScreen.a * toGroup.a
+                    return { circle, x: centre.x, y: centre.y, r: Number(circle.getAttribute('r')) * toScreen.a * toGroup.a }
+                }
+                const circles = [...svg.querySelectorAll('g.em-centroid circle')].map(measure).filter((c) => c.r > 0)
+                const step = Math.PI / 90 // 2 degrees
+                for (const a of annotations) {
+                    const own = circles.find((c) => c.circle.parentNode.id === `ps${a.portCode}`)
+                    if (!own) continue
+                    // circles drawn after this one (later in the document) are on top of it
+                    const above = circles.filter(
+                        (c) =>
+                            c !== own &&
+                            Math.hypot(c.x - own.x, c.y - own.y) < c.r + own.r &&
+                            own.circle.compareDocumentPosition(c.circle) & Node.DOCUMENT_POSITION_FOLLOWING
+                    )
+                    const covered = (x, y) => above.some((c) => Math.hypot(x - c.x, y - c.y) < c.r + 0.5)
                     const noteX = a.x + a.dx
                     const noteY = a.y + a.dy
-                    const length = Math.hypot(noteX - centre.x, noteY - centre.y) || 1
-                    a.x = centre.x + ((noteX - centre.x) / length) * radius
-                    a.y = centre.y + ((noteY - centre.y) / length) * radius
+                    const facing = Math.atan2(noteY - own.y, noteX - own.x)
+                    // the uncovered point of the edge closest to the direction of the note (all of it, if nothing is free)
+                    let best = facing
+                    for (let i = 0; i <= 90; i++) {
+                        const free = [facing + i * step, facing - i * step].find((angle) => !covered(own.x + own.r * Math.cos(angle), own.y + own.r * Math.sin(angle)))
+                        if (free !== undefined) {
+                            best = free
+                            break
+                        }
+                    }
+                    a.x = own.x + own.r * Math.cos(best)
+                    a.y = own.y + own.r * Math.sin(best)
                     a.dx = noteX - a.x
                     a.dy = noteY - a.y
                 }
