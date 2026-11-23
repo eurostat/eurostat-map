@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Top 10 intra-EU airport pairs, 2025</title>
+        <style>
+            #airport-pairs-map .em-title {
+                font-size: 25px;
+            }
+
+            #airport-pairs-map .em-subtitle {
+                font-size: 20px;
+            }
+
+            #airport-pairs-map .em-label,
+            #airport-pairs-map .em-label-halo {
+                font:
+                    12px Arial,
+                    sans-serif;
+                text-anchor: start;
+            }
+        </style>
+    </head>
+    <body style="margin: 0">
+        <button id="export-png-btn" type="button" disabled>Export map as PNG</button>
+        <button id="export-svg-btn" type="button" disabled>Export map as SVG</button>
+        <svg id="airport-pairs-map"></svg>
+        <p id="map-error" role="alert" hidden>The airport pairs map could not be loaded.</p>
+
+        <script src="../../../../../../build/eurostatmap.js"></script>
+        <script src="../../../../d3.v7.min.js"></script>
+        <script>
+            async function buildAirportMap() {
+                // Source: Map2-Passengers-Airport-Pairs-EU-2024-2025.xlsx, "For map" worksheet.
+                const response = await fetch('./airportPairsGraph2025.json')
+                if (!response.ok) throw new Error('Unable to load airport pairs data')
+                const graph = await response.json()
+                const width = 1000
+                const height = width / 1.5
+                const projection = d3
+                    .geoAzimuthalEquidistant()
+                    .rotate([2, -35])
+                    .scale(1500)
+                    .translate([width / 2.4, width / 2.3])
+                const formatPassengers = new Intl.NumberFormat('en')
+                const formatChange = new Intl.NumberFormat('en', {
+                    style: 'percent',
+                    signDisplay: 'exceptZero',
+                    maximumFractionDigits: 1,
+                })
+                const changeColors = ['#b2182b', '#ef8a62', '#d1e5f0', '#67a9cf', '#2166ac']
+                const changeLabels = ['Below −5%', '−5% to below 0%', '0% to below 2%', '2% to below 5%', '5% or more']
+                const changeColor = d3.scaleThreshold().domain([-5, 0, 2, 5]).range(changeColors)
+                const airportNames = {
+                    LEMD: 'Madrid-Barajas',
+                    LEBL: 'Barcelona-El Prat',
+                    LEPA: 'Palma de Mallorca',
+                    LIRF: 'Rome-Fiumicino',
+                    LICC: 'Catania',
+                    LPPT: 'Lisbon',
+                    GCLP: 'Gran Canaria',
+                    GCXO: 'Tenerife North',
+                    LFPO: 'Paris-Orly',
+                }
+                const labelOffsets = {
+                    LEMD: [-103, -35],
+                    LEBL: [15, -36],
+                    LEPA: [20, 18],
+                    LIRF: [-25, -32],
+                    LICC: [16, -4],
+                    LPPT: [-66, -5],
+                    GCLP: [-20, 25],
+                    GCXO: [-62, -12],
+                    LFPO: [17, -4],
+                }
+                const airportLabels = graph.nodes.map(({ id, x, y }) => {
+                    const [offsetX, offsetY] = labelOffsets[id]
+                    const [screenX, screenY] = projection([x, y])
+                    const [lon, lat] = projection.invert([screenX + offsetX, screenY + offsetY])
+                    return { text: airportNames[id], x: lon, y: lat }
+                })
+
+                const png = document.getElementById('export-png-btn')
+                const svg = document.getElementById('export-svg-btn')
+                eurostatmap
+                    .map('flow')
+                    .fontFamily('Arial')
+                    .svgId('airport-pairs-map')
+                    .width(width)
+                    .height(height)
+                    .title('Top 10 intra-EU airport pairs, 2025')
+                    .subtitle('by passengers carried')
+                    .header(true)
+                    .footer(true)
+                    .showEstatLogo(true)
+                    .showEstatRibbon(true)
+                    .logoPosition([2, height + 42])
+                    .ribbonPosition([width - 180, height + 35])
+                    .ribbonWidth(300)
+                    .ribbonHeight(50)
+                    .zoomButtons(false)
+                    .projectionFunction(projection)
+                    .geo('WORLD')
+                    .proj('4326')
+                    .scale('60M')
+                    .flowGraph(graph)
+                    .flowSettings({
+                        minWidth: 3,
+                        maxWidth: 15,
+                        lineType: 'curved',
+                        stack: true,
+                        nodes: true,
+                        arrows: false,
+                        outlines: true,
+                        widthGradient: true,
+                        color: (link) => changeColor(link.changePct),
+                        curvatureSettings: { gapX: 0, padX: 0, padY: 2, bumpY: 10, curvature: 0.3 },
+                    })
+                    .legend({
+                        x: width - 225,
+                        y: height - 252,
+                        boxPadding: 10,
+                        boxOpacity: 1,
+                        title: 'Passengers carried',
+                        flowWidthLegend: {
+                            values: [1700000, graph.links[0].value],
+                            labels: ['1.7M', '2.4M'],
+                        },
+                        nodeSizeLegend: {
+                            title: 'Airport total (shown routes)',
+                            values: [12000000, 1700000],
+                        },
+                        flowColorLegend: {
+                            marginTop: 30,
+                            title: 'Change vs 2024',
+                            items: changeColors.map((color, index) => ({ color, label: changeLabels[index] })).reverse(),
+                        },
+                        regionColorLegend: false,
+                    })
+                    .labels({ labels: airportLabels, shadows: true, hideOverlapping: true })
+                    .tooltip({
+                        textFunction: (link) => `
+                            <div class="em-tooltip-bar"><b>${airportNames[link.source.id]} and ${airportNames[link.target.id]}</b></div>
+                            <div class="em-tooltip-text">
+                                <table class="em-tooltip-table">
+                                    <tr><td>Passengers carried: ${formatPassengers.format(link.value)}</td></tr>
+                                    <tr><td>Change since 2024: ${formatChange.format(link.changePct / 100)}</td></tr>
+                                </table>
+                            </div>`,
+                    })
+                    .footnote("Intra-EU flights only. <tspan font-style='italic'>Source</tspan>: Eurostat (avia_pa)")
+                    .onBuild((map) => {
+                        map.svg().select('#em-labels').raise()
+                        map.svg()
+                            .append('text')
+                            .attr('class', 'em-footnote')
+                            .attr('x', width - 315)
+                            .attr('y', height + 105)
+                            .text('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM')
+                        png.onclick = () => map.exportMapToPNG(undefined, undefined, 'airport-pairs-2025')
+                        svg.onclick = () => map.exportMapToSVG('airport-pairs-2025')
+                        png.disabled = false
+                        svg.disabled = false
+                    })
+                    .build()
+            }
+
+            buildAirportMap().catch(() => {
+                document.getElementById('map-error').hidden = false
+            })
+        </script>
+    </body>
+</html>

@@ -100,6 +100,8 @@
         'statistics-explained/business/services/choropleth/index.html',
         'statistics-explained/business/services/proportional-circle/index.html',
         'statistics-explained/index.html',
+        'statistics-explained/transport/air/airports/2025/index.html',
+        'statistics-explained/transport/air/airports/2026/index.html',
         'statistics-explained/transport/air/airports/index.html',
         'statistics-explained/transport/air/freight/2025/index.html',
         'statistics-explained/transport/air/freight/2026/index.html',
