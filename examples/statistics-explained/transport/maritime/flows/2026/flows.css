@@ -30,8 +30,18 @@
 .em-bn-d,
 .em-kosovo-bn {
     stroke-width: 0.4px !important;
-    stroke: rgb(116, 116, 116) !important;
     stroke-dasharray: 2, 1 !important;
+}
+
+/* disputed borders are muted like the national ones above (same grey, same opacity) */
+.em-bn-d {
+    stroke: grey !important;
+    opacity: 0.5 !important;
+}
+
+/* Kosovo stays a touch lighter than the national borders and darker than regional ones */
+.em-kosovo-bn {
+    stroke: #9a9a9a !important;
 }
 
 .em-flow-exporter,
