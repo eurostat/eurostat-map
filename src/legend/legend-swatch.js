@@ -79,3 +79,41 @@ export function appendLegendSwatchRows(container, items, opts) {
         return { row, swatch, label, y }
     })
 }
+
+/** Thin line across the top of a swatch, separating it from the one above. */
+export function appendLegendSeparator(row, y, length) {
+    return row.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', length).attr('y2', y)
+}
+
+/** `decorate` hook for "ranges" rows: a separator above every row but the first. */
+export function rangesDecorator(sepLength) {
+    return (row, { i, y }) => {
+        if (i > 0) appendLegendSeparator(row, y, sepLength)
+    }
+}
+
+/**
+ * `decorate` hook for "thresholds" rows: every internal boundary gets a separator, a tick and the threshold
+ * label, which sits on the boundary below its swatch (so the last swatch has none).
+ *
+ * @param {Object} o
+ * @param {number} o.count number of rows
+ * @param {number} o.sepLength separator length
+ * @param {number} o.tickLength tick length, drawn after the separator
+ * @param {number} o.labelX x of the boundary labels
+ * @param {number} o.shapeHeight swatch height (boundary labels sit at the swatch bottom)
+ * @param {(i:number, item:Object)=>string} o.labelText text of the boundary label below row i
+ * @param {(label:Object, i:number)=>void} [o.onLabel] hook to tag a label (e.g. the one at the point of divergence)
+ */
+export function thresholdsDecorator({ count, sepLength, tickLength, labelX, shapeHeight, labelText, onLabel }) {
+    return (row, { i, y, item }) => {
+        if (i > 0) {
+            appendLegendSeparator(row, y, sepLength)
+            row.append('line').attr('class', 'em-legend-tick').attr('x1', sepLength).attr('y1', y).attr('x2', sepLength + tickLength).attr('y2', y)
+        }
+        if (i < count - 1) {
+            const label = appendLegendSwatchLabel(row, { x: labelX, y: y + shapeHeight, dy: '0.3em', text: () => labelText(i, item) })
+            onLabel?.(label, i)
+        }
+    }
+}

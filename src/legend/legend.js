@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
-import { appendLegendSwatch, appendLegendSwatchLabel } from './legend-swatch'
+import { appendLegendSwatchRows } from './legend-swatch'
 import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
 import { BOX_CORNER_RADIUS } from '../core/buttons/corner-radius'
 import { getCornerPosition, getCornerCoords } from '../core/decoration/corner-position'
@@ -346,21 +346,20 @@ export const legend = function (map) {
         const onEnter = () => interact(highlightFunction)
         const onLeave = () => interact(unhighlightFunction)
 
-        appendLegendSwatch(container, {
-            y: out.noDataPadding,
-            width: out.noDataShapeWidth,
-            height: out.noDataShapeHeight,
-            color,
-            onEnter,
-            onLeave,
-        })
-        appendLegendSwatchLabel(container, {
-            className: labelClass,
-            dy: '0.35em',
-            x: out.noDataShapeWidth + 5,
-            y: out.noDataShapeHeight / 2 + out.noDataPadding,
-            text,
-        })
+        // a single row of the swatch stack, padded from the top of its container
+        const [{ label }] = appendLegendSwatchRows(
+            container,
+            [{ color, label: text, onEnter, onLeave }],
+            {
+                shapeWidth: out.noDataShapeWidth,
+                shapeHeight: out.noDataShapeHeight,
+                startY: out.noDataPadding,
+                labelX: out.noDataShapeWidth + 5,
+                labelDy: '0.35em',
+            }
+        )
+        label
+            .attr('class', labelClass)
             .style('pointer-events', 'all')
             .style('cursor', 'pointer')
             .on('mouseover', onEnter)

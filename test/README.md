@@ -61,6 +61,10 @@ Plain Node scripts that import `build/eurostatmap.js` after `helpers/dom-shim.js
 
 - `e2e/kosovo-border.test.mjs` measures border prominence per map type and border mode
   (`--verbose`, `--mode <name>`).
+- `e2e/legend-layout.test.mjs` renders the swatch legends (choropleth ranges/thresholds, horizontal, diverging, max/min,
+  no-data, categorical, proportional-symbol colour legend) offline and compares a font-independent fingerprint of every
+  legend element with `e2e/baselines/legend-layout.json` (`--capture` to rewrite it, `--bundle-dir <dir>` to test another
+  bundle, e.g. one built from an older commit). Fixtures are in `helpers/synthetic-nuts.mjs`.
 - `e2e/inset-regression.test.mjs` renders a matrix of map configurations and compares the serialised DOM
   with `e2e/baselines/inset-regression.json.gz` (`--capture` to rewrite it, `--only <substring>`,
   `--against <build dir>` to compare two builds).

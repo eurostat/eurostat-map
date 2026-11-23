@@ -39,7 +39,7 @@
         "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
         "test:unit": "node --import ./test/helpers/register-src.mjs --test \"test/unit/**/*.test.mjs\"",
         "test:integration": "node --test \"test/integration/**/*.test.mjs\"",
-        "test:e2e": "node --test test/e2e/flow-color-legend.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs",
+        "test:e2e": "node --test test/e2e/flow-color-legend.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/legend-layout.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs",
         "format": "prettier --write .",
         "copy-types": "node scripts/copy-types.js",
         "check:types:legend-config-sync": "node scripts/check-legend-config-sync.js",

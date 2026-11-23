@@ -50551,6 +50551,945 @@ const legend = function (map, config) {
 
 /***/ },
 
+/***/ "./src/legend/discrete/divergence.js"
+/*!*******************************************!*\
+  !*** ./src/legend/discrete/divergence.js ***!
+  \*******************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   drawDivergingLine: () => (/* binding */ drawDivergingLine),
+/* harmony export */   drawHorizontalDivergence: () => (/* binding */ drawHorizontalDivergence)
+/* harmony export */ });
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+// The point-of-divergence line and labels of diverging discrete legends
+
+
+function drawDivergingLine(out, y, config, scaleTopY, scaleBottomY) {
+    const container = out._discreteLegendContainer.append('g').attr('class', 'em-legend-divergence-container')
+    const markerHeight = 6
+    const x = 0
+    if (config.labelType == 'ranges') y = y + config.pointOfDivergencePadding / 2 // move to the middle of the space between legend item
+    const maxLabelLength = out._discreteLegendContainer
+        .selectAll('.em-legend-label')
+        .filter(function () {
+            return !this.classList.contains('em-legend-label-max') && !this.classList.contains('em-legend-label-min')
+        })
+        .nodes()
+        .reduce((max, node) => Math.max(max, node.getBBox().width), 0)
+    const divergingLinePadding = config.divergingLinePadding ?? 15
+    const lineLength =
+        config.divergingLineLength || config.shapeWidth + config.labelOffsets?.x + maxLabelLength + config.labelOffsets?.x + divergingLinePadding // rect > offset > label > offset > padding > vertical line
+
+    const showDivergingLine = config.showDivergingLine ?? true
+    if (showDivergingLine) {
+        // Draw the horizontal divergence line
+        container
+            .append('line')
+            .attr('x1', x)
+            .attr('y1', y)
+            .attr('x2', x + lineLength)
+            .attr('y2', y)
+            .attr('class', 'em-legend-diverging-line')
+
+        // Small vertical tick at the end of the line, matching other threshold ticks
+        const tickLen = config.tickLength || 5
+        container
+            .append('line')
+            .attr('class', 'em-legend-tick')
+            .attr('x1', x + lineLength)
+            .attr('y1', y - tickLen / 2)
+            .attr('x2', x + lineLength)
+            .attr('y2', y + tickLen / 2)
+    }
+
+    const labels = config.pointOfDivergenceLabel.split('|')
+    if (labels.length > 1) {
+        // divergence line with up and down arrows
+        const directionLineLength = config.divergingArrowLength || 30
+        const directionLineX = x + lineLength
+        const labelsAtExtremes = (config.pointOfDivergenceLabelsAtExtremes ?? false) && scaleTopY != null && scaleBottomY != null
+        const labelsStacked = config.pointOfDivergenceLabelsStacked ?? false
+
+        // When labels sit at the scale extremes and the caller hasn't pinned an explicit
+        // arrow length, stretch each arrow to reach near its own label instead of stopping
+        // at the short default length meant for a divergence-point-adjacent label.
+        const extremesArrowMargin = 20
+        const autoExtendArrows = labelsAtExtremes && config.divergingArrowLength == null
+        const upLength = autoExtendArrows ? Math.max(y - scaleTopY - extremesArrowMargin, markerHeight) : directionLineLength
+        const downLength = autoExtendArrows ? Math.max(scaleBottomY - y - extremesArrowMargin, markerHeight) : directionLineLength
+
+        // Add arrowhead marker definition
+        const defs = container.append('defs')
+        defs.append('marker')
+            .attr('id', 'arrowhead')
+            .attr('markerWidth', markerHeight)
+            .attr('markerHeight', markerHeight)
+            .attr('refX', 0)
+            .attr('refY', markerHeight / 2)
+            .attr('orient', 'auto')
+            .append('polygon')
+            .attr('points', `0 0, ${markerHeight} ${markerHeight / 2}, 0 ${markerHeight}`)
+            .attr('fill', 'black')
+
+        // Upward line with arrowhead
+        container
+            .append('line')
+            .attr('class', 'em-legend-diverging-line')
+            .attr('x1', directionLineX)
+            .attr('y1', y)
+            .attr('x2', directionLineX)
+            .attr('y2', y - upLength)
+            .attr('marker-end', 'url(#arrowhead)')
+
+        // Downward line with arrowhead
+        container
+            .append('line')
+            .attr('class', 'em-legend-diverging-line')
+            .attr('x1', directionLineX)
+            .attr('y1', y)
+            .attr('x2', directionLineX)
+            .attr('y2', y + downLength)
+            .attr('marker-end', 'url(#arrowhead)')
+
+        // Labels for the upward and downward arrows: either beside the arrow (default) or
+        // above/below its head, starting at the arrow's x position ('stacked'); either near
+        // the divergence point (default) or up near the top/bottom of the whole scale ('at
+        // extremes').
+        const upTipY = y - upLength
+        const downTipY = y + downLength
+
+        if (labelsStacked) {
+            // Gap in pixels between an arrow tip and its label, when not positioned at the
+            // scale extremes (where the labels instead sit flush with the max/min value labels).
+            const stackedLabelGap = 10
+
+            const topLabel = container
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', directionLineX)
+                .attr('y', labelsAtExtremes ? scaleTopY : upTipY - stackedLabelGap)
+                .text(labels[0])
+            if (labelsAtExtremes) {
+                // Sits on the same y as the max stat value label (which uses dy=0.3em to center
+                // its text on that y) - match it so this label never renders further north than
+                // the max label's own text does.
+                topLabel.attr('dy', '0.3em')
+            } else {
+                // Pull the text further up, away from the tip, the same way the bottom label's
+                // dy pushes it further down - otherwise the (undescended) baseline sitting only
+                // stackedLabelGap above the tip reads as almost touching it.
+                topLabel.attr('dy', '-0.3em')
+            }
+
+            container
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', directionLineX)
+                .attr('y', labelsAtExtremes ? scaleBottomY : downTipY + stackedLabelGap)
+                .attr('dy', labelsAtExtremes ? '0.3em' : '0.9em')
+                .text(labels[1])
+        } else {
+            container
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', directionLineX + 10)
+                .attr('y', labelsAtExtremes ? scaleTopY : upTipY + 10)
+                .attr('dy', '0.3em')
+                .text(labels[0])
+
+            container
+                .append('text')
+                .attr('class', 'em-legend-label')
+                .attr('x', directionLineX + 10)
+                .attr('y', labelsAtExtremes ? scaleBottomY : downTipY - 10)
+                .attr('dy', '0.3em')
+                .text(labels[1])
+        }
+    } else {
+        // just the single label
+        container
+            .append('text')
+            .attr('class', 'em-legend-diverging-label em-legend-label')
+            .attr('x', x + lineLength + 5)
+            .attr('y', y)
+            .attr('dy', '0.3em')
+            .text(config.pointOfDivergenceLabel)
+    }
+
+    // Move the threshold value label at the divergence point so it never overlaps the line -
+    // only relevant when the line is actually drawn. With showDivergingLine false there's
+    // nothing to overlap, so the stat value stays in its normal place next to its own tick.
+    if (showDivergingLine) {
+        if (labels.length > 1) {
+            // Move it to the right of the line end and reparent into container
+            out._discreteLegendContainer
+                .selectAll('.em-legend-label-divergence')
+                .each(function () {
+                    container.node().appendChild(this)
+                })
+                .attr('x', x + lineLength + 10)
+        } else {
+            // Single pointOfDivergenceLabel — remove the threshold value label to avoid clashing
+            out._discreteLegendContainer.selectAll('.em-legend-label-divergence').remove()
+        }
+    }
+}
+
+function drawHorizontalDivergence(out, config, c) {
+    const { xSeam, barWidth, titlePadding, tickLength, labelFontSize } = c
+    const container = out._discreteLegendContainer.append('g').attr('class', 'em-legend-divergence-container')
+    const markerHeight = 6
+    const labels = config.pointOfDivergenceLabel.split('|')
+
+    // the line runs down from the top of the bar, past the labels
+    const lineLength = config.divergingLineLength || config.shapeHeight + tickLength + 2 + labelFontSize + (config.divergingLinePadding ?? 15)
+    const yEnd = titlePadding + lineLength
+    const showDivergingLine = config.showDivergingLine ?? true
+    if (showDivergingLine) {
+        container
+            .append('line')
+            .attr('class', 'em-legend-diverging-line')
+            .attr('x1', xSeam)
+            .attr('y1', titlePadding)
+            .attr('x2', xSeam)
+            .attr('y2', yEnd)
+        const tickLen = config.tickLength || 5
+        container
+            .append('line')
+            .attr('class', 'em-legend-tick')
+            .attr('x1', xSeam - tickLen / 2)
+            .attr('y1', yEnd)
+            .attr('x2', xSeam + tickLen / 2)
+            .attr('y2', yEnd)
+    }
+
+    if (labels.length > 1) {
+        // arrows pointing left (lower values) and right (higher values). labels[0] is the "top" label of the
+        // vertical legend, i.e. the high end when ascending, so it goes on the right in that case.
+        const rightText = out.ascending ? labels[0] : labels[1]
+        const leftText = out.ascending ? labels[1] : labels[0]
+        const arrowLength = config.divergingArrowLength || 30
+        const atExtremes = config.pointOfDivergenceLabelsAtExtremes ?? false
+        const stacked = config.pointOfDivergenceLabelsStacked ?? false
+
+        const defs = container.append('defs')
+        defs.append('marker')
+            .attr('id', 'arrowhead')
+            .attr('markerWidth', markerHeight)
+            .attr('markerHeight', markerHeight)
+            .attr('refX', 0)
+            .attr('refY', markerHeight / 2)
+            .attr('orient', 'auto')
+            .append('polygon')
+            .attr('points', `0 0, ${markerHeight} ${markerHeight / 2}, 0 ${markerHeight}`)
+            .attr('fill', 'black')
+
+        const makeLabel = (text, x, y, anchor, dy) =>
+            container.append('text').attr('class', 'em-legend-label').attr('x', x).attr('y', y).attr('dy', dy).attr('text-anchor', anchor).text(text)
+
+        // when the labels sit at the extremes, draw them first so the arrows can stretch up to them
+        let leftLen = arrowLength
+        let rightLen = arrowLength
+        if (atExtremes) {
+            const leftLabel = makeLabel(leftText, 0, yEnd, 'start', '0.3em')
+            const rightLabel = makeLabel(rightText, barWidth, yEnd, 'end', '0.3em')
+            if (config.divergingArrowLength == null) {
+                leftLen = Math.max(xSeam - leftLabel.node().getBBox().width - 10, markerHeight)
+                rightLen = Math.max(barWidth - xSeam - rightLabel.node().getBBox().width - 10, markerHeight)
+            }
+        }
+        container
+            .append('line')
+            .attr('class', 'em-legend-diverging-line')
+            .attr('x1', xSeam)
+            .attr('y1', yEnd)
+            .attr('x2', xSeam - leftLen)
+            .attr('y2', yEnd)
+            .attr('marker-end', 'url(#arrowhead)')
+        container
+            .append('line')
+            .attr('class', 'em-legend-diverging-line')
+            .attr('x1', xSeam)
+            .attr('y1', yEnd)
+            .attr('x2', xSeam + rightLen)
+            .attr('y2', yEnd)
+            .attr('marker-end', 'url(#arrowhead)')
+
+        if (!atExtremes) {
+            if (stacked) {
+                // above each arrow, running outwards from the line
+                makeLabel(leftText, xSeam - 6, yEnd - 4, 'end', '0')
+                makeLabel(rightText, xSeam + 6, yEnd - 4, 'start', '0')
+            } else {
+                // beyond each arrow tip
+                makeLabel(leftText, xSeam - leftLen - 8, yEnd, 'end', '0.3em')
+                makeLabel(rightText, xSeam + rightLen + 8, yEnd, 'start', '0.3em')
+            }
+        }
+
+        // the threshold value at the divergence seam would sit under the line: move it below the arrows' junction
+        if (showDivergingLine) {
+            out._discreteLegendContainer.selectAll('.em-legend-label-divergence').each(function () {
+                container.node().appendChild(this)
+            })
+            container
+                .selectAll('.em-legend-label-divergence')
+                .attr('x', xSeam)
+                .attr('y', yEnd + 4)
+                .attr('dy', '0.9em')
+        }
+    } else {
+        // single label under the end of the line; it replaces the threshold value at that seam
+        container
+            .append('text')
+            .attr('class', 'em-legend-diverging-label em-legend-label')
+            .attr('x', xSeam)
+            .attr('y', yEnd + 4)
+            .attr('dy', '0.9em')
+            .attr('text-anchor', 'middle')
+            .text(config.pointOfDivergenceLabel)
+        if (showDivergingLine) out._discreteLegendContainer.selectAll('.em-legend-label-divergence').remove()
+    }
+}
+
+
+/***/ },
+
+/***/ "./src/legend/discrete/extras.js"
+/*!***************************************!*\
+  !*** ./src/legend/discrete/extras.js ***!
+  \***************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   appendExtraSwatchRow: () => (/* binding */ appendExtraSwatchRow),
+/* harmony export */   appendExtraSwatchStack: () => (/* binding */ appendExtraSwatchStack),
+/* harmony export */   extraSwatchRows: () => (/* binding */ extraSwatchRows)
+/* harmony export */ });
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../legend-swatch */ "./src/legend/legend-swatch.js");
+// "No data" and extra categorical swatches that sit next to the class swatches of a discrete colour legend
+
+
+
+/**
+ * The extra single-swatch rows of a discrete legend, in drawing order: the "no data" box, then one row per extra
+ * categorical class mixed into the classification (`out.layer.categoryFillStyle_` / `categoryText_`, e.g. IMAGE's
+ * "edit classification" categories). `draw(container)` fills a row's group.
+ *
+ * @param {Object} out legend instance
+ * @param {Object} config legend config (noData, noDataText)
+ * @param {{includeNoData?: boolean}} [opts] pass includeNoData: false for categories only
+ * @returns {Array<{className:string, draw:(container:Object)=>void}>}
+ */
+function extraSwatchRows(out, config, { includeNoData = true } = {}) {
+    const highlightFunction = out.getHighlightFunction(out.map)
+    const unhighlightFunction = out.getUnHighlightFunction(out.map)
+    const rows = []
+    if (includeNoData && config.noData) {
+        rows.push({
+            className: 'em-no-data-legend',
+            draw: (c) => out.appendNoDataLegend(c, config.noDataText, highlightFunction, unhighlightFunction),
+        })
+    }
+    const fills = out.layer?.categoryFillStyle_
+    if (fills) {
+        const texts = out.layer.categoryText_
+        Object.keys(fills).forEach((raw) =>
+            rows.push({
+                className: 'em-category-legend',
+                draw: (c) =>
+                    out.appendCategoryLegend(c, (0,_core_utils__WEBPACK_IMPORTED_MODULE_0__.toCategoryEcl)(raw), fills[raw], (texts && texts[raw]) || raw, highlightFunction, unhighlightFunction),
+            })
+        )
+    }
+    return rows
+}
+
+/**
+ * Stack extra rows vertically from startY into out._discreteLegendContainer. Row spacing comes from the same
+ * layout helper as the class swatches (each row is one no-data-sized swatch plus its padding).
+ */
+function appendExtraSwatchStack(out, rows, startY) {
+    const stack = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_1__.swatchStackLayout)({ count: rows.length, shapeHeight: out.noDataShapeHeight, gap: out.noDataPadding, startY })
+    rows.forEach((row, i) => {
+        row.draw(out._discreteLegendContainer.append('g').attr('class', row.className).attr('transform', `translate(0,${stack.rowY(i)})`))
+    })
+}
+
+/** Lay the extra rows out side by side to the right of a horizontal bar, `startX` from the left. */
+function appendExtraSwatchRow(out, rows, startX, y, gap = 16) {
+    let x = startX
+    rows.forEach((row) => {
+        const container = out._discreteLegendContainer.append('g').attr('class', row.className).attr('transform', `translate(${x},${y})`)
+        row.draw(container)
+        x += container.node().getBBox().width + gap
+    })
+}
+
+
+/***/ },
+
+/***/ "./src/legend/discrete/horizontal.js"
+/*!*******************************************!*\
+  !*** ./src/legend/discrete/horizontal.js ***!
+  \*******************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   appendHorizontalExtraItems: () => (/* binding */ appendHorizontalExtraItems),
+/* harmony export */   createHorizontalLegend: () => (/* binding */ createHorizontalLegend)
+/* harmony export */ });
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../legend-swatch */ "./src/legend/legend-swatch.js");
+/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./shared */ "./src/legend/discrete/shared.js");
+/* harmony import */ var _extras__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./extras */ "./src/legend/discrete/extras.js");
+/* harmony import */ var _divergence__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./divergence */ "./src/legend/discrete/divergence.js");
+/* harmony import */ var _max_min__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./max-min */ "./src/legend/discrete/max-min.js");
+// Horizontal variant of the discrete colour legend
+
+
+
+
+
+
+
+
+/**
+ * Horizontal variant of the discrete legend (orientation: 'horizontal'): one contiguous bar of
+ * class swatches running low -> high from left to right, `config.width` pixels wide in total
+ * (shared equally between the classes), with the class thresholds (labelType 'thresholds') labelled
+ * under the seams between swatches, or each class's range (labelType 'ranges') centred under its
+ * own swatch. Supports the same maxMin / maxMinLabels / maxMinRegionLabels and point-of-divergence
+ * options as the vertical layout (the divergence line is vertical, with its arrows pointing left/right).
+ */
+function createHorizontalLegend(out, config) {
+    const map = out.map
+    const container = out._discreteLegendContainer
+    const n = out.getNumberOfClasses(out)
+    const titlePadding = (0,_shared__WEBPACK_IMPORTED_MODULE_3__.getTitlePadding)(out)
+    const highlightFunction = out.getHighlightFunction(map)
+    const unhighlightFunction = out.getUnHighlightFunction(map)
+    const classifier = out.getColorClassifier(out)
+    const classToFillStyle = out.getClassToFillStyle(out)
+    const labelFormatter = out.getLabelFormatter(out)
+    const ranges = out.labelType === 'ranges' || out.colorLegend?.labelType === 'ranges'
+    const barWidth = config.width ?? out.width
+    const tickLength = config.tickLength ?? 4
+    const barBottom = titlePadding + config.shapeHeight
+    const labelY = barBottom + tickLength + 2
+    const labelFontSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-legend-label') || 12
+
+    // Point of divergence: s = number of classes to the left of the divergence seam. The config index counts
+    // from the top of the equivalent vertical legend, so it is mirrored when the vertical one would be ascending.
+    const hasDivergence = !!config.pointOfDivergenceLabel && config.pointOfDivergence != null
+    let s = null
+    if (hasDivergence) {
+        const idx = config.pointOfDivergence
+        s = out.ascending ? n - idx : idx
+        if (!(s >= 0 && s <= n)) s = null
+    }
+    // in 'ranges' mode the classes after the divergence seam shift right to leave a gap for the line
+    const gap = s !== null && ranges ? (config.pointOfDivergencePadding ?? 0) : 0
+    const itemWidth = (barWidth - gap) / n
+    const itemX = (j) => j * itemWidth + (gap && j >= s ? gap : 0)
+    // x of the seam between class j and j+1
+    const seamX = (j) => (j + 1) * itemWidth + (gap && j + 1 > s ? gap : 0)
+
+    // low -> high from left to right, whichever way the vertical legend would be ordered
+    for (let j = 0; j < n; j++) {
+        const x = itemX(j)
+        const ecl = j
+        const itemContainer = container.append('g').attr('class', 'em-legend-item')
+
+        ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatch)(itemContainer, {
+            x,
+            y: titlePadding,
+            width: itemWidth,
+            height: config.shapeHeight,
+            color: classToFillStyle(ecl, n),
+            onEnter: () => (0,_shared__WEBPACK_IMPORTED_MODULE_3__.highlightClass)(map, highlightFunction, ecl),
+            onLeave: () => (0,_shared__WEBPACK_IMPORTED_MODULE_3__.highlightClass)(map, unhighlightFunction, ecl),
+        })
+
+        if (j > 0 && !(gap && j === s)) {
+            itemContainer
+                .append('line')
+                .attr('class', 'em-legend-separator')
+                .attr('x1', x)
+                .attr('y1', titlePadding)
+                .attr('x2', x)
+                .attr('y2', barBottom)
+        }
+
+        if (ranges) {
+            // vertical-legend index of this class, as labelFormatter's 'ranges' mode expects
+            const i = out.ascending ? n - 1 - j : j
+            const text = config.labels
+                ? config.labels[i]
+                : classifier?.invertExtent
+                  ? labelFormatter(classifier.invertExtent(ecl)[out.ascending ? 0 : 1], i)
+                  : ''
+            ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchLabel)(itemContainer, { x: x + itemWidth / 2, y: barBottom + 4, dy: '0.9em', anchor: 'middle', text })
+        } else if (j < n - 1) {
+            // threshold between class j and j+1
+            const sx = seamX(j)
+            itemContainer
+                .append('line')
+                .attr('class', 'em-legend-tick')
+                .attr('x1', sx)
+                .attr('y1', barBottom)
+                .attr('x2', sx)
+                .attr('y2', barBottom + tickLength)
+            const text = config.labels
+                ? config.labels[out.ascending ? n - 2 - j : j]
+                : classifier?.invertExtent
+                  ? labelFormatter(classifier.invertExtent(ecl)[1])
+                  : ''
+            const label = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchLabel)(itemContainer, { x: sx, y: labelY, dy: '0.9em', anchor: 'middle', text })
+            // mark the label at the divergence seam so drawHorizontalDivergence can move it
+            if (hasDivergence && j + 1 === s) label.attr('class', 'em-legend-label em-legend-label-divergence')
+        }
+    }
+
+    // Range labels are wide ('98.9 − < 133.9'): when neighbours would touch, alternate them onto a second row
+    if (ranges) {
+        const rowEnds = [-Infinity, -Infinity]
+        container.selectAll('.em-legend-item > text.em-legend-label').each(function () {
+            const box = this.getBBox()
+            let row = rowEnds[0] + 3 < box.x ? 0 : rowEnds[1] + 3 < box.x ? 1 : 0
+            if (row === 1) (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('y', barBottom + 4 + labelFontSize + 2)
+            rowEnds[row] = box.x + box.width
+        })
+    }
+
+    // Max / min bounds: a tick and label at each end of the bar, from the stat data extent
+    // (like the vertical legend, bounds only exist for threshold labels)
+    if (!ranges) {
+        drawHorizontalMaxMin(out, config, { n, barWidth, barBottom, labelY, tickLength, labelFontSize, classifier, labelFormatter })
+    }
+
+    // Point of divergence line + labels (drawn last so it can see the label sizes)
+    if (hasDivergence && s !== null) {
+        const xSeam = s * itemWidth + gap / 2
+        ;(0,_divergence__WEBPACK_IMPORTED_MODULE_5__.drawHorizontalDivergence)(out, config, { xSeam, barWidth, titlePadding, tickLength, labelFontSize })
+    }
+}
+
+function drawHorizontalMaxMin(out, config, c) {
+    const { n, barWidth, barBottom, labelY, tickLength, labelFontSize, classifier, labelFormatter } = c
+    const container = out._discreteLegendContainer
+    // low -> high from left to right: the top class is the last one
+    const mm = (0,_max_min__WEBPACK_IMPORTED_MODULE_6__.resolveMaxMin)(out, config, { classifier, labelFormatter, topEcl: n - 1, bottomEcl: 0 })
+    if (!mm) return
+
+    const group = container.append('g').attr('class', 'em-legend-max-min-group')
+    const tickEnd = barBottom + (config.maxMinTickLength ?? tickLength)
+    const add = (isMax, x, text, onOver) => {
+        const kind = isMax ? 'max' : 'min'
+        const tick = group
+            .append('line')
+            .attr('class', `em-legend-tick em-legend-tick-${kind}`)
+            .attr('x1', x)
+            .attr('y1', barBottom)
+            .attr('x2', x)
+            .attr('y2', tickEnd)
+        const label = group
+            .append('text')
+            .style('pointer-events', 'all')
+            .style('cursor', 'pointer')
+            .on('mouseover', onOver)
+            .on('mouseout', mm.unhighlight)
+            .attr('class', `em-legend-label em-legend-label-${kind}`)
+            .attr('x', x)
+            .attr('y', labelY)
+            .attr('dy', '0.9em')
+            // end labels are anchored inwards so they never stick out of the legend box
+            .attr('text-anchor', isMax ? 'end' : 'start')
+            .text(text)
+        return { tick, label }
+    }
+    const items = []
+    if (mm.showMin) items.push(add(false, 0, mm.minLabel, mm.highlightMin))
+    if (mm.showMax) items.push(add(true, barWidth, mm.maxLabel, mm.highlightMax))
+
+    // if an end label runs into a neighbouring threshold label, drop it onto a second row
+    const others = container
+        .selectAll('.em-legend-label')
+        .filter(function () {
+            return !this.classList.contains('em-legend-label-max') && !this.classList.contains('em-legend-label-min')
+        })
+        .nodes()
+    items.forEach(({ tick, label }) => {
+        const box = label.node().getBBox()
+        const clash = others.some((o) => {
+            const ob = o.getBBox()
+            return ob.x < box.x + box.width + 2 && ob.x + ob.width + 2 > box.x
+        })
+        if (clash) {
+            const rowY = labelY + labelFontSize + 4
+            label.attr('y', rowY)
+            tick.attr('y2', rowY)
+        }
+    })
+}
+
+/** No-data and extra category swatches for the horizontal layout: a row to the right of the bar. */
+function appendHorizontalExtraItems(out, config) {
+    const barWidth = config.width ?? out.width
+    ;(0,_extras__WEBPACK_IMPORTED_MODULE_4__.appendExtraSwatchRow)(out, (0,_extras__WEBPACK_IMPORTED_MODULE_4__.extraSwatchRows)(out, config), barWidth + 16, (0,_shared__WEBPACK_IMPORTED_MODULE_3__.getTitlePadding)(out))
+}
+
+
+/***/ },
+
+/***/ "./src/legend/discrete/max-min.js"
+/*!****************************************!*\
+  !*** ./src/legend/discrete/max-min.js ***!
+  \****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   appendVerticalMaxMin: () => (/* binding */ appendVerticalMaxMin),
+/* harmony export */   highlightMaxRegion: () => (/* binding */ highlightMaxRegion),
+/* harmony export */   highlightMinRegion: () => (/* binding */ highlightMinRegion),
+/* harmony export */   resolveMaxMin: () => (/* binding */ resolveMaxMin)
+/* harmony export */ });
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../legend.js */ "./src/legend/legend.js");
+/* harmony import */ var _core_geo_centroids__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../legend-swatch */ "./src/legend/legend-swatch.js");
+// Max / min bounds of discrete colour legends: the extreme values, their labels and region highlighting
+
+
+
+
+
+
+function highlightMaxRegion(map, numberOfClasses, id) {
+    const ecl = numberOfClasses - 1
+    applyMaxMinHighlight(map, ecl, id)
+    if (map.insetTemplates_) {
+        (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(map.insetTemplates_, map.svgId, (insetMap) => {
+            applyMaxMinHighlight(insetMap, ecl, id)
+        })
+    }
+}
+
+function highlightMinRegion(map, id) {
+    const ecl = 0
+    applyMaxMinHighlight(map, ecl, id)
+    if (map.insetTemplates_) {
+        (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(map.insetTemplates_, map.svgId, (insetMap) => {
+            applyMaxMinHighlight(insetMap, ecl, id)
+        })
+    }
+}
+
+function applyMaxMinHighlight(map, ecl, id) {
+    if (map._mapType === 'ps') {
+        applyMaxMinHighlightPs(map, id)
+        return
+    }
+
+    (0,_legend_js__WEBPACK_IMPORTED_MODULE_2__.highlightRegions)(map, ecl)
+    const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getLegendRegionsSelector)(map)
+    map.svg_
+        .selectAll(selector)
+        .selectAll(`[ecl='${ecl}']`)
+        .each(function (d) {
+            if (!d?.properties?.id) return
+            if (d.properties.id !== id) (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('fill', (0,_legend_js__WEBPACK_IMPORTED_MODULE_2__.getDimmedFill)(map))
+        })
+}
+
+// Isolate a single proportional symbol by region id, dimming every other symbol regardless
+// of its class (the max/min region is a single feature, not "the whole top/bottom class").
+function applyMaxMinHighlightPs(map, id) {
+    const layer = map.activeLayer ? map.activeLayer() : map
+    ;(0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_3__.getCentroidsGroup)(layer)
+        .selectAll('[ecl]')
+        .each(function (d) {
+            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('opacity', d?.properties?.id === id ? layer.psFillOpacity_ : '0')
+        })
+}
+
+/**
+ * Work out the max / min bounds of a discrete legend from the stat data: the extreme values, their labels, whether
+ * each is worth drawing, and the region highlighting for hovering them. Shared by the vertical and horizontal
+ * layouts, which only differ in where the ticks go. Returns null when the legend shows no bounds.
+ *
+ * @param {Object} out legend instance
+ * @param {Object} config legend config (maxMin, maxMinLabels, maxMinRegionLabels)
+ * @param {Object} c
+ * @param {Object} c.classifier colour classifier (for invertExtent)
+ * @param {Function} c.labelFormatter
+ * @param {number} c.topEcl class drawn next to the MAX end of the scale
+ * @param {number} c.bottomEcl class drawn next to the MIN end of the scale
+ */
+function resolveMaxMin(out, config, { classifier, labelFormatter, topEcl, bottomEcl }) {
+    const map = out.map
+    const stat = out.getColorStats(out)
+    if (!(out.maxMin || config.maxMin) || !stat?.getMin || !stat?.getMax) return null
+    const globalMin = stat.getMin()
+    const globalMax = stat.getMax()
+    if (!Number.isFinite(globalMin) || !Number.isFinite(globalMax)) return null
+
+    let minRegionId
+    let maxRegionId
+    let minRegion
+    let maxRegion
+    if (stat.getMaxRegionId && stat.getMinRegionId) {
+        minRegionId = stat.getMinRegionId()
+        maxRegionId = stat.getMaxRegionId()
+        const allFeatures = map.Geometries.getAllRegionFeatures()
+        const minFeature = allFeatures.find((f) => f.properties.id === minRegionId)
+        const maxFeature = allFeatures.find((f) => f.properties.id === maxRegionId)
+        if (minFeature) minRegion = minFeature.properties?.na || minRegionId
+        if (maxFeature) maxRegion = maxFeature.properties?.na || maxRegionId
+    }
+
+    // A top or bottom class holding a single value already shows that value as its threshold label, so the
+    // duplicate bound is suppressed. That is a class with equal bounds, or whose inner boundary is the extreme.
+    let showMax = true
+    let showMin = true
+    if (classifier?.invertExtent) {
+        const topExtent = classifier.invertExtent(topEcl)
+        const bottomExtent = classifier.invertExtent(bottomEcl)
+        if (topExtent && (topExtent[0] === topExtent[1] || topExtent[0] === globalMax)) showMax = false
+        if (bottomExtent && (bottomExtent[0] === bottomExtent[1] || bottomExtent[1] === globalMin)) showMin = false
+    }
+
+    let maxLabel = labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : '')
+    let minLabel = labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : '')
+    if (config.maxMinRegionLabels) {
+        maxLabel = `${labelFormatter(globalMax)} (${maxRegion})`
+        minLabel = `${labelFormatter(globalMin)} (${minRegion})`
+    }
+
+    return {
+        showMax,
+        showMin,
+        maxLabel,
+        minLabel,
+        highlightMax: () => highlightMaxRegion(map, out.getNumberOfClasses(out), maxRegionId),
+        highlightMin: () => highlightMinRegion(map, minRegionId),
+        unhighlight: () => {
+            const unhighlightFunction = out.getUnHighlightFunction(map)
+            unhighlightFunction(map)
+            if (map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(map.insetTemplates_, map.svgId, unhighlightFunction)
+        },
+    }
+}
+
+/** MAX and MIN ticks and labels at the two ends of the vertical swatch stack. */
+function appendVerticalMaxMin(out, config, { container, titlePadding, numberOfClasses, sepLineLength, classifier, labelFormatter }) {
+    const mm = resolveMaxMin(out, config, {
+        classifier,
+        labelFormatter,
+        topEcl: out.ascending ? numberOfClasses - 1 : 0,
+        bottomEcl: out.ascending ? 0 : numberOfClasses - 1,
+    })
+    if (!mm) return
+
+    const tickX2 = config.maxMinTickLength ? sepLineLength + config.maxMinTickLength : sepLineLength + config.tickLength
+    const labelX =
+        Math.max(config.shapeWidth, sepLineLength + (config.maxMinTickLength || config.tickLength)) + (config.labelOffsets.x || 0)
+    const group = container.append('g').attr('class', 'em-legend-max-min-group')
+
+    const add = (kind, y, text, onOver) => {
+        group
+            .append('line')
+            .attr('class', `em-legend-tick em-legend-tick-${kind}`)
+            .attr('x1', 0)
+            .attr('y1', y)
+            .attr('x2', tickX2)
+            .attr('y2', y)
+        group
+            .append('text')
+            .style('pointer-events', 'all')
+            .style('cursor', 'pointer')
+            .on('mouseover', onOver)
+            .on('mouseout', mm.unhighlight)
+            .attr('class', `em-legend-label em-legend-label-${kind}`)
+            .attr('x', labelX)
+            .attr('y', y)
+            .attr('dy', '0.3em')
+            .text(text)
+    }
+    if (mm.showMax) add('max', titlePadding, mm.maxLabel, mm.highlightMax)
+    if (mm.showMin) add('min', (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_4__.swatchStackLayout)({ count: numberOfClasses, shapeHeight: config.shapeHeight, startY: titlePadding }).bottom, mm.minLabel, mm.highlightMin)
+}
+
+
+/***/ },
+
+/***/ "./src/legend/discrete/shared.js"
+/*!***************************************!*\
+  !*** ./src/legend/discrete/shared.js ***!
+  \***************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   classStackBottom: () => (/* binding */ classStackBottom),
+/* harmony export */   getTitlePadding: () => (/* binding */ getTitlePadding),
+/* harmony export */   highlightClass: () => (/* binding */ highlightClass)
+/* harmony export */ });
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../legend-swatch */ "./src/legend/legend-swatch.js");
+// Helpers shared by the vertical and horizontal discrete colour legends
+
+
+
+function highlightClass(map, callback, ecl) {
+    callback(map, ecl)
+    if (map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_0__.executeForAllInsets)(map.insetTemplates_, map.svgId, callback, ecl)
+}
+
+/** y of the bottom of the class swatch stack (just below the title), before any divergence shift. */
+function classStackBottom(out, config) {
+    return (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_1__.swatchStackLayout)({ count: out.getNumberOfClasses(out), shapeHeight: config.shapeHeight, startY: getTitlePadding(out) }).bottom
+}
+
+function getTitlePadding(out) {
+    // Calculate the padding between the title and the first legend item
+    const map = out.map
+    let p = map._mapType == 'ps' ? out.colorLegend.titlePadding : out.titlePadding || 0
+    if (out.maxMin) p += 10 // extra padding if max/min labels are shown
+    if (out.colorLegend?.subtitle) p += (0,_core_utils__WEBPACK_IMPORTED_MODULE_0__.getFontSizeFromClass)('em-legend-subtitle') + 2
+    return p
+}
+
+
+/***/ },
+
+/***/ "./src/legend/discrete/vertical.js"
+/*!*****************************************!*\
+  !*** ./src/legend/discrete/vertical.js ***!
+  \*****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   createRangesLegend: () => (/* binding */ createRangesLegend),
+/* harmony export */   createThresholdsLegend: () => (/* binding */ createThresholdsLegend)
+/* harmony export */ });
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../legend-swatch */ "./src/legend/legend-swatch.js");
+/* harmony import */ var _shared__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./shared */ "./src/legend/discrete/shared.js");
+/* harmony import */ var _divergence__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./divergence */ "./src/legend/discrete/divergence.js");
+/* harmony import */ var _max_min__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./max-min */ "./src/legend/discrete/max-min.js");
+// Vertical discrete colour legend: a stack of class swatches labelled by range or by threshold
+
+
+
+
+
+/** Swatches as {color, hover handlers} items, in legend order (descending legends list the top class first). */
+function classItems(out, numberOfClasses) {
+    const map = out.map
+    const highlightFunction = out.getHighlightFunction(map)
+    const unhighlightFunction = out.getUnHighlightFunction(map)
+    const classToFillStyle = out.getClassToFillStyle(out)
+    const items = []
+    for (let i = 0; i < numberOfClasses; i++) {
+        const ecl = out.ascending ? numberOfClasses - i - 1 : i
+        items.push({
+            ecl,
+            color: classToFillStyle(ecl, numberOfClasses),
+            onEnter: () => (0,_shared__WEBPACK_IMPORTED_MODULE_1__.highlightClass)(map, highlightFunction, ecl),
+            onLeave: () => (0,_shared__WEBPACK_IMPORTED_MODULE_1__.highlightClass)(map, unhighlightFunction, ecl),
+        })
+    }
+    return items
+}
+
+/** Draw the point-of-divergence line once the labels exist, so it can clear the widest one. */
+function appendDivergence(out, config, numberOfClasses, titlePadding) {
+    if (!config.pointOfDivergenceLabel) return
+    const stack = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.swatchStackLayout)({ count: numberOfClasses, shapeHeight: config.shapeHeight, startY: titlePadding })
+    for (let i = 0; i < numberOfClasses; i++) {
+        if (i == config.pointOfDivergence) (0,_divergence__WEBPACK_IMPORTED_MODULE_2__.drawDivergingLine)(out, stack.rowY(i), config, stack.top, stack.bottom)
+    }
+}
+
+/** Swatches with a label at each boundary between classes (the 'thresholds' label type). */
+function createThresholdsLegend(out, config) {
+    const map = out.map
+    const numberOfClasses = out.getNumberOfClasses(out)
+    const titlePadding = (0,_shared__WEBPACK_IMPORTED_MODULE_1__.getTitlePadding)(out)
+    const classifier = out.getColorClassifier(out)
+    const labelFormatter = out.getLabelFormatter(out)
+    const sepLineLength = config.sepLineLength ?? config.shapeWidth
+
+    ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.appendLegendSwatchRows)(out._discreteLegendContainer, classItems(out, numberOfClasses), {
+        shapeWidth: config.shapeWidth,
+        shapeHeight: config.shapeHeight,
+        startY: titlePadding,
+        decorate: (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.thresholdsDecorator)({
+            count: numberOfClasses,
+            sepLength: sepLineLength,
+            tickLength: config.tickLength,
+            labelX: Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0),
+            shapeHeight: config.shapeHeight,
+            labelText: (i, item) => {
+                if (config.labels) return config.labels[i]
+                if (classifier?.invertExtent) return labelFormatter(classifier.invertExtent(item.ecl)[out.ascending ? 0 : 1])
+                return map.noDataText_ || ''
+            },
+            // mark the label at the divergence so drawDivergingLine can move it
+            onLabel: (label, i) => {
+                if (config.pointOfDivergenceLabel && i == config.pointOfDivergence - 1) label.attr('class', 'em-legend-label em-legend-label-divergence')
+            },
+        }),
+    })
+
+    ;(0,_max_min__WEBPACK_IMPORTED_MODULE_3__.appendVerticalMaxMin)(out, config, {
+        container: out._discreteLegendContainer,
+        titlePadding,
+        numberOfClasses,
+        sepLineLength,
+        classifier,
+        labelFormatter,
+    })
+    appendDivergence(out, config, numberOfClasses, titlePadding)
+}
+
+/** Swatches each labelled with its own range (the 'ranges' label type). */
+function createRangesLegend(out, config) {
+    const numberOfClasses = out.getNumberOfClasses(out)
+    const labelFormatter = out.getLabelFormatter(out)
+    const colorClassifier = out.getColorClassifier(out)
+    const titlePadding = (0,_shared__WEBPACK_IMPORTED_MODULE_1__.getTitlePadding)(out)
+    const sepLineLength = config.sepLineLength ?? config.shapeWidth
+
+    const items = classItems(out, numberOfClasses).map((item, i) => ({
+        ...item,
+        // shift legend items down after the point of divergence if applicable
+        yOffset: config.pointOfDivergenceLabel && i >= config.pointOfDivergence ? config.pointOfDivergencePadding : 0,
+        label: config.labels ? config.labels[i] : labelFormatter(colorClassifier.invertExtent(item.ecl)[out.ascending ? 0 : 1], i),
+    }))
+    ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.appendLegendSwatchRows)(out._discreteLegendContainer, items, {
+        shapeWidth: config.shapeWidth,
+        shapeHeight: config.shapeHeight,
+        startY: titlePadding,
+        labelX: Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0),
+        decorate: (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.rangesDecorator)(sepLineLength),
+    })
+
+    appendDivergence(out, config, numberOfClasses, titlePadding)
+}
+
+
+/***/ },
+
 /***/ "./src/legend/flow/legend-flow-color.js"
 /*!**********************************************!*\
   !*** ./src/legend/flow/legend-flow-color.js ***!
@@ -52350,12 +53289,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   drawDiscreteLegend: () => (/* binding */ drawDiscreteLegend),
 /* harmony export */   resolveDecimals: () => (/* binding */ resolveDecimals)
 /* harmony export */ });
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var d3_format__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-format */ "./node_modules/d3-format/src/defaultLocale.js");
-/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./legend-swatch */ "./src/legend/legend-swatch.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
-/* harmony import */ var _legend_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./legend.js */ "./src/legend/legend.js");
-/* harmony import */ var _core_geo_centroids__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../core/geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var d3_format__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-format */ "./node_modules/d3-format/src/defaultLocale.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _discrete_shared__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./discrete/shared */ "./src/legend/discrete/shared.js");
+/* harmony import */ var _discrete_extras__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./discrete/extras */ "./src/legend/discrete/extras.js");
+/* harmony import */ var _discrete_vertical__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./discrete/vertical */ "./src/legend/discrete/vertical.js");
+/* harmony import */ var _discrete_horizontal__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./discrete/horizontal */ "./src/legend/discrete/horizontal.js");
 // legends for discrete color scales
 
 
@@ -52387,7 +53326,7 @@ function buildDiscreteLabelFormatter(out, getThresholdsFn, statData, labelType, 
     }
 
     const decimals = resolveDecimals(out, statData)
-    const decimalFormatter = (0,d3_format__WEBPACK_IMPORTED_MODULE_1__.format)(`,.${decimals}f`)
+    const decimalFormatter = (0,d3_format__WEBPACK_IMPORTED_MODULE_0__.format)(`,.${decimals}f`)
     const fmt = (value) => normalizeMinus(decimalFormatter(value))
 
     if (labelType === 'ranges') {
@@ -52457,7 +53396,7 @@ function drawDiscreteLegend(out, x, y) {
 
     // subtitle
     if (out.colorLegend?.subtitle) {
-        const titleH = out.colorLegend.title ? (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getFontSizeFromClass)('em-color-legend-title') + 2 : 0
+        const titleH = out.colorLegend.title ? (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-color-legend-title') + 2 : 0
         out._discreteLegendContainer.append('text').attr('class', 'em-legend-subtitle').attr('x', 0).attr('y', titleH).html(out.colorLegend.subtitle)
     }
 
@@ -52468,35 +53407,23 @@ function drawDiscreteLegend(out, x, y) {
 
     // thresholds vs ranges
     if (horizontal) {
-        createHorizontalLegend(out, config)
+        (0,_discrete_horizontal__WEBPACK_IMPORTED_MODULE_5__.createHorizontalLegend)(out, config)
     } else if (out.labelType === 'ranges' || out.colorLegend?.labelType === 'ranges') {
-        createRangesLegend(out, config)
+        (0,_discrete_vertical__WEBPACK_IMPORTED_MODULE_4__.createRangesLegend)(out, config)
     } else {
-        createThresholdsLegend(out, config)
+        (0,_discrete_vertical__WEBPACK_IMPORTED_MODULE_4__.createThresholdsLegend)(out, config)
     }
 
     if (horizontal) {
-        appendHorizontalExtraItems(out, config)
+        (0,_discrete_horizontal__WEBPACK_IMPORTED_MODULE_5__.appendHorizontalExtraItems)(out, config)
         return
     }
 
-    // Optionally add no-data
-    if (config.noData) {
-        let y = classStackBottom(out, config) + 3 // 3px padding
-        const x = 0
-        if (config.pointOfDivergence && config.pointOfDivergencePadding) y += config.pointOfDivergencePadding // shift legend items down after point of divergence
-        const container = out._discreteLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
-        const highlightFunction = out.getHighlightFunction(out.map)
-        const unhighlightFunction = out.getUnHighlightFunction(out.map)
-        out.appendNoDataLegend(container, config.noDataText, highlightFunction, unhighlightFunction)
-    }
-
-    // Optionally add extra categorical classes mixed into this choropleth's classification
-    // (e.g. a "no railway lines" class alongside numeric electrification-rate classes)
-    let categoryY = classStackBottom(out, config) + 3
-    if (config.pointOfDivergence && config.pointOfDivergencePadding) categoryY += config.pointOfDivergencePadding
-    if (config.noData) categoryY += out.noDataShapeHeight + out.noDataPadding // stack below the no-data box
-    appendCategoryLegendItems(out, categoryY)
+    // The no-data box and any extra categorical classes (e.g. a "no railway lines" class alongside numeric
+    // electrification-rate classes) stack below the classes, as rows of the same swatch stack.
+    let extrasY = (0,_discrete_shared__WEBPACK_IMPORTED_MODULE_2__.classStackBottom)(out, config) + 3 // 3px padding
+    if (config.pointOfDivergence && config.pointOfDivergencePadding) extrasY += config.pointOfDivergencePadding // shift down after point of divergence
+    ;(0,_discrete_extras__WEBPACK_IMPORTED_MODULE_3__.appendExtraSwatchStack)(out, (0,_discrete_extras__WEBPACK_IMPORTED_MODULE_3__.extraSwatchRows)(out, config), extrasY)
 }
 
 /**
@@ -52508,859 +53435,7 @@ function drawDiscreteLegend(out, x, y) {
  * No-ops if there are no categories configured.
  */
 function appendCategoryLegendItems(out, startY) {
-    const categoryFillStyle = out.layer?.categoryFillStyle_
-    if (!categoryFillStyle) return
-    const categoryText = out.layer.categoryText_
-    let y = startY
-    const highlightFunction = out.getHighlightFunction(out.map)
-    const unhighlightFunction = out.getUnHighlightFunction(out.map)
-    Object.keys(categoryFillStyle).forEach((rawValue) => {
-        const container = out._discreteLegendContainer.append('g').attr('class', 'em-category-legend').attr('transform', `translate(0,${y})`)
-        const text = (categoryText && categoryText[rawValue]) || rawValue
-        out.appendCategoryLegend(container, (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.toCategoryEcl)(rawValue), categoryFillStyle[rawValue], text, highlightFunction, unhighlightFunction)
-        y += out.noDataShapeHeight + out.noDataPadding
-    })
-}
-
-function highlightClass(map, callback, ecl) {
-    callback(map, ecl)
-    if (map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(map.insetTemplates_, map.svgId, callback, ecl)
-}
-
-/**
- * Horizontal variant of the discrete legend (orientation: 'horizontal'): one contiguous bar of
- * class swatches running low -> high from left to right, `config.width` pixels wide in total
- * (shared equally between the classes), with the class thresholds (labelType 'thresholds') labelled
- * under the seams between swatches, or each class's range (labelType 'ranges') centred under its
- * own swatch. Supports the same maxMin / maxMinLabels / maxMinRegionLabels and point-of-divergence
- * options as the vertical layout (the divergence line is vertical, with its arrows pointing left/right).
- */
-function createHorizontalLegend(out, config) {
-    const map = out.map
-    const container = out._discreteLegendContainer
-    const n = out.getNumberOfClasses(out)
-    const titlePadding = getTitlePadding(out)
-    const highlightFunction = out.getHighlightFunction(map)
-    const unhighlightFunction = out.getUnHighlightFunction(map)
-    const classifier = out.getColorClassifier(out)
-    const classToFillStyle = out.getClassToFillStyle(out)
-    const labelFormatter = out.getLabelFormatter(out)
-    const ranges = out.labelType === 'ranges' || out.colorLegend?.labelType === 'ranges'
-    const barWidth = config.width ?? out.width
-    const tickLength = config.tickLength ?? 4
-    const barBottom = titlePadding + config.shapeHeight
-    const labelY = barBottom + tickLength + 2
-    const labelFontSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getFontSizeFromClass)('em-legend-label') || 12
-
-    // Point of divergence: s = number of classes to the left of the divergence seam. The config index counts
-    // from the top of the equivalent vertical legend, so it is mirrored when the vertical one would be ascending.
-    const hasDivergence = !!config.pointOfDivergenceLabel && config.pointOfDivergence != null
-    let s = null
-    if (hasDivergence) {
-        const idx = config.pointOfDivergence
-        s = out.ascending ? n - idx : idx
-        if (!(s >= 0 && s <= n)) s = null
-    }
-    // in 'ranges' mode the classes after the divergence seam shift right to leave a gap for the line
-    const gap = s !== null && ranges ? (config.pointOfDivergencePadding ?? 0) : 0
-    const itemWidth = (barWidth - gap) / n
-    const itemX = (j) => j * itemWidth + (gap && j >= s ? gap : 0)
-    // x of the seam between class j and j+1
-    const seamX = (j) => (j + 1) * itemWidth + (gap && j + 1 > s ? gap : 0)
-
-    // low -> high from left to right, whichever way the vertical legend would be ordered
-    for (let j = 0; j < n; j++) {
-        const x = itemX(j)
-        const ecl = j
-        const itemContainer = container.append('g').attr('class', 'em-legend-item')
-
-        ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatch)(itemContainer, {
-            x,
-            y: titlePadding,
-            width: itemWidth,
-            height: config.shapeHeight,
-            color: classToFillStyle(ecl, n),
-            onEnter: () => highlightClass(map, highlightFunction, ecl),
-            onLeave: () => highlightClass(map, unhighlightFunction, ecl),
-        })
-
-        if (j > 0 && !(gap && j === s)) {
-            itemContainer
-                .append('line')
-                .attr('class', 'em-legend-separator')
-                .attr('x1', x)
-                .attr('y1', titlePadding)
-                .attr('x2', x)
-                .attr('y2', barBottom)
-        }
-
-        if (ranges) {
-            // vertical-legend index of this class, as labelFormatter's 'ranges' mode expects
-            const i = out.ascending ? n - 1 - j : j
-            const text = config.labels
-                ? config.labels[i]
-                : classifier?.invertExtent
-                  ? labelFormatter(classifier.invertExtent(ecl)[out.ascending ? 0 : 1], i)
-                  : ''
-            ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchLabel)(itemContainer, { x: x + itemWidth / 2, y: barBottom + 4, dy: '0.9em', anchor: 'middle', text })
-        } else if (j < n - 1) {
-            // threshold between class j and j+1
-            const sx = seamX(j)
-            itemContainer
-                .append('line')
-                .attr('class', 'em-legend-tick')
-                .attr('x1', sx)
-                .attr('y1', barBottom)
-                .attr('x2', sx)
-                .attr('y2', barBottom + tickLength)
-            const text = config.labels
-                ? config.labels[out.ascending ? n - 2 - j : j]
-                : classifier?.invertExtent
-                  ? labelFormatter(classifier.invertExtent(ecl)[1])
-                  : ''
-            const label = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchLabel)(itemContainer, { x: sx, y: labelY, dy: '0.9em', anchor: 'middle', text })
-            // mark the label at the divergence seam so drawHorizontalDivergence can move it
-            if (hasDivergence && j + 1 === s) label.attr('class', 'em-legend-label em-legend-label-divergence')
-        }
-    }
-
-    // Range labels are wide ('98.9 − < 133.9'): when neighbours would touch, alternate them onto a second row
-    if (ranges) {
-        const rowEnds = [-Infinity, -Infinity]
-        container.selectAll('.em-legend-item > text.em-legend-label').each(function () {
-            const box = this.getBBox()
-            let row = rowEnds[0] + 3 < box.x ? 0 : rowEnds[1] + 3 < box.x ? 1 : 0
-            if (row === 1) (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('y', barBottom + 4 + labelFontSize + 2)
-            rowEnds[row] = box.x + box.width
-        })
-    }
-
-    // Max / min bounds: a tick and label at each end of the bar, from the stat data extent
-    const stat = out.getColorStats(out)
-    // (like the vertical legend, bounds only exist for threshold labels)
-    if (!ranges && (out.maxMin || config.maxMin) && stat?.getMin && stat?.getMax && Number.isFinite(stat.getMin()) && Number.isFinite(stat.getMax())) {
-        drawHorizontalMaxMin(out, config, { n, barWidth, barBottom, labelY, tickLength, labelFontSize, classifier, labelFormatter, stat })
-    }
-
-    // Point of divergence line + labels (drawn last so it can see the label sizes)
-    if (hasDivergence && s !== null) {
-        const xSeam = s * itemWidth + gap / 2
-        drawHorizontalDivergence(out, config, { xSeam, barWidth, titlePadding, tickLength, labelFontSize })
-    }
-}
-
-function drawHorizontalMaxMin(out, config, c) {
-    const { n, barWidth, barBottom, labelY, tickLength, labelFontSize, classifier, labelFormatter, stat } = c
-    const map = out.map
-    const container = out._discreteLegendContainer
-    const globalMin = stat.getMin()
-    const globalMax = stat.getMax()
-    let globalMinRegionId
-    let globalMaxRegionId
-    let globalMinRegion
-    let globalMaxRegion
-    if (stat.getMaxRegionId && stat.getMinRegionId) {
-        globalMinRegionId = stat.getMinRegionId()
-        globalMaxRegionId = stat.getMaxRegionId()
-        const allFeatures = map.Geometries.getAllRegionFeatures()
-        const minFeature = allFeatures.find((f) => f.properties.id === globalMinRegionId)
-        const maxFeature = allFeatures.find((f) => f.properties.id === globalMaxRegionId)
-        if (minFeature) globalMinRegion = minFeature.properties?.na || globalMinRegionId
-        if (maxFeature) globalMaxRegion = maxFeature.properties?.na || globalMaxRegionId
-    }
-
-    // a single-value top/bottom class already shows the same value as its threshold label
-    let showMax = true
-    let showMin = true
-    if (classifier?.invertExtent) {
-        const topExtent = classifier.invertExtent(n - 1)
-        const bottomExtent = classifier.invertExtent(0)
-        if (topExtent && (topExtent[0] === topExtent[1] || topExtent[0] === globalMax)) showMax = false
-        if (bottomExtent && (bottomExtent[0] === bottomExtent[1] || bottomExtent[1] === globalMin)) showMin = false
-    }
-
-    let maxLabel = labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : '')
-    let minLabel = labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : '')
-    if (config.maxMinRegionLabels) {
-        maxLabel = `${labelFormatter(globalMax)} (${globalMaxRegion})`
-        minLabel = `${labelFormatter(globalMin)} (${globalMinRegion})`
-    }
-
-    const group = container.append('g').attr('class', 'em-legend-max-min-group')
-    const tickEnd = barBottom + (config.maxMinTickLength ?? tickLength)
-    const unhighlight = () => {
-        const unhighlightFunction = out.getUnHighlightFunction(map)
-        unhighlightFunction(map)
-        if (map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(map.insetTemplates_, map.svgId, unhighlightFunction)
-    }
-    const add = (isMax, x, text, onOver) => {
-        const kind = isMax ? 'max' : 'min'
-        const tick = group
-            .append('line')
-            .attr('class', `em-legend-tick em-legend-tick-${kind}`)
-            .attr('x1', x)
-            .attr('y1', barBottom)
-            .attr('x2', x)
-            .attr('y2', tickEnd)
-        const label = group
-            .append('text')
-            .style('pointer-events', 'all')
-            .style('cursor', 'pointer')
-            .on('mouseover', onOver)
-            .on('mouseout', unhighlight)
-            .attr('class', `em-legend-label em-legend-label-${kind}`)
-            .attr('x', x)
-            .attr('y', labelY)
-            .attr('dy', '0.9em')
-            // end labels are anchored inwards so they never stick out of the legend box
-            .attr('text-anchor', isMax ? 'end' : 'start')
-            .text(text)
-        return { tick, label }
-    }
-    const items = []
-    if (showMin) items.push(add(false, 0, minLabel, () => highlightMinRegion(map, globalMinRegionId)))
-    if (showMax) items.push(add(true, barWidth, maxLabel, () => highlightMaxRegion(map, n, globalMaxRegionId)))
-
-    // if an end label runs into a neighbouring threshold label, drop it onto a second row
-    const others = container
-        .selectAll('.em-legend-label')
-        .filter(function () {
-            return !this.classList.contains('em-legend-label-max') && !this.classList.contains('em-legend-label-min')
-        })
-        .nodes()
-    items.forEach(({ tick, label }) => {
-        const box = label.node().getBBox()
-        const clash = others.some((o) => {
-            const ob = o.getBBox()
-            return ob.x < box.x + box.width + 2 && ob.x + ob.width + 2 > box.x
-        })
-        if (clash) {
-            const rowY = labelY + labelFontSize + 4
-            label.attr('y', rowY)
-            tick.attr('y2', rowY)
-        }
-    })
-}
-
-function drawHorizontalDivergence(out, config, c) {
-    const { xSeam, barWidth, titlePadding, tickLength, labelFontSize } = c
-    const container = out._discreteLegendContainer.append('g').attr('class', 'em-legend-divergence-container')
-    const markerHeight = 6
-    const labels = config.pointOfDivergenceLabel.split('|')
-
-    // the line runs down from the top of the bar, past the labels
-    const lineLength = config.divergingLineLength || config.shapeHeight + tickLength + 2 + labelFontSize + (config.divergingLinePadding ?? 15)
-    const yEnd = titlePadding + lineLength
-    const showDivergingLine = config.showDivergingLine ?? true
-    if (showDivergingLine) {
-        container
-            .append('line')
-            .attr('class', 'em-legend-diverging-line')
-            .attr('x1', xSeam)
-            .attr('y1', titlePadding)
-            .attr('x2', xSeam)
-            .attr('y2', yEnd)
-        const tickLen = config.tickLength || 5
-        container
-            .append('line')
-            .attr('class', 'em-legend-tick')
-            .attr('x1', xSeam - tickLen / 2)
-            .attr('y1', yEnd)
-            .attr('x2', xSeam + tickLen / 2)
-            .attr('y2', yEnd)
-    }
-
-    if (labels.length > 1) {
-        // arrows pointing left (lower values) and right (higher values). labels[0] is the "top" label of the
-        // vertical legend, i.e. the high end when ascending, so it goes on the right in that case.
-        const rightText = out.ascending ? labels[0] : labels[1]
-        const leftText = out.ascending ? labels[1] : labels[0]
-        const arrowLength = config.divergingArrowLength || 30
-        const atExtremes = config.pointOfDivergenceLabelsAtExtremes ?? false
-        const stacked = config.pointOfDivergenceLabelsStacked ?? false
-
-        const defs = container.append('defs')
-        defs.append('marker')
-            .attr('id', 'arrowhead')
-            .attr('markerWidth', markerHeight)
-            .attr('markerHeight', markerHeight)
-            .attr('refX', 0)
-            .attr('refY', markerHeight / 2)
-            .attr('orient', 'auto')
-            .append('polygon')
-            .attr('points', `0 0, ${markerHeight} ${markerHeight / 2}, 0 ${markerHeight}`)
-            .attr('fill', 'black')
-
-        const makeLabel = (text, x, y, anchor, dy) =>
-            container.append('text').attr('class', 'em-legend-label').attr('x', x).attr('y', y).attr('dy', dy).attr('text-anchor', anchor).text(text)
-
-        // when the labels sit at the extremes, draw them first so the arrows can stretch up to them
-        let leftLen = arrowLength
-        let rightLen = arrowLength
-        if (atExtremes) {
-            const leftLabel = makeLabel(leftText, 0, yEnd, 'start', '0.3em')
-            const rightLabel = makeLabel(rightText, barWidth, yEnd, 'end', '0.3em')
-            if (config.divergingArrowLength == null) {
-                leftLen = Math.max(xSeam - leftLabel.node().getBBox().width - 10, markerHeight)
-                rightLen = Math.max(barWidth - xSeam - rightLabel.node().getBBox().width - 10, markerHeight)
-            }
-        }
-        container
-            .append('line')
-            .attr('class', 'em-legend-diverging-line')
-            .attr('x1', xSeam)
-            .attr('y1', yEnd)
-            .attr('x2', xSeam - leftLen)
-            .attr('y2', yEnd)
-            .attr('marker-end', 'url(#arrowhead)')
-        container
-            .append('line')
-            .attr('class', 'em-legend-diverging-line')
-            .attr('x1', xSeam)
-            .attr('y1', yEnd)
-            .attr('x2', xSeam + rightLen)
-            .attr('y2', yEnd)
-            .attr('marker-end', 'url(#arrowhead)')
-
-        if (!atExtremes) {
-            if (stacked) {
-                // above each arrow, running outwards from the line
-                makeLabel(leftText, xSeam - 6, yEnd - 4, 'end', '0')
-                makeLabel(rightText, xSeam + 6, yEnd - 4, 'start', '0')
-            } else {
-                // beyond each arrow tip
-                makeLabel(leftText, xSeam - leftLen - 8, yEnd, 'end', '0.3em')
-                makeLabel(rightText, xSeam + rightLen + 8, yEnd, 'start', '0.3em')
-            }
-        }
-
-        // the threshold value at the divergence seam would sit under the line: move it below the arrows' junction
-        if (showDivergingLine) {
-            out._discreteLegendContainer.selectAll('.em-legend-label-divergence').each(function () {
-                container.node().appendChild(this)
-            })
-            container
-                .selectAll('.em-legend-label-divergence')
-                .attr('x', xSeam)
-                .attr('y', yEnd + 4)
-                .attr('dy', '0.9em')
-        }
-    } else {
-        // single label under the end of the line; it replaces the threshold value at that seam
-        container
-            .append('text')
-            .attr('class', 'em-legend-diverging-label em-legend-label')
-            .attr('x', xSeam)
-            .attr('y', yEnd + 4)
-            .attr('dy', '0.9em')
-            .attr('text-anchor', 'middle')
-            .text(config.pointOfDivergenceLabel)
-        if (showDivergingLine) out._discreteLegendContainer.selectAll('.em-legend-label-divergence').remove()
-    }
-}
-
-/** No-data and extra category swatches for the horizontal layout: a row to the right of the bar. */
-function appendHorizontalExtraItems(out, config) {
-    const barWidth = config.width ?? out.width
-    const titlePadding = getTitlePadding(out)
-    const highlightFunction = out.getHighlightFunction(out.map)
-    const unhighlightFunction = out.getUnHighlightFunction(out.map)
-    const gap = 16
-    let x = barWidth + gap
-    const place = (cls, draw) => {
-        const container = out._discreteLegendContainer.append('g').attr('class', cls).attr('transform', `translate(${x},${titlePadding})`)
-        draw(container)
-        x += container.node().getBBox().width + gap
-    }
-    if (config.noData) {
-        place('em-no-data-legend', (c) => out.appendNoDataLegend(c, config.noDataText, highlightFunction, unhighlightFunction))
-    }
-    const fills = out.layer?.categoryFillStyle_
-    if (fills) {
-        const texts = out.layer.categoryText_
-        Object.keys(fills).forEach((raw) =>
-            place('em-category-legend', (c) =>
-                out.appendCategoryLegend(c, (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.toCategoryEcl)(raw), fills[raw], (texts && texts[raw]) || raw, highlightFunction, unhighlightFunction)
-            )
-        )
-    }
-}
-
-/** y of the bottom of the class swatch stack (just below the title), before any divergence shift. */
-function classStackBottom(out, config) {
-    return (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.swatchStackLayout)({ count: out.getNumberOfClasses(out), shapeHeight: config.shapeHeight, startY: getTitlePadding(out) }).bottom
-}
-
-function getTitlePadding(out) {
-    // Calculate the padding between the title and the first legend item
-    const map = out.map
-    let p = map._mapType == 'ps' ? out.colorLegend.titlePadding : out.titlePadding || 0
-    if (out.maxMin) p += 10 // extra padding if max/min labels are shown
-    if (out.colorLegend?.subtitle) p += (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getFontSizeFromClass)('em-legend-subtitle') + 2
-    return p
-}
-
-function createThresholdsLegend(out, config) {
-    const map = out.map
-    const container = out._discreteLegendContainer
-    const numberOfClasses = out.getNumberOfClasses(out)
-    const titlePadding = getTitlePadding(out)
-    const highlightFunction = out.getHighlightFunction(map)
-    const unhighlightFunction = out.getUnHighlightFunction(map)
-    const classifier = out.getColorClassifier(out)
-    const classToFillStyle = out.getClassToFillStyle(out)
-    const stat = out.getColorStats(out)
-    const sepLineLength = config.sepLineLength ?? config.shapeWidth
-
-    // Label formatter
-    const labelFormatter = out.getLabelFormatter(out)
-
-    // ---- Correct global min/max from statData ----
-    let globalMin
-    let globalMax
-    let globalMinRegionId
-    let globalMaxRegionId
-    let globalMinRegion
-    let globalMaxRegion
-    if ((out.maxMin || config.maxMin) && stat) {
-        if (stat?.getMin && stat?.getMax) {
-            globalMin = stat.getMin()
-            globalMax = stat.getMax()
-        }
-        if (stat?.getMaxRegionId && stat?.getMinRegionId) {
-            globalMinRegionId = stat.getMinRegionId()
-            globalMaxRegionId = stat.getMaxRegionId()
-            const allFeatures = map.Geometries.getAllRegionFeatures()
-            const minFeature = allFeatures.find((f) => f.properties.id === globalMinRegionId)
-            const maxFeature = allFeatures.find((f) => f.properties.id === globalMaxRegionId)
-            if (minFeature) globalMinRegion = minFeature.properties?.na || globalMinRegionId
-            if (maxFeature) globalMaxRegion = maxFeature.properties?.na || globalMaxRegionId
-        }
-    }
-
-    const thresholdItems = []
-    for (let i = 0; i < numberOfClasses; i++) {
-        const ecl = out.ascending ? numberOfClasses - i - 1 : i
-        thresholdItems.push({
-            color: classToFillStyle(ecl, numberOfClasses),
-            onEnter: () => highlightClass(map, highlightFunction, ecl),
-            onLeave: () => highlightClass(map, unhighlightFunction, ecl),
-            ecl,
-        })
-    }
-    const thresholdLabelX = Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
-    ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchRows)(container, thresholdItems, {
-        shapeWidth: config.shapeWidth,
-        shapeHeight: config.shapeHeight,
-        startY: titlePadding,
-        decorate: (row, { i, y, item }) => {
-            if (i > 0) {
-                appendSeparator(row, y, sepLineLength)
-                // tick at each internal boundary
-                row.append('line').attr('class', 'em-legend-tick').attr('x1', sepLineLength).attr('y1', y).attr('x2', sepLineLength + config.tickLength).attr('y2', y)
-            }
-            // label at internal boundaries, below the swatch
-            if (i < numberOfClasses - 1) {
-                const label = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchLabel)(row, {
-                    x: thresholdLabelX,
-                    y: y + config.shapeHeight,
-                    dy: '0.3em',
-                    text: () => {
-                        if (config.labels) return config.labels[i]
-                        if (classifier?.invertExtent) return labelFormatter(classifier.invertExtent(item.ecl)[out.ascending ? 0 : 1])
-                        return map.noDataText_ || ''
-                    },
-                })
-                // mark label so we can move it in drawDivergingLine
-                if (config.pointOfDivergenceLabel && i == config.pointOfDivergence - 1) label.attr('class', 'em-legend-label em-legend-label-divergence')
-            }
-        },
-    })
-
-    // Add MIN and MAX ticks at the ends of the scale using statData extent
-    if ((out.maxMin || config.maxMin) && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
-        // Detect if the top or bottom class is a single-value class.
-        // When that happens, the threshold label already shows the same value,
-        // so we suppress the duplicate max/min boundary label.
-        let showMax = true
-        let showMin = true
-        if (classifier?.invertExtent) {
-            const topClassEcl = out.ascending ? numberOfClasses - 1 : 0
-            const bottomClassEcl = out.ascending ? 0 : numberOfClasses - 1
-            const topExtent = classifier.invertExtent(topClassEcl)
-            const bottomExtent = classifier.invertExtent(bottomClassEcl)
-            // A class with equal bounds, or whose inner boundary equals the global extreme,
-            // contains only one distinct value and would duplicate the threshold label.
-            if (topExtent && (topExtent[0] === topExtent[1] || topExtent[0] === globalMax)) showMax = false
-            if (bottomExtent && (bottomExtent[0] === bottomExtent[1] || bottomExtent[1] === globalMin)) showMin = false
-        }
-
-        const tickX1 = 0
-        const tickX2 = config.maxMinTickLength ? sepLineLength + config.maxMinTickLength : sepLineLength + config.tickLength
-        const labelX = config.maxMinTickLength
-            ? Math.max(config.shapeWidth, sepLineLength + config.maxMinTickLength) + (config.labelOffsets.x || 0)
-            : Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
-
-        let maxLabel = labelFormatter(globalMax) + (config.maxMinLabels ? config.maxMinLabels[1] : '')
-        let minLabel = labelFormatter(globalMin) + (config.maxMinLabels ? config.maxMinLabels[0] : '')
-
-        if (config.maxMinRegionLabels) {
-            maxLabel = `${labelFormatter(globalMax)} (${globalMaxRegion})`
-            minLabel = `${labelFormatter(globalMin)} (${globalMinRegion})`
-        }
-        const maxMinGroup = container.append('g').attr('class', 'em-legend-max-min-group')
-
-        if (showMax) {
-            // Top boundary (MAX)
-            const yTop = titlePadding
-            maxMinGroup
-                .append('line')
-                .attr('class', 'em-legend-tick em-legend-tick-max')
-                .attr('x1', tickX1)
-                .attr('y1', yTop)
-                .attr('x2', tickX2)
-                .attr('y2', yTop)
-
-            maxMinGroup
-                .append('text')
-                .style('pointer-events', 'all')
-                .style('cursor', 'pointer')
-                .on('mouseover', function () {
-                    const numberOfClasses = out.getNumberOfClasses(out)
-                    highlightMaxRegion(map, numberOfClasses, globalMaxRegionId)
-                })
-                .on('mouseout', function () {
-                    const unhighlightFunction = out.getUnHighlightFunction(map)
-                    unhighlightFunction(map)
-                    if (map.insetTemplates_) {
-                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(map.insetTemplates_, map.svgId, unhighlightFunction)
-                    }
-                })
-                .attr('class', 'em-legend-label em-legend-label-max')
-                .attr('x', labelX)
-                .attr('y', yTop)
-                .attr('dy', '0.3em')
-                .text(maxLabel)
-        }
-
-        if (showMin) {
-            // Bottom boundary (MIN)
-            const yBottom = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.swatchStackLayout)({ count: numberOfClasses, shapeHeight: config.shapeHeight, startY: titlePadding }).bottom
-            maxMinGroup
-                .append('line')
-                .attr('class', 'em-legend-tick em-legend-tick-min')
-                .attr('x1', tickX1)
-                .attr('y1', yBottom)
-                .attr('x2', tickX2)
-                .attr('y2', yBottom)
-
-            maxMinGroup
-                .append('text')
-                .style('pointer-events', 'all')
-                .style('cursor', 'pointer')
-                .on('mouseover', function () {
-                    highlightMinRegion(map, globalMinRegionId)
-                })
-                .on('mouseout', function () {
-                    const unhighlightFunction = out.getUnHighlightFunction(map)
-                    unhighlightFunction(map)
-                    if (map.insetTemplates_) {
-                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(map.insetTemplates_, map.svgId, unhighlightFunction)
-                    }
-                })
-                .attr('class', 'em-legend-label em-legend-label-min')
-                .attr('x', labelX)
-                .attr('y', yBottom)
-                .attr('dy', '0.3em')
-                .text(minLabel)
-        }
-    }
-
-    // Draw diverging line if applicable. We draw it afterwards so that we can calculate
-    // the max length of the legend labels so it doesnt cover them
-    if (config.pointOfDivergenceLabel) {
-        const scaleTopY = titlePadding
-        const scaleBottomY = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.swatchStackLayout)({ count: numberOfClasses, shapeHeight: config.shapeHeight, startY: titlePadding }).bottom
-        for (let i = 0; i < numberOfClasses; i++) {
-            let y = i * config.shapeHeight + titlePadding
-            // point of divergence indicator
-            if (i == config.pointOfDivergence) {
-                drawDivergingLine(out, y, config, scaleTopY, scaleBottomY)
-            }
-        }
-    }
-}
-
-/** Thin line across the top of a swatch, separating it from the one above. */
-function appendSeparator(row, y, length) {
-    return row.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', length).attr('y2', y)
-}
-
-function createRangesLegend(out, config) {
-    const map = out.map
-    const container = out._discreteLegendContainer
-    const labelFormatter = out.getLabelFormatter(out)
-    const numberOfClasses = out.getNumberOfClasses(out)
-    const highlightFunction = out.getHighlightFunction(map)
-    const unhighlightFunction = out.getUnHighlightFunction(map)
-    const classToFillStyle = out.getClassToFillStyle(out)
-    const colorClassifier = out.getColorClassifier(out)
-    const titlePadding = getTitlePadding(out)
-    const sepLineLength = config.sepLineLength ?? config.shapeWidth
-
-    const items = []
-    for (let i = 0; i < numberOfClasses; i++) {
-        const ecl = out.ascending ? numberOfClasses - i - 1 : i
-        items.push({
-            color: classToFillStyle(ecl, numberOfClasses),
-            // shift legend items down after point of divergence if applicable
-            yOffset: config.pointOfDivergenceLabel && i >= config.pointOfDivergence ? config.pointOfDivergencePadding : 0,
-            onEnter: () => highlightClass(map, highlightFunction, ecl),
-            onLeave: () => highlightClass(map, unhighlightFunction, ecl),
-            label: config.labels ? config.labels[i] : labelFormatter(colorClassifier.invertExtent(ecl)[out.ascending ? 0 : 1], i),
-        })
-    }
-    (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchRows)(container, items, {
-        shapeWidth: config.shapeWidth,
-        shapeHeight: config.shapeHeight,
-        startY: titlePadding,
-        labelX: Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0),
-        decorate: (row, { i, y }) => {
-            if (i > 0) appendSeparator(row, y, sepLineLength)
-        },
-    })
-
-    // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them
-    if (config.pointOfDivergenceLabel) {
-        const scaleTopY = titlePadding
-        const scaleBottomY = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.swatchStackLayout)({ count: numberOfClasses, shapeHeight: config.shapeHeight, startY: titlePadding }).bottom
-        for (let i = 0; i < numberOfClasses; i++) {
-            let y = i * config.shapeHeight + titlePadding
-            // point of divergence indicator
-            if (i == config.pointOfDivergence) {
-                drawDivergingLine(out, y, config, scaleTopY, scaleBottomY)
-            }
-        }
-    }
-}
-
-function drawDivergingLine(out, y, config, scaleTopY, scaleBottomY) {
-    const container = out._discreteLegendContainer.append('g').attr('class', 'em-legend-divergence-container')
-    const markerHeight = 6
-    const x = 0
-    if (config.labelType == 'ranges') y = y + config.pointOfDivergencePadding / 2 // move to the middle of the space between legend item
-    const maxLabelLength = out._discreteLegendContainer
-        .selectAll('.em-legend-label')
-        .filter(function () {
-            return !this.classList.contains('em-legend-label-max') && !this.classList.contains('em-legend-label-min')
-        })
-        .nodes()
-        .reduce((max, node) => Math.max(max, node.getBBox().width), 0)
-    const divergingLinePadding = config.divergingLinePadding ?? 15
-    const lineLength =
-        config.divergingLineLength || config.shapeWidth + config.labelOffsets?.x + maxLabelLength + config.labelOffsets?.x + divergingLinePadding // rect > offset > label > offset > padding > vertical line
-
-    const showDivergingLine = config.showDivergingLine ?? true
-    if (showDivergingLine) {
-        // Draw the horizontal divergence line
-        container
-            .append('line')
-            .attr('x1', x)
-            .attr('y1', y)
-            .attr('x2', x + lineLength)
-            .attr('y2', y)
-            .attr('class', 'em-legend-diverging-line')
-
-        // Small vertical tick at the end of the line, matching other threshold ticks
-        const tickLen = config.tickLength || 5
-        container
-            .append('line')
-            .attr('class', 'em-legend-tick')
-            .attr('x1', x + lineLength)
-            .attr('y1', y - tickLen / 2)
-            .attr('x2', x + lineLength)
-            .attr('y2', y + tickLen / 2)
-    }
-
-    const labels = config.pointOfDivergenceLabel.split('|')
-    if (labels.length > 1) {
-        // divergence line with up and down arrows
-        const directionLineLength = config.divergingArrowLength || 30
-        const directionLineX = x + lineLength
-        const labelsAtExtremes = (config.pointOfDivergenceLabelsAtExtremes ?? false) && scaleTopY != null && scaleBottomY != null
-        const labelsStacked = config.pointOfDivergenceLabelsStacked ?? false
-
-        // When labels sit at the scale extremes and the caller hasn't pinned an explicit
-        // arrow length, stretch each arrow to reach near its own label instead of stopping
-        // at the short default length meant for a divergence-point-adjacent label.
-        const extremesArrowMargin = 20
-        const autoExtendArrows = labelsAtExtremes && config.divergingArrowLength == null
-        const upLength = autoExtendArrows ? Math.max(y - scaleTopY - extremesArrowMargin, markerHeight) : directionLineLength
-        const downLength = autoExtendArrows ? Math.max(scaleBottomY - y - extremesArrowMargin, markerHeight) : directionLineLength
-
-        // Add arrowhead marker definition
-        const defs = container.append('defs')
-        defs.append('marker')
-            .attr('id', 'arrowhead')
-            .attr('markerWidth', markerHeight)
-            .attr('markerHeight', markerHeight)
-            .attr('refX', 0)
-            .attr('refY', markerHeight / 2)
-            .attr('orient', 'auto')
-            .append('polygon')
-            .attr('points', `0 0, ${markerHeight} ${markerHeight / 2}, 0 ${markerHeight}`)
-            .attr('fill', 'black')
-
-        // Upward line with arrowhead
-        container
-            .append('line')
-            .attr('class', 'em-legend-diverging-line')
-            .attr('x1', directionLineX)
-            .attr('y1', y)
-            .attr('x2', directionLineX)
-            .attr('y2', y - upLength)
-            .attr('marker-end', 'url(#arrowhead)')
-
-        // Downward line with arrowhead
-        container
-            .append('line')
-            .attr('class', 'em-legend-diverging-line')
-            .attr('x1', directionLineX)
-            .attr('y1', y)
-            .attr('x2', directionLineX)
-            .attr('y2', y + downLength)
-            .attr('marker-end', 'url(#arrowhead)')
-
-        // Labels for the upward and downward arrows: either beside the arrow (default) or
-        // above/below its head, starting at the arrow's x position ('stacked'); either near
-        // the divergence point (default) or up near the top/bottom of the whole scale ('at
-        // extremes').
-        const upTipY = y - upLength
-        const downTipY = y + downLength
-
-        if (labelsStacked) {
-            // Gap in pixels between an arrow tip and its label, when not positioned at the
-            // scale extremes (where the labels instead sit flush with the max/min value labels).
-            const stackedLabelGap = 10
-
-            const topLabel = container
-                .append('text')
-                .attr('class', 'em-legend-label')
-                .attr('x', directionLineX)
-                .attr('y', labelsAtExtremes ? scaleTopY : upTipY - stackedLabelGap)
-                .text(labels[0])
-            if (labelsAtExtremes) {
-                // Sits on the same y as the max stat value label (which uses dy=0.3em to center
-                // its text on that y) - match it so this label never renders further north than
-                // the max label's own text does.
-                topLabel.attr('dy', '0.3em')
-            } else {
-                // Pull the text further up, away from the tip, the same way the bottom label's
-                // dy pushes it further down - otherwise the (undescended) baseline sitting only
-                // stackedLabelGap above the tip reads as almost touching it.
-                topLabel.attr('dy', '-0.3em')
-            }
-
-            container
-                .append('text')
-                .attr('class', 'em-legend-label')
-                .attr('x', directionLineX)
-                .attr('y', labelsAtExtremes ? scaleBottomY : downTipY + stackedLabelGap)
-                .attr('dy', labelsAtExtremes ? '0.3em' : '0.9em')
-                .text(labels[1])
-        } else {
-            container
-                .append('text')
-                .attr('class', 'em-legend-label')
-                .attr('x', directionLineX + 10)
-                .attr('y', labelsAtExtremes ? scaleTopY : upTipY + 10)
-                .attr('dy', '0.3em')
-                .text(labels[0])
-
-            container
-                .append('text')
-                .attr('class', 'em-legend-label')
-                .attr('x', directionLineX + 10)
-                .attr('y', labelsAtExtremes ? scaleBottomY : downTipY - 10)
-                .attr('dy', '0.3em')
-                .text(labels[1])
-        }
-    } else {
-        // just the single label
-        container
-            .append('text')
-            .attr('class', 'em-legend-diverging-label em-legend-label')
-            .attr('x', x + lineLength + 5)
-            .attr('y', y)
-            .attr('dy', '0.3em')
-            .text(config.pointOfDivergenceLabel)
-    }
-
-    // Move the threshold value label at the divergence point so it never overlaps the line -
-    // only relevant when the line is actually drawn. With showDivergingLine false there's
-    // nothing to overlap, so the stat value stays in its normal place next to its own tick.
-    if (showDivergingLine) {
-        if (labels.length > 1) {
-            // Move it to the right of the line end and reparent into container
-            out._discreteLegendContainer
-                .selectAll('.em-legend-label-divergence')
-                .each(function () {
-                    container.node().appendChild(this)
-                })
-                .attr('x', x + lineLength + 10)
-        } else {
-            // Single pointOfDivergenceLabel — remove the threshold value label to avoid clashing
-            out._discreteLegendContainer.selectAll('.em-legend-label-divergence').remove()
-        }
-    }
-}
-
-function highlightMaxRegion(map, numberOfClasses, id) {
-    const ecl = numberOfClasses - 1
-    applyMaxMinHighlight(map, ecl, id)
-    if (map.insetTemplates_) {
-        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(map.insetTemplates_, map.svgId, (insetMap) => {
-            applyMaxMinHighlight(insetMap, ecl, id)
-        })
-    }
-}
-
-function highlightMinRegion(map, id) {
-    const ecl = 0
-    applyMaxMinHighlight(map, ecl, id)
-    if (map.insetTemplates_) {
-        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(map.insetTemplates_, map.svgId, (insetMap) => {
-            applyMaxMinHighlight(insetMap, ecl, id)
-        })
-    }
-}
-
-function applyMaxMinHighlight(map, ecl, id) {
-    if (map._mapType === 'ps') {
-        applyMaxMinHighlightPs(map, id)
-        return
-    }
-
-    (0,_legend_js__WEBPACK_IMPORTED_MODULE_4__.highlightRegions)(map, ecl)
-    const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getLegendRegionsSelector)(map)
-    map.svg_
-        .selectAll(selector)
-        .selectAll(`[ecl='${ecl}']`)
-        .each(function (d) {
-            if (!d?.properties?.id) return
-            if (d.properties.id !== id) (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('fill', (0,_legend_js__WEBPACK_IMPORTED_MODULE_4__.getDimmedFill)(map))
-        })
-}
-
-// Isolate a single proportional symbol by region id, dimming every other symbol regardless
-// of its class (the max/min region is a single feature, not "the whole top/bottom class").
-function applyMaxMinHighlightPs(map, id) {
-    const layer = map.activeLayer ? map.activeLayer() : map
-    ;(0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_5__.getCentroidsGroup)(layer)
-        .selectAll('[ecl]')
-        .each(function (d) {
-            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('opacity', d?.properties?.id === id ? layer.psFillOpacity_ : '0')
-        })
+    (0,_discrete_extras__WEBPACK_IMPORTED_MODULE_3__.appendExtraSwatchStack)(out, (0,_discrete_extras__WEBPACK_IMPORTED_MODULE_3__.extraSwatchRows)(out, {}, { includeNoData: false }), startY)
 }
 
 
@@ -54789,10 +54864,13 @@ const legend = function (map, config) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   appendLegendSeparator: () => (/* binding */ appendLegendSeparator),
 /* harmony export */   appendLegendSwatch: () => (/* binding */ appendLegendSwatch),
 /* harmony export */   appendLegendSwatchLabel: () => (/* binding */ appendLegendSwatchLabel),
 /* harmony export */   appendLegendSwatchRows: () => (/* binding */ appendLegendSwatchRows),
-/* harmony export */   swatchStackLayout: () => (/* binding */ swatchStackLayout)
+/* harmony export */   rangesDecorator: () => (/* binding */ rangesDecorator),
+/* harmony export */   swatchStackLayout: () => (/* binding */ swatchStackLayout),
+/* harmony export */   thresholdsDecorator: () => (/* binding */ thresholdsDecorator)
 /* harmony export */ });
 /** Draw an SVG colour swatch at the position chosen by the legend layout. */
 function appendLegendSwatch(row, { x, y, width, height, color, onEnter, onLeave }) {
@@ -54874,6 +54952,44 @@ function appendLegendSwatchRows(container, items, opts) {
         const label = item.label == null ? null : appendLegendSwatchLabel(row, { x: labelX, y: y + shapeHeight / 2, dy: labelDy, text: item.label })
         return { row, swatch, label, y }
     })
+}
+
+/** Thin line across the top of a swatch, separating it from the one above. */
+function appendLegendSeparator(row, y, length) {
+    return row.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', length).attr('y2', y)
+}
+
+/** `decorate` hook for "ranges" rows: a separator above every row but the first. */
+function rangesDecorator(sepLength) {
+    return (row, { i, y }) => {
+        if (i > 0) appendLegendSeparator(row, y, sepLength)
+    }
+}
+
+/**
+ * `decorate` hook for "thresholds" rows: every internal boundary gets a separator, a tick and the threshold
+ * label, which sits on the boundary below its swatch (so the last swatch has none).
+ *
+ * @param {Object} o
+ * @param {number} o.count number of rows
+ * @param {number} o.sepLength separator length
+ * @param {number} o.tickLength tick length, drawn after the separator
+ * @param {number} o.labelX x of the boundary labels
+ * @param {number} o.shapeHeight swatch height (boundary labels sit at the swatch bottom)
+ * @param {(i:number, item:Object)=>string} o.labelText text of the boundary label below row i
+ * @param {(label:Object, i:number)=>void} [o.onLabel] hook to tag a label (e.g. the one at the point of divergence)
+ */
+function thresholdsDecorator({ count, sepLength, tickLength, labelX, shapeHeight, labelText, onLabel }) {
+    return (row, { i, y, item }) => {
+        if (i > 0) {
+            appendLegendSeparator(row, y, sepLength)
+            row.append('line').attr('class', 'em-legend-tick').attr('x1', sepLength).attr('y1', y).attr('x2', sepLength + tickLength).attr('y2', y)
+        }
+        if (i < count - 1) {
+            const label = appendLegendSwatchLabel(row, { x: labelX, y: y + shapeHeight, dy: '0.3em', text: () => labelText(i, item) })
+            onLabel?.(label, i)
+        }
+    }
 }
 
 
@@ -55667,21 +55783,20 @@ const legend = function (map) {
         const onEnter = () => interact(highlightFunction)
         const onLeave = () => interact(unhighlightFunction)
 
-        ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatch)(container, {
-            y: out.noDataPadding,
-            width: out.noDataShapeWidth,
-            height: out.noDataShapeHeight,
-            color,
-            onEnter,
-            onLeave,
-        })
-        ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchLabel)(container, {
-            className: labelClass,
-            dy: '0.35em',
-            x: out.noDataShapeWidth + 5,
-            y: out.noDataShapeHeight / 2 + out.noDataPadding,
-            text,
-        })
+        // a single row of the swatch stack, padded from the top of its container
+        const [{ label }] = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchRows)(
+            container,
+            [{ color, label: text, onEnter, onLeave }],
+            {
+                shapeWidth: out.noDataShapeWidth,
+                shapeHeight: out.noDataShapeHeight,
+                startY: out.noDataPadding,
+                labelX: out.noDataShapeWidth + 5,
+                labelDy: '0.35em',
+            }
+        )
+        label
+            .attr('class', labelClass)
             .style('pointer-events', 'all')
             .style('cursor', 'pointer')
             .on('mouseover', onEnter)
@@ -78131,7 +78246,7 @@ function applyProjectionDefaults(wkt) {
   \**********************/
 (module) {
 
-module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node --test test/e2e/flow-color-legend.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0","typedoc":{"minimatch":"6.2.3"}},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node --test test/e2e/flow-color-legend.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/legend-layout.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0","typedoc":{"minimatch":"6.2.3"}},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
 
 /***/ }
 

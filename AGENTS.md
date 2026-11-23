@@ -125,6 +125,11 @@ the regions that end up with a classified/sized value from whatever data was jus
   Every vertical swatch stack (choropleth ranges/thresholds, categorical, flow colour) is laid out by
   `appendLegendSwatchRows`/`swatchStackLayout` there; add separators or ticks through its `decorate` hook and
   never position swatches by hand (the flow legend once had a different gap from the choropleth one).
+  The discrete colour legend is split by concern in `src/legend/discrete/` (`vertical`, `horizontal`, `max-min`,
+  `divergence`, `extras` for no-data/category swatches, `shared`); add a feature to the module that owns it.
+  IMAGE (sibling repo) depends on the legend's CSS classes (`em-legend-rect`, `em-legend-label`, `em-legend-title`...)
+  and on the `legend()` config names, so keep both. `test/e2e/legend-layout.test.mjs` pins the geometry: run it after
+  touching any legend layout.
   Scope flow legend highlights to the owning SVG and match custom colour entries against the stable
   `data-color` on each route. Route hover and gradients can change the visible fill or stroke.
 - Flow rendering writes projected coordinates into graph nodes. On redraw, project from the original
