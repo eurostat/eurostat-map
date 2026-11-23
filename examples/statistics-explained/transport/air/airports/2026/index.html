@@ -13,18 +13,33 @@
                 font-size: 20px;
             }
 
+            /* bold dark labels on a thick white halo so they stay readable over the flows and the land */
             #airport-pairs-map .em-label,
             #airport-pairs-map .em-label-halo {
                 font:
-                    12px Arial,
+                    bold 12px Arial,
                     sans-serif;
                 text-anchor: start;
+            }
+
+            #airport-pairs-map .em-label {
+                fill: #333333;
+                opacity: 1;
+            }
+
+            #airport-pairs-map .em-label-halo {
+                stroke: #ffffff;
+                stroke-width: 4px;
+                stroke-linejoin: round;
+                opacity: 0.9;
             }
         </style>
     </head>
     <body style="margin: 0">
-        <button id="export-png-btn" type="button" disabled>Export map as PNG</button>
-        <button id="export-svg-btn" type="button" disabled>Export map as SVG</button>
+        <div>
+            <button id="export-png-btn" type="button" disabled>Export map as PNG</button>
+            <button id="export-svg-btn" type="button" disabled>Export map as SVG</button>
+        </div>
         <svg id="airport-pairs-map"></svg>
         <p id="map-error" role="alert" hidden>The airport pairs map could not be loaded.</p>
 
@@ -64,10 +79,10 @@
                     LFPO: 'Paris-Orly',
                 }
                 const labelOffsets = {
-                    LEMD: [-103, -35],
-                    LEBL: [15, -36],
+                    LEMD: [-104, -22],
+                    LEBL: [-58, -34],
                     LEPA: [20, 18],
-                    LIRF: [-25, -32],
+                    LIRF: [-22, -26],
                     LICC: [16, -4],
                     LPPT: [-66, -5],
                     GCLP: [-20, 25],
