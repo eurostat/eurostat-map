@@ -1,4 +1,8 @@
-function labelMaritimePartners(map, graph) {
+// options.preferred: { PARTNER_ID: [dx, dy] or [[dx, dy], ...] }, the sides of the flow end to try first, in order,
+// e.g. { MA: [[-1, 1], [-1, 0]] } tries below-left of Morocco, then left, before the usual order. dx, dy are -1, 0 or 1.
+// options.positions: { PARTNER_ID: [x, y] }, the centre of the label's first line in map pixels, used as it is (no search) for
+// the few labels the automatic placement cannot put well.
+function labelMaritimePartners(map, graph, options = {}) {
     const svg = map.svg()
     const zoomGroup = svg.select('#em-zoom-group-' + map.svgId())
     zoomGroup.selectAll('.maritime-partner-labels').remove()
@@ -78,9 +82,16 @@ function labelMaritimePartners(map, graph) {
 
         const box = label.node().getBBox()
         let placement
+        const fixed = options.positions?.[partner.id]
+        if (fixed) {
+            placement = { x: fixed[0], y: fixed[1] }
+            occupied.push({ left: placement.x + box.x - 2, right: placement.x + box.x + box.width + 2, top: placement.y + box.y - 2, bottom: placement.y + box.y + box.height + 2 })
+        }
         for (let distance = 16; distance <= 140 && !placement; distance += 4) {
             const outward = partner.x < width / 2 ? -1 : 1
+            const preferred = options.preferred?.[partner.id] ?? []
             for (const [dx, dy] of [
+                ...(typeof preferred[0] === 'number' ? [preferred] : preferred),
                 [outward, 0],
                 [0, -1],
                 [0, 1],

@@ -140,7 +140,8 @@
                     .attr('id', 'em-footnote-2')
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
 
-                labelMaritimePartners(map, maritimeFlowGraph)
+                // Morocco and Algeria sit side by side under their flow ends, instead of Algeria's label trailing off to the left of Morocco's
+                labelMaritimePartners(map, maritimeFlowGraph, { positions: { MA: [438, 386], DZ: [517, 388] } })
 
             })
             .annotations({
