@@ -218,6 +218,7 @@
                         .attr('id', 'em-footnote-2')
                         .append('tspan')
                         .html('Cartography: GISCO, Boundaries: ©EuroGeographics ©OSM')
+
                 })
                 .annotations({ editMode: editMode, annotations: portsAnnotations })
                 .tooltip({
@@ -227,9 +228,50 @@
 
             map.statData('size').setData(portsSizeData)
 
+            // The ports are drawn asynchronously and their circles grow to size in a transition. Wait until every callout's
+            // circle has a size that has stopped changing, then put the end of each line on its circle and redraw.
+            const portRadii = () =>
+                window.portsAnnotations.map((a) => Number(document.querySelector(`#ports-map [id="ps${a.portCode}"] circle`)?.getAttribute('r')))
+            const snapWhenDrawn = (previous = [], attempts = 100) => {
+                const radii = portRadii()
+                const settled = radii.every((r) => r > 0) && radii.every((r, i) => r === previous[i])
+                if (settled || attempts === 0) {
+                    snapAnnotationsToPorts(window.portsAnnotations)
+                    map.annotations({ editMode: editMode, annotations: window.portsAnnotations })
+                } else setTimeout(() => snapWhenDrawn(radii, attempts - 1), 200)
+            }
+            snapWhenDrawn()
+
+            /**
+             * Anchor every callout on the edge of its port's circle, so the line touches it.
+             * The note keeps the place it was given; only the end of the line moves, to the point of the
+             * circle that faces the note. Positions come from the drawn circle (insets included), so this
+             * stays right when the data, the symbol sizes or the map position change.
+             */
+            function snapAnnotationsToPorts(annotations) {
+                const svg = document.getElementById('ports-map')
+                const zoomGroup = svg.querySelector('#em-zoom-group-ports-map')
+                const toGroup = zoomGroup.getScreenCTM().inverse()
+                for (const a of annotations) {
+                    const circle = svg.querySelector(`[id="ps${a.portCode}"] circle`)
+                    if (!circle) continue
+                    const toScreen = circle.getScreenCTM()
+                    const centre = new DOMPoint(0, 0).matrixTransform(toScreen).matrixTransform(toGroup)
+                    const radius = Number(circle.getAttribute('r')) * toScreen.a * toGroup.a
+                    const noteX = a.x + a.dx
+                    const noteY = a.y + a.dy
+                    const length = Math.hypot(noteX - centre.x, noteY - centre.y) || 1
+                    a.x = centre.x + ((noteX - centre.x) / length) * radius
+                    a.y = centre.y + ((noteY - centre.y) / length) * radius
+                    a.dx = noteX - a.x
+                    a.dy = noteY - a.y
+                }
+            }
+
             var editModeBtn = document.getElementById('toggle-edit-mode-btn')
             editModeBtn.addEventListener('click', function () {
                 editMode = !editMode
+                snapAnnotationsToPorts(window.portsAnnotations)
                 map.annotations({ editMode: editMode, annotations: window.portsAnnotations })
             })
 
