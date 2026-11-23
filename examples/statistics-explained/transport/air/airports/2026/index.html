@@ -137,6 +137,15 @@
                         widthGradient: false,
                         color: (link) => changeColor(link.changePct),
                         curvatureSettings: { gapX: 0, padX: 0, padY: 2, bumpY: 10, curvature: 0.3 },
+                        // Order of the flows within each airport's stack. By default they follow the angle to their other end,
+                        // which puts the Canary Islands flows above Lisbon's where they meet at Madrid. Lisbon goes on top there.
+                        order: (a, b) => {
+                            const otherEnd = (d) => (d.at === 'out' ? d.link.target : d.link.source).id
+                            const atMadrid = (d) => (d.at === 'out' ? d.link.source : d.link.target).id === 'LEMD'
+                            if (atMadrid(a) && atMadrid(b) && (otherEnd(a) === 'LPPT') !== (otherEnd(b) === 'LPPT')) return otherEnd(a) === 'LPPT' ? -1 : 1
+                            const angle = (d) => Math.atan2(d.otherY - d.nodeY, d.otherX - d.nodeX)
+                            return angle(a) - angle(b) || (b.link.value ?? 0) - (a.link.value ?? 0)
+                        },
                     })
                     .legend({
                         x: width - 225,
