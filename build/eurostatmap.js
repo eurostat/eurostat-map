@@ -20823,10 +20823,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   buildGridCartogramBase: () => (/* binding */ buildGridCartogramBase),
 /* harmony export */   getGridCartogramChartAnchor: () => (/* binding */ getGridCartogramChartAnchor),
 /* harmony export */   getGridCartogramChartOffset: () => (/* binding */ getGridCartogramChartOffset),
+/* harmony export */   getGridCartogramMargins: () => (/* binding */ getGridCartogramMargins),
 /* harmony export */   isGridCellStatDataReady: () => (/* binding */ isGridCellStatDataReady)
 /* harmony export */ });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var d3_dsv__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-dsv */ "./node_modules/d3-dsv/src/csv.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
+
 
 
 
@@ -20867,7 +20870,7 @@ const buildGridCartogramBase = function (out) {
     }
 
     // Center the grid
-    centerGrid(gridGroup, out.width_, out.height_, out.gridCartogramSettings_.margins)
+    centerGrid(gridGroup, out.width_, out.height_, getGridCartogramMargins(out))
 
     // Fit labels after centering so country names do not overlap their neighbors.
     fitGridCartogramLabels(gridGroup, out)
@@ -21023,6 +21026,27 @@ function getGridCartogramChartAnchor(map, bbox) {
     return { x, y: y + offset.y }
 }
 
+const DEFAULT_MARGINS = { top: 80, right: 50, bottom: 80, left: 150 }
+const COMPACT_MARGINS = { top: 70, right: 6, bottom: 10, left: 6 }
+const DEFAULT_CELL_PADDING = 4
+const COMPACT_CELL_PADDING = 2
+
+/**
+ * The margins the grid is laid out in. The defaults leave room for a legend beside the grid and are made for a wide
+ * map: in the compact layout (legends under the map) they would shrink the cells to a few pixels, so the grid uses
+ * the width. Margins the caller set are kept as they are.
+ */
+const getGridCartogramMargins = function (out) {
+    const margins = out.gridCartogramSettings_.margins
+    const isDefault = margins && Object.keys(DEFAULT_MARGINS).every((side) => margins[side] === DEFAULT_MARGINS[side])
+    return (0,_layout_profile__WEBPACK_IMPORTED_MODULE_2__.isCompact)(out) && isDefault ? COMPACT_MARGINS : margins
+}
+
+const getGridCellPadding = function (out) {
+    const padding = out.gridCartogramSettings_.cellPadding || 0
+    return (0,_layout_profile__WEBPACK_IMPORTED_MODULE_2__.isCompact)(out) && padding === DEFAULT_CELL_PADDING ? COMPACT_CELL_PADDING : padding
+}
+
 /** Determines the grid layout based on settings */
 const getGridLayout = (out) => {
     const squareGrid = `
@@ -21093,11 +21117,13 @@ const getGridData = (position, out, filterFn) => {
 
 /** Draws a square grid */
 const drawSquareGrid = (gridGroup, gridData, out) => {
-    const numCols = Math.max(...gridData.map((d) => d.col)) + 1
+    // compact layout: empty columns at the left take no room, the cells use the width of the columns that have a cell
+    const firstCol = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_2__.isCompact)(out) ? Math.min(...gridData.map((d) => d.col)) : 0
+    const numCols = Math.max(...gridData.map((d) => d.col)) - firstCol + 1
     const numRows = Math.max(...gridData.map((d) => d.row)) + 1
 
-    const margins = out.gridCartogramSettings_.margins
-    const cellPadding = out.gridCartogramSettings_.cellPadding || 0 // Keep cell padding
+    const margins = getGridCartogramMargins(out)
+    const cellPadding = getGridCellPadding(out)
 
     const cellWidth = (out.width_ - margins.left - margins.right) / numCols - cellPadding
     const cellHeight = (out.height_ - margins.top - margins.bottom) / numRows - cellPadding
@@ -21111,7 +21137,7 @@ const drawSquareGrid = (gridGroup, gridData, out) => {
         .append('g')
         .attr('class', 'em-grid-cell')
         .attr('id', (d) => `em-grid-cell-${d.id}`)
-        .attr('transform', (d) => `translate(${d.col * (cellSize + cellPadding) + margins.left}, ${d.row * (cellSize + cellPadding) + margins.top})`)
+        .attr('transform', (d) => `translate(${(d.col - firstCol) * (cellSize + cellPadding) + margins.left}, ${d.row * (cellSize + cellPadding) + margins.top})`)
         .each(function (d) {
             const hasNoData = isNoDataCell(d.id, out)
 
@@ -21143,8 +21169,8 @@ const drawHexagonGrid = (gridGroup, gridData, out) => {
     const numCols = Math.max(...gridData.map((d) => d.col)) + 1
     const numRows = Math.max(...gridData.map((d) => d.row)) + 1
 
-    const margins = out.gridCartogramSettings_.margins
-    const cellPadding = out.gridCartogramSettings_.cellPadding || 0 // Keep cell padding
+    const margins = getGridCartogramMargins(out)
+    const cellPadding = getGridCellPadding(out)
 
     const baseHexRadius = Math.min(
         (out.width_ - margins.left - margins.right) / (numCols * 1.5),
@@ -21231,7 +21257,8 @@ const getGridCountryLabelFontSize = (out, maxWidth) => {
         return fitFontSize
     }
 
-    return baseFontSize
+    // a code is two letters: it must fit its cell (a no-op on a wide map, where cells are big)
+    return Math.min(baseFontSize, Math.max(6, Math.floor(maxWidth * 0.42)))
 }
 
 const fitGridCartogramLabels = (gridGroup, out) => {
@@ -30216,12 +30243,16 @@ const updateResponsiveMap = function (out) {
 
     wrapper.classList.toggle('em-map-wrapper--responsive', !!out.responsive_)
     if (out.responsive_) {
-        if (!svg.hasAttribute('viewBox')) out._responsiveViewBoxNode = svg
+        // The viewBox is ours when there was none or when the library set it: a map built again into the same svg
+        // (a new map() call, as examples do when a setting changes) must update it, not keep the one of the map before.
+        if (!svg.hasAttribute('viewBox') || svg.hasAttribute('data-em-viewbox')) out._responsiveViewBoxNode = svg
         if (out._responsiveViewBoxNode === svg) {
             svg.setAttribute('viewBox', `0 0 ${svg.getAttribute('width')} ${svg.getAttribute('height')}`)
+            svg.setAttribute('data-em-viewbox', '')
         }
-    } else if (out._responsiveViewBoxNode === svg) {
+    } else if (out._responsiveViewBoxNode === svg || svg.hasAttribute('data-em-viewbox')) {
         svg.removeAttribute('viewBox')
+        svg.removeAttribute('data-em-viewbox')
         out._responsiveViewBoxNode = undefined
     }
 }
@@ -31416,6 +31447,8 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             // the shape of the map follows its width, not the height of the screen: a compact map filling the window left bands of empty space
             let defaultHeight = (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : mobile ? 1 : 0.85) * out.width()
 
+            // a grid cartogram is as tall as its square cells need (about 11 rows for every 12 columns, plus the title above it)
+            if (out.gridCartogram_ && mobile) defaultHeight = (out.width() - 12) * 0.92 + 80
             if (defaultHeight > maxMapHeight) defaultHeight = maxMapHeight
             out.height_ = defaultHeight
         }

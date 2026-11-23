@@ -1,5 +1,6 @@
 import { select } from 'd3-selection'
 import { csvParseRows } from 'd3-dsv'
+import { isCompact } from './layout-profile'
 
 const COUNTRY_CODE_ALIASES = {
     EL: 'GR',
@@ -38,7 +39,7 @@ export const buildGridCartogramBase = function (out) {
     }
 
     // Center the grid
-    centerGrid(gridGroup, out.width_, out.height_, out.gridCartogramSettings_.margins)
+    centerGrid(gridGroup, out.width_, out.height_, getGridCartogramMargins(out))
 
     // Fit labels after centering so country names do not overlap their neighbors.
     fitGridCartogramLabels(gridGroup, out)
@@ -194,6 +195,27 @@ export function getGridCartogramChartAnchor(map, bbox) {
     return { x, y: y + offset.y }
 }
 
+const DEFAULT_MARGINS = { top: 80, right: 50, bottom: 80, left: 150 }
+const COMPACT_MARGINS = { top: 70, right: 6, bottom: 10, left: 6 }
+const DEFAULT_CELL_PADDING = 4
+const COMPACT_CELL_PADDING = 2
+
+/**
+ * The margins the grid is laid out in. The defaults leave room for a legend beside the grid and are made for a wide
+ * map: in the compact layout (legends under the map) they would shrink the cells to a few pixels, so the grid uses
+ * the width. Margins the caller set are kept as they are.
+ */
+export const getGridCartogramMargins = function (out) {
+    const margins = out.gridCartogramSettings_.margins
+    const isDefault = margins && Object.keys(DEFAULT_MARGINS).every((side) => margins[side] === DEFAULT_MARGINS[side])
+    return isCompact(out) && isDefault ? COMPACT_MARGINS : margins
+}
+
+const getGridCellPadding = function (out) {
+    const padding = out.gridCartogramSettings_.cellPadding || 0
+    return isCompact(out) && padding === DEFAULT_CELL_PADDING ? COMPACT_CELL_PADDING : padding
+}
+
 /** Determines the grid layout based on settings */
 const getGridLayout = (out) => {
     const squareGrid = `
@@ -264,11 +286,13 @@ const getGridData = (position, out, filterFn) => {
 
 /** Draws a square grid */
 const drawSquareGrid = (gridGroup, gridData, out) => {
-    const numCols = Math.max(...gridData.map((d) => d.col)) + 1
+    // compact layout: empty columns at the left take no room, the cells use the width of the columns that have a cell
+    const firstCol = isCompact(out) ? Math.min(...gridData.map((d) => d.col)) : 0
+    const numCols = Math.max(...gridData.map((d) => d.col)) - firstCol + 1
     const numRows = Math.max(...gridData.map((d) => d.row)) + 1
 
-    const margins = out.gridCartogramSettings_.margins
-    const cellPadding = out.gridCartogramSettings_.cellPadding || 0 // Keep cell padding
+    const margins = getGridCartogramMargins(out)
+    const cellPadding = getGridCellPadding(out)
 
     const cellWidth = (out.width_ - margins.left - margins.right) / numCols - cellPadding
     const cellHeight = (out.height_ - margins.top - margins.bottom) / numRows - cellPadding
@@ -282,7 +306,7 @@ const drawSquareGrid = (gridGroup, gridData, out) => {
         .append('g')
         .attr('class', 'em-grid-cell')
         .attr('id', (d) => `em-grid-cell-${d.id}`)
-        .attr('transform', (d) => `translate(${d.col * (cellSize + cellPadding) + margins.left}, ${d.row * (cellSize + cellPadding) + margins.top})`)
+        .attr('transform', (d) => `translate(${(d.col - firstCol) * (cellSize + cellPadding) + margins.left}, ${d.row * (cellSize + cellPadding) + margins.top})`)
         .each(function (d) {
             const hasNoData = isNoDataCell(d.id, out)
 
@@ -314,8 +338,8 @@ const drawHexagonGrid = (gridGroup, gridData, out) => {
     const numCols = Math.max(...gridData.map((d) => d.col)) + 1
     const numRows = Math.max(...gridData.map((d) => d.row)) + 1
 
-    const margins = out.gridCartogramSettings_.margins
-    const cellPadding = out.gridCartogramSettings_.cellPadding || 0 // Keep cell padding
+    const margins = getGridCartogramMargins(out)
+    const cellPadding = getGridCellPadding(out)
 
     const baseHexRadius = Math.min(
         (out.width_ - margins.left - margins.right) / (numCols * 1.5),
@@ -402,7 +426,8 @@ const getGridCountryLabelFontSize = (out, maxWidth) => {
         return fitFontSize
     }
 
-    return baseFontSize
+    // a code is two letters: it must fit its cell (a no-op on a wide map, where cells are big)
+    return Math.min(baseFontSize, Math.max(6, Math.floor(maxWidth * 0.42)))
 }
 
 const fitGridCartogramLabels = (gridGroup, out) => {

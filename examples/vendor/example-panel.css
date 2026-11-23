@@ -127,3 +127,17 @@
         display: none;
     }
 }
+
+/* ECL spaces radios for a form page: tighter in a settings panel */
+.ex-panel .ecl-radio,
+.ex-panel .ecl-radio + .ecl-radio {
+    margin-top: 0;
+    margin-bottom: 4px;
+}
+
+.ex-panel .ecl-radio__label,
+.ex-panel .ecl-checkbox__label {
+    min-height: 0;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}

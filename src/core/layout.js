@@ -146,12 +146,16 @@ export const updateResponsiveMap = function (out) {
 
     wrapper.classList.toggle('em-map-wrapper--responsive', !!out.responsive_)
     if (out.responsive_) {
-        if (!svg.hasAttribute('viewBox')) out._responsiveViewBoxNode = svg
+        // The viewBox is ours when there was none or when the library set it: a map built again into the same svg
+        // (a new map() call, as examples do when a setting changes) must update it, not keep the one of the map before.
+        if (!svg.hasAttribute('viewBox') || svg.hasAttribute('data-em-viewbox')) out._responsiveViewBoxNode = svg
         if (out._responsiveViewBoxNode === svg) {
             svg.setAttribute('viewBox', `0 0 ${svg.getAttribute('width')} ${svg.getAttribute('height')}`)
+            svg.setAttribute('data-em-viewbox', '')
         }
-    } else if (out._responsiveViewBoxNode === svg) {
+    } else if (out._responsiveViewBoxNode === svg || svg.hasAttribute('data-em-viewbox')) {
         svg.removeAttribute('viewBox')
+        svg.removeAttribute('data-em-viewbox')
         out._responsiveViewBoxNode = undefined
     }
 }

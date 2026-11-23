@@ -5,6 +5,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Bar Chart Map</title>
         <style>
+            body {
+                margin: 0;
+                padding: 8px;
+            }
+
+            /* a phone: the map fills the screen */
+            @media (max-width: 900px) {
+                body {
+                    padding: 0;
+                }
+            }
+
             .em-grid-rect,
             .em-grid-hexagon {
                 fill: white;
@@ -13,57 +25,65 @@
         </style>
     </head>
     <body>
-        <label for="bartype">Bar type:</label>
-        <select id="bartype">
-            <option value="grouped" selected>Grouped (vertical)</option>
-            <option value="stacked">Stacked (horizontal)</option>
-        </select>
-        <br />
-        <fieldset style="display: inline-block; margin-top: 8px">
-            <legend>NUTS level</legend>
-            <label>
-                <input type="radio" name="nuts-level" value="0" checked />
-                0
-            </label>
-            <label>
-                <input type="radio" name="nuts-level" value="1" />
-                1
-            </label>
-            <label>
-                <input type="radio" name="nuts-level" value="2" />
-                2
-            </label>
-            <label>
-                <input type="radio" name="nuts-level" value="3" />
-                3
-            </label>
-        </fieldset>
-        <br />
-        <label>
-            <input type="checkbox" id="grid-cartogram-toggle" />
-            Grid cartogram (NUTS 0 only)
-        </label>
-        <br />
         <svg id="map"></svg>
 
-        <!-- <script src="../../build/eurostatmap.js"></script> -->
         <script src="../../build/eurostatmap.js"></script>
-        <script>
+        <script type="module">
+            // the reusable settings panel (Eurostat UI components), shared by the examples
+            import { createPanel } from '../vendor/example-panel.js'
+
+            const state = { barType: 'grouped', nutsLevel: 0, gridCartogram: false }
             let map
 
-            function buildMap(barType, nutsLevel, useGridCartogram) {
+            const panel = createPanel({ map: '#map', title: 'Map settings' })
+            panel.select({
+                id: 'barType',
+                label: 'Bar type',
+                value: state.barType,
+                options: [
+                    { value: 'grouped', label: 'Grouped (vertical)' },
+                    { value: 'stacked', label: 'Stacked (horizontal)' },
+                ],
+                onChange: (v) => {
+                    state.barType = v
+                    buildMap()
+                },
+            })
+            panel.radio({
+                id: 'nutsLevel',
+                label: 'NUTS level',
+                value: state.nutsLevel,
+                options: [0, 1, 2, 3].map((n) => ({ value: n, label: String(n) })),
+                onChange: (v) => {
+                    state.nutsLevel = +v
+                    buildMap()
+                },
+            })
+            panel.checkbox({
+                id: 'gridCartogram',
+                label: 'Grid cartogram',
+                checked: state.gridCartogram,
+                onChange: (v) => {
+                    state.gridCartogram = v
+                    buildMap()
+                },
+            })
+
+            function buildMap() {
+                // the grid cartogram only exists for countries
+                panel.show('gridCartogram', state.nutsLevel === 0)
                 if (map) map.svg().selectAll('*').remove()
 
-                const shouldUseGridCartogram = useGridCartogram && nutsLevel === 0
+                const useGridCartogram = state.gridCartogram && state.nutsLevel === 0
 
-                let mapBuilder = eurostatmap
+                map = eurostatmap
                     .map('bar')
                     .svgId('map')
                     .title('Tourism nights spent by residence of guest')
-                    .subtitle(`NUTS ${nutsLevel}, 2022`)
-                    .nutsLevel(nutsLevel)
+                    .subtitle(`NUTS ${state.nutsLevel}, 2022`)
+                    .nutsLevel(state.nutsLevel)
                     .scale('20M')
-                    .barSettings({ type: barType })
+                    .barSettings({ type: state.barType })
                     // Stacked sizing
                     // .barMinWidth(6)
                     // .barMaxWidth(70)
@@ -80,6 +100,8 @@
                         categoryColors: ['#7fc97f', '#beaed4'],
                     })
                     .encoding('composition', { stat: 'composition' })
+                    // on a phone the map (with its legend below) fills the screen above the closed settings sheet
+                    .height(() => (window.matchMedia('(max-width: 900px)').matches && !useGridCartogram ? window.innerHeight - 52 - 190 : undefined))
                     .legend({
                         x: 570,
                         y: 0,
@@ -96,51 +118,12 @@
                         },
                     })
 
-                if (shouldUseGridCartogram) {
-                    mapBuilder = mapBuilder.gridCartogram(true).gridCartogramSettings({ chartOffset: { x: 0, y: 20 } })
-                }
-
-                map = mapBuilder
+                if (useGridCartogram) map.gridCartogram(true).gridCartogramSettings({ chartOffset: { x: 0, y: 20 } })
 
                 map.build()
             }
 
-            function getSelectedNutsLevel() {
-                const selected = document.querySelector('input[name="nuts-level"]:checked')
-                return Number(selected.value)
-            }
-
-            function getSelectedBarType() {
-                return document.getElementById('bartype').value
-            }
-
-            function isGridCartogramEnabled() {
-                return document.getElementById('grid-cartogram-toggle').checked
-            }
-
-            function updateGridCartogramToggleState() {
-                const toggle = document.getElementById('grid-cartogram-toggle')
-                const isNuts0 = getSelectedNutsLevel() === 0
-                toggle.disabled = !isNuts0
-            }
-
-            updateGridCartogramToggleState()
-            buildMap(getSelectedBarType(), getSelectedNutsLevel(), isGridCartogramEnabled())
-
-            document.getElementById('bartype').addEventListener('change', function (e) {
-                buildMap(e.target.value, getSelectedNutsLevel(), isGridCartogramEnabled())
-            })
-
-            document.querySelectorAll('input[name="nuts-level"]').forEach((radio) => {
-                radio.addEventListener('change', function () {
-                    updateGridCartogramToggleState()
-                    buildMap(getSelectedBarType(), Number(this.value), isGridCartogramEnabled())
-                })
-            })
-
-            document.getElementById('grid-cartogram-toggle').addEventListener('change', function () {
-                buildMap(getSelectedBarType(), getSelectedNutsLevel(), this.checked)
-            })
+            buildMap()
         </script>
     </body>
 </html>
