@@ -13,6 +13,19 @@
                 font-size: 20px;
             }
 
+            /* muted national borders, as in the 2025 map: the flows are the subject, not the country outlines */
+            #airport-pairs-map .em-worldbn {
+                stroke: grey !important;
+                stroke-width: 1.3px !important;
+                opacity: 0.5;
+            }
+
+            /* Kosovo stays thinner than the national borders */
+            #airport-pairs-map .em-kosovo-bn {
+                stroke: grey !important;
+                stroke-width: 0.1px !important;
+            }
+
             /* bold dark labels on a thick white halo so they stay readable over the flows and the land */
             #airport-pairs-map .em-label,
             #airport-pairs-map .em-label-halo {
