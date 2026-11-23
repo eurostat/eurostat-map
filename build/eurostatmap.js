@@ -2123,6 +2123,24 @@ a text {
     cursor: -webkit-grabbing;
 }
 
+/* While the map is being zoomed the browser keeps strokes at their screen width itself, so that the stroke width of every
+   element need not be rewritten on every zoom event (see freezeStrokeWidths in core/zoom.js). */
+.em-map.em-zooming .em-zoom-group path,
+.em-map.em-zooming .em-zoom-group line,
+.em-map.em-zooming .em-zoom-group polyline,
+.em-map.em-zooming .em-zoom-group polygon,
+.em-map.em-zooming .em-zoom-group rect,
+.em-map.em-zooming .em-zoom-group circle,
+.em-map.em-zooming .em-zoom-group ellipse {
+    vector-effect: non-scaling-stroke;
+}
+
+/* flow links are resized by the zoom handler itself, on every event */
+.em-map.em-zooming .em-zoom-group .em-flow-link,
+.em-map.em-zooming .em-zoom-group .em-flow-link-outline {
+    vector-effect: none;
+}
+
 /* Coastal margin */
 .em-coastal-margin {
     filter: url(#em-coastal-blur);
@@ -35252,6 +35270,7 @@ const defineGeographicZoom = function (map) {
             }
         })
         .on('end', (e) => {
+            unfreezeStrokeWidths(map)
             svg.classed('em-dragging', false)
             map.onZoomEnd_?.(e, map)
             window.dispatchEvent(new CustomEvent('estatmap:zoomend-' + map.svgId_, { detail: map }))
@@ -35389,7 +35408,8 @@ const zoomHandler = (event, previousT, map) => {
     //  Store current zoom scale for later use (hover, click, etc.)
     map._lastZoomK = t.k
 
-    scaleStrokeWidths(t, map)
+    freezeStrokeWidths(map) // until the zoom ends
+    scaleStrokeWidths(t, map, 'flow')
     if (map.labels_?.scaleOnZoom !== false) {
         scaleLabelTexts(t, map)
     }
@@ -35463,28 +35483,23 @@ const scaleLabelTexts = function (transform, map) {
 
     elements.each(function () {
         const element = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
-        const computedStyle = window.getComputedStyle(this)
 
-        // Get font-size from inline or computed style
-        const inlineFontSize = element.attr('font-size')
-        const cssFontSize = computedStyle.fontSize
-        const fontSize = inlineFontSize || cssFontSize
-
-        // Only process elements that have a font size defined
-        if (fontSize && parseFloat(fontSize) > 0) {
-            const originalFontSize = parseFloat(element.attr('data-fs')) || parseFloat(inlineFontSize) || parseFloat(cssFontSize)
-
+        // the original size is stored on the first zoom: no need to ask the browser for the computed style again
+        let originalFontSize = parseFloat(element.attr('data-fs'))
+        if (!(originalFontSize > 0)) {
+            // Get font-size from inline or computed style
+            const inlineFontSize = element.attr('font-size')
+            const cssFontSize = window.getComputedStyle(this).fontSize
+            const fontSize = inlineFontSize || cssFontSize
+            // Only process elements that have a font size defined
+            if (!(fontSize && parseFloat(fontSize) > 0)) return
+            originalFontSize = parseFloat(inlineFontSize) || parseFloat(cssFontSize)
             // Store the original font size for the first time
-            if (!element.attr('data-fs')) {
-                element.attr('data-fs', originalFontSize)
-            }
-
-            // Calculate the target font size based on zoom factor
-            const targetFontSize = originalFontSize / zoomFactor
-
-            // Add the style change to a batch array
-            updates.push({ element: this, targetFontSize })
+            element.attr('data-fs', originalFontSize)
         }
+
+        // Calculate the target font size based on zoom factor and add the style change to a batch array
+        updates.push({ element: this, targetFontSize: originalFontSize / zoomFactor })
     })
 
     // Apply all style changes at once
@@ -35534,54 +35549,102 @@ const scaleLocations = function (transform, map) {
 }
 
 /**
- * @description adjusts all stroke-widths dynamically according to zoom
- * @param {*} transform
+ * Elements whose stroke width follows the zoom, found once per set of map elements (not on every zoom event: a map has
+ * thousands of them, and asking the browser for the computed style of each one is what made zooming laggy).
+ * A plain element gets its width as `calc(<base>px / var(--em-zoom-k))` once, so that a zoom changes one CSS variable on
+ * the zoom group instead of rewriting every element. Flow links keep their own per-event update (width and dashes).
+ * The set is found again when elements are added or removed (a MutationObserver marks it stale).
  */
-const scaleStrokeWidths = function (transform, map) {
-    const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
-    const elements = zoomGroup.selectAll('*')
-    const zoomFactor = transform.k
-    const updates = []
-
-    elements.each(function () {
-        const element = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
-        if (this.closest && this.closest('.em-locations')) {
-            // Let custom locations (symbols + labels) scale naturally with zoom.
-            return
+const getStrokeTargets = function (zoomGroup) {
+    const group = zoomGroup.node()
+    let cache = group.__emStrokeTargets
+    if (cache && !cache.stale) return cache
+    if (!cache) {
+        cache = { stale: true, flow: [] }
+        group.__emStrokeTargets = cache
+        if (typeof MutationObserver !== 'undefined') {
+            // stroke widths we set ourselves are attribute/style changes: only added or removed elements matter
+            cache.observer = new MutationObserver(() => (cache.stale = true))
+            cache.observer.observe(group, { childList: true, subtree: true })
         }
-        const computedStyle = window.getComputedStyle(this)
-
-        const inlineStrokeWidth = element.attr('stroke-width')
-        const cssStrokeWidth = computedStyle.strokeWidth
-        const strokeWidth = inlineStrokeWidth || cssStrokeWidth
-
-        if (strokeWidth && parseFloat(strokeWidth) > 0) {
-            const originalStrokeWidth = parseFloat(element.attr('data-sw')) || parseFloat(inlineStrokeWidth) || parseFloat(cssStrokeWidth)
-
-            if (!element.attr('data-sw')) {
-                element.attr('data-sw', originalStrokeWidth)
-            }
-
-            const targetStrokeWidth = originalStrokeWidth / zoomFactor
-            updates.push({ element: this, targetStrokeWidth })
+    }
+    cache.flow = []
+    // measure first, write after: writing between measurements would make the browser recalculate style for every one
+    const found = []
+    zoomGroup.selectAll('*').each(function () {
+        // Custom locations (symbols + labels) scale naturally with zoom.
+        if (this.closest && this.closest('.em-locations')) return
+        const inlineStrokeWidth = this.getAttribute('stroke-width')
+        const stored = parseFloat(this.getAttribute('data-sw'))
+        let base = stored
+        if (!(base > 0)) {
+            const strokeWidth = inlineStrokeWidth || window.getComputedStyle(this).strokeWidth
+            base = parseFloat(inlineStrokeWidth) || parseFloat(strokeWidth)
+        }
+        if (base > 0) found.push({ element: this, base, stored: stored > 0 })
+    })
+    found.forEach(({ element, base, stored }) => {
+        if (!stored) element.setAttribute('data-sw', base)
+        if (element.classList.contains('em-flow-link') || element.classList.contains('em-flow-link-outline')) {
+            cache.flow.push({ element, base })
+        } else {
+            element.style.setProperty('stroke-width', `calc(${base}px / var(--em-zoom-k, 1))`, 'important')
         }
     })
+    cache.stale = false
+    // the writes above are not mutations of the set, but the observer may have queued records for them
+    cache.observer?.takeRecords()
+    return cache
+}
 
-    updates.forEach(({ element, targetStrokeWidth }) => {
+/**
+ * Stroke widths are the costly part of a zoom: changing them makes the browser recalculate the style of every element of
+ * the map, thousands of them, which is more than a phone can do 60 times a second. So while the map is being zoomed they
+ * are not changed: a CSS class (`em-zooming`, see map.css) makes the browser keep strokes at a constant screen width by
+ * itself (`vector-effect: non-scaling-stroke`) and the variable behind the widths is set to 1. When the zoom ends the
+ * class is removed and the variable gets the final zoom factor: two style recalculations per gesture, not one per event.
+ * A pan never changes the zoom factor, so it does none.
+ */
+const freezeStrokeWidths = function (map) {
+    if (map.__strokesFrozen) return
+    map.__strokesFrozen = true
+    const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
+    getStrokeTargets(zoomGroup) // found now, not in the middle of the gesture
+    zoomGroup.node().style.setProperty('--em-zoom-k', 1)
+    map.svg_.classed('em-zooming', true)
+}
+
+const unfreezeStrokeWidths = function (map) {
+    if (!map.__strokesFrozen) return
+    map.__strokesFrozen = false
+    map.svg_.classed('em-zooming', false)
+    scaleStrokeWidths(map.__lastTransform ?? d3_zoom__WEBPACK_IMPORTED_MODULE_0__.zoomIdentity, map, 'plain')
+}
+
+/**
+ * @description adjusts all stroke-widths dynamically according to zoom
+ * @param {*} transform
+ * @param {'all'|'plain'|'flow'} [part] plain elements (a variable, see getStrokeTargets), flow links, or both
+ */
+const scaleStrokeWidths = function (transform, map, part = 'all') {
+    const zoomGroup = map.svg_.select('#em-zoom-group-' + map.svgId_)
+    const zoomFactor = transform.k
+    const targets = getStrokeTargets(zoomGroup)
+
+    // one variable for every plain element (see getStrokeTargets)
+    if (part !== 'flow') zoomGroup.node().style.setProperty('--em-zoom-k', zoomFactor)
+    // flow links and tapered ribbons are few, and their geometry has to follow every event
+    if (part === 'plain') return
+
+    targets.flow.forEach(({ element, base }) => {
         const el = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(element)
-        if (el.classed('em-flow-link') || el.classed('em-flow-link-outline')) {
-            el.attr('stroke-width', targetStrokeWidth)
+        el.attr('stroke-width', base / zoomFactor)
 
-            // Rescale dasharray from original stored values
-            const baseDashVis = parseFloat(el.attr('data-dash-vis'))
-            const baseDashGap = parseFloat(el.attr('data-dash-gap'))
-            if (!isNaN(baseDashVis) && !isNaN(baseDashGap)) {
-                const scaledVis = baseDashVis / zoomFactor
-                const scaledGap = baseDashGap / zoomFactor
-                el.attr('stroke-dasharray', `${scaledVis} ${scaledGap}`)
-            }
-        } else {
-            element.style.setProperty('stroke-width', `${targetStrokeWidth}px`, 'important')
+        // Rescale dasharray from original stored values
+        const baseDashVis = parseFloat(el.attr('data-dash-vis'))
+        const baseDashGap = parseFloat(el.attr('data-dash-gap'))
+        if (!isNaN(baseDashVis) && !isNaN(baseDashGap)) {
+            el.attr('stroke-dasharray', `${baseDashVis / zoomFactor} ${baseDashGap / zoomFactor}`)
         }
     })
 

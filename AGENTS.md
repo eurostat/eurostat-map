@@ -341,6 +341,10 @@ hand-rolling markup in an example. Not every older example has been converted ye
   on it (viewBox, layout observer) must be keyed to the svg, not to the map instance (the `data-em-viewbox` marker).
 - Examples: settings go in the shared panel (bottom sheet on phones); drop fixed `.width(...)`; on a phone fill the screen with
   `.height(() => ...)`. `view.html` hides the code panel by default on phones so the example has the whole screen.
+- Zoom performance: nothing that touches the style of every map element may run per zoom event (thousands of paths: a style
+  recalculation of all of them is ~50ms on a throttled phone). Strokes are frozen during a zoom (`em-zooming` class,
+  `vector-effect: non-scaling-stroke`) and set once at its end (`core/zoom.js`, `freezeStrokeWidths`); per-element
+  `getComputedStyle` is cached in `data-sw`/`data-fs`. Profile with CPU throttling and a trace (`UpdateLayoutTree`), not by eye.
 - Check an example on a phone with Playwright (`isMobile`, 390x844) and its desktop layout, not only one of them.
 - In this shell, heredocs/commands containing non-ASCII characters or quotes can fail with exit 127: write scripts with the
   Write tool and run them.

@@ -61,6 +61,24 @@ a text {
     cursor: -webkit-grabbing;
 }
 
+/* While the map is being zoomed the browser keeps strokes at their screen width itself, so that the stroke width of every
+   element need not be rewritten on every zoom event (see freezeStrokeWidths in core/zoom.js). */
+.em-map.em-zooming .em-zoom-group path,
+.em-map.em-zooming .em-zoom-group line,
+.em-map.em-zooming .em-zoom-group polyline,
+.em-map.em-zooming .em-zoom-group polygon,
+.em-map.em-zooming .em-zoom-group rect,
+.em-map.em-zooming .em-zoom-group circle,
+.em-map.em-zooming .em-zoom-group ellipse {
+    vector-effect: non-scaling-stroke;
+}
+
+/* flow links are resized by the zoom handler itself, on every event */
+.em-map.em-zooming .em-zoom-group .em-flow-link,
+.em-map.em-zooming .em-zoom-group .em-flow-link-outline {
+    vector-effect: none;
+}
+
 /* Coastal margin */
 .em-coastal-margin {
     filter: url(#em-coastal-blur);
