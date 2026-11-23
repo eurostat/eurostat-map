@@ -4,7 +4,16 @@ import { min, max } from 'd3-array'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { interpolateYlGnBu } from 'd3-scale-chromatic'
 import { piecewise, interpolateLab } from 'd3-interpolate'
-import { EUROSTAT_SINGLE_HUES, isSingleHueName, singleHuePalette } from '../../core/color-palettes'
+import {
+    EUROSTAT_SINGLE_HUES,
+    EUROSTAT_DIVERGING_SCHEMES,
+    isSingleHueName,
+    isDivergingName,
+    singleHuePalette,
+    divergingInterpolator,
+    divergingPalette,
+    divergingClassColors,
+} from '../../core/color-palettes'
 import { createStatMap, buildSingleLayerMap } from '../../core/stat-map'
 import { registerLayerType } from '../../core/layer-registry'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
@@ -107,22 +116,65 @@ export const decorateChoroplethLayer = function (layer, config) {
     })
 
     /**
-     * colors(['#fff', ...]) sets explicit class colours; colors('teal') picks a Eurostat single-hue
-     * palette (see EUROSTAT_SINGLE_HUES), generated for the current number of classes.
+     * colors(['#fff', ...]) sets explicit class colours. colors('teal') picks a Eurostat single-hue
+     * palette (see EUROSTAT_SINGLE_HUES) and colors('cobalt-plum') a diverging one (two single hues
+     * joined at a neutral, centred on pointOfDivergence(), which defaults to 0). Named palettes are
+     * generated for the current number of classes, and also drive colorFunction() for continuous schemes.
      */
     layer.colors = function (v) {
         if (!arguments.length) return resolveNamedColors()
         layer.colorsName_ = typeof v === 'string' ? v : null
-        if (layer.colorsName_ && !isSingleHueName(layer.colorsName_)) {
-            throw new Error('Unknown colour palette: ' + layer.colorsName_ + '. Available: ' + Object.keys(EUROSTAT_SINGLE_HUES).join(', '))
+        layer.divergingScheme_ = false
+        if (layer.colorsName_) {
+            if (isDivergingName(layer.colorsName_)) {
+                layer.divergingScheme_ = true
+                layer.colorFunction_ = divergingInterpolator(layer.colorsName_)
+            } else if (isSingleHueName(layer.colorsName_)) {
+                const ramp = piecewise(interpolateLab, singleHuePalette(layer.colorsName_, 9))
+                layer.colorFunction_ = (t) => ramp(Math.min(Math.max(0, t), 1))
+            } else {
+                throw new Error(
+                    'Unknown colour palette: ' +
+                        layer.colorsName_ +
+                        '. Available: ' +
+                        Object.keys(EUROSTAT_SINGLE_HUES).join(', ') +
+                        ', or a diverging pair such as ' +
+                        EUROSTAT_DIVERGING_SCHEMES.slice(0, 3).join(', ')
+                )
+            }
         }
         layer.colors_ = layer.colorsName_ ? null : v
         return layer
     }
     // regenerate a named palette for the current number of classes
     function resolveNamedColors() {
-        if (layer.colorsName_) layer.colors_ = singleHuePalette(layer.colorsName_, layer.numberOfClasses_)
+        const name = layer.colorsName_
+        if (!name) return layer.colors_
+        if (layer.colorSchemeType_ === 'continuous') return (layer.colors_ = null) // the colour function drives continuous schemes
+        if (!layer.divergingScheme_) {
+            layer.colors_ = singleHuePalette(name, layer.numberOfClasses_)
+        } else {
+            layer.colors_ = divergingColorsForClasses(name)
+        }
         return layer.colors_
+    }
+    // class colours of a diverging scheme: the neutral sits at the point of divergence
+    function divergingColorsForClasses(name) {
+        const n = layer.numberOfClasses_
+        const classifier = layer.classifier_
+        const extent = layer.dataExtent_
+        if (!classifier || !extent || typeof classifier.invertExtent !== 'function') return divergingPalette(name, n)
+
+        const pivot = layer.pointOfDivergence_ ?? 0
+        if (pivot <= extent[0]) return divergingClassColors(name, 0, false, n) // every class is above it
+        if (pivot >= extent[1]) return divergingClassColors(name, n, false, 0) // every class is below it
+
+        // upper limit of every class but the last
+        const limits = Array.from({ length: n - 1 }, (_, i) => classifier.invertExtent(i)[1])
+        const onLimit = limits.findIndex((l) => Math.abs(l - pivot) <= 1e-9 * Math.max(1, Math.abs(pivot)))
+        if (onLimit >= 0) return divergingClassColors(name, onLimit + 1, false, n - onLimit - 1)
+        const containing = classifier(pivot)
+        return divergingClassColors(name, containing, true, n - 1 - containing)
     }
 
     //override attribute values with config values
@@ -201,6 +253,7 @@ export const decorateChoroplethLayer = function (layer, config) {
         const fillData = resolveFillData()
         const dataArray = fillData.getArray()
         const dataArrayNumeric = (dataArray || []).map((v) => +v).filter((v) => Number.isFinite(v))
+        layer.dataExtent_ = dataArrayNumeric.length ? [min(dataArrayNumeric), max(dataArrayNumeric)] : null // used to place a diverging scheme's neutral
 
         if (dataArray) {
             const setupClassifier = () => {

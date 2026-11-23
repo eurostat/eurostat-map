@@ -21411,11 +21411,19 @@ function adjustGridCartogramTextLabels({ map, getAnchors, getRadius, margin = 2 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   DEFAULT_CATEGORICAL_COLORS: () => (/* binding */ DEFAULT_CATEGORICAL_COLORS),
+/* harmony export */   EUROSTAT_DIVERGING_SCHEMES: () => (/* binding */ EUROSTAT_DIVERGING_SCHEMES),
 /* harmony export */   EUROSTAT_SINGLE_HUES: () => (/* binding */ EUROSTAT_SINGLE_HUES),
+/* harmony export */   divergingClassColors: () => (/* binding */ divergingClassColors),
+/* harmony export */   divergingInterpolator: () => (/* binding */ divergingInterpolator),
+/* harmony export */   divergingPalette: () => (/* binding */ divergingPalette),
+/* harmony export */   isDivergingName: () => (/* binding */ isDivergingName),
 /* harmony export */   isSingleHueName: () => (/* binding */ isSingleHueName),
 /* harmony export */   singleHuePalette: () => (/* binding */ singleHuePalette)
 /* harmony export */ });
 /* harmony import */ var d3_color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-color */ "./node_modules/d3-color/src/color.js");
+/* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/lab.js");
+/* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/piecewise.js");
+
 
 
 const DEFAULT_CATEGORICAL_COLORS = [
@@ -21553,6 +21561,79 @@ function singleHuePalette(name, n) {
     }
 
     return Array.from({ length: n }, (_, i) => toHex(bez(correct(i / (n - 1)))))
+}
+
+/**
+ * Diverging schemes are named after the two single hues they join: 'cobalt-plum' runs from dark cobalt
+ * (lowest values) through a light neutral to dark plum (highest values). The neutral sits at the point
+ * of divergence (see `pointOfDivergence`). Any two different single hues can be joined; these are the
+ * combinations that work well together.
+ */
+const EUROSTAT_DIVERGING_SCHEMES = [
+    'cobalt-plum',
+    'cobalt-sienna',
+    'cobalt-darkGold',
+    'cobalt-sunsetRed',
+    'cornflower-sienna',
+    'cornflower-berry',
+    'teal-plum',
+    'teal-berry',
+    'teal-sunsetRed',
+    'teal-sienna',
+    'forestGreen-plum',
+    'forestGreen-berry',
+    'darkOrchid-darkGold',
+]
+
+const NEUTRAL = '#f5f5f5'
+
+function parseDiverging(name) {
+    const parts = String(name).split('-')
+    if (parts.length !== 2) return null
+    const keys = parts.map((p) => Object.keys(EUROSTAT_SINGLE_HUES).find((k) => k.toLowerCase() === p.toLowerCase()))
+    return keys[0] && keys[1] && keys[0] !== keys[1] ? keys : null
+}
+
+/** Whether `name` joins two different single hues, e.g. 'cobalt-plum' (case-insensitive). */
+const isDivergingName = (name) => typeof name === 'string' && !!parseDiverging(name)
+
+/**
+ * A function t in [0, 1] -> hex colour for a diverging scheme: the first hue's dark end at 0, the
+ * neutral at 0.5 and the second hue's dark end at 1.
+ * @param {string} name e.g. 'cobalt-plum'
+ */
+function divergingInterpolator(name) {
+    const keys = parseDiverging(name)
+    if (!keys) throw new Error('Unknown diverging colour scheme: ' + name)
+    const low = singleHuePalette(keys[0], 9).reverse() // dark -> light
+    const high = singleHuePalette(keys[1], 9) // light -> dark
+    const f = (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_2__["default"])(d3_interpolate__WEBPACK_IMPORTED_MODULE_1__["default"], [...low, NEUTRAL, ...high])
+    return (t) => (0,d3_color__WEBPACK_IMPORTED_MODULE_0__.rgb)(f(Math.min(1, Math.max(0, t)))).formatHex()
+}
+
+/**
+ * Colours for a classed diverging map. Classes below the point of divergence step from the first hue
+ * towards the neutral, classes above step from the neutral to the second hue, so the intensity follows
+ * the class order on each side. A class that contains the point of divergence is the neutral one.
+ * @param {string} name e.g. 'cobalt-plum'
+ * @param {number} nBelow number of classes entirely below the point of divergence
+ * @param {boolean} neutral whether one class contains the point of divergence
+ * @param {number} nAbove number of classes entirely above it
+ * @returns {string[]} hex colours, lowest class first
+ */
+function divergingClassColors(name, nBelow, neutral, nAbove) {
+    const f = divergingInterpolator(name)
+    const ts = []
+    for (let i = 0; i < nBelow; i++) ts.push((0.5 * i) / nBelow)
+    if (neutral) ts.push(0.5)
+    for (let j = 1; j <= nAbove; j++) ts.push(0.5 + (0.5 * j) / nAbove)
+    return ts.map(f)
+}
+
+/** `n` colours for a diverging scheme with the point of divergence in the middle of the classes. */
+function divergingPalette(name, n) {
+    const below = Math.floor(n / 2)
+    return divergingClassColors(name, below, n % 2 === 1, n - below - (n % 2))
 }
 
 
@@ -34154,7 +34235,8 @@ const getURLParameterByName = function (name) {
 }
 
 const checkIfDiverging = function (map) {
-    return map.pointOfDivergence_ !== null
+    // a named diverging colour scheme (colors('cobalt-plum')) always diverges, at 0 unless set
+    return map.pointOfDivergence_ !== null || !!map.divergingScheme_
 }
 
 /**
@@ -36219,22 +36301,65 @@ const decorateChoroplethLayer = function (layer, config) {
     })
 
     /**
-     * colors(['#fff', ...]) sets explicit class colours; colors('teal') picks a Eurostat single-hue
-     * palette (see EUROSTAT_SINGLE_HUES), generated for the current number of classes.
+     * colors(['#fff', ...]) sets explicit class colours. colors('teal') picks a Eurostat single-hue
+     * palette (see EUROSTAT_SINGLE_HUES) and colors('cobalt-plum') a diverging one (two single hues
+     * joined at a neutral, centred on pointOfDivergence(), which defaults to 0). Named palettes are
+     * generated for the current number of classes, and also drive colorFunction() for continuous schemes.
      */
     layer.colors = function (v) {
         if (!arguments.length) return resolveNamedColors()
         layer.colorsName_ = typeof v === 'string' ? v : null
-        if (layer.colorsName_ && !(0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.isSingleHueName)(layer.colorsName_)) {
-            throw new Error('Unknown colour palette: ' + layer.colorsName_ + '. Available: ' + Object.keys(_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.EUROSTAT_SINGLE_HUES).join(', '))
+        layer.divergingScheme_ = false
+        if (layer.colorsName_) {
+            if ((0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.isDivergingName)(layer.colorsName_)) {
+                layer.divergingScheme_ = true
+                layer.colorFunction_ = (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingInterpolator)(layer.colorsName_)
+            } else if ((0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.isSingleHueName)(layer.colorsName_)) {
+                const ramp = (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_8__["default"])(d3_interpolate__WEBPACK_IMPORTED_MODULE_7__["default"], (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.singleHuePalette)(layer.colorsName_, 9))
+                layer.colorFunction_ = (t) => ramp(Math.min(Math.max(0, t), 1))
+            } else {
+                throw new Error(
+                    'Unknown colour palette: ' +
+                        layer.colorsName_ +
+                        '. Available: ' +
+                        Object.keys(_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.EUROSTAT_SINGLE_HUES).join(', ') +
+                        ', or a diverging pair such as ' +
+                        _core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.EUROSTAT_DIVERGING_SCHEMES.slice(0, 3).join(', ')
+                )
+            }
         }
         layer.colors_ = layer.colorsName_ ? null : v
         return layer
     }
     // regenerate a named palette for the current number of classes
     function resolveNamedColors() {
-        if (layer.colorsName_) layer.colors_ = (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.singleHuePalette)(layer.colorsName_, layer.numberOfClasses_)
+        const name = layer.colorsName_
+        if (!name) return layer.colors_
+        if (layer.colorSchemeType_ === 'continuous') return (layer.colors_ = null) // the colour function drives continuous schemes
+        if (!layer.divergingScheme_) {
+            layer.colors_ = (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.singleHuePalette)(name, layer.numberOfClasses_)
+        } else {
+            layer.colors_ = divergingColorsForClasses(name)
+        }
         return layer.colors_
+    }
+    // class colours of a diverging scheme: the neutral sits at the point of divergence
+    function divergingColorsForClasses(name) {
+        const n = layer.numberOfClasses_
+        const classifier = layer.classifier_
+        const extent = layer.dataExtent_
+        if (!classifier || !extent || typeof classifier.invertExtent !== 'function') return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingPalette)(name, n)
+
+        const pivot = layer.pointOfDivergence_ ?? 0
+        if (pivot <= extent[0]) return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingClassColors)(name, 0, false, n) // every class is above it
+        if (pivot >= extent[1]) return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingClassColors)(name, n, false, 0) // every class is below it
+
+        // upper limit of every class but the last
+        const limits = Array.from({ length: n - 1 }, (_, i) => classifier.invertExtent(i)[1])
+        const onLimit = limits.findIndex((l) => Math.abs(l - pivot) <= 1e-9 * Math.max(1, Math.abs(pivot)))
+        if (onLimit >= 0) return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingClassColors)(name, onLimit + 1, false, n - onLimit - 1)
+        const containing = classifier(pivot)
+        return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingClassColors)(name, containing, true, n - 1 - containing)
     }
 
     //override attribute values with config values
@@ -36313,6 +36438,7 @@ const decorateChoroplethLayer = function (layer, config) {
         const fillData = resolveFillData()
         const dataArray = fillData.getArray()
         const dataArrayNumeric = (dataArray || []).map((v) => +v).filter((v) => Number.isFinite(v))
+        layer.dataExtent_ = dataArrayNumeric.length ? [(0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])(dataArrayNumeric), (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(dataArrayNumeric)] : null // used to place a diverging scheme's neutral
 
         if (dataArray) {
             const setupClassifier = () => {

@@ -1,5 +1,5 @@
 import { MapConfig } from '../../core/MapConfig'
-import type { EurostatSingleHue } from '../../core/color-palettes'
+import type { EurostatSingleHue, EurostatDivergingScheme } from '../../core/color-palettes'
 import type { ChoroplethLegendConfig } from '../../legend/choropleth/ChoroplethLegendConfig'
 
 /**
@@ -18,8 +18,8 @@ export interface ChoroplethConfig extends MapConfig {
     /** Make classif nice. */
     makeClassifNice?: boolean
 
-    /** Colors: an array of class colours, or the name of a Eurostat single-hue palette, e.g. 'teal'. */
-    colors?: string[] | EurostatSingleHue
+    /** Colors: an array of class colours, or the name of a Eurostat single-hue palette ('teal') or diverging scheme ('cobalt-plum'). */
+    colors?: string[] | EurostatSingleHue | EurostatDivergingScheme
     colorFunction?: (t: number) => string
     /** Color scheme type. */
     colorSchemeType?: 'discrete' | 'continuous'

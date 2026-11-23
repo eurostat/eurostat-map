@@ -1,4 +1,5 @@
 import { rgb } from 'd3-color'
+import { piecewise, interpolateLab } from 'd3-interpolate'
 
 export const DEFAULT_CATEGORICAL_COLORS = [
     '#388AE2',
@@ -135,4 +136,77 @@ export function singleHuePalette(name, n) {
     }
 
     return Array.from({ length: n }, (_, i) => toHex(bez(correct(i / (n - 1)))))
+}
+
+/**
+ * Diverging schemes are named after the two single hues they join: 'cobalt-plum' runs from dark cobalt
+ * (lowest values) through a light neutral to dark plum (highest values). The neutral sits at the point
+ * of divergence (see `pointOfDivergence`). Any two different single hues can be joined; these are the
+ * combinations that work well together.
+ */
+export const EUROSTAT_DIVERGING_SCHEMES = [
+    'cobalt-plum',
+    'cobalt-sienna',
+    'cobalt-darkGold',
+    'cobalt-sunsetRed',
+    'cornflower-sienna',
+    'cornflower-berry',
+    'teal-plum',
+    'teal-berry',
+    'teal-sunsetRed',
+    'teal-sienna',
+    'forestGreen-plum',
+    'forestGreen-berry',
+    'darkOrchid-darkGold',
+]
+
+const NEUTRAL = '#f5f5f5'
+
+function parseDiverging(name) {
+    const parts = String(name).split('-')
+    if (parts.length !== 2) return null
+    const keys = parts.map((p) => Object.keys(EUROSTAT_SINGLE_HUES).find((k) => k.toLowerCase() === p.toLowerCase()))
+    return keys[0] && keys[1] && keys[0] !== keys[1] ? keys : null
+}
+
+/** Whether `name` joins two different single hues, e.g. 'cobalt-plum' (case-insensitive). */
+export const isDivergingName = (name) => typeof name === 'string' && !!parseDiverging(name)
+
+/**
+ * A function t in [0, 1] -> hex colour for a diverging scheme: the first hue's dark end at 0, the
+ * neutral at 0.5 and the second hue's dark end at 1.
+ * @param {string} name e.g. 'cobalt-plum'
+ */
+export function divergingInterpolator(name) {
+    const keys = parseDiverging(name)
+    if (!keys) throw new Error('Unknown diverging colour scheme: ' + name)
+    const low = singleHuePalette(keys[0], 9).reverse() // dark -> light
+    const high = singleHuePalette(keys[1], 9) // light -> dark
+    const f = piecewise(interpolateLab, [...low, NEUTRAL, ...high])
+    return (t) => rgb(f(Math.min(1, Math.max(0, t)))).formatHex()
+}
+
+/**
+ * Colours for a classed diverging map. Classes below the point of divergence step from the first hue
+ * towards the neutral, classes above step from the neutral to the second hue, so the intensity follows
+ * the class order on each side. A class that contains the point of divergence is the neutral one.
+ * @param {string} name e.g. 'cobalt-plum'
+ * @param {number} nBelow number of classes entirely below the point of divergence
+ * @param {boolean} neutral whether one class contains the point of divergence
+ * @param {number} nAbove number of classes entirely above it
+ * @returns {string[]} hex colours, lowest class first
+ */
+export function divergingClassColors(name, nBelow, neutral, nAbove) {
+    const f = divergingInterpolator(name)
+    const ts = []
+    for (let i = 0; i < nBelow; i++) ts.push((0.5 * i) / nBelow)
+    if (neutral) ts.push(0.5)
+    for (let j = 1; j <= nAbove; j++) ts.push(0.5 + (0.5 * j) / nAbove)
+    return ts.map(f)
+}
+
+/** `n` colours for a diverging scheme with the point of divergence in the middle of the classes. */
+export function divergingPalette(name, n) {
+    const below = Math.floor(n / 2)
+    return divergingClassColors(name, below, n % 2 === 1, n - below - (n % 2))
 }

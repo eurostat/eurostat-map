@@ -4,35 +4,56 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Eurostat colour palettes</title>
+        <!-- Eurostat UI: the Europa Component Library (ECL) styles used on ec.europa.eu/eurostat, and the
+             Eurostat web component <ewc-singleselect> -->
+        <link rel="stylesheet" href="https://cdn1.fpfis.tech.ec.europa.eu/ecl/v4.8.0/eu/styles/ecl-eu.css" />
         <style>
             body {
                 margin: 0;
-                font: 14px Arial, sans-serif;
-                color: #383838;
+                padding: 8px;
+                font-family: Arial, Helvetica, sans-serif;
             }
 
             .controls {
                 display: flex;
                 flex-wrap: wrap;
-                gap: 8px 24px;
-                padding: 8px;
+                align-items: flex-start;
+                gap: 16px 32px;
+                max-width: 820px;
             }
 
-            .controls label {
-                display: flex;
-                flex-direction: column;
-                gap: 2px;
+            .control {
+                min-width: 240px;
+            }
+
+            .control[hidden] {
+                display: none;
+            }
+
+            .control-label {
+                margin-bottom: 4px;
+                font-size: 14px;
+                font-weight: 700;
+                color: #404040;
+            }
+
+            .ecl-range {
+                width: 100%;
             }
 
             #swatches {
                 display: flex;
                 height: 14px;
-                margin: 0 8px 4px;
                 max-width: 800px;
+                margin: 12px 0 4px;
             }
 
             #swatches span {
                 flex: 1;
+            }
+
+            #swatches.continuous {
+                display: block;
             }
 
             #map {
@@ -45,75 +66,188 @@
 
     <body>
         <div class="controls">
-            <label>
-                Colour palette
-                <select id="palette"></select>
-            </label>
-            <label>
-                Classes
-                <select id="classes"></select>
-            </label>
+            <div class="control">
+                <div class="control-label">Colour palette</div>
+                <ewc-singleselect
+                    id="palette"
+                    dropdownHeight="260px"
+                    selectedLabel="Select below"
+                    invertColors="false"
+                    searchMode=""
+                    defaultOption="teal"
+                    activeOption="teal"
+                    options='[
+                        [
+                            { "name": "Cornflower", "code": "cornflower", "status": "active" },
+                            { "name": "Cobalt", "code": "cobalt", "status": "active" },
+                            { "name": "Dark orchid", "code": "darkOrchid", "status": "active" },
+                            { "name": "Fuchsia", "code": "fuchsia", "status": "active" },
+                            { "name": "Berry", "code": "berry", "status": "active" },
+                            { "name": "Sunset red", "code": "sunsetRed", "status": "active" },
+                            { "name": "Sienna", "code": "sienna", "status": "active" },
+                            { "name": "Dark gold", "code": "darkGold", "status": "active" },
+                            { "name": "Forest green", "code": "forestGreen", "status": "active" },
+                            { "name": "Teal", "code": "teal", "status": "active" },
+                            { "name": "Plum", "code": "plum", "status": "active" }
+                        ],
+                        [
+                            { "name": "Cobalt – plum", "code": "cobalt-plum", "status": "active" },
+                            { "name": "Cobalt – sienna", "code": "cobalt-sienna", "status": "active" },
+                            { "name": "Cobalt – dark gold", "code": "cobalt-darkGold", "status": "active" },
+                            { "name": "Cobalt – sunset red", "code": "cobalt-sunsetRed", "status": "active" },
+                            { "name": "Cornflower – sienna", "code": "cornflower-sienna", "status": "active" },
+                            { "name": "Cornflower – berry", "code": "cornflower-berry", "status": "active" },
+                            { "name": "Teal – plum", "code": "teal-plum", "status": "active" },
+                            { "name": "Teal – berry", "code": "teal-berry", "status": "active" },
+                            { "name": "Teal – sunset red", "code": "teal-sunsetRed", "status": "active" },
+                            { "name": "Teal – sienna", "code": "teal-sienna", "status": "active" },
+                            { "name": "Forest green – plum", "code": "forestGreen-plum", "status": "active" },
+                            { "name": "Forest green – berry", "code": "forestGreen-berry", "status": "active" },
+                            { "name": "Dark orchid – dark gold", "code": "darkOrchid-darkGold", "status": "active" }
+                        ]
+                    ]'
+                ></ewc-singleselect>
+            </div>
+
+            <fieldset class="control ecl-form-group" style="border: 0; padding: 0; margin: 0">
+                <legend class="control-label">Colour scheme</legend>
+                <div class="ecl-radio">
+                    <input id="type-discrete" name="scheme-type" class="ecl-radio__input" type="radio" value="discrete" checked />
+                    <label class="ecl-radio__label" for="type-discrete">
+                        <span class="ecl-radio__box"><span class="ecl-radio__box-inner"></span></span>
+                        <span class="ecl-radio__text">Discrete (classes)</span>
+                    </label>
+                </div>
+                <div class="ecl-radio">
+                    <input id="type-continuous" name="scheme-type" class="ecl-radio__input" type="radio" value="continuous" />
+                    <label class="ecl-radio__label" for="type-continuous">
+                        <span class="ecl-radio__box"><span class="ecl-radio__box-inner"></span></span>
+                        <span class="ecl-radio__text">Continuous</span>
+                    </label>
+                </div>
+            </fieldset>
+
+            <div class="control" id="classes-control">
+                <div class="control-label">Number of classes</div>
+                <ewc-singleselect
+                    id="classes"
+                    dropdownHeight="220px"
+                    selectedLabel="Select below"
+                    invertColors="false"
+                    searchMode=""
+                    defaultOption="7"
+                    activeOption="7"
+                    options='[
+                        [
+                            { "name": "3", "code": "3", "status": "active" },
+                            { "name": "4", "code": "4", "status": "active" },
+                            { "name": "5", "code": "5", "status": "active" },
+                            { "name": "6", "code": "6", "status": "active" },
+                            { "name": "7", "code": "7", "status": "active" },
+                            { "name": "8", "code": "8", "status": "active" },
+                            { "name": "9", "code": "9", "status": "active" }
+                        ]
+                    ]'
+                ></ewc-singleselect>
+            </div>
+
+            <div class="control ecl-form-group" id="pivot-control" hidden>
+                <label class="control-label" for="pivot">Point of divergence</label>
+                <input id="pivot" class="ecl-range" type="range" min="-20" max="20" step="0.5" value="0" />
+                <div class="ecl-range__value">Value: <span class="ecl-range__value-current" id="pivot-value">0</span> ‰</div>
+            </div>
         </div>
+
         <div id="swatches" aria-hidden="true"></div>
         <svg id="map"></svg>
 
         <script src="../../build/eurostatmap.js"></script>
-        <script>
-            // The single-hue palettes of the Eurostat visual style guide, usable by name: map.colors('teal')
-            const palettes = {
-                cornflower: 'Cornflower',
-                cobalt: 'Cobalt',
-                darkOrchid: 'Dark orchid',
-                fuchsia: 'Fuchsia',
-                berry: 'Berry',
-                sunsetRed: 'Sunset red',
-                sienna: 'Sienna',
-                darkGold: 'Dark gold',
-                forestGreen: 'Forest green',
-                teal: 'Teal',
-                plum: 'Plum',
-            }
+        <script type="module" src="../vendor/ewc-singleselect.js"></script>
+        <script type="module">
+            await customElements.whenDefined('ewc-singleselect')
 
-            const paletteSelect = document.getElementById('palette')
-            const classesSelect = document.getElementById('classes')
-            Object.entries(palettes).forEach(([value, label]) => paletteSelect.add(new Option(label, value)))
-            for (let n = 3; n <= 9; n++) classesSelect.add(new Option(n, n))
-            paletteSelect.value = 'teal'
-            classesSelect.value = '6'
-
+            const state = { palette: 'teal', classes: 7, type: 'discrete', pivot: 0 }
+            // diverging schemes join two hues, e.g. 'cobalt-plum'; single hues are just 'teal'
+            const isDiverging = () => state.palette.includes('-')
             let map
 
             function showSwatches() {
-                document.getElementById('swatches').replaceChildren(
-                    ...map.colors().map((color) => {
-                        const swatch = document.createElement('span')
-                        swatch.style.background = color
-                        swatch.title = color
-                        return swatch
-                    })
-                )
+                const strip = document.getElementById('swatches')
+                const continuous = state.type === 'continuous'
+                strip.classList.toggle('continuous', continuous)
+                if (continuous) {
+                    // sample the colour function; in a diverging scheme the neutral sits at 0.5
+                    const f = map.colorFunction()
+                    const stops = Array.from({ length: 21 }, (_, i) => f(i / 20))
+                    strip.style.height = '14px'
+                    strip.style.background = `linear-gradient(to right, ${stops.join(',')})`
+                    strip.replaceChildren()
+                } else {
+                    strip.style.background = ''
+                    strip.replaceChildren(
+                        ...map.colors().map((color) => {
+                            const swatch = document.createElement('span')
+                            swatch.style.background = color
+                            swatch.title = color
+                            return swatch
+                        })
+                    )
+                }
             }
 
-            // build the map with the chosen palette and number of classes
+            // controls that only apply to some choices
+            function updateControls() {
+                document.getElementById('classes-control').hidden = state.type === 'continuous'
+                document.getElementById('pivot-control').hidden = !isDiverging()
+            }
+
+            // build the map with the chosen palette, scheme type and point of divergence
             function render() {
+                updateControls()
                 document.getElementById('map').replaceChildren()
                 map = eurostatmap
                     .map('choropleth')
-                    .title('Population density in Europe')
+                    .title('Population change in Europe')
                     .width(800)
-                    .subtitle('2021')
-                    .stat('value', { eurostatDatasetCode: 'demo_r_d3dens', unitText: ' people/km²', filters: { TIME: '2021' } })
-                    .encoding('fill', { stat: 'value' })
-                    .legend({ x: 10, y: 130, title: 'Density, people/km²', boxOpacity: 0 })
+                    .subtitle('Crude rate of total population change, 2024')
                     .nutsLevel(2)
-                    .numberOfClasses(+classesSelect.value)
-                    .colors(paletteSelect.value) // a palette name, e.g. 'teal' or 'plum'
-                    .build()
-                showSwatches()
+                    .nutsYear(2024)
+                    .stat('value', {
+                        eurostatDatasetCode: 'demo_r_gind3',
+                        filters: { indic_de: 'GROWRT', time: 2024 },
+                        unitText: ' ‰',
+                    })
+                    .encoding('fill', { stat: 'value' })
+                    .legend({ x: 10, y: 130, title: 'Per 1 000 persons', boxOpacity: 0 })
+                    .colorSchemeType(state.type)
+                    .numberOfClasses(state.classes)
+                    .colors(state.palette) // a palette name, e.g. 'teal' or 'cobalt-plum'
+                if (isDiverging()) map.pointOfDivergence(state.pivot) // where the neutral colour sits
+                map.callback(showSwatches) // once the data has arrived and the classes are known
+                map.build()
             }
 
-            paletteSelect.addEventListener('change', render)
-            classesSelect.addEventListener('change', render)
+            document.getElementById('palette').addEventListener('option-selected', (e) => {
+                state.palette = e.detail.option.code
+                render()
+            })
+            document.getElementById('classes').addEventListener('option-selected', (e) => {
+                state.classes = +e.detail.option.code
+                render()
+            })
+            document.querySelectorAll('input[name=scheme-type]').forEach((input) =>
+                input.addEventListener('change', () => {
+                    state.type = input.value
+                    render()
+                })
+            )
+            const pivot = document.getElementById('pivot')
+            pivot.addEventListener('input', () => (document.getElementById('pivot-value').textContent = pivot.value))
+            pivot.addEventListener('change', () => {
+                state.pivot = +pivot.value
+                render()
+            })
+
             render()
         </script>
     </body>

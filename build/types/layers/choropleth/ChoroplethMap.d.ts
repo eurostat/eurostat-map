@@ -1,5 +1,5 @@
 import { MapInstance } from '../../core/MapInstance'
-import type { EurostatSingleHue } from '../../core/color-palettes'
+import type { EurostatSingleHue, EurostatDivergingScheme } from '../../core/color-palettes'
 
 /**
  * Choropleth map object
@@ -15,8 +15,8 @@ export interface ChoroplethMap extends MapInstance {
     thresholds(t: number[]): this
 
     colors(): string[] | null
-    /** Explicit class colours, or the name of a Eurostat single-hue palette (generated for the number of classes). */
-    colors(c: string[] | EurostatSingleHue): this
+    /** Explicit class colours, or a Eurostat palette name: single hue ('teal') or diverging ('cobalt-plum', centred on pointOfDivergence, default 0). Generated for the number of classes. */
+    colors(c: string[] | EurostatSingleHue | EurostatDivergingScheme): this
 
     colorFunction(): (t: number) => string
     colorFunction(fn: (t: number) => string): this

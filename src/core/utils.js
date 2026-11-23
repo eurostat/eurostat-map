@@ -404,7 +404,8 @@ export const getURLParameterByName = function (name) {
 }
 
 export const checkIfDiverging = function (map) {
-    return map.pointOfDivergence_ !== null
+    // a named diverging colour scheme (colors('cobalt-plum')) always diverges, at 0 unless set
+    return map.pointOfDivergence_ !== null || !!map.divergingScheme_
 }
 
 /**

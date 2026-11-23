@@ -266,6 +266,15 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
 * Maintain existing formatting standards defined in `.prettierrc`.
 * Do not leave active console logging statements or unfinished debugger codes in production files.
 
+## Examples use Eurostat UI components
+
+Controls in examples (dropdowns, radios, sliders, checkboxes) use Eurostat's own components, not bare
+browser widgets: `<ewc-singleselect>` for dropdowns (`examples/vendor/ewc-singleselect.js`, options in the
+`options` attribute, `option-selected` event, see `examples/choropleth/eurostat-colour-palettes.html`) and
+the Europa Component Library styles the Eurostat site uses for the rest
+(`https://cdn1.fpfis.tech.ec.europa.eu/ecl/v4.8.0/eu/styles/ecl-eu.css`: `ecl-radio`, `ecl-checkbox`,
+`ecl-range`; copy the markup from ec.europa.eu/eurostat). Not every older example has been converted yet.
+
 ## Example gallery categories
 
 - Gallery examples can belong to multiple map-type filters. Keep `typesForPath()` in
