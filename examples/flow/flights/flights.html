@@ -65,28 +65,8 @@
                 color: #383838;
             }
 
-            .flight-details h2 {
-                margin: 0 0 6px;
-                font-size: 14px;
-            }
-
-            #flight-tooltip {
-                /* Keep the latest hover content visible in this panel between routes. */
-                position: static;
-                opacity: 1 !important;
-                pointer-events: auto;
-                width: 100%;
-                max-width: none;
-                height: 9rem;
-                max-height: none;
-                box-sizing: border-box;
-                overflow: auto;
-                border: 1px solid #d5d5d5;
-                border-radius: 6px;
-            }
-
             #empty-legend {
-                margin-top: 12px;
+                margin-top: 8px;
             }
 
             #empty-legend .ramp {
@@ -98,11 +78,6 @@
             #empty-legend .ramp-labels {
                 display: flex;
                 justify-content: space-between;
-            }
-
-            .flight-tooltip-hint {
-                margin: 0;
-                padding: 10px;
             }
 
             @media (max-width: 640px) {
@@ -161,11 +136,7 @@
         </form>
         <div class="flight-layout">
             <div id="flight-map"><svg id="map"></svg></div>
-            <aside class="flight-details" aria-labelledby="flight-details-title">
-                <h2 id="flight-details-title">Flight details</h2>
-                <div id="flight-tooltip">
-                    <p class="flight-tooltip-hint">Hover over a route or airport to see its passenger and seat counts.</p>
-                </div>
+            <aside class="flight-details">
                 <div id="empty-legend" hidden>
                     Share of seats that are empty (%)
                     <div class="ramp"></div>
@@ -402,7 +373,7 @@
 
                     .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
 
-                    .tooltip({ id: 'flight-tooltip', textFunction: flowTooltip(flightsByKey, s.merge) })
+                    .tooltip({ textFunction: flowTooltip(flightsByKey, s.merge), offset: { x: 60, y: 40 } }) // follows the pointer; default offset is 30 x 20
                     .labels({
                         values: false,
                         backgrounds: true,
