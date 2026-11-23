@@ -55,7 +55,15 @@
                         Object.entries(regions).flatMap(([region, codes]) => codes.map((code) => [code, region.toLowerCase()]))
                     )
 
-                    const valuesLabelFormatter = d3.format('.3~s')
+                    const compactValue = d3.format('.3~s')
+                    // each flow label reads "63.7M (+3.6%)": the amount, then the change since the year before, so the colour classes are not all a reader has
+                    const changeByValue = new Map(graphData.nodes.filter((n) => n.change).map((n) => [n.value, n.change]))
+                    const signedChange = (change) => {
+                        const pct = parseChangeToPct(change)
+                        return `${pct > 0 ? '+' : pct < 0 ? '−' : ''}${Math.abs(pct).toFixed(1)}%`
+                    }
+                    const valuesLabelFormatter = (value) =>
+                        changeByValue.has(value) ? `${compactValue(value)} (${signedChange(changeByValue.get(value))})` : compactValue(value)
 
                     const colorFunction = d3
                         .scaleThreshold()

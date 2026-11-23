@@ -2,14 +2,12 @@ const airMapConfigs = {
     "2025": {
         "passengers": {
             "breaks": [
-                -5,
                 0,
                 5,
                 10,
                 20
             ],
             "colors": [
-                "#ad292f",
                 "#d66567",
                 "#809dca",
                 "#557db7",
@@ -19,8 +17,7 @@ const airMapConfigs = {
             "legend": {
                 "title": "Change vs 2024 (%)",
                 "labels": [
-                    "< -5",
-                    "-5 to < 0",
+                    "< 0",
                     "0 to < 5",
                     "5 to < 10",
                     "10 to < 20",

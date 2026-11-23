@@ -36,7 +36,7 @@ const regionLabels = [
     },
     {
         "text": "Eastern Asia",
-        "x": 104,
+        "x": 116,
         "y": 31.7
     },
     {

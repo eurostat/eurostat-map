@@ -323,6 +323,12 @@ hand-rolling markup in an example. Not every older example has been converted ye
   When changing country groups or fills, check for duplicate country assignments and verify that groups sharing
   a border arc in the GISCO world geometry have distinct fills.
 
+- Audit each 2026 map's colour legend against its data: every class should appear on the map (the passengers change
+  legend had an empty "< -5" class, so it is 5 classes now), and a colour-coded value should also be written on the map
+  (air flow labels read "63.7M (+3.6%)" through the `valuesFormatter`, which receives only the value).
+- Maritime partner labels (`maritime/flows/partner-labels.js`) are placed by hand through `positions`; a label must sit
+  at its own flow's end, and overlapping a neighbouring flow a little is the accepted cost (Türkiye, `TR`).
+
 ## Keep this file current for the next agent
 
 Different agents and sessions (potentially different providers entirely) work in this repo over
