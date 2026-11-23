@@ -60,8 +60,3 @@
 .em-flow-node-stems {
     opacity: 0.6 !important;
 }
-
-/* flows end flush, without the dark stem tick at each end */
-#maritime-flow-map .em-flow-node-stems {
-    display: none;
-}
