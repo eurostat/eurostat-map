@@ -64,9 +64,12 @@
                     signDisplay: 'exceptZero',
                     maximumFractionDigits: 1,
                 })
-                const changeColors = ['#b2182b', '#ef8a62', '#d1e5f0', '#67a9cf', '#2166ac']
-                const changeLabels = ['Below −5%', '−5% to below 0%', '0% to below 2%', '2% to below 5%', '5% or more']
-                const changeColor = d3.scaleThreshold().domain([-5, 0, 2, 5]).range(changeColors)
+                // Diverging, centred on zero: reds fall, blues rise, grey is little change. The grey is darker than the
+                // land so that small changes stay visible against it.
+                const changeColors = ['#b2182b', '#ef8a62', '#c4c4c4', '#67a9cf', '#2166ac']
+                const changeLabels = ['Fall of more than 5%', 'Fall of 1% to 5%', 'Little change (±1%)', 'Rise of 1% to 5%', 'Rise of more than 5%']
+                const changeColor = d3.scaleThreshold().domain([-5, -1, 1, 5]).range(changeColors)
+                const uniformNodeSize = Object.assign(() => 6, { domain: () => [0, 1] }) // the library expects scales to have domain()
                 const airportNames = {
                     LEMD: 'Madrid-Barajas',
                     LEBL: 'Barcelona-El Prat',
@@ -126,15 +129,18 @@
                         lineType: 'curved',
                         stack: true,
                         nodes: true,
+                        // airports are markers only: size would repeat the passenger volume shown by the flow widths
+                        nodeSizeScale: uniformNodeSize,
                         arrows: false,
                         outlines: true,
-                        widthGradient: true,
+                        // constant width along each flow: width encodes the passenger volume, nothing else
+                        widthGradient: false,
                         color: (link) => changeColor(link.changePct),
                         curvatureSettings: { gapX: 0, padX: 0, padY: 2, bumpY: 10, curvature: 0.3 },
                     })
                     .legend({
                         x: width - 225,
-                        y: height - 252,
+                        y: height - 208,
                         boxPadding: 10,
                         boxOpacity: 1,
                         title: 'Passengers carried',
@@ -142,17 +148,14 @@
                             values: [1700000, graph.links[0].value],
                             labels: ['1.7M', '2.4M'],
                         },
-                        nodeSizeLegend: {
-                            title: 'Airport total (shown routes)',
-                            values: [12000000, 1700000],
-                        },
                         flowColorLegend: {
-                            marginTop: 30,
+                            marginTop: 0,
                             title: 'Change vs 2024',
                             items: changeColors.map((color, index) => ({ color, label: changeLabels[index] })).reverse(),
                         },
                         regionColorLegend: false,
                     })
+                    .minimap({ x: width - 90, y: 170, z: 200, color: 'lightgrey', debounce: 2 })
                     .labels({ labels: airportLabels, shadows: true, hideOverlapping: true })
                     .tooltip({
                         textFunction: (link) => `
@@ -167,6 +170,8 @@
                     .footnote("Intra-EU flights only. <tspan font-style='italic'>Source</tspan>: Eurostat (avia_pa)")
                     .onBuild((map) => {
                         map.svg().select('#em-labels').raise()
+                        // the legend always draws a node size key; the markers are a uniform size here, so drop it
+                        map.svg().select('.em-node-size-legend').remove()
                         map.svg()
                             .append('text')
                             .attr('class', 'em-footnote')
