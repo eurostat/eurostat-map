@@ -139,9 +139,10 @@ export const wrapMapSvg = function (svg) {
 }
 
 export const updateResponsiveMap = function (out) {
-    const svg = out.svg_?.node()
-    const wrapper = out._wrapper_
-    const standalone = svg && wrapper && svg.parentNode === wrapper && svg.tagName.toLowerCase() === 'svg'
+    const svg = (out.svg_ ?? (typeof out.svg === 'function' ? out.svg() : undefined))?.node?.()
+    // the wrapper is found from the DOM: the map asked may be a layer (a legend asks), which has no _wrapper_ of its own
+    const wrapper = svg?.parentNode?.classList?.contains('em-map-wrapper') ? svg.parentNode : undefined
+    const standalone = svg && wrapper && svg.tagName.toLowerCase() === 'svg'
     if (!standalone) return
 
     wrapper.classList.toggle('em-map-wrapper--responsive', !!out.responsive_)

@@ -196,9 +196,10 @@ export function getGridCartogramChartAnchor(map, bbox) {
 }
 
 const DEFAULT_MARGINS = { top: 80, right: 50, bottom: 80, left: 150 }
-const COMPACT_MARGINS = { top: 70, right: 6, bottom: 10, left: 6 }
+const COMPACT_MARGINS = { top: 24, right: 6, bottom: 10, left: 6 }
 const DEFAULT_CELL_PADDING = 4
 const COMPACT_CELL_PADDING = 2
+const MIN_CELL_FOR_NAMES = 60 // px: below it country names overlap, codes are shown
 
 /**
  * The margins the grid is laid out in. The defaults leave room for a legend beside the grid and are made for a wide
@@ -297,6 +298,7 @@ const drawSquareGrid = (gridGroup, gridData, out) => {
     const cellWidth = (out.width_ - margins.left - margins.right) / numCols - cellPadding
     const cellHeight = (out.height_ - margins.top - margins.bottom) / numRows - cellPadding
     const cellSize = Math.min(cellWidth, cellHeight)
+    out._gridCellSize_ = cellSize
     const labelFontSize = getGridCountryLabelFontSize(out, cellSize)
 
     gridGroup
@@ -396,6 +398,8 @@ const getGridCountryLabelText = (out, d) => {
     }
 
     if (labelMode === 'name') {
+        // a name does not fit a small cell (the compact layout): its code does
+        if (isCompact(out) && out._gridCellSize_ < MIN_CELL_FOR_NAMES) return d.id
         return getEnglishCountryName(d.id, d.properties?.name)
     }
 
@@ -420,7 +424,7 @@ const getGridCountryLabelFontSize = (out, maxWidth) => {
     const baseFontSize = settings.countryLabelFontSize || getFontSize(out._mapType)
     const mode = settings.countryLabels || 'code'
 
-    if (mode === 'name') {
+    if (mode === 'name' && !(isCompact(out) && out._gridCellSize_ < MIN_CELL_FOR_NAMES)) {
         const minFontSize = settings.countryLabelMinFontSize || 8
         const fitFontSize = Math.max(minFontSize, Math.min(baseFontSize, Math.floor(maxWidth / 4.8)))
         return fitFontSize

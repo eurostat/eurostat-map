@@ -1,8 +1,7 @@
 function renderCommutingMap({ towns, links, view, title, subtitle, overview = false, maxFlowWidth = 8, scaleMaxFlow, scaleMaxLocal }) {
     const map = eurostatmap
         .map('flow')
-        .width(795)
-        .height(620)
+        .height((m) => m.width() * 0.78)
         .responsive(true)
         .nutsLevel(overview ? 2 : 3)
         .insets(false)

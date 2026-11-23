@@ -646,8 +646,8 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             // the shape of the map follows its width, not the height of the screen: a compact map filling the window left bands of empty space
             let defaultHeight = (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : mobile ? 1 : 0.85) * out.width()
 
-            // a grid cartogram is as tall as its square cells need (about 11 rows for every 12 columns, plus the title above it)
-            if (out.gridCartogram_ && mobile) defaultHeight = (out.width() - 12) * 0.92 + 80
+            // a grid cartogram is as tall as its square cells need (about 11 rows for every 12 columns, plus the margins)
+            if (out.gridCartogram_ && mobile) defaultHeight = (out.width() - 12) * 0.92 + 40
             if (defaultHeight > maxMapHeight) defaultHeight = maxMapHeight
             out.height_ = defaultHeight
         }

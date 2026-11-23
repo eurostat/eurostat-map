@@ -278,8 +278,7 @@
             }
             const map = eurostatmap
                 .map('choropleth')
-                .height(700)
-                .width(700)
+                .height((m) => m.width()) // square at any width
                 .title('World map example')
                 .geo('WORLD')
                 .nutsLevel('mixed')

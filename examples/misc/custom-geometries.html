@@ -127,8 +127,7 @@
                     // Initialize the map
                     const map = eurostatmap
                         .map('choropleth')
-                        .width(width)
-                        .height(height)
+                        .height((m) => (m.width() * height) / width)
                         .title('Custom Map Geometries/Regions')
                         .subtitle('Unemployment rate, municipality level, 2023')
                         .geometries([

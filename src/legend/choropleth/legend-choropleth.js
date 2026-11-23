@@ -84,7 +84,7 @@ export const legend = function (map, config = {}) {
         // Under the map (compact layout) a legend runs along it, as wide as the map allows; elsewhere it is as configured
         const below = legendsBelowMap(out.map) && !out.histogram
         out.orientation = below && !orientationIsExplicit ? 'horizontal' : configuredOrientation
-        out.width = below && !widthIsExplicit ? Math.max(120, Math.min(out.map.width() - 2 * (EDGE + out.boxPadding), 480)) : configuredWidth
+        out.width = below && !widthIsExplicit ? Math.max(120, Math.min(out.map.width() - 2 * (EDGE + out.boxPadding) - 24, 480)) : configuredWidth
         out.updateContainer()
 
         if (out.lgg.node()) {

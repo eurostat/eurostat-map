@@ -31,8 +31,7 @@
                 .subtitle('Azimuthal Equal Area projection centered on Spain')
                 .nutsLevel('mixed')
                 .nutsYear(2021)
-                .width(600)
-                .height(600)
+                .height((m) => m.width()) // square at any width
                 .scale('03M')
                 .projectionFunction(projectionFunction)
                 .labels({

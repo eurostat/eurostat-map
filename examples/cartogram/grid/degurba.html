@@ -67,6 +67,22 @@
                 stroke: #999 !important;
                 stroke-width: 0px !important;
             }
+            .controls {
+                display: none; /* replaced by the settings panel */
+            }
+        </style>
+            <style>
+            body {
+                margin: 0;
+                padding: 8px;
+            }
+
+            /* a phone: the map fills the screen */
+            @media (max-width: 900px) {
+                body {
+                    padding: 0;
+                }
+            }
         </style>
     </head>
 
@@ -318,6 +334,12 @@
                 useTotalPopWidth = e.target.checked
                 buildMap(currentDataset, isCartogram)
             })
+        </script>
+        <script type="module">
+            // the reusable settings panel (Eurostat UI components), shared by the examples: it shows the native controls of this page as Eurostat ones
+            import { createPanel } from '../../vendor/example-panel.js'
+
+            createPanel({ map: '#bar', title: 'Map settings' }).adopt('#dataset-select', '#cartogram-toggle', '#width-total-toggle')
         </script>
     </body>
 </html>

@@ -21027,9 +21027,10 @@ function getGridCartogramChartAnchor(map, bbox) {
 }
 
 const DEFAULT_MARGINS = { top: 80, right: 50, bottom: 80, left: 150 }
-const COMPACT_MARGINS = { top: 70, right: 6, bottom: 10, left: 6 }
+const COMPACT_MARGINS = { top: 24, right: 6, bottom: 10, left: 6 }
 const DEFAULT_CELL_PADDING = 4
 const COMPACT_CELL_PADDING = 2
+const MIN_CELL_FOR_NAMES = 60 // px: below it country names overlap, codes are shown
 
 /**
  * The margins the grid is laid out in. The defaults leave room for a legend beside the grid and are made for a wide
@@ -21128,6 +21129,7 @@ const drawSquareGrid = (gridGroup, gridData, out) => {
     const cellWidth = (out.width_ - margins.left - margins.right) / numCols - cellPadding
     const cellHeight = (out.height_ - margins.top - margins.bottom) / numRows - cellPadding
     const cellSize = Math.min(cellWidth, cellHeight)
+    out._gridCellSize_ = cellSize
     const labelFontSize = getGridCountryLabelFontSize(out, cellSize)
 
     gridGroup
@@ -21227,6 +21229,8 @@ const getGridCountryLabelText = (out, d) => {
     }
 
     if (labelMode === 'name') {
+        // a name does not fit a small cell (the compact layout): its code does
+        if ((0,_layout_profile__WEBPACK_IMPORTED_MODULE_2__.isCompact)(out) && out._gridCellSize_ < MIN_CELL_FOR_NAMES) return d.id
         return getEnglishCountryName(d.id, d.properties?.name)
     }
 
@@ -21251,7 +21255,7 @@ const getGridCountryLabelFontSize = (out, maxWidth) => {
     const baseFontSize = settings.countryLabelFontSize || getFontSize(out._mapType)
     const mode = settings.countryLabels || 'code'
 
-    if (mode === 'name') {
+    if (mode === 'name' && !((0,_layout_profile__WEBPACK_IMPORTED_MODULE_2__.isCompact)(out) && out._gridCellSize_ < MIN_CELL_FOR_NAMES)) {
         const minFontSize = settings.countryLabelMinFontSize || 8
         const fitFontSize = Math.max(minFontSize, Math.min(baseFontSize, Math.floor(maxWidth / 4.8)))
         return fitFontSize
@@ -30236,9 +30240,10 @@ const wrapMapSvg = function (svg) {
 }
 
 const updateResponsiveMap = function (out) {
-    const svg = out.svg_?.node()
-    const wrapper = out._wrapper_
-    const standalone = svg && wrapper && svg.parentNode === wrapper && svg.tagName.toLowerCase() === 'svg'
+    const svg = (out.svg_ ?? (typeof out.svg === 'function' ? out.svg() : undefined))?.node?.()
+    // the wrapper is found from the DOM: the map asked may be a layer (a legend asks), which has no _wrapper_ of its own
+    const wrapper = svg?.parentNode?.classList?.contains('em-map-wrapper') ? svg.parentNode : undefined
+    const standalone = svg && wrapper && svg.tagName.toLowerCase() === 'svg'
     if (!standalone) return
 
     wrapper.classList.toggle('em-map-wrapper--responsive', !!out.responsive_)
@@ -31447,8 +31452,8 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             // the shape of the map follows its width, not the height of the screen: a compact map filling the window left bands of empty space
             let defaultHeight = (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : mobile ? 1 : 0.85) * out.width()
 
-            // a grid cartogram is as tall as its square cells need (about 11 rows for every 12 columns, plus the title above it)
-            if (out.gridCartogram_ && mobile) defaultHeight = (out.width() - 12) * 0.92 + 80
+            // a grid cartogram is as tall as its square cells need (about 11 rows for every 12 columns, plus the margins)
+            if (out.gridCartogram_ && mobile) defaultHeight = (out.width() - 12) * 0.92 + 40
             if (defaultHeight > maxMapHeight) defaultHeight = maxMapHeight
             out.height_ = defaultHeight
         }
@@ -49999,7 +50004,7 @@ const legend = function (map, config = {}) {
         // Under the map (compact layout) a legend runs along it, as wide as the map allows; elsewhere it is as configured
         const below = (0,_core_legend_below__WEBPACK_IMPORTED_MODULE_6__.legendsBelowMap)(out.map) && !out.histogram
         out.orientation = below && !orientationIsExplicit ? 'horizontal' : configuredOrientation
-        out.width = below && !widthIsExplicit ? Math.max(120, Math.min(out.map.width() - 2 * (_core_legend_below__WEBPACK_IMPORTED_MODULE_6__.EDGE + out.boxPadding), 480)) : configuredWidth
+        out.width = below && !widthIsExplicit ? Math.max(120, Math.min(out.map.width() - 2 * (_core_legend_below__WEBPACK_IMPORTED_MODULE_6__.EDGE + out.boxPadding) - 24, 480)) : configuredWidth
         out.updateContainer()
 
         if (out.lgg.node()) {

@@ -4,6 +4,19 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Composition Charts</title>
+            <style>
+            body {
+                margin: 0;
+                padding: 8px;
+            }
+
+            /* a phone: the map fills the screen */
+            @media (max-width: 900px) {
+                body {
+                    padding: 0;
+                }
+            }
+        </style>
     </head>
 
     <body>
@@ -134,6 +147,12 @@
             })
 
             applyCompositionSettings()
+        </script>
+        <script type="module">
+            // the reusable settings panel (Eurostat UI components), shared by the examples: it shows the native controls of this page as Eurostat ones
+            import { createPanel } from '../vendor/example-panel.js'
+
+            createPanel({ map: '#map', title: 'Map settings' }).adopt('#composition-type-select', '#radar-value-mode-select')
         </script>
     </body>
 </html>
