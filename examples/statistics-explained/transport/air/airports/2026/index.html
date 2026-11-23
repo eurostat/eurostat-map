@@ -82,14 +82,14 @@
                 }
                 const labelOffsets = {
                     LEMD: [-92, -16],
-                    LEBL: [30, 2],
+                    LEBL: [17, 12],
                     LEPA: [8, 6],
-                    LIRF: [14, -16],
-                    LICC: [8, -6],
-                    LPPT: [-47, -5],
+                    LIRF: [14, -1],
+                    LICC: [5, 5],
+                    LPPT: [-45, 5],
                     GCLP: [-20, 25],
                     GCXO: [-62, -12],
-                    LFPO: [8, -6],
+                    LFPO: [5, 6],
                 }
                 const airportLabels = graph.nodes.map(({ id, x, y }) => {
                     const [offsetX, offsetY] = labelOffsets[id]
@@ -142,11 +142,13 @@
                             const stackOrder = {
                                 LEMD: ['LPPT', 'GCXO', 'GCLP'], // Madrid: Lisbon, then Tenerife North, then Gran Canaria
                                 LIRF: ['LEMD', 'LEBL'], // Rome: Madrid above Barcelona
+                                LEPA: ['LEBL', 'LEMD'], // Palma: Barcelona above Madrid
                             }
                             const node = (d) => (d.at === 'out' ? d.link.source : d.link.target).id
                             const otherEnd = (d) => (d.at === 'out' ? d.link.target : d.link.source).id
                             const ranks = stackOrder[node(a)]
-                            if (ranks && ranks.includes(otherEnd(a)) && ranks.includes(otherEnd(b))) return ranks.indexOf(otherEnd(a)) - ranks.indexOf(otherEnd(b))
+                            if (ranks && ranks.includes(otherEnd(a)) && ranks.includes(otherEnd(b)))
+                                return ranks.indexOf(otherEnd(a)) - ranks.indexOf(otherEnd(b))
                             const angle = (d) => Math.atan2(d.otherY - d.nodeY, d.otherX - d.nodeX)
                             return angle(a) - angle(b) || (b.link.value ?? 0) - (a.link.value ?? 0)
                         },
