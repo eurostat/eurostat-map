@@ -29,7 +29,7 @@
             // the reusable settings panel (Eurostat UI components), shared by the examples
             import { createPanel } from '../vendor/example-panel.js'
 
-            const state = { palette: 'teal', classes: 7, type: 'discrete', pivot: 0 }
+            const state = { palette: 'teal', classes: 7, type: 'discrete', stretch: 'linear', pivot: 0 }
             // diverging schemes join two hues, e.g. 'cobalt-plum'; single hues are just 'teal'
             const isDiverging = () => state.palette.includes('-')
             let map
@@ -117,6 +117,21 @@
                     render()
                 },
             })
+            panel.select({
+                id: 'stretch',
+                label: 'Colour stretching',
+                value: state.stretch,
+                options: [
+                    { value: 'linear', label: 'Linear' },
+                    { value: 'sqrt', label: 'Square root' },
+                    { value: 'cbrt', label: 'Cube root' },
+                    { value: 'log', label: 'Logarithmic' },
+                ],
+                onChange: (v) => {
+                    state.stretch = v
+                    render()
+                },
+            })
             panel.range({
                 id: 'pivot',
                 label: 'Point of divergence',
@@ -179,6 +194,7 @@
             function render() {
                 // controls that only apply to some choices
                 panel.show('classes', state.type === 'discrete')
+                panel.show('stretch', state.type === 'continuous') // spreads the colours over the values: sqrt and log lift the low end
                 panel.show('pivot', isDiverging())
 
                 const dataset = isDiverging() ? datasets.diverging : datasets.sequential
@@ -193,6 +209,7 @@
                     .encoding('fill', { stat: 'value' })
                     .legend({ x: 10, y: 130, title: dataset.legendTitle, boxOpacity: 0 })
                     .colorSchemeType(state.type)
+                    .colorStretch(state.stretch)
                     .numberOfClasses(state.classes)
                     .colors(state.palette) // a palette name, e.g. 'teal' or 'cobalt-plum'
                 if (dataset.nutsYear) map.nutsYear(dataset.nutsYear)

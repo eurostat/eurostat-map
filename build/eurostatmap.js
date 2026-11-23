@@ -21639,6 +21639,55 @@ function divergingPalette(name, n) {
 
 /***/ },
 
+/***/ "./src/core/color-stretch.js"
+/*!***********************************!*\
+  !*** ./src/core/color-stretch.js ***!
+  \***********************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   COLOR_STRETCHES: () => (/* binding */ COLOR_STRETCHES),
+/* harmony export */   colorStretch: () => (/* binding */ colorStretch)
+/* harmony export */ });
+// Named "stretching" of the value-to-colour mapping of continuous colour schemes, as a
+// valueTransform / valueUntransform pair for the choropleth layer.
+
+/** Names of the available stretches. 'linear' leaves the values as they are. */
+const COLOR_STRETCHES = ['linear', 'sqrt', 'cbrt', 'log']
+
+// [curve, inverse] applied to the distance from the reference value
+const CURVES = {
+    sqrt: [Math.sqrt, (u) => u * u],
+    cbrt: [Math.cbrt, (u) => u * u * u],
+    log: [Math.log1p, Math.expm1],
+}
+
+/**
+ * The transform and untransform functions of a stretch. The stretch is applied to the distance from a
+ * reference value (the point of divergence, or the lowest value of a sequential scheme) and keeps its sign,
+ * so it also works for negative values and leaves the reference where it is.
+ * @param {string} name one of COLOR_STRETCHES
+ * @param {number} [reference=0]
+ * @returns {{transform: (v: number) => number, untransform: (v: number) => number}}
+ */
+function colorStretch(name, reference = 0) {
+    if (name === 'linear') return { transform: (v) => v, untransform: (v) => v }
+    const curve = CURVES[name]
+    if (!curve) throw new Error('Unknown colour stretch: ' + name + '. Available: ' + COLOR_STRETCHES.join(', '))
+    const [forward, inverse] = curve
+    return {
+        transform: (v) => {
+            const d = v - reference
+            return Math.sign(d) * forward(Math.abs(d))
+        },
+        untransform: (u) => reference + Math.sign(u) * inverse(Math.abs(u)),
+    }
+}
+
+
+/***/ },
+
 /***/ "./src/core/decoration/annotations.js"
 /*!********************************************!*\
   !*** ./src/core/decoration/annotations.js ***!
@@ -33576,6 +33625,7 @@ const buildSingleLayerMap = function (type, config) {
             'colorSchemeType_',
             'valueTransform_',
             'valueUntransform_',
+            'colorStretch_',
             'pointOfDivergence_',
             'skipNormalization_',
             'filtersDefinitionFunction_',
@@ -33596,6 +33646,7 @@ const buildSingleLayerMap = function (type, config) {
             'colorSchemeType',
             'valueTransform',
             'valueUntransform',
+            'colorStretch',
             'pointOfDivergence',
             'skipNormalization',
             'threshold',
@@ -36194,15 +36245,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/lab.js");
 /* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/piecewise.js");
 /* harmony import */ var _core_color_palettes__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../core/color-palettes */ "./src/core/color-palettes.js");
-/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../core/stat-map */ "./src/core/stat-map.js");
-/* harmony import */ var _core_layer_registry__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../core/layer-registry */ "./src/core/layer-registry.js");
-/* harmony import */ var _legend_choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../legend/choropleth/legend-choropleth */ "./src/legend/choropleth/legend-choropleth.js");
-/* harmony import */ var _core_decoration_ranked_bar_chart__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../core/decoration/ranked-bar-chart */ "./src/core/decoration/ranked-bar-chart.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
-/* harmony import */ var simple_statistics__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! simple-statistics */ "./node_modules/simple-statistics/dist/simple-statistics.mjs");
-/* harmony import */ var _core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../core/decoration/pattern-fill */ "./src/core/decoration/pattern-fill.js");
-/* harmony import */ var _legend_legend_utils__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../../legend/legend-utils */ "./src/legend/legend-utils.js");
+/* harmony import */ var _core_color_stretch__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../core/color-stretch */ "./src/core/color-stretch.js");
+/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../core/stat-map */ "./src/core/stat-map.js");
+/* harmony import */ var _core_layer_registry__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../core/layer-registry */ "./src/core/layer-registry.js");
+/* harmony import */ var _legend_choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../legend/choropleth/legend-choropleth */ "./src/legend/choropleth/legend-choropleth.js");
+/* harmony import */ var _core_decoration_ranked_bar_chart__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../core/decoration/ranked-bar-chart */ "./src/core/decoration/ranked-bar-chart.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var simple_statistics__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! simple-statistics */ "./node_modules/simple-statistics/dist/simple-statistics.mjs");
+/* harmony import */ var _core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../../core/decoration/pattern-fill */ "./src/core/decoration/pattern-fill.js");
+/* harmony import */ var _legend_legend_utils__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../../legend/legend-utils */ "./src/legend/legend-utils.js");
 //map-choropleth.js
+
 
 
 
@@ -36229,7 +36282,7 @@ __webpack_require__.r(__webpack_exports__);
  * @returns {ChoroplethMap}
  */
 const map = function (config) {
-    return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_10__.buildSingleLayerMap)('choropleth', config)
+    return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_11__.buildSingleLayerMap)('choropleth', config)
 }
 
 /**
@@ -36269,6 +36322,7 @@ const decorateChoroplethLayer = function (layer, config) {
     layer.colorSchemeType_ = 'discrete' // or 'continuous'
     layer.valueTransform_ = (x) => x // for distribution stretching in continuous mode
     layer.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
+    layer.colorStretch_ = null // named stretching of a continuous scheme: 'linear', 'sqrt', 'cbrt' or 'log' (sets valueTransform/valueUntransform)
     layer.skipNormalization_ = false // whether to skip normalization step for continuous color schemes (e.g. for pre-normalized data like quantile)
     layer.pointOfDivergence_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
 
@@ -36289,6 +36343,7 @@ const decorateChoroplethLayer = function (layer, config) {
         'colorSchemeType_',
         'valueTransform_',
         'valueUntransform_',
+        'colorStretch_',
         'pointOfDivergence_',
         'skipNormalization_',
     ]
@@ -36405,7 +36460,7 @@ const decorateChoroplethLayer = function (layer, config) {
             const map = layer.map
             // apply classification to all insets that are outside of the main map's SVG
             if (map.insetTemplates_) {
-                (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.executeForAllInsets)(map.insetTemplates_, map.svgId_, applyClassificationToMap)
+                (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.executeForAllInsets)(map.insetTemplates_, map.svgId_, applyClassificationToMap)
             }
 
             // apply to main map
@@ -36445,6 +36500,13 @@ const decorateChoroplethLayer = function (layer, config) {
                 const range = generateRange(layer.numberOfClasses_)
 
                 if (layer.colorSchemeType_ === 'continuous') {
+                    if (layer.colorStretch_) {
+                        // stretch the distance from the point of divergence, or from the lowest value
+                        const reference = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.checkIfDiverging)(layer) ? (layer.pointOfDivergence_ ?? 0) : (0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])(dataArrayNumeric)
+                        const { transform, untransform } = (0,_core_color_stretch__WEBPACK_IMPORTED_MODULE_10__.colorStretch)(layer.colorStretch_, reference)
+                        layer.valueTransform_ = transform
+                        layer.valueUntransform_ = untransform
+                    }
                     const valueTransform = layer.valueTransform_ || ((d) => d)
 
                     if (layer.skipNormalization_) {
@@ -36455,7 +36517,7 @@ const decorateChoroplethLayer = function (layer, config) {
                         const transformedValues = dataArrayNumeric.map(valueTransform)
                         const minVal = (0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])(transformedValues)
                         const maxVal = (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(transformedValues)
-                        const isDiverging = (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.checkIfDiverging)(layer)
+                        const isDiverging = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.checkIfDiverging)(layer)
                         const isFullScale = typeof layer.colorFunction_?.domain === 'function'
 
                         if (!isFullScale) {
@@ -36498,7 +36560,7 @@ const decorateChoroplethLayer = function (layer, config) {
                         // alone so the legend still shows its configured number of classes/colors;
                         // any classes beyond what the data supports simply end up unused.
                         const nClasses = Math.min(layer.numberOfClasses_, dataArrayNumeric.length) || 1
-                        const jenksBreaks = (0,simple_statistics__WEBPACK_IMPORTED_MODULE_15__.jenks)(dataArrayNumeric, nClasses) //data, lowerClassLimits, nClasses
+                        const jenksBreaks = (0,simple_statistics__WEBPACK_IMPORTED_MODULE_16__.jenks)(dataArrayNumeric, nClasses) //data, lowerClassLimits, nClasses
                         const domain = jenksBreaks ? jenksBreaks.slice(1, -1) : []
                         layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_5__["default"])().domain(domain).range(range))
                         break
@@ -36508,7 +36570,7 @@ const decorateChoroplethLayer = function (layer, config) {
                         // for more classes than there are data points - guard the zero-data case
                         // explicitly rather than relying on the clamp below to avoid it.
                         const nClasses = Math.min(layer.numberOfClasses_, dataArrayNumeric.length)
-                        const domain = nClasses > 0 ? (0,simple_statistics__WEBPACK_IMPORTED_MODULE_15__.ckmeans)(dataArrayNumeric, nClasses).map((cluster) => cluster.pop()).slice(0, -1) : []
+                        const domain = nClasses > 0 ? (0,simple_statistics__WEBPACK_IMPORTED_MODULE_16__.ckmeans)(dataArrayNumeric, nClasses).map((cluster) => cluster.pop()).slice(0, -1) : []
                         layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_5__["default"])().domain(domain).range(range))
                         break
                     }
@@ -36517,7 +36579,7 @@ const decorateChoroplethLayer = function (layer, config) {
                 // For quantile, keep exact quantile thresholds so class counts stay balanced.
                 if (layer.makeClassifNice_) {
                     const rawThresholds = layer.classifier_.domain()
-                    const niceThresholds = (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.applyNiceNumbers)(rawThresholds, dataArrayNumeric)
+                    const niceThresholds = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.applyNiceNumbers)(rawThresholds, dataArrayNumeric)
                     layer.classifier_.domain(niceThresholds)
                 }
             }
@@ -36545,7 +36607,7 @@ const decorateChoroplethLayer = function (layer, config) {
                     // otherwise numeric/discrete classification - takes priority over
                     // both numeric classification and the generic no-data handling below
                     if (layer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(layer.categoryFillStyle_, value)) {
-                        sel.attr('ecl', (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.toCategoryEcl)(value))
+                        sel.attr('ecl', (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.toCategoryEcl)(value))
                         return
                     }
 
@@ -36570,7 +36632,7 @@ const decorateChoroplethLayer = function (layer, config) {
             setupClassifier()
 
             if (map.svg_) {
-                const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.getRegionsSelector)(map)
+                const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getRegionsSelector)(map)
                 classifyRegions(map.svg().selectAll(selector))
 
                 if (map.nutsLevel_ === 'mixed') {
@@ -36587,7 +36649,7 @@ const decorateChoroplethLayer = function (layer, config) {
             const map = layer.map
             // apply style to insets
             if (map.insetTemplates_) {
-                (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.executeForAllInsets)(map.insetTemplates_, map.svgId_, applyStyleToMap)
+                (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.executeForAllInsets)(map.insetTemplates_, map.svgId_, applyStyleToMap)
             }
 
             // apply to main map
@@ -36612,7 +36674,7 @@ const decorateChoroplethLayer = function (layer, config) {
 
         // Apply color and events to regions if SVG exists
         if (map.svg_) {
-            const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.getRegionsSelector)(map)
+            const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getRegionsSelector)(map)
             const regions = map.svg().selectAll(selector)
 
             const finalizeRegionStyling = () => {
@@ -36630,7 +36692,7 @@ const decorateChoroplethLayer = function (layer, config) {
                         .selectAll('.em-grid-text')
                         .each(function () {
                             const cellColor = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this.parentNode).style('fill')
-                            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('fill', (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.getTextColorForBackground)(cellColor))
+                            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('fill', (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getTextColorForBackground)(cellColor))
                         })
                 }
             }
@@ -36670,25 +36732,25 @@ const decorateChoroplethLayer = function (layer, config) {
 
             //add hatching if needed
             if (map.patternFill_) {
-                (0,_core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_16__.applyPatternFill)(map, map.patternFill_)
+                (0,_core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_17__.applyPatternFill)(map, map.patternFill_)
             }
         }
     }
 
     //@override
     layer.getLegendConstructor = function () {
-        return _legend_choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_12__.legend
+        return _legend_choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_13__.legend
     }
 
     //@override
     layer.getRankedBarChartConstructor = function () {
-        return _core_decoration_ranked_bar_chart__WEBPACK_IMPORTED_MODULE_13__.rankedBarChart
+        return _core_decoration_ranked_bar_chart__WEBPACK_IMPORTED_MODULE_14__.rankedBarChart
     }
 
     // when mixing different NUTS levels (e.g. showing NUTS 1 and NUTS 2 data simultaneously)
     const styleMixedNUTS = function (map) {
         map.svg()
-            .selectAll((0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.getRegionsSelector)(map))
+            .selectAll((0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getRegionsSelector)(map))
             .each(function () {
                 if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
                 const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
@@ -36725,7 +36787,7 @@ const decorateChoroplethLayer = function (layer, config) {
         }
 
         // Extra categorical value mixed into this classification
-        const categoryValue = (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.fromCategoryEcl)(ecl)
+        const categoryValue = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.fromCategoryEcl)(ecl)
         if (categoryValue !== undefined) {
             return (layer.categoryFillStyle_ && layer.categoryFillStyle_[categoryValue]) || layer.noDataFillStyle_ || 'gray'
         }
@@ -36785,7 +36847,7 @@ const decorateChoroplethLayer = function (layer, config) {
         const map = layer.map
         if (!map.svg_) return layer
 
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.getRegionsSelector)(map)
+        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getRegionsSelector)(map)
         const region = map
             .svg()
             .selectAll(selector)
@@ -36828,7 +36890,7 @@ const decorateChoroplethLayer = function (layer, config) {
         const map = layer.map
         if (!map.svg_) return layer
 
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.getRegionsSelector)(map)
+        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getRegionsSelector)(map)
         map.svg()
             .selectAll(selector)
             .each(function () {
@@ -36888,18 +36950,18 @@ const getFillPatternLegend = function () {
  * comments.md's tooltip decimal-truncation item for the reasoning.
  */
 function formatTooltipValue(value, statData, tooltipConfig) {
-    if (typeof value !== 'number' || !Number.isFinite(value)) return (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.spaceAsThousandSeparator)(value)
+    if (typeof value !== 'number' || !Number.isFinite(value)) return (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.spaceAsThousandSeparator)(value)
 
     const decimals =
         typeof tooltipConfig?.decimals === 'number'
             ? tooltipConfig.decimals
-            : (0,_legend_legend_utils__WEBPACK_IMPORTED_MODULE_17__.getMaxDomainPrecision)({ domain: () => [0, (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])((statData.getArray?.() || []).map((v) => +v).filter(Number.isFinite)) ?? value] })
+            : (0,_legend_legend_utils__WEBPACK_IMPORTED_MODULE_18__.getMaxDomainPrecision)({ domain: () => [0, (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])((statData.getArray?.() || []).map((v) => +v).filter(Number.isFinite)) ?? value] })
 
     // toFixed()'s decimal part is kept as a literal string (spaceAsThousandSeparator/toLocaleString
     // would round-trip through Number and re-drop trailing zeros, e.g. Number("7.0") === 7).
     // Only the integer part goes through the normal thousand-separator formatting.
     const [integerPart, decimalPart] = value.toFixed(decimals).split('.')
-    const formattedInteger = (0,_core_utils__WEBPACK_IMPORTED_MODULE_14__.spaceAsThousandSeparator)(Number(integerPart))
+    const formattedInteger = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.spaceAsThousandSeparator)(Number(integerPart))
     return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger
 }
 
@@ -36970,7 +37032,7 @@ const choroplethTooltipFunction = function (region, layer) {
     // Optional status flag
     const statusFlag = sv.status
     if (statusFlag && layer.map.tooltip_.showFlags) {
-        const flagText = layer.map.tooltip_.showFlags === 'short' ? statusFlag : _core_utils__WEBPACK_IMPORTED_MODULE_14__.flags[statusFlag] || statusFlag
+        const flagText = layer.map.tooltip_.showFlags === 'short' ? statusFlag : _core_utils__WEBPACK_IMPORTED_MODULE_15__.flags[statusFlag] || statusFlag
         buf.push(` <span class="status-flag">${flagText}</span>`)
     }
 
@@ -37005,8 +37067,8 @@ function getContinuousColor(value, layer) {
     return colorFn(Math.min(Math.max(t, 0), 1))
 }
 
-(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_11__.registerLayerType)('choropleth', 'base', decorateChoroplethLayer)
-;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_11__.registerLayerType)('ch', 'base', decorateChoroplethLayer)
+(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_12__.registerLayerType)('choropleth', 'base', decorateChoroplethLayer)
+;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_12__.registerLayerType)('ch', 'base', decorateChoroplethLayer)
 
 
 /***/ },

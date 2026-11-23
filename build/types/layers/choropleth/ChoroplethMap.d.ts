@@ -41,6 +41,10 @@ export interface ChoroplethMap extends MapInstance {
     valueUntransform(): (x: number) => number
     valueUntransform(v: (x: number) => number): this
 
+    /** Named stretching of the colour distribution of a continuous scheme (it sets valueTransform and valueUntransform). @default null */
+    colorStretch(): 'linear' | 'sqrt' | 'cbrt' | 'log' | null
+    colorStretch(stretch: 'linear' | 'sqrt' | 'cbrt' | 'log' | null): this
+
     pointOfDivergence(): number | null
     pointOfDivergence(v: number | null): this
 

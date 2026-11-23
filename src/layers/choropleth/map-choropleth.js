@@ -14,6 +14,7 @@ import {
     divergingPalette,
     divergingClassColors,
 } from '../../core/color-palettes'
+import { colorStretch } from '../../core/color-stretch'
 import { createStatMap, buildSingleLayerMap } from '../../core/stat-map'
 import { registerLayerType } from '../../core/layer-registry'
 import * as ChoroplethLegend from '../../legend/choropleth/legend-choropleth'
@@ -84,6 +85,7 @@ export const decorateChoroplethLayer = function (layer, config) {
     layer.colorSchemeType_ = 'discrete' // or 'continuous'
     layer.valueTransform_ = (x) => x // for distribution stretching in continuous mode
     layer.valueUntransform_ = (x) => x // the legends need to 'untransform' the value to show the original value
+    layer.colorStretch_ = null // named stretching of a continuous scheme: 'linear', 'sqrt', 'cbrt' or 'log' (sets valueTransform/valueUntransform)
     layer.skipNormalization_ = false // whether to skip normalization step for continuous color schemes (e.g. for pre-normalized data like quantile)
     layer.pointOfDivergence_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
 
@@ -104,6 +106,7 @@ export const decorateChoroplethLayer = function (layer, config) {
         'colorSchemeType_',
         'valueTransform_',
         'valueUntransform_',
+        'colorStretch_',
         'pointOfDivergence_',
         'skipNormalization_',
     ]
@@ -260,6 +263,13 @@ export const decorateChoroplethLayer = function (layer, config) {
                 const range = generateRange(layer.numberOfClasses_)
 
                 if (layer.colorSchemeType_ === 'continuous') {
+                    if (layer.colorStretch_) {
+                        // stretch the distance from the point of divergence, or from the lowest value
+                        const reference = checkIfDiverging(layer) ? (layer.pointOfDivergence_ ?? 0) : min(dataArrayNumeric)
+                        const { transform, untransform } = colorStretch(layer.colorStretch_, reference)
+                        layer.valueTransform_ = transform
+                        layer.valueUntransform_ = untransform
+                    }
                     const valueTransform = layer.valueTransform_ || ((d) => d)
 
                     if (layer.skipNormalization_) {
