@@ -11,45 +11,31 @@
                 margin: 0;
             }
 
-            .flight-controls {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 8px 16px;
-                max-width: 1042px;
-                padding: 8px;
-                font: 13px Arial, sans-serif;
-                color: #383838;
+            :root {
+                --eu-blue: #0e47cb;
+                --eu-blue-light: #e8eefb;
+                --eu-text: #383838;
+                --eu-muted: #666;
+                --eu-border: #ccc;
+                --eu-surface: #f5f5f5;
             }
 
-            .flight-controls label {
-                display: flex;
-                flex-direction: column;
-                gap: 2px;
+            body {
+                font: 14px/1.4 Arial, sans-serif;
+                color: var(--eu-text);
             }
 
-            .flight-controls label.toggle {
-                flex-direction: row;
-                align-items: center;
-                gap: 6px;
-            }
-
-            .flight-controls select,
-            .flight-controls input[type='range'] {
-                width: 100%;
-                box-sizing: border-box;
-            }
-
+            /* ---- layout: controls panel beside the map, stacked on narrow screens ---- */
             .flight-layout {
                 display: grid;
-                grid-template-columns: minmax(0, 795px) 235px;
-                grid-template-areas: 'map details';
+                grid-template-columns: 270px minmax(0, 795px);
                 align-items: start;
-                gap: 12px;
-                padding-right: 8px;
+                gap: 16px;
+                padding: 8px;
             }
 
             #flight-map {
-                grid-area: map;
+                min-width: 0;
             }
 
             #map {
@@ -58,19 +44,244 @@
                 height: auto;
             }
 
-            .flight-details {
-                grid-area: details;
-                margin-top: 8px;
-                font: 14px Arial, sans-serif;
-                color: #383838;
+            /* ---- controls panel ---- */
+            .flight-controls {
+                border: 1px solid var(--eu-border);
+                border-top: 4px solid var(--eu-blue);
+                background: #fff;
+            }
+
+            .flight-controls summary {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 14px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                list-style: none;
+            }
+
+            .flight-controls summary::-webkit-details-marker {
+                display: none;
+            }
+
+            .flight-controls summary::after {
+                content: '';
+                width: 8px;
+                height: 8px;
+                border-right: 2px solid var(--eu-blue);
+                border-bottom: 2px solid var(--eu-blue);
+                transform: rotate(45deg);
+                transition: transform 0.15s ease;
+            }
+
+            .flight-controls[open] summary::after {
+                transform: rotate(-135deg);
+            }
+
+            .flight-controls form {
+                padding: 0 14px 14px;
+            }
+
+            .flight-controls fieldset {
+                margin: 0;
+                padding: 12px 0;
+                border: 0;
+                border-top: 1px solid #e3e3e3;
+                display: grid;
+                gap: 12px;
+            }
+
+            .flight-controls legend {
+                padding: 0;
+                margin-bottom: 2px;
+                font-size: 12px;
+                font-weight: bold;
+                letter-spacing: 0.04em;
+                text-transform: uppercase;
+                color: var(--eu-blue);
+            }
+
+            .field {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                font-weight: bold;
+            }
+
+            .field-head {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+            }
+
+            .field output {
+                font-weight: normal;
+                color: var(--eu-muted);
+                font-variant-numeric: tabular-nums;
+            }
+
+            select {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 7px 10px;
+                font: inherit;
+                font-weight: normal;
+                color: var(--eu-text);
+                background: #fff;
+                border: 1px solid var(--eu-border);
+                border-radius: 4px;
+            }
+
+            select:hover {
+                border-color: var(--eu-blue);
+            }
+
+            input[type='range'] {
+                width: 100%;
+                margin: 4px 0;
+                accent-color: var(--eu-blue);
+            }
+
+            :is(select, input, button, summary):focus-visible {
+                outline: 2px solid var(--eu-blue);
+                outline-offset: 2px;
+            }
+
+            /* segmented control: mutually exclusive options as adjoining buttons */
+            .segmented {
+                display: flex;
+                border: 1px solid var(--eu-border);
+                border-radius: 6px;
+                overflow: hidden;
+            }
+
+            .segmented input {
+                position: absolute;
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .segmented label {
+                flex: 1;
+                padding: 8px 6px;
+                text-align: center;
+                font-weight: normal;
+                cursor: pointer;
+                user-select: none;
+                background: #fff;
+                transition:
+                    background-color 0.15s ease,
+                    color 0.15s ease;
+            }
+
+            .segmented label:not(:last-of-type) {
+                border-right: 1px solid var(--eu-border);
+            }
+
+            .segmented label:hover {
+                background: var(--eu-blue-light);
+            }
+
+            .segmented input:checked + label {
+                background: var(--eu-blue);
+                color: #fff;
+                font-weight: bold;
+            }
+
+            .segmented input:focus-visible + label {
+                outline: 2px solid var(--eu-blue);
+                outline-offset: -2px;
+            }
+
+            /* on/off switches */
+            .switch {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                cursor: pointer;
+            }
+
+            .switch input {
+                appearance: none;
+                flex: none;
+                position: relative;
+                width: 38px;
+                height: 22px;
+                margin: 0;
+                border-radius: 11px;
+                background: #b5b5b5;
+                cursor: pointer;
+                transition: background-color 0.15s ease;
+            }
+
+            .switch input::after {
+                content: '';
+                position: absolute;
+                top: 3px;
+                left: 3px;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #fff;
+                transition: transform 0.15s ease;
+            }
+
+            .switch input:checked {
+                background: var(--eu-blue);
+            }
+
+            .switch input:checked::after {
+                transform: translateX(16px);
+            }
+
+            .controls-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding-top: 12px;
+                border-top: 1px solid #e3e3e3;
+            }
+
+            #summary {
+                margin: 0;
+                color: var(--eu-muted);
+            }
+
+            #reset-controls {
+                padding: 7px 14px;
+                font: inherit;
+                font-weight: bold;
+                color: var(--eu-blue);
+                background: #fff;
+                border: 1px solid var(--eu-blue);
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+            #reset-controls:hover {
+                background: var(--eu-blue);
+                color: #fff;
             }
 
             #empty-legend {
-                margin-top: 8px;
+                padding: 8px 10px;
+                border-radius: 4px;
+                background: var(--eu-surface);
+                font-size: 13px;
+            }
+
+            #empty-legend[hidden] {
+                display: none;
             }
 
             #empty-legend .ramp {
                 height: 10px;
+                margin: 4px 0 2px;
                 border: 1px solid #d5d5d5;
                 background: linear-gradient(to right, var(--ramp));
             }
@@ -78,19 +289,12 @@
             #empty-legend .ramp-labels {
                 display: flex;
                 justify-content: space-between;
+                color: var(--eu-muted);
             }
 
-            @media (max-width: 640px) {
+            @media (max-width: 900px) {
                 .flight-layout {
                     grid-template-columns: minmax(0, 1fr);
-                    grid-template-areas: 'details' 'map';
-                    padding-right: 0;
-                }
-
-                .flight-details {
-                    justify-self: end;
-                    width: min(235px, calc(100% - 16px));
-                    margin-right: 8px;
                 }
             }
 
@@ -116,33 +320,58 @@
     </head>
 
     <body>
-        <form class="flight-controls" id="controls" onsubmit="return false">
-            <label>Airport <select id="airport"></select></label>
-            <label>
-                Line width means...
-                <select id="theme">
-                    <option>Passengers carried</option>
-                    <option>Empty seats</option>
-                </select>
-            </label>
-            <label>Show top N flights: <output id="topN-out"></output><input id="topN" type="range" min="0" max="1600" step="10" value="800" /></label>
-            <label>Max line width: <output id="maxWidth-out"></output><input id="maxWidth" type="range" min="0.5" max="20" step="0.5" value="10" /></label>
-            <label>Line opacity: <output id="opacity-out"></output><input id="opacity" type="range" min="0.1" max="1" step="0.1" value="0.2" /></label>
-            <label class="toggle"><input id="emptySeats" type="checkbox" /> Colour lines by empty seats</label>
-            <label class="toggle"><input id="bundling" type="checkbox" checked /> Edge bundling</label>
-            <label class="toggle"><input id="merge" type="checkbox" checked /> Merge flows (to and from)</label>
-            <label class="toggle"><input id="voronoi" type="checkbox" /> Voronoi</label>
-            <label class="toggle"><input id="animate" type="checkbox" /> Animate</label>
-        </form>
         <div class="flight-layout">
+            <details class="flight-controls" open>
+                <summary>Map controls</summary>
+                <form id="controls" onsubmit="return false">
+                    <fieldset>
+                        <legend>Data</legend>
+                        <label class="field">Airport <select id="airport"></select></label>
+                        <div class="field" role="radiogroup" aria-labelledby="theme-label">
+                            <span id="theme-label">Line width means</span>
+                            <div class="segmented">
+                                <input type="radio" name="theme" id="theme-pax" value="Passengers carried" checked />
+                                <label for="theme-pax">Passengers</label>
+                                <input type="radio" name="theme" id="theme-empty" value="Empty seats" />
+                                <label for="theme-empty">Empty seats</label>
+                            </div>
+                        </div>
+                        <label class="field">
+                            <span class="field-head">Show top flights <output id="topN-out" for="topN"></output></span>
+                            <input id="topN" type="range" min="0" max="1600" step="10" value="800" />
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Lines</legend>
+                        <label class="field">
+                            <span class="field-head">Max line width <output id="maxWidth-out" for="maxWidth"></output></span>
+                            <input id="maxWidth" type="range" min="0.5" max="20" step="0.5" value="10" />
+                        </label>
+                        <label class="field">
+                            <span class="field-head">Line opacity <output id="opacity-out" for="opacity"></output></span>
+                            <input id="opacity" type="range" min="0.1" max="1" step="0.1" value="0.2" />
+                        </label>
+                        <label class="switch"><span>Colour lines by empty seats</span><input id="emptySeats" type="checkbox" role="switch" /></label>
+                        <div id="empty-legend" hidden>
+                            Share of seats that are empty (%)
+                            <div class="ramp"></div>
+                            <div class="ramp-labels"><span id="empty-min"></span><span id="empty-max"></span></div>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend>Display</legend>
+                        <label class="switch"><span>Edge bundling</span><input id="bundling" type="checkbox" role="switch" checked /></label>
+                        <label class="switch"><span>Merge flows (to and from)</span><input id="merge" type="checkbox" role="switch" checked /></label>
+                        <label class="switch"><span>Voronoi cells</span><input id="voronoi" type="checkbox" role="switch" /></label>
+                        <label class="switch"><span>Animate</span><input id="animate" type="checkbox" role="switch" /></label>
+                    </fieldset>
+                    <div class="controls-footer">
+                        <p id="summary" aria-live="polite"></p>
+                        <button type="button" id="reset-controls">Reset</button>
+                    </div>
+                </form>
+            </details>
             <div id="flight-map"><svg id="map"></svg></div>
-            <aside class="flight-details">
-                <div id="empty-legend" hidden>
-                    Share of seats that are empty (%)
-                    <div class="ramp"></div>
-                    <div class="ramp-labels"><span id="empty-min"></span><span id="empty-max"></span></div>
-                </div>
-            </aside>
         </div>
 
         <script src="../../../build/eurostatmap.js"></script>
@@ -169,7 +398,7 @@
             function readSettings() {
                 return {
                     airport: $('airport').value,
-                    theme: $('theme').value, // 'Passengers carried' | 'Empty seats'
+                    theme: document.querySelector('input[name=theme]:checked').value, // 'Passengers carried' | 'Empty seats'
                     topN: +$('topN').value, // 0 = all flights
                     maxWidth: +$('maxWidth').value,
                     opacity: +$('opacity').value,
@@ -300,6 +529,7 @@
                 $('opacity-out').textContent = s.opacity
 
                 const flights = selectFlights(s)
+                $('summary').textContent = `${fmt(flights.length)} flight${flights.length === 1 ? '' : 's'} shown`
                 const flightsByKey = new Map(flights.map((f) => [f.origin + '|' + f.destination, f]))
                 const graph = toFlowGraph({
                     airports: data.airports,
@@ -412,10 +642,17 @@
                     .build()
             }
 
+            // on narrow screens start with the controls folded away so the map is visible straight away
+            if (window.matchMedia('(max-width: 900px)').matches) document.querySelector('.flight-controls').open = false
+
             let timer
             $('controls').addEventListener('input', () => {
                 clearTimeout(timer)
                 timer = setTimeout(render, 150)
+            })
+            $('reset-controls').addEventListener('click', () => {
+                $('controls').reset()
+                render()
             })
             render()
         </script>
