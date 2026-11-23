@@ -292,6 +292,8 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
 
 - Edition folders use the dissemination year. Map titles and data use the reference year
   in the supplied workbook. Keep legacy page URLs working when archiving an edition.
+- Maritime edition roots serve the publication maps and hold their export assets. Update the
+  Statistics Explained index and regenerate the example manifest when moving map pages.
 - The archived maritime world-flow pages use the main `build/eurostatmap.js` bundle. The old
   Statistics Explained bundle can fail on current world geometry with an undefined `features`
   error. Apply label offsets to the matching `em-label-halo-*` IDs too, so the white halos stay aligned in PNG exports.

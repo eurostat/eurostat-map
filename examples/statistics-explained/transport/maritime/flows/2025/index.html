@@ -9,7 +9,14 @@
 </head>
 
 <body style="margin:0">
-    <svg id="maritime-flow-map"></svg>
+    <div>
+        <button id="export-png-btn" type="button">Export map as PNG</button>
+        <button id="export-svg-btn" type="button">Export map as SVG</button>
+    </div>
+    <div>
+        <svg id="maritime-flow-map"></svg>
+    </div>
+
 
     <script src="../../../../../../build/eurostatmap.js"></script>
     <script src="../../../../d3.v7.min.js"></script>
@@ -45,8 +52,25 @@
             .hoverColor('#ffc700')
             .width(width)
             .height(height)
-            .title("Top 20 main extra-EU flows")
-            .subtitle("by gross weight of goods handled in main ports, EU, 2024")
+            .title("Top 20 extra-EU maritime flows")
+            .subtitle("by gross weight of goods handled in main ports, 2024")
+
+            //static settings
+            .header(true)
+            .footer(true)
+            .zoomButtons(false)
+            .showEstatLogo(true)
+            .showEstatRibbon(true)
+            .logoPosition([2, height + 65])
+            .ribbonPosition([width - 180, height + 40])
+            .ribbonWidth(300)
+            .ribbonHeight(50)
+            .footnote(
+                "<tspan style='font-style: italic;'>Source</tspan>: Eurostat (mar_go)"
+            )
+            .footnotePosition([4, 20])
+            .footerPadding(20)
+            //end static settings
 
             //projection
             .projectionFunction(worldProjection)
@@ -55,18 +79,6 @@
             .geo("WORLD")
             .proj("4326")
             .scale("60M")
-
-            //static settings
-            .header(true)
-            .footer(true)
-            .zoomButtons(false)
-            .showEstatLogo(true)
-            .showEstatRibbon(true)
-            .logoPosition([2, height + 55])
-            .ribbonPosition([width - 180, height + 30])
-            .ribbonWidth(300)
-            .ribbonHeight(50)
-            //end static settings
 
             // flow settings
             .flowGraph(maritimeFlowGraph)
@@ -78,33 +90,29 @@
                     return map.flowRegionColors_[0];
                 },
             })
-            .flowSettings({ minWidth: 5, maxWidth: 30 })
-            //.flowLineType("straight")
-            .flowSettings({ lineType: "curved", nodeType: false ? 'donut' : 'circle', opacity: 0.9, arrows: false, outlines: true, outlineColor: 'white', outlineWidth: 1, colorGradient: false, widthGradient: false })
-            //.flowTopLocations(0)
-            //.flowWidthGradient(true)
-            .flowSettings({ stack: true })
+            .flowSettings({ minWidth: 5, maxWidth: 30, lineType: "curved", nodeType: false ? 'donut' : 'circle', opacity: 1, arrows: false, outlines: true, outlineColor: 'white', outlineWidth: 1, colorGradient: false, widthGradient: false, stack: true })
             .flowSettings({
                 curvatureSettings: {
                     gapX: 1,        // how far before/after node to begin/end curve
                     padX: 0,         // horizontal clearance near node stems
                     padY: 1,         // vertical collision detection padding
                     bumpY: 5,        // extra height for hop
-                    curvature: 0.3   // 0..1; default sankey smoothness
+                    curvature: 0.2  // 0..1; default sankey smoothness
                 },
-            }).flowSettings({ order: flowOrderFunction })
-
-
+            })
+            .flowSettings({ order: flowOrderFunction })
             .labels({
                 labels: getRegionLabels(maritimeFlowGraph),
-                shadows: true
+                shadows: true,
+                // values: true
             })
 
             // legend
             .legend({
-                x: width - 190,
-                y: height - 225,
+                x: width - 170,
+                y: height - 150,
                 boxPadding: 10,
+                boxOpacity: 1,
                 title: "Freight carried",
                 subtitle: "million tonnes",
                 flowWidthLegend: {
@@ -116,34 +124,44 @@
                 regionColorLegend: {
                     marginTop: 20,
                     title: " ",
-                    labels: ["Inwards (import)", "Outwards (export)"]
+                    labels: ["Inwards", "Outwards"]
                 }
             })
             // zoom min/max
             .zoomExtent([0.6, 10])
-            .zoomButtons(true)
+            .zoomButtons(false) //static map, no zoom buttons
             .lockPanUntilZoom(false)
-            .flowSettings({ regionColors: ["#2171b5", "#51824f"] })
-            .footnote(
-                "<tspan style='font-style: italic;'>Source</tspan>: Eurostat (mar_go)"
-            )
-
+            //.flowRegionColors(["#2171b5", "#51824f"])
+            .flowSettings({ regionColors: ['#007243', '#104F99'] }) // Eurostat green and blue
             .callback(() => {
+                const euCodes = ["AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "EL"]
+                // set fill of regions
+                const countries = d3.selectAll("#maritime-flow-map .em-worldrg path");
+                countries.style("fill", function (d) {
+                    if (d.id == 'MA') return map.flowRegionColors_[0]; // override 'majority exporter vs importer' fill rule for Morocco
+                    if (d.id == 'UK') return map.flowRegionColors_[0]; // override for United Kingdom
+
+                    if (euCodes.includes(d.id)) {
+                        return 'rgba(0, 51, 153, 0.4)'; // EU blue
+                    }
+                    // Do not change existing fill; return the current one
+                    return this.style.fill || this.getAttribute('fill') || null;
+                });
+
+
                 // --- REMOVE if it already exists ---
                 d3.select("#maritime-flow-map #em-footnote-2").remove();
                 d3.selectAll("#maritime-flow-map")
                     .append('text')
                     .attr('x', width - 310)
-                    .attr('y', height + 90)
+                    .attr('y', height + 110)
                     .attr('class', 'em-footnote')
                     .attr('id', 'em-footnote-2')
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
 
                 //annotations were causing z-index issues with labels
                 d3.selectAll("#em-labels").raise()
-            })
-            .tooltip({
-                textFunction: flowMapTooltipFunction
+
             })
             .annotations({
                 annotations: [
@@ -173,58 +191,17 @@
                 editMode: false
             })
 
-
             .build();
 
+        var exportBtnPNG = document.getElementById("export-png-btn");
+        exportBtnPNG.addEventListener("click", function () {
+            map.exportMapToPNG(width, 759.28);
+        });
 
-        function flowMapTooltipFunction(link, map) {
-            const buf = [];
-            const statData = map.statData();
-            const unit = statData.unitText() || '';
-
-            // ---- FIX: determine true origin/destination for split flows ----
-            const originId =
-                link.originId ??
-                (link.source.isMidpoint ? null : link.source.id);
-
-            const destId =
-                link.destId ??
-                (link.target.isMidpoint ? null : link.target.id);
-
-            const nodeById = map._nodeById || new Map();
-
-            const originNode = nodeById.get(originId) || { id: originId, name: originId };
-            const destNode = nodeById.get(destId) || { id: destId, name: destId };
-
-            const originName = originNode.name || originNode.id;
-            const destName = destNode.name || destNode.id;
-
-            // Header
-            const title = `${originName} to ${destName}`;
-            buf.push(`
-        <div class="em-tooltip-bar">
-            <b>${title}</b>
-        </div>
-    `);
-
-            // Value
-            buf.push(`
-        <div class='em-tooltip-text'>
-            <table class="em-tooltip-table">
-                <tbody>
-                    <tr>
-                        <td>Goods handled: ${(link.value / 1000000).toFixed(1)} million tonnes ${unit}</td>
-                    </tr>
-                      <tr>
-                        <td>Share of total extra-EU: ${(link.meta.share * 100).toFixed(1)}%</td>
-                        </tr>
-                </tbody>
-            </table>
-        </div>
-    `);
-
-            return buf.join('');
-        };
+        var exportBtnSVG = document.getElementById("export-svg-btn");
+        exportBtnSVG.addEventListener("click", function () {
+            map.exportMapToSVG(width, height);
+        });
 
         function flowOrderFunction(a, b) {
             const srcA = a.link.originId ?? (a.link.source && a.link.source.id);
@@ -254,7 +231,6 @@
 
             return 0;
         }
-
 
     </script>
 </body>
