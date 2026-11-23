@@ -20,6 +20,25 @@
                 opacity: 0.5;
             }
 
+            /* value written on each flow: dark text on a white halo reads on every flow colour */
+            #airport-pairs-map .flow-value-label {
+                font:
+                    bold 11px Arial,
+                    sans-serif;
+                fill: #222222;
+                stroke: #ffffff;
+                stroke-width: 3px;
+                stroke-linejoin: round;
+                paint-order: stroke;
+                text-anchor: middle;
+                dominant-baseline: central;
+                pointer-events: none;
+            }
+
+            .em-annotations {
+                pointer-events: none !important;
+            }
+
             /* Kosovo stays thinner than the national borders */
             #airport-pairs-map .em-kosovo-bn {
                 stroke: grey !important;
@@ -72,6 +91,12 @@
                     .scale(1500)
                     .translate([width / 2.4, width / 2.3])
                 const formatPassengers = new Intl.NumberFormat('en')
+                const millions = (value) => `${(value / 1e6).toFixed(2)}M`
+                const flowValues = graph.links.map((link) => link.value)
+                const smallestFlow = Math.min(...flowValues)
+                const largestFlow = Math.max(...flowValues)
+                const madridFlows = graph.links.filter((link) => link.source === 'LEMD' || link.target === 'LEMD')
+                const madridTotal = madridFlows.reduce((total, link) => total + link.value, 0)
                 const formatChange = new Intl.NumberFormat('en', {
                     style: 'percent',
                     signDisplay: 'exceptZero',
@@ -173,8 +198,8 @@
                         boxOpacity: 1,
                         title: 'Passengers carried',
                         flowWidthLegend: {
-                            values: [1700000, graph.links[0].value],
-                            labels: ['1.7M', '2.4M'],
+                            values: [smallestFlow, largestFlow],
+                            labels: [millions(smallestFlow), millions(largestFlow)],
                         },
                         flowColorLegend: {
                             marginTop: 40,
@@ -195,8 +220,58 @@
                                 </table>
                             </div>`,
                     })
+                    .annotations({
+                        editMode: false,
+                        annotations: [
+                            {
+                                type: 'annotationCalloutCircle',
+                                note: {
+                                    title: 'Madrid moves millions',
+                                    label: `${madridFlows.length} of the top 10 routes either started or ended in Madrid, with a total of over ${Math.floor(madridTotal / 1e5) / 10} million passengers carried.`,
+                                    wrap: 210,
+                                },
+                                subject: { radius: 30 },
+                                x: projection([-3.57, 40.49])[0],
+                                y: projection([-3.57, 40.49])[1],
+                                dx: -170,
+                                dy: -110,
+                                color: '#696969',
+                            },
+                            {
+                                note: {
+                                    title: 'Busiest route',
+                                    label: `Barcelona to Mallorca was the busiest route in 2025, with ${formatPassengers.format(largestFlow)} passengers carried.`,
+                                    wrap: 210,
+                                },
+                                connector: { end: 'dot', type: 'curve', points: [[-10, 50]] },
+                                x: projection([2.5, 40.3])[0],
+                                y: projection([2.5, 40.3])[1],
+                                dx: 0,
+                                dy: 140,
+                                color: '#696969',
+                            },
+                        ],
+                    })
                     .footnote("Intra-EU flights only. <tspan font-style='italic'>Source</tspan>: Eurostat (avia_pa)")
                     .onBuild((map) => {
+                        // write each flow's value on the flow, half way along its centre line
+                        const flowLabels = map.svg().select('#em-flow-lines').append('g').attr('class', 'flow-value-labels')
+                        map.svg()
+                            .selectAll('#em-flow-lines .em-flow-link')
+                            .each(function () {
+                                const centre = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+                                centre.setAttribute('d', this.getAttribute('data-center-path'))
+                                // a flow too short to hold its label (Barcelona to Palma) is read from the 'Busiest route' note instead
+                                if (centre.getTotalLength() < 70) return
+                                const middle = centre.getPointAtLength(centre.getTotalLength() / 2)
+                                flowLabels
+                                    .append('text')
+                                    .attr('class', 'flow-value-label')
+                                    .attr('x', middle.x)
+                                    .attr('y', middle.y)
+                                    .text(millions(graph.links[+this.getAttribute('data-link-index')].value))
+                            })
+                        map.svg().select('.em-annotations').raise()
                         map.svg().select('#em-labels').raise()
                         map.svg()
                             .append('text')
