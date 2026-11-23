@@ -6,6 +6,7 @@ import { highlightClass, getTitlePadding } from './shared'
 import { appendExtraSwatchRow, extraSwatchRows } from './extras'
 import { drawHorizontalDivergence } from './divergence'
 import { resolveMaxMin } from './max-min'
+import { legendsBelowMap } from '../../core/legend-below'
 
 /**
  * Horizontal variant of the discrete legend (orientation: 'horizontal'): one contiguous bar of
@@ -187,5 +188,12 @@ function drawHorizontalMaxMin(out, config, c) {
 /** No-data and extra category swatches for the horizontal layout: a row to the right of the bar. */
 export function appendHorizontalExtraItems(out, config) {
     const barWidth = config.width ?? out.width
-    appendExtraSwatchRow(out, extraSwatchRows(out, config), barWidth + 16, getTitlePadding(out))
+    const rows = extraSwatchRows(out, config)
+    if (legendsBelowMap(out.map)) {
+        // the legend is as wide as the map: the extra items (no data) go under the bar, not beside it, where they would be off the map
+        const box = out._discreteLegendContainer.node().getBBox()
+        appendExtraSwatchRow(out, rows, 0, box.y + box.height + 8)
+        return
+    }
+    appendExtraSwatchRow(out, rows, barWidth + 16, getTitlePadding(out))
 }

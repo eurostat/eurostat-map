@@ -51482,7 +51482,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _extras__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./extras */ "./src/legend/discrete/extras.js");
 /* harmony import */ var _divergence__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./divergence */ "./src/legend/discrete/divergence.js");
 /* harmony import */ var _max_min__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./max-min */ "./src/legend/discrete/max-min.js");
+/* harmony import */ var _core_legend_below__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../core/legend-below */ "./src/core/legend-below.js");
 // Horizontal variant of the discrete colour legend
+
 
 
 
@@ -51671,7 +51673,14 @@ function drawHorizontalMaxMin(out, config, c) {
 /** No-data and extra category swatches for the horizontal layout: a row to the right of the bar. */
 function appendHorizontalExtraItems(out, config) {
     const barWidth = config.width ?? out.width
-    ;(0,_extras__WEBPACK_IMPORTED_MODULE_4__.appendExtraSwatchRow)(out, (0,_extras__WEBPACK_IMPORTED_MODULE_4__.extraSwatchRows)(out, config), barWidth + 16, (0,_shared__WEBPACK_IMPORTED_MODULE_3__.getTitlePadding)(out))
+    const rows = (0,_extras__WEBPACK_IMPORTED_MODULE_4__.extraSwatchRows)(out, config)
+    if ((0,_core_legend_below__WEBPACK_IMPORTED_MODULE_7__.legendsBelowMap)(out.map)) {
+        // the legend is as wide as the map: the extra items (no data) go under the bar, not beside it, where they would be off the map
+        const box = out._discreteLegendContainer.node().getBBox()
+        ;(0,_extras__WEBPACK_IMPORTED_MODULE_4__.appendExtraSwatchRow)(out, rows, 0, box.y + box.height + 8)
+        return
+    }
+    (0,_extras__WEBPACK_IMPORTED_MODULE_4__.appendExtraSwatchRow)(out, rows, barWidth + 16, (0,_shared__WEBPACK_IMPORTED_MODULE_3__.getTitlePadding)(out))
 }
 
 

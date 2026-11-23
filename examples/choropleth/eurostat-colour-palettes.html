@@ -225,8 +225,6 @@
                     .title(dataset.title)
                     .subtitle(dataset.subtitle)
                     .nutsLevel(2)
-                    // on a phone the map (with its legend below) fills the screen above the closed settings sheet
-                    .height(() => (window.matchMedia('(max-width: 900px)').matches ? window.innerHeight - 52 - 120 : undefined))
                     .stat('value', dataset.stat)
                     .encoding('fill', { stat: 'value' })
                     .legend({ x: 10, y: 130, title: dataset.legendTitle, lowLabel: dataset.lowLabel, highLabel: dataset.highLabel, boxOpacity: 0 })

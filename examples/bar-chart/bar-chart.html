@@ -100,8 +100,6 @@
                         categoryColors: ['#7fc97f', '#beaed4'],
                     })
                     .encoding('composition', { stat: 'composition' })
-                    // on a phone the map (with its legend below) fills the screen above the closed settings sheet
-                    .height(() => (window.matchMedia('(max-width: 900px)').matches && !useGridCartogram ? window.innerHeight - 52 - 190 : undefined))
                     .legend({
                         x: 570,
                         y: 0,
