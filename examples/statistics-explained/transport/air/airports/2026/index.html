@@ -135,12 +135,18 @@
                         widthGradient: false,
                         color: (link) => changeColor(link.changePct),
                         curvatureSettings: { gapX: 0, padX: 0, padY: 2, bumpY: 10, curvature: 0.3 },
-                        // Order of the flows within each airport's stack. By default they follow the angle to their other end,
-                        // which puts the Canary Islands flows above Lisbon's where they meet at Madrid. Lisbon goes on top there.
+                        // Order of the flows within each airport's stack, top to bottom. By default they follow the angle to their
+                        // other end; where that makes flows that meet at an airport cover each other the wrong way round, stackOrder
+                        // lists the airports at the other end of the flows in the order they should be stacked.
                         order: (a, b) => {
+                            const stackOrder = {
+                                LEMD: ['LPPT', 'GCXO', 'GCLP'], // Madrid: Lisbon, then Tenerife North, then Gran Canaria
+                                LIRF: ['LEMD', 'LEBL'], // Rome: Madrid above Barcelona
+                            }
+                            const node = (d) => (d.at === 'out' ? d.link.source : d.link.target).id
                             const otherEnd = (d) => (d.at === 'out' ? d.link.target : d.link.source).id
-                            const atMadrid = (d) => (d.at === 'out' ? d.link.source : d.link.target).id === 'LEMD'
-                            if (atMadrid(a) && atMadrid(b) && (otherEnd(a) === 'LPPT') !== (otherEnd(b) === 'LPPT')) return otherEnd(a) === 'LPPT' ? -1 : 1
+                            const ranks = stackOrder[node(a)]
+                            if (ranks && ranks.includes(otherEnd(a)) && ranks.includes(otherEnd(b))) return ranks.indexOf(otherEnd(a)) - ranks.indexOf(otherEnd(b))
                             const angle = (d) => Math.atan2(d.otherY - d.nodeY, d.otherX - d.nodeX)
                             return angle(a) - angle(b) || (b.link.value ?? 0) - (a.link.value ?? 0)
                         },
