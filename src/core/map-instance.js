@@ -1,5 +1,5 @@
 import { select, selectAll } from 'd3-selection'
-import { getBBOXAsGeoJSON, executeForAllInsets, getParameterByName, getApproxCurrentGeoBbox, isMobile } from './utils'
+import { getBBOXAsGeoJSON, executeForAllInsets, getParameterByName, getApproxCurrentGeoBbox } from './utils'
 import { appendAnnotations } from './decoration/annotations'
 import { addLabelsToMap, updateLabels, updateValuesLabels } from './decoration/labels'
 import { defineDeprecatedFunctions } from './deprecated'
@@ -23,6 +23,7 @@ import { applyBorderModeClasses, createMapSVG, recalculateLayout, updateResponsi
 import { DEFAULT_FIT_ZOOM, defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
 import { addCentroidsToMap } from './geo/centroids'
 import { BOX_CORNER_RADIUS } from './buttons/corner-radius'
+import { isCompact, observeContainer, resolveContainerWidth } from './layout-profile'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -42,6 +43,9 @@ const roundInsetCorners = (out) => (sel) => {
     if (out.isInset) sel.attr('rx', BOX_CORNER_RADIUS).attr('ry', BOX_CORNER_RADIUS)
 }
 
+/** Widest a map gets by default (px), when its container offers more. */
+const DEFAULT_MAX_WIDTH = 795
+
 export const createMapInstance = function (config, withCenterPoints, mapType) {
     //build map template object
     const out = {}
@@ -54,10 +58,16 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     //map
     out.svgId_ = 'map'
     out.svg_ = undefined
-    out.width_ = Math.min(795, window.innerWidth)
+    out.width_ = Math.min(DEFAULT_MAX_WIDTH, window.innerWidth)
     out.height_ = 0
     out.containerId_ = undefined
-    out.responsive_ = true
+    out.responsive_ = true // scale the svg down to fit its container (viewBox)
+    // How the layout adapts to the room the map has (see layout-profile.js): 'auto' follows the width of the
+    // map's container (a small iframe is as compact as a phone), 'desktop' and 'compact' fix the profile.
+    out.layout_ = 'auto'
+    // 'below' (default): in the compact layout the legends sit under the map, wherever they were placed on a wide one;
+    // 'keep': they stay where legend() puts them
+    out.legendCompactPosition_ = 'below'
 
     //geographical focus
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
@@ -150,11 +160,11 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.insetsButton_ = false // show insets button
     out._insetsButtonExplicit_ = false // true once the user has explicitly called insetsButton(v)
     out.insetsButtonPosition_ = undefined // [x,y] position of insets button. If not specified, they are positioned in the top right corner
-    out.insetsVisibilityBreakpoint_ = 700 // viewport width (px) at/below which insets start hidden (behind the insets button) unless insetsButton was set explicitly. See isMobile checks in insets.js and appendInsetsButton's caller in map-instance.js.
+    out.insetsVisibilityBreakpoint_ = 480 // container width (px) at/below which insets start hidden (behind the insets button) unless insetsButton was set explicitly. See isMobile checks in insets.js and appendInsetsButton's caller in map-instance.js.
     out.legendButton_ = false // show legend toggle button
     out.legendButtonPosition_ = undefined // [x,y] position of legend button. If not specified, they are positioned in the top left corner
     out.legendVisible_ = undefined // legend visibility state (initialized in stat-map when legendButton is enabled)
-    out.legendVisibilityBreakpoint_ = 699 // viewport width (px) at/below which the legend starts hidden (behind the legend button) when legendButton is enabled. See getDefaultLegendVisible() in stat-map.js.
+    out.legendVisibilityBreakpoint_ = 480 // container width (px) at/below which the legend starts hidden (behind the legend button) when legendButton is enabled. See getDefaultLegendVisible() in stat-map.js.
 
     //tooltip
     out.tooltip_ = {
@@ -266,6 +276,28 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             out[att] = v
             return out
         }
+    }
+
+    // a width set by the caller is kept as it is; otherwise it follows the container (see buildMapTemplateBase)
+    const setWidth = out.width
+    out.width = function (v) {
+        if (arguments.length) out._widthExplicit_ = true
+        return setWidth.apply(out, arguments)
+    }
+
+    const setHeight = out.height
+    out.height = function (v) {
+        // a function is asked for the height at every build, e.g. to fill the window: height(() => innerHeight - 60)
+        if (typeof v === 'function') {
+            out._heightFn_ = v
+            out._heightExplicit_ = false
+            return out
+        }
+        if (arguments.length) {
+            out._heightExplicit_ = true
+            out._heightFn_ = undefined
+        }
+        return setHeight.apply(out, arguments)
     }
 
     out.isInset = config?.isInset || false
@@ -591,20 +623,31 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         //clear SVG (to avoid building multiple svgs on top of each other during multiple build() calls)
         selectAll('#' + out.svgId() + ' > *').remove()
 
+        // how much room the container offers decides the layout profile, and the width unless it was set
+        if (!out.isInset) {
+            const containerWidth = resolveContainerWidth(out)
+            if (containerWidth && !out._widthExplicit_) out.width_ = Math.min(DEFAULT_MAX_WIDTH, containerWidth)
+        }
+        svg.classed('em--compact', isCompact(out))
+
         //set SVG dimensions
-        if (!out.height()) {
+        const requestedHeight = out._heightFn_ ? +out._heightFn_(out) : NaN
+        if (requestedHeight > 0) {
+            out.height_ = Math.max(150, requestedHeight)
+        } else if (!out._heightExplicit_ || !out.height()) {
             // Get available height constrained to 99% of screen/container height
             const availableHeight = getAvailableHeight(out)
             const maxTotalHeight = 0.99 * availableHeight
 
             // Estimate header/footer/padding overhead to find maximum allowed map height
-            const mobile = isMobile()
+            const mobile = isCompact(out)
             const overhead = mobile ? (out.header_ ? 60 : 0) + (out.footnote_ ? 20 : 0) + 5 : (out.header_ ? 80 : 0) + (out.footnote_ ? 40 : 0) + 15
             const maxMapHeight = Math.max(150, maxTotalHeight - overhead)
-            let defaultHeight = mobile ? maxMapHeight : (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : 0.85) * out.width()
+            // the shape of the map follows its width, not the height of the screen: a compact map filling the window left bands of empty space
+            let defaultHeight = (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : mobile ? 1 : 0.85) * out.width()
 
             if (defaultHeight > maxMapHeight) defaultHeight = maxMapHeight
-            out.height(defaultHeight)
+            out.height_ = defaultHeight
         }
 
         if (out.geo_.toUpperCase() == 'WORLD') {
@@ -815,7 +858,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         // auto-show the toggle button whenever insets exist and the user hasn't explicitly
         // configured insetsButton themselves - otherwise there would be no way to reveal them.
         {
-            const isMobileForInsetsButton = isMobile(out.insetsVisibilityBreakpoint_)
+            const isMobileForInsetsButton = isCompact(out, out.insetsVisibilityBreakpoint_)
             const hasInsets = Array.isArray(out.insets_) ? out.insets_.length > 0 : !!out.insets_
             if (out.insetsButton_ || (!out._insetsButtonExplicit_ && isMobileForInsetsButton && hasInsets)) {
                 appendInsetsButton(out)

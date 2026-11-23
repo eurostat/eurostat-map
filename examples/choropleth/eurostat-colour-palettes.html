@@ -10,6 +10,13 @@
                 padding: 8px;
             }
 
+            /* a phone: the map fills the screen */
+            @media (max-width: 900px) {
+                body {
+                    padding: 0;
+                }
+            }
+
             #swatches {
                 display: flex;
                 height: 14px;
@@ -50,6 +57,8 @@
                     subtitle: '2021',
                     stat: { eurostatDatasetCode: 'demo_r_d3dens', unitText: ' people/km²', filters: { TIME: '2021' } },
                     legendTitle: 'Density, people/km²',
+                    lowLabel: 'Low',
+                    highLabel: 'High',
                     unit: 'people/km²',
                 },
                 diverging: {
@@ -58,6 +67,9 @@
                     nutsYear: 2024,
                     stat: { eurostatDatasetCode: 'demo_r_gind3', filters: { indic_de: 'GROWRT', time: 2024 }, unitText: ' ‰' },
                     legendTitle: 'Per 1 000 persons',
+                    // the ends of a continuous legend, for a measure of change
+                    lowLabel: 'Decrease',
+                    highLabel: 'Increase',
                     unit: '‰',
                 },
             }
@@ -211,12 +223,13 @@
                 map = eurostatmap
                     .map('choropleth')
                     .title(dataset.title)
-                    .width(800)
                     .subtitle(dataset.subtitle)
                     .nutsLevel(2)
+                    // on a phone the map (with its legend below) fills the screen above the closed settings sheet
+                    .height(() => (window.matchMedia('(max-width: 900px)').matches ? window.innerHeight - 52 - 120 : undefined))
                     .stat('value', dataset.stat)
                     .encoding('fill', { stat: 'value' })
-                    .legend({ x: 10, y: 130, title: dataset.legendTitle, boxOpacity: 0 })
+                    .legend({ x: 10, y: 130, title: dataset.legendTitle, lowLabel: dataset.lowLabel, highLabel: dataset.highLabel, boxOpacity: 0 })
                     .colorSchemeType(state.type)
                     .colorStretch(state.stretch)
                     .numberOfClasses(state.classes)

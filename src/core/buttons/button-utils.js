@@ -1,11 +1,16 @@
-import { getCSSPropertyFromClass, isMobile } from '../utils'
+import { getCSSPropertyFromClass } from '../utils'
+import { isCompact } from '../layout-profile'
 
-export function getButtonSize() {
+/** Buttons are bigger in the compact layout, where they are pressed with a finger. */
+export const COMPACT_BUTTON_SIZE = 40
+
+export function getButtonSize(map) {
+    if (map && isCompact(map)) return COMPACT_BUTTON_SIZE
     return parseFloat(getCSSPropertyFromClass('em-button', 'width')) || 35
 }
 
-export function getButtonPadding() {
-    return isMobile() ? 8 : 10
+export function getButtonPadding(map) {
+    return isCompact(map) ? 8 : 10
 }
 
 export function getMapDrawingExtent(map) {

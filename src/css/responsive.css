@@ -1,32 +1,30 @@
 /* ── Mobile/Tablet ─────────────────────────────────── */
 
+/* The map itself follows its layout profile (the class on its svg, set from the width of its container: see
+   core/layout-profile.js), so a map in a small iframe is as compact as one on a phone. */
+.em--compact .em-title {
+    font-size: 17px;
+}
+
+.em--compact .em-subtitle,
+.em--compact .em-legend-subtitle {
+    font-size: 13px;
+}
+
+.em--compact .em-inset-title {
+    font-size: 14px;
+}
+
+.em--compact .em-inset-subtitle {
+    font-size: 12px;
+}
+
+.em--compact .em-button text {
+    font-size: 22px;
+}
+
+/* The tooltip is a page element, outside the map, so it follows the window. */
 @media (max-width: 768px) {
-    .em-title {
-        font-size: 17px;
-    }
-
-    .em-subtitle,
-    .em-legend-subtitle {
-        font-size: 13px;
-    }
-
-    .em-inset-title {
-        font-size: 14px;
-    }
-
-    .em-inset-subtitle {
-        font-size: 12px;
-    }
-
-    .em-button {
-        width: 28px;
-        height: 28px;
-    }
-
-    .em-button text {
-        font-size: 16px;
-    }
-
     /* Prevent the tooltip from being taller than half the screen,
        and ensure it never bleeds past either edge */
     .em-tooltip {

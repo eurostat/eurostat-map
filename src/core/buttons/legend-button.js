@@ -8,8 +8,8 @@ export const appendLegendButton = (map) => {
     const svg = select('#' + map.svgId())
     if (svg.empty()) return
 
-    const buttonSize = getButtonSize()
-    const padding = getButtonPadding()
+    const buttonSize = getButtonSize(map)
+    const padding = getButtonPadding(map)
 
     const legendButton = svg.append('g').attr('class', 'em-legend-button em-button').attr('id', 'em-legend-button')
 
@@ -75,8 +75,8 @@ export const updateLegendButtonPosition = (map) => {
     const legendButton = svg.select('#em-legend-button')
     if (legendButton.empty()) return
 
-    const buttonSize = getButtonSize()
-    positionLegendButton(map, legendButton, buttonSize, getButtonPadding())
+    const buttonSize = getButtonSize(map)
+    positionLegendButton(map, legendButton, buttonSize, getButtonPadding(map))
 }
 
 function positionLegendButton(map, legendButton, buttonSize, padding) {

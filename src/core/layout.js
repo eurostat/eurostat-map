@@ -2,6 +2,7 @@ import { select, selectAll } from 'd3-selection'
 import { updateLegendButtonPosition } from './buttons/legend-button'
 import { updateInsetsButtonPosition } from './buttons/insets-button'
 import { updateZoomButtonsPosition } from './buttons/zoom-buttons'
+import { placeLegendsBelow } from './legend-below'
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
@@ -184,9 +185,14 @@ export const recalculateLayout = function (out) {
 
     // --- Move the map group below the header ---
     drawing.attr('transform', `translate(0, ${headerHeight})`)
+    out._headerHeight_ = headerHeight
+
+    // --- Compact layout: the legends go under the map, which makes the svg taller ---
+    const legendsHeight = placeLegendsBelow(out, headerHeight + out.height_)
+    out._legendsBelowHeight_ = legendsHeight
 
     // --- Move footer below map ---
-    footer.attr('transform', `translate(0, ${headerHeight + out.height_ + footerMapPadding})`)
+    footer.attr('transform', `translate(0, ${headerHeight + out.height_ + legendsHeight + footerMapPadding})`)
 
     // --- Frame bounds ---
     frame.attr('x', 0).attr('y', 0).attr('width', out.width_).attr('height', out.height_)
@@ -195,7 +201,7 @@ export const recalculateLayout = function (out) {
     clipRect.attr('x', 0).attr('y', 0).attr('width', out.width_).attr('height', out.height_)
 
     // --- Resize entire SVG ---
-    const totalHeight = out.height_ + headerHeight + footerHeight + footerMapPadding
+    const totalHeight = out.height_ + headerHeight + legendsHeight + footerHeight + footerMapPadding
     svg.attr('width', out.width_).attr('height', totalHeight)
     updateResponsiveMap(out)
 

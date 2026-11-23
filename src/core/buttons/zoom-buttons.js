@@ -13,7 +13,7 @@ const roundedButtonPath = (size, radius, { top, bottom }) => {
 
 export const appendZoomButtons = (map) => {
     const svg = select('#' + map.svgId())
-    const buttonSize = getButtonSize()
+    const buttonSize = getButtonSize(map)
 
     const buttonGroup = svg.append('g').attr('class', 'em-zoom-buttons').style('pointer-events', 'all')
 
@@ -66,11 +66,11 @@ export function updateZoomButtonsPosition(map) {
     const buttonGroup = svg.select('.em-zoom-buttons')
     if (buttonGroup.empty()) return
 
-    positionZoomButtons(map, buttonGroup, getButtonSize())
+    positionZoomButtons(map, buttonGroup, getButtonSize(map))
 }
 
 function positionZoomButtons(map, buttonGroup, buttonSize) {
-    const padding = getButtonPadding()
+    const padding = getButtonPadding(map)
     const extent = getMapDrawingExtent(map)
     const ribbonOffsetY = map.showEstatRibbon_ ? 10 : 0
     buttonGroup.attr(

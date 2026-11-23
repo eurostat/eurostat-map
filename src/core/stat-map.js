@@ -1,4 +1,5 @@
-import { executeForAllInsets, isMobile } from './utils'
+import { executeForAllInsets } from './utils'
+import { isCompact, observeContainer } from './layout-profile'
 import * as StatisticalData from './stat-data'
 import * as Legend from '../legend/legend'
 import { select } from 'd3-selection'
@@ -489,7 +490,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
     // one that actually showed it.
     const getDefaultLegendVisible = function () {
         if (out.legendButton_) {
-            return !isMobile(out.legendVisibilityBreakpoint_)
+            return !isCompact(out, out.legendVisibilityBreakpoint_)
         }
         return true
     }
@@ -670,6 +671,8 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
 
         //build map template base
         out.buildMapTemplateBase()
+        // rebuild when the room the map has changes enough to change its layout (see layout-profile.js)
+        observeContainer(out)
 
         //add additional filters for fill patterns for example
         if (out.filtersDefinitionFunction_) {

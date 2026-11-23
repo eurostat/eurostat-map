@@ -3,6 +3,8 @@ import { formatDefaultLocale } from 'd3-format'
 import { appendLegendSwatchRows } from './legend-swatch'
 import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
 import { BOX_CORNER_RADIUS } from '../core/buttons/corner-radius'
+import { legendsBelowMap, placeLegendsBelow } from '../core/legend-below'
+import { recalculateLayout } from '../core/layout'
 import { getCornerPosition, getCornerCoords } from '../core/decoration/corner-position'
 import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
 import { getPropSymbolColorLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
@@ -192,6 +194,13 @@ export const legend = function (map) {
         const map = out.map
         const container = out.lgg
         if (!map || !container || !container.node()) return
+        // compact layout: the legends sit under the map (see core/legend-below.js)
+        if (legendsBelowMap(map) && !out._hasExternalSvgId) {
+            const height = placeLegendsBelow(map, (map._headerHeight_ || 0) + map.height())
+            // the legends are drawn once the data is in: make room for them under the map
+            if (height !== map._legendsBelowHeight_) recalculateLayout(map)
+            return
+        }
 
         const hasManualX = out.x != null
         const hasManualY = out.y != null

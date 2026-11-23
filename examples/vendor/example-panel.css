@@ -69,14 +69,61 @@
     max-width: 100%;
 }
 
-/* narrow screens: the panel goes below the map */
+/* narrow screens: the map fills the screen and the panel is a sheet at the bottom, closed to its title bar */
 @media (max-width: 900px) {
     .ex-layout {
         grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+        padding-bottom: 52px; /* the closed sheet must not cover the end of the map */
     }
 
     .ex-panel {
-        position: static;
-        margin: 0 8px 8px;
+        position: fixed;
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 20;
+        margin: 0;
+        max-height: 75vh;
+        max-height: 75dvh;
+        overflow-y: auto;
+        border-radius: 12px 12px 0 0;
+        border-width: 1px 0 0;
+        box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.18);
+    }
+
+    .ex-panel-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 28px;
+        cursor: pointer;
+    }
+
+    .ex-panel-title::after {
+        content: '';
+        width: 10px;
+        height: 10px;
+        margin-right: 4px;
+        border: solid #0e47cb;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    .ex-panel.ex-collapsed {
+        padding-bottom: 12px;
+    }
+
+    .ex-panel.ex-collapsed .ex-panel-title {
+        margin-bottom: 0;
+    }
+
+    .ex-panel.ex-collapsed .ex-panel-title::after {
+        transform: rotate(-135deg);
+    }
+
+    .ex-panel.ex-collapsed > :not(.ex-panel-title) {
+        display: none;
     }
 }

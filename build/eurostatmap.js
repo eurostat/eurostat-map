@@ -2363,33 +2363,31 @@ var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBP
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `/* ── Mobile/Tablet ─────────────────────────────────── */
 
+/* The map itself follows its layout profile (the class on its svg, set from the width of its container: see
+   core/layout-profile.js), so a map in a small iframe is as compact as one on a phone. */
+.em--compact .em-title {
+    font-size: 17px;
+}
+
+.em--compact .em-subtitle,
+.em--compact .em-legend-subtitle {
+    font-size: 13px;
+}
+
+.em--compact .em-inset-title {
+    font-size: 14px;
+}
+
+.em--compact .em-inset-subtitle {
+    font-size: 12px;
+}
+
+.em--compact .em-button text {
+    font-size: 22px;
+}
+
+/* The tooltip is a page element, outside the map, so it follows the window. */
 @media (max-width: 768px) {
-    .em-title {
-        font-size: 17px;
-    }
-
-    .em-subtitle,
-    .em-legend-subtitle {
-        font-size: 13px;
-    }
-
-    .em-inset-title {
-        font-size: 14px;
-    }
-
-    .em-inset-subtitle {
-        font-size: 12px;
-    }
-
-    .em-button {
-        width: 28px;
-        height: 28px;
-    }
-
-    .em-button text {
-        font-size: 16px;
-    }
-
     /* Prevent the tooltip from being taller than half the screen,
        and ensure it never bleeds past either edge */
     .em-tooltip {
@@ -20431,19 +20429,26 @@ class TricoloreViz {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   COMPACT_BUTTON_SIZE: () => (/* binding */ COMPACT_BUTTON_SIZE),
 /* harmony export */   getButtonPadding: () => (/* binding */ getButtonPadding),
 /* harmony export */   getButtonSize: () => (/* binding */ getButtonSize),
 /* harmony export */   getMapDrawingExtent: () => (/* binding */ getMapDrawingExtent)
 /* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/core/utils.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../layout-profile */ "./src/core/layout-profile.js");
 
 
-function getButtonSize() {
+
+/** Buttons are bigger in the compact layout, where they are pressed with a finger. */
+const COMPACT_BUTTON_SIZE = 40
+
+function getButtonSize(map) {
+    if (map && (0,_layout_profile__WEBPACK_IMPORTED_MODULE_1__.isCompact)(map)) return COMPACT_BUTTON_SIZE
     return parseFloat((0,_utils__WEBPACK_IMPORTED_MODULE_0__.getCSSPropertyFromClass)('em-button', 'width')) || 35
 }
 
-function getButtonPadding() {
-    return (0,_utils__WEBPACK_IMPORTED_MODULE_0__.isMobile)() ? 8 : 10
+function getButtonPadding(map) {
+    return (0,_layout_profile__WEBPACK_IMPORTED_MODULE_1__.isCompact)(map) ? 8 : 10
 }
 
 function getMapDrawingExtent(map) {
@@ -20504,7 +20509,7 @@ __webpack_require__.r(__webpack_exports__);
 const appendInsetsButton = (map) => {
     const svg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])('#' + map.svgId())
 
-    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)()
+    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)(map)
 
     const insetButton = svg.append('g').attr('class', 'em-insets-button em-button').attr('id', 'em-insets-button')
 
@@ -20557,11 +20562,11 @@ function updateInsetsButtonPosition(map) {
     const insetButton = svg.select('#em-insets-button')
     if (insetButton.empty()) return
 
-    positionInsetsButton(map, insetButton, (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)())
+    positionInsetsButton(map, insetButton, (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)(map))
 }
 
 function positionInsetsButton(map, insetButton, buttonSize) {
-    const padding = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonPadding)()
+    const padding = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonPadding)(map)
     const extent = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getMapDrawingExtent)(map)
     const legendButtonPosition = getCornerPosition(map.legendObj_?.position) || 'top left'
     const reserveLegendButton = map.legendButton_ && !map.legendButtonPosition_ && legendButtonPosition === 'top right'
@@ -20602,8 +20607,8 @@ const appendLegendButton = (map) => {
     const svg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])('#' + map.svgId())
     if (svg.empty()) return
 
-    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)()
-    const padding = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonPadding)()
+    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)(map)
+    const padding = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonPadding)(map)
 
     const legendButton = svg.append('g').attr('class', 'em-legend-button em-button').attr('id', 'em-legend-button')
 
@@ -20669,8 +20674,8 @@ const updateLegendButtonPosition = (map) => {
     const legendButton = svg.select('#em-legend-button')
     if (legendButton.empty()) return
 
-    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)()
-    positionLegendButton(map, legendButton, buttonSize, (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonPadding)())
+    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)(map)
+    positionLegendButton(map, legendButton, buttonSize, (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonPadding)(map))
 }
 
 function positionLegendButton(map, legendButton, buttonSize, padding) {
@@ -20729,7 +20734,7 @@ const roundedButtonPath = (size, radius, { top, bottom }) => {
 
 const appendZoomButtons = (map) => {
     const svg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])('#' + map.svgId())
-    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonSize)()
+    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonSize)(map)
 
     const buttonGroup = svg.append('g').attr('class', 'em-zoom-buttons').style('pointer-events', 'all')
 
@@ -20782,11 +20787,11 @@ function updateZoomButtonsPosition(map) {
     const buttonGroup = svg.select('.em-zoom-buttons')
     if (buttonGroup.empty()) return
 
-    positionZoomButtons(map, buttonGroup, (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonSize)())
+    positionZoomButtons(map, buttonGroup, (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonSize)(map))
 }
 
 function positionZoomButtons(map, buttonGroup, buttonSize) {
-    const padding = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonPadding)()
+    const padding = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonPadding)(map)
     const extent = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getMapDrawingExtent)(map)
     const ribbonOffsetY = map.showEstatRibbon_ ? 10 : 0
     buttonGroup.attr(
@@ -24769,6 +24774,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   addTitle: () => (/* binding */ addTitle)
 /* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/core/utils.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../layout-profile */ "./src/core/layout-profile.js");
+
 
 
 function addTitle(out) {
@@ -24854,7 +24861,7 @@ function addSubtitle(out) {
 }
 
 function wrapTextForMobile(textSelection, out, x) {
-    if (!(0,_utils__WEBPACK_IMPORTED_MODULE_0__.isMobile)()) return
+    if (!(0,_layout_profile__WEBPACK_IMPORTED_MODULE_1__.isCompact)(out)) return
 
     const node = textSelection.node()
     if (!node) return
@@ -28493,7 +28500,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _decoration_scalebar__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./decoration/scalebar */ "./src/core/decoration/scalebar.js");
 /* harmony import */ var _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./buttons/corner-radius */ "./src/core/buttons/corner-radius.js");
 /* harmony import */ var _buttons_button_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./buttons/button-utils */ "./src/core/buttons/button-utils.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./utils */ "./src/core/utils.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
 
 
 
@@ -28519,12 +28526,12 @@ const buildInsets = function (out, withCenterPoints, mapType) {
     // On mobile, insets are hidden by default to save space (see the display:none below), and the
     // toggle button is auto-shown so they can still be revealed (see map-instance.js) unless the
     // user has explicitly configured insetsButton themselves.
-    const mobile = (0,_utils__WEBPACK_IMPORTED_MODULE_5__.isMobile)(out.insetsVisibilityBreakpoint_)
+    const mobile = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_5__.isCompact)(out, out.insetsVisibilityBreakpoint_)
     const showsInsetsButton = out.insetsButton_ || (!out._insetsButtonExplicit_ && mobile)
     const presetName = typeof out.insets_ === 'string' ? out.insets_ : null
 
     if (!out.insetBoxPosition_) {
-        const buttonClearanceY = showsInsetsButton ? (0,_buttons_button_utils__WEBPACK_IMPORTED_MODULE_4__.getButtonSize)() + (0,_buttons_button_utils__WEBPACK_IMPORTED_MODULE_4__.getButtonPadding)() : 0
+        const buttonClearanceY = showsInsetsButton ? (0,_buttons_button_utils__WEBPACK_IMPORTED_MODULE_4__.getButtonSize)(out) + (0,_buttons_button_utils__WEBPACK_IMPORTED_MODULE_4__.getButtonPadding)(out) : 0
         const insetBoxWidth = presetName === 'image' ? OVERSEAS_BOX_WIDTH : out.insetBoxWidth_
         out.insetBoxPosition_ = [out.width_ - insetBoxWidth - 2 * out.insetBoxPadding_, 2 * out.insetBoxPadding_ + buttonClearanceY]
     }
@@ -29891,6 +29898,157 @@ const forwardChainableMethod = function (map, name) {
 
 /***/ },
 
+/***/ "./src/core/layout-profile.js"
+/*!************************************!*\
+  !*** ./src/core/layout-profile.js ***!
+  \************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   COMPACT_BREAKPOINT: () => (/* binding */ COMPACT_BREAKPOINT),
+/* harmony export */   getActiveWidth: () => (/* binding */ getActiveWidth),
+/* harmony export */   isCompact: () => (/* binding */ isCompact),
+/* harmony export */   measureContainerWidth: () => (/* binding */ measureContainerWidth),
+/* harmony export */   observeContainer: () => (/* binding */ observeContainer),
+/* harmony export */   resolveContainerWidth: () => (/* binding */ resolveContainerWidth),
+/* harmony export */   setActiveContainerWidth: () => (/* binding */ setActiveContainerWidth)
+/* harmony export */ });
+/**
+ * Layout profile: how much room a map really has, and so which layout it should use.
+ *
+ * Responsive behaviour is decided from the width of the map's own container, never from the device or the
+ * window: a map embedded in a 600px iframe on a desktop is as cramped as a map on a phone, and a map in a
+ * wide column on a phone-sized window is not. `window.innerWidth` is only the fallback, for when the container
+ * cannot be measured (server side rendering, a container that shrinks to fit the map, a map not yet in the page).
+ *
+ * `map.layout()` picks the policy: 'auto' (default, the profile follows the container), 'desktop' or 'compact'
+ * (the profile is fixed, whatever the container).
+ */
+
+/** Container width (px) at or below which the 'compact' layout profile is used. */
+const COMPACT_BREAKPOINT = 768
+
+/** A container narrower than this was not really measured (a collapsed or shrink-to-fit parent). */
+const MIN_MEASURABLE_WIDTH = 60
+
+/** The container width of the map that was laid out last: what code without a map at hand falls back to. */
+let activeContainerWidth
+
+const setActiveContainerWidth = function (width) {
+    activeContainerWidth = width
+}
+
+/** Width (px) of the container of the map laid out last, else of the window: what the layout is sized to. */
+const getActiveWidth = function () {
+    return activeContainerWidth ?? (typeof window !== 'undefined' ? window.innerWidth : COMPACT_BREAKPOINT)
+}
+
+/**
+ * The width (px) the container of a map offers, or undefined when it cannot be told.
+ * The map's own svg is taken out of the flow while measuring, so that it does not size its own container.
+ * @param {*} out map instance
+ * @returns {number|undefined}
+ */
+const measureContainerWidth = function (out) {
+    if (typeof document === 'undefined') return undefined
+    const svg = out.svg_?.node?.()
+    if (!svg) return undefined
+    let host = svg.parentNode
+    // the wrapper the library adds is sized by its parent, which is the real container
+    if (host?.classList?.contains('em-map-wrapper')) host = host.parentNode
+    // a map nested in another svg (IMAGE) is laid out by that svg's host page
+    while (host && host instanceof SVGElement) host = host.parentNode
+    if (!host || host === document || !host.getBoundingClientRect) return undefined
+
+    const previous = { position: svg.style.position, width: svg.style.width, height: svg.style.height }
+    svg.style.position = 'absolute'
+    svg.style.width = '0'
+    svg.style.height = '0'
+    const wrapper = svg.parentNode?.classList?.contains('em-map-wrapper') ? svg.parentNode : undefined
+    const wrapperPosition = wrapper ? wrapper.style.position : undefined
+    if (wrapper) wrapper.style.position = 'static'
+    let width = host.clientWidth
+    svg.style.position = previous.position
+    svg.style.width = previous.width
+    svg.style.height = previous.height
+    if (wrapper) wrapper.style.position = wrapperPosition
+
+    const style = window.getComputedStyle(host)
+    width -= (parseFloat(style.paddingLeft) || 0) + (parseFloat(style.paddingRight) || 0)
+    return width >= MIN_MEASURABLE_WIDTH ? Math.floor(width) : undefined
+}
+
+/**
+ * Measure the container and remember on the map the width its layout is for: `out._containerWidth_`. That is the
+ * width of the container, unless the caller set `width()`: then the map is drawn at that width (and the browser
+ * scales it to fit, see `responsive`), so its layout is the one for that width, whatever the container.
+ * @param {*} out map instance
+ * @returns {number|undefined} the measured width of the container
+ */
+const resolveContainerWidth = function (out) {
+    const width = out._widthExplicit_ ? undefined : measureContainerWidth(out)
+    out._containerWidth_ = out._widthExplicit_ ? out.width_ : width
+    if (!out.isInset && !out.isInset_) setActiveContainerWidth(width)
+    return width
+}
+
+/**
+ * Whether the compact layout profile applies.
+ * @param {*} [out] map instance; without one, the last laid out map (or the window) decides
+ * @param {number} [breakpoint] container width (px) at or below which a feature goes compact
+ * @returns {boolean}
+ */
+const isCompact = function (out, breakpoint = COMPACT_BREAKPOINT) {
+    if (out?.layout_ === 'compact') return true
+    if (out?.layout_ === 'desktop') return false
+    const width = out?._containerWidth_ ?? activeContainerWidth ?? (typeof window !== 'undefined' ? window.innerWidth : Infinity)
+    return width <= breakpoint
+}
+
+/**
+ * Observe the container of a map and rebuild it when the profile changes or the container's width does. Only for a
+ * map in 'auto' layout whose width was not set (a map drawn at a width of its own is scaled by the browser instead).
+ * Replaces any observer of an earlier build.
+ * @param {*} out map instance
+ */
+const observeContainer = function (out) {
+    out._layoutObserver?.disconnect()
+    out._layoutObserver = undefined
+    // a map built again into the same svg (a new map() call) replaces the one before: its observer must go
+    const previousSvg = out.svg_?.node?.()
+    previousSvg?.__emLayoutObserver?.disconnect()
+    if (previousSvg) previousSvg.__emLayoutObserver = undefined
+    if (out.isInset || out.layout_ !== 'auto' || out._widthExplicit_ || typeof ResizeObserver === 'undefined') return
+    const svg = out.svg_?.node?.()
+    let host = svg?.parentNode
+    if (host?.classList?.contains('em-map-wrapper')) host = host.parentNode
+    if (!host || host instanceof SVGElement) return
+
+    let timer
+    let lastWidth = out._containerWidth_
+    let lastCompact = isCompact(out)
+    const observer = new ResizeObserver(() => {
+        clearTimeout(timer)
+        timer = setTimeout(() => {
+            const width = measureContainerWidth(out)
+            if (width === undefined || width === lastWidth) return
+            const compact = width <= COMPACT_BREAKPOINT
+            const widthChanged = Math.abs(width - lastWidth) >= 16
+            lastWidth = width
+            if (compact === lastCompact && !widthChanged) return
+            lastCompact = compact
+            out.build()
+        }, 150)
+    })
+    observer.observe(host)
+    out._layoutObserver = observer
+    if (svg) svg.__emLayoutObserver = observer
+}
+
+
+/***/ },
+
 /***/ "./src/core/layout.js"
 /*!****************************!*\
   !*** ./src/core/layout.js ***!
@@ -29909,6 +30067,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _buttons_legend_button__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./buttons/legend-button */ "./src/core/buttons/legend-button.js");
 /* harmony import */ var _buttons_insets_button__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./buttons/insets-button */ "./src/core/buttons/insets-button.js");
 /* harmony import */ var _buttons_zoom_buttons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./buttons/zoom-buttons */ "./src/core/buttons/zoom-buttons.js");
+/* harmony import */ var _legend_below__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./legend-below */ "./src/core/legend-below.js");
+
 
 
 
@@ -30095,9 +30255,14 @@ const recalculateLayout = function (out) {
 
     // --- Move the map group below the header ---
     drawing.attr('transform', `translate(0, ${headerHeight})`)
+    out._headerHeight_ = headerHeight
+
+    // --- Compact layout: the legends go under the map, which makes the svg taller ---
+    const legendsHeight = (0,_legend_below__WEBPACK_IMPORTED_MODULE_4__.placeLegendsBelow)(out, headerHeight + out.height_)
+    out._legendsBelowHeight_ = legendsHeight
 
     // --- Move footer below map ---
-    footer.attr('transform', `translate(0, ${headerHeight + out.height_ + footerMapPadding})`)
+    footer.attr('transform', `translate(0, ${headerHeight + out.height_ + legendsHeight + footerMapPadding})`)
 
     // --- Frame bounds ---
     frame.attr('x', 0).attr('y', 0).attr('width', out.width_).attr('height', out.height_)
@@ -30106,7 +30271,7 @@ const recalculateLayout = function (out) {
     clipRect.attr('x', 0).attr('y', 0).attr('width', out.width_).attr('height', out.height_)
 
     // --- Resize entire SVG ---
-    const totalHeight = out.height_ + headerHeight + footerHeight + footerMapPadding
+    const totalHeight = out.height_ + headerHeight + legendsHeight + footerHeight + footerMapPadding
     svg.attr('width', out.width_).attr('height', totalHeight)
     updateResponsiveMap(out)
 
@@ -30117,6 +30282,73 @@ const recalculateLayout = function (out) {
     ;(0,_buttons_insets_button__WEBPACK_IMPORTED_MODULE_2__.updateInsetsButtonPosition)(out)
     if (out.legendButton_) (0,_buttons_legend_button__WEBPACK_IMPORTED_MODULE_1__.updateLegendButtonPosition)(out)
     if (out.legendObj_?.applyPosition) out.legendObj_.applyPosition()
+}
+
+
+/***/ },
+
+/***/ "./src/core/legend-below.js"
+/*!**********************************!*\
+  !*** ./src/core/legend-below.js ***!
+  \**********************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   EDGE: () => (/* binding */ EDGE),
+/* harmony export */   legendsBelowMap: () => (/* binding */ legendsBelowMap),
+/* harmony export */   placeLegendsBelow: () => (/* binding */ placeLegendsBelow)
+/* harmony export */ });
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
+
+
+const EDGE = 8 // px between the legend and the edge of the map
+const GAP = 8 // px between the map and the first legend, and between legends
+
+/**
+ * Whether the legends of a map sit below it, not on it: in the compact layout a legend on the map hides much of
+ * a small map. Not when the author asked to `keep` the configured placement (`legendCompactPosition('keep')`),
+ * or when the legends are behind a toggle button (they float over the map when opened).
+ * @param {*} map owning map
+ * @returns {boolean}
+ */
+const legendsBelowMap = function (map) {
+    return !!map && (0,_layout_profile__WEBPACK_IMPORTED_MODULE_0__.isCompact)(map) && map.legendCompactPosition_ !== 'keep' && !map.legendButton_
+}
+
+/**
+ * Stack the legends of a map under it, left aligned, and return the height they need (0 when none is placed).
+ * Positions are in svg coordinates, as every legend's are.
+ * @param {*} map owning map
+ * @param {number} mapBottom svg y of the bottom edge of the map
+ * @returns {number}
+ */
+const placeLegendsBelow = function (map, mapBottom) {
+    if (!legendsBelowMap(map)) return 0
+    const legends = new Set()
+    ;(map.layers_ || []).forEach((layer) => {
+        const legend = layer.legendObj_
+        // a legend drawn into a container the caller manages is theirs to position
+        if (legend?.lgg && !legend.lgg.empty() && !legend._hasExternalSvgId) legends.add(legend)
+    })
+    let y = mapBottom + GAP
+    let placed = 0
+    legends.forEach((legend) => {
+        const node = legend.lgg.node()
+        if (node.style.display === 'none') return
+        let box
+        try {
+            box = node.getBBox()
+        } catch (e) {
+            return
+        }
+        if (!box.width && !box.height) return
+        legend.lgg.attr('transform', `translate(${EDGE - box.x},${y - box.y})`)
+        y += box.height + GAP
+        placed++
+    })
+    map._legendsBelowMap_ = placed > 0
+    return placed ? y - mapBottom : 0
 }
 
 
@@ -30535,6 +30767,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _geo_projection__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./geo/projection */ "./src/core/geo/projection.js");
 /* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
 /* harmony import */ var _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./buttons/corner-radius */ "./src/core/buttons/corner-radius.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
+
 
 
 
@@ -30579,6 +30813,9 @@ const roundInsetCorners = (out) => (sel) => {
     if (out.isInset) sel.attr('rx', _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_24__.BOX_CORNER_RADIUS).attr('ry', _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_24__.BOX_CORNER_RADIUS)
 }
 
+/** Widest a map gets by default (px), when its container offers more. */
+const DEFAULT_MAX_WIDTH = 795
+
 const createMapInstance = function (config, withCenterPoints, mapType) {
     //build map template object
     const out = {}
@@ -30591,10 +30828,16 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     //map
     out.svgId_ = 'map'
     out.svg_ = undefined
-    out.width_ = Math.min(795, window.innerWidth)
+    out.width_ = Math.min(DEFAULT_MAX_WIDTH, window.innerWidth)
     out.height_ = 0
     out.containerId_ = undefined
-    out.responsive_ = true
+    out.responsive_ = true // scale the svg down to fit its container (viewBox)
+    // How the layout adapts to the room the map has (see layout-profile.js): 'auto' follows the width of the
+    // map's container (a small iframe is as compact as a phone), 'desktop' and 'compact' fix the profile.
+    out.layout_ = 'auto'
+    // 'below' (default): in the compact layout the legends sit under the map, wherever they were placed on a wide one;
+    // 'keep': they stay where legend() puts them
+    out.legendCompactPosition_ = 'below'
 
     //geographical focus
     out.nutsLevel_ = 3 // 0,1,2,3, or 'mixed'
@@ -30687,11 +30930,11 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     out.insetsButton_ = false // show insets button
     out._insetsButtonExplicit_ = false // true once the user has explicitly called insetsButton(v)
     out.insetsButtonPosition_ = undefined // [x,y] position of insets button. If not specified, they are positioned in the top right corner
-    out.insetsVisibilityBreakpoint_ = 700 // viewport width (px) at/below which insets start hidden (behind the insets button) unless insetsButton was set explicitly. See isMobile checks in insets.js and appendInsetsButton's caller in map-instance.js.
+    out.insetsVisibilityBreakpoint_ = 480 // container width (px) at/below which insets start hidden (behind the insets button) unless insetsButton was set explicitly. See isMobile checks in insets.js and appendInsetsButton's caller in map-instance.js.
     out.legendButton_ = false // show legend toggle button
     out.legendButtonPosition_ = undefined // [x,y] position of legend button. If not specified, they are positioned in the top left corner
     out.legendVisible_ = undefined // legend visibility state (initialized in stat-map when legendButton is enabled)
-    out.legendVisibilityBreakpoint_ = 699 // viewport width (px) at/below which the legend starts hidden (behind the legend button) when legendButton is enabled. See getDefaultLegendVisible() in stat-map.js.
+    out.legendVisibilityBreakpoint_ = 480 // container width (px) at/below which the legend starts hidden (behind the legend button) when legendButton is enabled. See getDefaultLegendVisible() in stat-map.js.
 
     //tooltip
     out.tooltip_ = {
@@ -30803,6 +31046,28 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             out[att] = v
             return out
         }
+    }
+
+    // a width set by the caller is kept as it is; otherwise it follows the container (see buildMapTemplateBase)
+    const setWidth = out.width
+    out.width = function (v) {
+        if (arguments.length) out._widthExplicit_ = true
+        return setWidth.apply(out, arguments)
+    }
+
+    const setHeight = out.height
+    out.height = function (v) {
+        // a function is asked for the height at every build, e.g. to fill the window: height(() => innerHeight - 60)
+        if (typeof v === 'function') {
+            out._heightFn_ = v
+            out._heightExplicit_ = false
+            return out
+        }
+        if (arguments.length) {
+            out._heightExplicit_ = true
+            out._heightFn_ = undefined
+        }
+        return setHeight.apply(out, arguments)
     }
 
     out.isInset = config?.isInset || false
@@ -31128,20 +31393,31 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         //clear SVG (to avoid building multiple svgs on top of each other during multiple build() calls)
         (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])('#' + out.svgId() + ' > *').remove()
 
+        // how much room the container offers decides the layout profile, and the width unless it was set
+        if (!out.isInset) {
+            const containerWidth = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.resolveContainerWidth)(out)
+            if (containerWidth && !out._widthExplicit_) out.width_ = Math.min(DEFAULT_MAX_WIDTH, containerWidth)
+        }
+        svg.classed('em--compact', (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.isCompact)(out))
+
         //set SVG dimensions
-        if (!out.height()) {
+        const requestedHeight = out._heightFn_ ? +out._heightFn_(out) : NaN
+        if (requestedHeight > 0) {
+            out.height_ = Math.max(150, requestedHeight)
+        } else if (!out._heightExplicit_ || !out.height()) {
             // Get available height constrained to 99% of screen/container height
             const availableHeight = getAvailableHeight(out)
             const maxTotalHeight = 0.99 * availableHeight
 
             // Estimate header/footer/padding overhead to find maximum allowed map height
-            const mobile = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.isMobile)()
+            const mobile = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.isCompact)(out)
             const overhead = mobile ? (out.header_ ? 60 : 0) + (out.footnote_ ? 20 : 0) + 5 : (out.header_ ? 80 : 0) + (out.footnote_ ? 40 : 0) + 15
             const maxMapHeight = Math.max(150, maxTotalHeight - overhead)
-            let defaultHeight = mobile ? maxMapHeight : (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : 0.85) * out.width()
+            // the shape of the map follows its width, not the height of the screen: a compact map filling the window left bands of empty space
+            let defaultHeight = (out.geo_.toUpperCase() === 'WORLD' ? 0.55 : mobile ? 1 : 0.85) * out.width()
 
             if (defaultHeight > maxMapHeight) defaultHeight = maxMapHeight
-            out.height(defaultHeight)
+            out.height_ = defaultHeight
         }
 
         if (out.geo_.toUpperCase() == 'WORLD') {
@@ -31352,7 +31628,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         // auto-show the toggle button whenever insets exist and the user hasn't explicitly
         // configured insetsButton themselves - otherwise there would be no way to reveal them.
         {
-            const isMobileForInsetsButton = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.isMobile)(out.insetsVisibilityBreakpoint_)
+            const isMobileForInsetsButton = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.isCompact)(out, out.insetsVisibilityBreakpoint_)
             const hasInsets = Array.isArray(out.insets_) ? out.insets_.length > 0 : !!out.insets_
             if (out.insetsButton_ || (!out._insetsButtonExplicit_ && isMobileForInsetsButton && hasInsets)) {
                 (0,_buttons_insets_button__WEBPACK_IMPORTED_MODULE_12__.appendInsetsButton)(out)
@@ -31770,12 +32046,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getMobileSymbolScale: () => (/* binding */ getMobileSymbolScale),
 /* harmony export */   getResponsiveSymbolSize: () => (/* binding */ getResponsiveSymbolSize)
 /* harmony export */ });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/core/utils.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/core/utils.js");
+
 
 
 function getMobileSymbolScale() {
-    if (!(0,_utils__WEBPACK_IMPORTED_MODULE_0__.isMobile)()) return 1
-    return Math.max(0.45, Math.min(1, window.innerWidth / _utils__WEBPACK_IMPORTED_MODULE_0__.MOBILE_BREAKPOINT))
+    if (!(0,_utils__WEBPACK_IMPORTED_MODULE_1__.isMobile)()) return 1
+    return Math.max(0.45, Math.min(1, (0,_layout_profile__WEBPACK_IMPORTED_MODULE_0__.getActiveWidth)() / _layout_profile__WEBPACK_IMPORTED_MODULE_0__.COMPACT_BREAKPOINT))
 }
 
 function getResponsiveSymbolSize(value, minimum = 0) {
@@ -32468,18 +32746,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getURLParameters: () => (/* binding */ getURLParameters)
 /* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/core/utils.js");
-/* harmony import */ var _stat_data__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./stat-data */ "./src/core/stat-data.js");
-/* harmony import */ var _legend_legend__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../legend/legend */ "./src/legend/legend.js");
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var _tooltip_tooltip__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../tooltip/tooltip */ "./src/tooltip/tooltip.js");
-/* harmony import */ var _decoration_spinner__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./decoration/spinner */ "./src/core/decoration/spinner.js");
-/* harmony import */ var _decoration_label_layout__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./decoration/label-layout */ "./src/core/decoration/label-layout.js");
-/* harmony import */ var _map_instance__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./map-instance */ "./src/core/map-instance.js");
-/* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
-/* harmony import */ var _export__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./export */ "./src/core/export.js");
-/* harmony import */ var _cartograms__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./cartograms */ "./src/core/cartograms.js");
-/* harmony import */ var _layer__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./layer */ "./src/core/layer.js");
-/* harmony import */ var _layer_registry__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./layer-registry */ "./src/core/layer-registry.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
+/* harmony import */ var _stat_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./stat-data */ "./src/core/stat-data.js");
+/* harmony import */ var _legend_legend__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../legend/legend */ "./src/legend/legend.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _tooltip_tooltip__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../tooltip/tooltip */ "./src/tooltip/tooltip.js");
+/* harmony import */ var _decoration_spinner__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./decoration/spinner */ "./src/core/decoration/spinner.js");
+/* harmony import */ var _decoration_label_layout__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./decoration/label-layout */ "./src/core/decoration/label-layout.js");
+/* harmony import */ var _map_instance__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./map-instance */ "./src/core/map-instance.js");
+/* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var _export__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./export */ "./src/core/export.js");
+/* harmony import */ var _cartograms__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./cartograms */ "./src/core/cartograms.js");
+/* harmony import */ var _layer__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./layer */ "./src/core/layer.js");
+/* harmony import */ var _layer_registry__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./layer-registry */ "./src/core/layer-registry.js");
+
 
 
 
@@ -32508,7 +32788,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 const createStatMap = function (config, withCenterPoints, mapType) {
     //build stat map from map template
-    const out = (0,_map_instance__WEBPACK_IMPORTED_MODULE_7__.createMapInstance)(config, withCenterPoints, mapType)
+    const out = (0,_map_instance__WEBPACK_IMPORTED_MODULE_8__.createMapInstance)(config, withCenterPoints, mapType)
 
     // build-completion latch
     out._geoDone_ = false
@@ -32520,7 +32800,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         if (!out._geoDone_ || !out._statDone_) return
         out._finalized_ = true
         // the title, subtitle and legend are drawn after the labels, so only now can collisions with them be judged
-        ;(0,_decoration_label_layout__WEBPACK_IMPORTED_MODULE_6__.hideCollidingLabels)(out)
+        ;(0,_decoration_label_layout__WEBPACK_IMPORTED_MODULE_7__.hideCollidingLabels)(out)
         if (out.onBuild()) out.onBuild()(out)
     }
 
@@ -32579,7 +32859,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
     }
 
     out._registerScalarCustomStat = function (key, config) {
-        const statData = _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData(config)
+        const statData = _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(config)
         statData.setData(config.customData)
         out.statData(key, statData)
         delete out.stat_[key]
@@ -32630,7 +32910,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
             statKeys[code] = statKey
 
             if (customData && !eurostatDatasetCode) {
-                const statData = _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData({ code, unitText: unitText || 'Value', preprocess, transform })
+                const statData = _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData({ code, unitText: unitText || 'Value', preprocess, transform })
                 const regionData = {}
                 for (const regionId in customData) {
                     const value = customData[regionId]?.[code]
@@ -32681,7 +32961,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
                 out.statChannels_[channel].totalStatKey = totalStatKey
 
                 if (customData && !eurostatDatasetCode) {
-                    const statData = _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData({ code: totalCode, unitText: unitText || 'Value', preprocess, transform })
+                    const statData = _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData({ code: totalCode, unitText: unitText || 'Value', preprocess, transform })
                     const regionData = {}
                     for (const regionId in customData) {
                         let total = customData[regionId]?.[totalCode]
@@ -32718,7 +32998,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
     // ── Layer 0 facade + thematic API ─────────────────────────────────────────────
     // The map is its own layer 0 until its type is migrated to a real Layer (Phase 3+).
     // makeMapSelfLayer installs the (relocated) encoding API onto the map.
-    ;(0,_layer__WEBPACK_IMPORTED_MODULE_11__.makeMapSelfLayer)(out)
+    ;(0,_layer__WEBPACK_IMPORTED_MODULE_12__.makeMapSelfLayer)(out)
 
     // ── Layer stack ───────────────────────────────────────────────────────────────
     out.layers_ = mapType ? [out] : [] // facade: the map is its own layer 0 if type specified, empty stack if not
@@ -32740,7 +33020,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
 
     out.addLayer = function (typeOrConfig, config) {
         const cfg = typeof typeOrConfig === 'string' ? { type: typeOrConfig, ...(config || {}) } : { ...typeOrConfig }
-        const role = cfg.role || (0,_layer_registry__WEBPACK_IMPORTED_MODULE_12__.getRole)(cfg.type)
+        const role = cfg.role || (0,_layer_registry__WEBPACK_IMPORTED_MODULE_13__.getRole)(cfg.type)
         const addingBase = role === 'base'
         const onlyFacade = out.layers_.length === 1 && out.layers_[0] === out
 
@@ -32754,7 +33034,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         }
 
         // Real Layer path is only available for REGISTERED types (Phase 3+).
-        if (!(0,_layer_registry__WEBPACK_IMPORTED_MODULE_12__.isLayerTypeRegistered)(cfg.type)) {
+        if (!(0,_layer_registry__WEBPACK_IMPORTED_MODULE_13__.isLayerTypeRegistered)(cfg.type)) {
             console.error(
                 `[eurostat-map] Layer type "${cfg.type}" is not yet available as a layer. ` +
                     `Use eurostatmap.map('${cfg.type}') for a standalone single-type map for now.`
@@ -32762,8 +33042,8 @@ const createStatMap = function (config, withCenterPoints, mapType) {
             return out.activeLayer()
         }
 
-        const layer = (0,_layer__WEBPACK_IMPORTED_MODULE_11__.createLayer)(out, cfg)
-        ;(0,_layer_registry__WEBPACK_IMPORTED_MODULE_12__.getLayerType)(cfg.type).decorate(layer, cfg)
+        const layer = (0,_layer__WEBPACK_IMPORTED_MODULE_12__.createLayer)(out, cfg)
+        ;(0,_layer_registry__WEBPACK_IMPORTED_MODULE_13__.getLayerType)(cfg.type).decorate(layer, cfg)
 
         if (addingBase) out.layers_.unshift(layer)
         else out.layers_.push(layer)
@@ -32788,7 +33068,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
             if (l.legendObj_) {
                 // Global lookup, not svg.select(...): a caller-managed external legend container
                 // (see _hasExternalSvgId) may live outside this map's own SVG subtree.
-                const ls = (0,d3_selection__WEBPACK_IMPORTED_MODULE_3__["default"])('#' + l.legendObj_.svgId)
+                const ls = (0,d3_selection__WEBPACK_IMPORTED_MODULE_4__["default"])('#' + l.legendObj_.svgId)
                 if (!ls.empty()) ls.remove()
             }
         }
@@ -32881,19 +33161,19 @@ const createStatMap = function (config, withCenterPoints, mapType) {
      * map.statData().setData({ DE: 120, FR: 95, IT: 88 })
      */
     out.statData_ = {
-        default: _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData(),
-        color: _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData(),
-        size: _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData(),
-        v1: _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData(),
-        v2: _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData(), //bivariate
-        v3: _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData(), //trivariate
+        default: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(),
+        color: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(),
+        size: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(),
+        v1: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(),
+        v2: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(), //bivariate
+        v3: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(), //trivariate
     }
     out.statData = function (k, v) {
         if (!arguments.length) return out.statData_['default']
 
         // lazy create if not exist
         if (arguments.length === 1) {
-            if (!out.statData_[k]) out.statData_[k] = _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData()
+            if (!out.statData_[k]) out.statData_[k] = _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData()
             return out.statData_[k]
         }
 
@@ -32971,7 +33251,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
     // one that actually showed it.
     const getDefaultLegendVisible = function () {
         if (out.legendButton_) {
-            return !(0,_utils__WEBPACK_IMPORTED_MODULE_0__.isMobile)(out.legendVisibilityBreakpoint_)
+            return !(0,_layout_profile__WEBPACK_IMPORTED_MODULE_1__.isCompact)(out, out.legendVisibilityBreakpoint_)
         }
         return true
     }
@@ -32984,7 +33264,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
 
         // Global lookup, not out.svg().select(...): a caller-managed external legend container
         // (see _hasExternalSvgId) may live outside this map's own SVG subtree.
-        const legendSvg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_3__["default"])('#' + legend.svgId)
+        const legendSvg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_4__["default"])('#' + legend.svgId)
         if (!legendSvg.empty()) {
             legendSvg.style('display', visible ? null : 'none')
         }
@@ -33045,7 +33325,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         if (v == false) {
             const legend = out.legendObj()
             if (legend) {
-                const legendSvg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_3__["default"])('#' + legend.svgId)
+                const legendSvg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_4__["default"])('#' + legend.svgId)
                 if (legendSvg.size() > 0) {
                     legendSvg.selectAll('*').remove()
                 }
@@ -33085,7 +33365,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         if (v == false) {
             const rankedBarChartObj = out.rankedBarChartObj()
             if (rankedBarChartObj) {
-                const rbcSvg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_3__["default"])('#' + rankedBarChartObj.svgId)
+                const rbcSvg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_4__["default"])('#' + rankedBarChartObj.svgId)
                 if (rbcSvg.size() > 0) {
                     rbcSvg.selectAll('*').remove()
                 }
@@ -33152,6 +33432,8 @@ const createStatMap = function (config, withCenterPoints, mapType) {
 
         //build map template base
         out.buildMapTemplateBase()
+        // rebuild when the room the map has changes enough to change its layout (see layout-profile.js)
+        ;(0,_layout_profile__WEBPACK_IMPORTED_MODULE_1__.observeContainer)(out)
 
         //add additional filters for fill patterns for example
         if (out.filtersDefinitionFunction_) {
@@ -33167,11 +33449,11 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         //define tooltip
         //prepare map tooltip
         if (out.tooltip_) {
-            out._tooltip = _tooltip_tooltip__WEBPACK_IMPORTED_MODULE_4__.tooltip(out.tooltip_)
+            out._tooltip = _tooltip_tooltip__WEBPACK_IMPORTED_MODULE_5__.tooltip(out.tooltip_)
         } else {
             //no config specified, use default
             if (!out.tooltip_) out.tooltip_ = { id: out.svgId() }
-            out._tooltip = _tooltip_tooltip__WEBPACK_IMPORTED_MODULE_4__.tooltip(out.tooltip_)
+            out._tooltip = _tooltip_tooltip__WEBPACK_IMPORTED_MODULE_5__.tooltip(out.tooltip_)
         }
 
         //launch geo data retrieval
@@ -33196,9 +33478,9 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         if (!out._wrapper_) return
 
         if (out._loadingGeoCount_ > 0 || out._loadingStatCount_ > 0) {
-            (0,_decoration_spinner__WEBPACK_IMPORTED_MODULE_5__.showSpinner)(out._wrapper_, 'Loading…')
+            (0,_decoration_spinner__WEBPACK_IMPORTED_MODULE_6__.showSpinner)(out._wrapper_, 'Loading…')
         } else {
-            (0,_decoration_spinner__WEBPACK_IMPORTED_MODULE_5__.hideSpinner)(out._wrapper_)
+            (0,_decoration_spinner__WEBPACK_IMPORTED_MODULE_6__.hideSpinner)(out._wrapper_)
         }
     }
 
@@ -33220,7 +33502,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         // Scoping this to out.svg() meant such containers were never found, and a second,
         // wrongly-nested element with the same id got created here instead, leaving the
         // caller-managed one empty while the real legend rendered into the wrong element.
-        let legendSvg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_3__["default"])('#' + legend.svgId)
+        let legendSvg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_4__["default"])('#' + legend.svgId)
         if (legendSvg.empty()) {
             out.svg().append('g').attr('id', legend.svgId).attr('class', 'em-legend')
         }
@@ -33267,7 +33549,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         // Global lookup, not out.svg().select(...): a caller-managed external container may live
         // outside this map's own SVG subtree entirely (see the equivalent comment on
         // buildLegendForLayer above).
-        let rbcSvg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_3__["default"])('#' + rankedBarChartObj.svgId)
+        let rbcSvg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_4__["default"])('#' + rankedBarChartObj.svgId)
         if (rbcSvg.empty()) {
             out.svg().append('g').attr('id', rankedBarChartObj.svgId).attr('class', 'em-ranked-bar-chart')
         }
@@ -33323,7 +33605,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         let remaining = targets
         _geoTargetsPending = targets
 
-        ;(0,_map_instance__WEBPACK_IMPORTED_MODULE_7__.updateGeoMapTemplate)(() => {
+        ;(0,_map_instance__WEBPACK_IMPORTED_MODULE_8__.updateGeoMapTemplate)(() => {
             out._loadingGeoCount_ = Math.max(0, out._loadingGeoCount_ - 1)
             out.updateLoader()
 
@@ -33364,7 +33646,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
             if (!config && !manualData) continue
 
             if (config) {
-                const statData = _stat_data__WEBPACK_IMPORTED_MODULE_1__.statData(config)
+                const statData = _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(config)
                 out.statData(statKey, statData)
 
                 // detect remote on statData, not config
@@ -33425,17 +33707,17 @@ const createStatMap = function (config, withCenterPoints, mapType) {
                 .select('#em-zoom-group-' + out.svgId_)
                 .selectAll('*')
                 .remove()
-            ;(0,_cartograms__WEBPACK_IMPORTED_MODULE_10__.buildGridCartogramBase)(out)
+            ;(0,_cartograms__WEBPACK_IMPORTED_MODULE_11__.buildGridCartogramBase)(out)
         }
 
         // filter out centroids without stat data
         if (withCenterPoints) {
             // insets
             if (out.insetTemplates_) {
-                (0,_utils__WEBPACK_IMPORTED_MODULE_0__.executeForAllInsets)(out.insetTemplates_, out.svgId_, _geo_centroids__WEBPACK_IMPORTED_MODULE_8__.refreshCentroids)
+                (0,_utils__WEBPACK_IMPORTED_MODULE_0__.executeForAllInsets)(out.insetTemplates_, out.svgId_, _geo_centroids__WEBPACK_IMPORTED_MODULE_9__.refreshCentroids)
             }
             //main map
-            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_8__.refreshCentroids)(out)
+            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_9__.refreshCentroids)(out)
         }
 
         out.updateAllLayers()
@@ -33477,7 +33759,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
      */
     out.getLegendConstructor = function () {
         console.warn('Map getLegendConstructor function not implemented')
-        return _legend_legend__WEBPACK_IMPORTED_MODULE_2__.legend
+        return _legend_legend__WEBPACK_IMPORTED_MODULE_3__.legend
     }
 
     /**
@@ -33531,11 +33813,11 @@ const createStatMap = function (config, withCenterPoints, mapType) {
     }
 
     out.exportMapToPNG = function (width, height, filename) {
-        return (0,_export__WEBPACK_IMPORTED_MODULE_9__.exportMapToPNG)(out, width, height, filename)
+        return (0,_export__WEBPACK_IMPORTED_MODULE_10__.exportMapToPNG)(out, width, height, filename)
     }
 
     out.exportMapToSVG = function (filename) {
-        return (0,_export__WEBPACK_IMPORTED_MODULE_9__.exportMapToSVG)(out, filename)
+        return (0,_export__WEBPACK_IMPORTED_MODULE_10__.exportMapToSVG)(out, filename)
     }
 
     return out
@@ -33562,7 +33844,7 @@ const getURLParameters = function () {
  * @returns {MapInstance}
  */
 const buildSingleLayerMap = function (type, config) {
-    const role = (0,_layer_registry__WEBPACK_IMPORTED_MODULE_12__.getRole)(type)
+    const role = (0,_layer_registry__WEBPACK_IMPORTED_MODULE_13__.getRole)(type)
     const withCenterPoints = role === 'overlay' || type === 'bar' || type === 'barComposition'
     const CANONICAL_MAP_TYPES = {
         choropleth: 'ch',
@@ -33739,11 +34021,11 @@ const buildSingleLayerMap = function (type, config) {
     typeFields = [...new Set(typeFields)]
     typeMethods = [...new Set(typeMethods)]
 
-    ;(0,_layer__WEBPACK_IMPORTED_MODULE_11__.forwardFieldsToActiveLayer)(out, [...baseFields, ...typeFields])
+    ;(0,_layer__WEBPACK_IMPORTED_MODULE_12__.forwardFieldsToActiveLayer)(out, [...baseFields, ...typeFields])
 
     const allMethods = [...baseMethods, ...typeMethods]
     for (const method of allMethods) {
-        ;(0,_layer__WEBPACK_IMPORTED_MODULE_11__.forwardChainableMethod)(out, method)
+        ;(0,_layer__WEBPACK_IMPORTED_MODULE_12__.forwardChainableMethod)(out, method)
     }
 
     return out
@@ -33880,20 +34162,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/linear.js");
 /* harmony import */ var d3_color__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-color */ "./node_modules/d3-color/src/color.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
+
 
 
 
 const MOBILE_BREAKPOINT = 768
 
 /**
- * Determine whether the current viewport is at or below the mobile breakpoint.
+ * Determine whether the compact layout applies: the container of the map (the last laid out map when none is
+ * given, the window when the container cannot be measured) is at or below the breakpoint, see layout-profile.js.
  * Returns false when no browser window is available (for example during SSR).
  *
  * @param {number} breakpoint
+ * @param {*} [out] the map instance, when known
  * @returns {boolean}
  */
-function isMobile(breakpoint = MOBILE_BREAKPOINT) {
-    return typeof window !== 'undefined' && window.innerWidth <= breakpoint
+function isMobile(breakpoint = MOBILE_BREAKPOINT, out) {
+    return typeof window !== 'undefined' && (0,_layout_profile__WEBPACK_IMPORTED_MODULE_2__.isCompact)(out, breakpoint)
 }
 
 //types
@@ -34813,7 +35099,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_zoom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-zoom */ "./node_modules/d3-zoom/src/index.js");
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var _layers_flow_sankey__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../layers/flow/sankey */ "./src/layers/flow/sankey.js");
-/* harmony import */ var _decoration_label_layout__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./decoration/label-layout */ "./src/core/decoration/label-layout.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
+/* harmony import */ var _decoration_label_layout__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./decoration/label-layout */ "./src/core/decoration/label-layout.js");
+
 
 
 
@@ -34913,12 +35201,12 @@ const defineGeographicZoom = function (map) {
                 if (map.lockPanUntilZoom_) panUnlocked = true
                 zoomHandler(e, previousT, map)
                 zoomGroup.attr('data-zoom', t.k).attr('transform', t)
-                ;(0,_decoration_label_layout__WEBPACK_IMPORTED_MODULE_3__.hideCollidingLabels)(map) // measures the screen, so it needs the new transform
+                ;(0,_decoration_label_layout__WEBPACK_IMPORTED_MODULE_4__.hideCollidingLabels)(map) // measures the screen, so it needs the new transform
                 previousT = t
             } else if (!map.lockPanUntilZoom_ || panUnlocked) {
                 panHandler(e, map)
                 zoomGroup.attr('transform', t)
-                ;(0,_decoration_label_layout__WEBPACK_IMPORTED_MODULE_3__.hideCollidingLabels)(map)
+                ;(0,_decoration_label_layout__WEBPACK_IMPORTED_MODULE_4__.hideCollidingLabels)(map)
                 previousT = t
             } else {
                 snappingBack = true
@@ -34942,6 +35230,9 @@ const defineGeographicZoom = function (map) {
     }
 
     svg.call(map.__zoomBehavior)
+    // In the compact layout a single finger scrolls the page (d3-zoom would otherwise claim every touch, trapping
+    // the page under the map); a horizontal drag still pans and two fingers pinch or pan the map.
+    if ((0,_layout_profile__WEBPACK_IMPORTED_MODULE_3__.isCompact)(map)) svg.style('touch-action', 'pan-y')
 }
 
 function setMapView(map, pos) {
@@ -49588,7 +49879,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _legend_continuous__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../legend-continuous */ "./src/legend/legend-continuous.js");
 /* harmony import */ var _legend_discrete__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../legend-discrete */ "./src/legend/legend-discrete.js");
 /* harmony import */ var _legend_value_by_alpha__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./legend-value-by-alpha */ "./src/legend/choropleth/legend-value-by-alpha.js");
+/* harmony import */ var _core_legend_below__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../core/legend-below */ "./src/core/legend-below.js");
 //legend-choropleth.js
+
 
 
 
@@ -49661,9 +49954,19 @@ const legend = function (map, config = {}) {
         }
     }
 
+    // what the caller set, which the compact layout must not override
+    const configuredOrientation = out.orientation
+    const configuredWidth = out.width
+    const orientationIsExplicit = config.orientation != null
+    const widthIsExplicit = config.width != null
+
     //@override
     out.update = function () {
         out.updateConfig()
+        // Under the map (compact layout) a legend runs along it, as wide as the map allows; elsewhere it is as configured
+        const below = (0,_core_legend_below__WEBPACK_IMPORTED_MODULE_6__.legendsBelowMap)(out.map) && !out.histogram
+        out.orientation = below && !orientationIsExplicit ? 'horizontal' : configuredOrientation
+        out.width = below && !widthIsExplicit ? Math.max(120, Math.min(out.map.width() - 2 * (_core_legend_below__WEBPACK_IMPORTED_MODULE_6__.EDGE + out.boxPadding), 480)) : configuredWidth
         out.updateContainer()
 
         if (out.lgg.node()) {
@@ -52813,7 +53116,7 @@ function drawLowHighLabels(out, width, height, isVertical) {
                 .text(divergence)
         }
     } else {
-        const barY = height + titleOffset + 10 // 10px below horizontal bar
+        const barY = height + titleOffset + 18 // below the horizontal bar, the text baseline clear of it
 
         if (low) {
             container.append('text').attr('class', 'em-legend-label').attr('x', 0).attr('y', barY).attr('text-anchor', 'start').text(low)
@@ -55663,9 +55966,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./legend-swatch */ "./src/legend/legend-swatch.js");
 /* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
 /* harmony import */ var _core_buttons_corner_radius__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../core/buttons/corner-radius */ "./src/core/buttons/corner-radius.js");
-/* harmony import */ var _core_decoration_corner_position__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../core/decoration/corner-position */ "./src/core/decoration/corner-position.js");
-/* harmony import */ var _choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./choropleth/legend-choropleth */ "./src/legend/choropleth/legend-choropleth.js");
-/* harmony import */ var _proportional_symbol_legend_proportional_symbols__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./proportional-symbol/legend-proportional-symbols */ "./src/legend/proportional-symbol/legend-proportional-symbols.js");
+/* harmony import */ var _core_legend_below__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../core/legend-below */ "./src/core/legend-below.js");
+/* harmony import */ var _core_layout__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../core/layout */ "./src/core/layout.js");
+/* harmony import */ var _core_decoration_corner_position__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../core/decoration/corner-position */ "./src/core/decoration/corner-position.js");
+/* harmony import */ var _choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./choropleth/legend-choropleth */ "./src/legend/choropleth/legend-choropleth.js");
+/* harmony import */ var _proportional_symbol_legend_proportional_symbols__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./proportional-symbol/legend-proportional-symbols */ "./src/legend/proportional-symbol/legend-proportional-symbols.js");
+
+
 
 
 
@@ -55860,10 +56167,17 @@ const legend = function (map) {
         const map = out.map
         const container = out.lgg
         if (!map || !container || !container.node()) return
+        // compact layout: the legends sit under the map (see core/legend-below.js)
+        if ((0,_core_legend_below__WEBPACK_IMPORTED_MODULE_5__.legendsBelowMap)(map) && !out._hasExternalSvgId) {
+            const height = (0,_core_legend_below__WEBPACK_IMPORTED_MODULE_5__.placeLegendsBelow)(map, (map._headerHeight_ || 0) + map.height())
+            // the legends are drawn once the data is in: make room for them under the map
+            if (height !== map._legendsBelowHeight_) (0,_core_layout__WEBPACK_IMPORTED_MODULE_6__.recalculateLayout)(map)
+            return
+        }
 
         const hasManualX = out.x != null
         const hasManualY = out.y != null
-        const userCornerPosition = (0,_core_decoration_corner_position__WEBPACK_IMPORTED_MODULE_5__.getCornerPosition)(out.position)
+        const userCornerPosition = (0,_core_decoration_corner_position__WEBPACK_IMPORTED_MODULE_7__.getCornerPosition)(out.position)
         // Don't fall back to a default 'top right' position for a caller-managed external
         // container (see _hasExternalSvgId in updateConfig()) — the caller positioned it
         // themselves and expects us to leave that transform alone unless they also opt into
@@ -55874,7 +56188,7 @@ const legend = function (map) {
 
         const bbox = getLegendBBox(container, out)
         const buttonReserve = cornerPosition ? getLegendButtonReserve(map, cornerPosition) : 0
-        const cornerCoords = cornerPosition ? (0,_core_decoration_corner_position__WEBPACK_IMPORTED_MODULE_5__.getCornerCoords)(cornerPosition, bbox, map, out.boxPadding, buttonReserve) : null
+        const cornerCoords = cornerPosition ? (0,_core_decoration_corner_position__WEBPACK_IMPORTED_MODULE_7__.getCornerCoords)(cornerPosition, bbox, map, out.boxPadding, buttonReserve) : null
 
         let x = hasManualX ? out.x : cornerCoords ? cornerCoords.x : map.width() - out.width - out.boxPadding
         let y = hasManualY ? out.y : cornerCoords ? cornerCoords.y : out.boxPadding
@@ -55888,7 +56202,7 @@ const legend = function (map) {
                 map.layers_.forEach((l) => {
                     const leg = l.legendObj_
                     if (leg && leg.lgg && !leg.lgg.empty()) {
-                        const legUserPos = (0,_core_decoration_corner_position__WEBPACK_IMPORTED_MODULE_5__.getCornerPosition)(leg.position)
+                        const legUserPos = (0,_core_decoration_corner_position__WEBPACK_IMPORTED_MODULE_7__.getCornerPosition)(leg.position)
                         const legPos = legUserPos || (!(leg.x != null) && !(leg.y != null) ? 'top right' : null)
                         if (legPos === cornerPosition) {
                             sharingLegends.push(leg)
@@ -56063,8 +56377,8 @@ const legend = function (map) {
     out.getLabelFormatter = function (out) {
         const map = out.map
         const mapType = map._mapType
-        if (mapType === 'ps') return (0,_proportional_symbol_legend_proportional_symbols__WEBPACK_IMPORTED_MODULE_7__.getPropSymbolColorLabelFormatter)(out)
-        return (0,_choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_6__.getChoroplethLabelFormatter)(out)
+        if (mapType === 'ps') return (0,_proportional_symbol_legend_proportional_symbols__WEBPACK_IMPORTED_MODULE_9__.getPropSymbolColorLabelFormatter)(out)
+        return (0,_choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_8__.getChoroplethLabelFormatter)(out)
     }
 
     out.getClassToFillStyle = function (out) {
@@ -56111,12 +56425,12 @@ const legend = function (map) {
     }
 
     out.getHighlightFunction = function (map) {
-        if (map._mapType == 'ps') return _proportional_symbol_legend_proportional_symbols__WEBPACK_IMPORTED_MODULE_7__.highlightPsSymbols
+        if (map._mapType == 'ps') return _proportional_symbol_legend_proportional_symbols__WEBPACK_IMPORTED_MODULE_9__.highlightPsSymbols
         return highlightRegions
     }
 
     out.getUnHighlightFunction = function (map) {
-        if (map._mapType == 'ps') return _proportional_symbol_legend_proportional_symbols__WEBPACK_IMPORTED_MODULE_7__.unhighlightPsSymbols
+        if (map._mapType == 'ps') return _proportional_symbol_legend_proportional_symbols__WEBPACK_IMPORTED_MODULE_9__.unhighlightPsSymbols
         return unhighlightRegions
     }
 
@@ -56145,7 +56459,7 @@ const legend = function (map) {
     function getLegendButtonReserve(map, position) {
         if (!map.legendButton_ || map.legendButtonPosition_) return 0
 
-        const buttonPosition = (0,_core_decoration_corner_position__WEBPACK_IMPORTED_MODULE_5__.getCornerPosition)(map.legendObj_?.position) || 'top left'
+        const buttonPosition = (0,_core_decoration_corner_position__WEBPACK_IMPORTED_MODULE_7__.getCornerPosition)(map.legendObj_?.position) || 'top left'
         if (buttonPosition !== position) return 0
 
         const svg = map.svg?.()

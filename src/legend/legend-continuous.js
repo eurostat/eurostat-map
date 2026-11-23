@@ -280,7 +280,7 @@ function drawLowHighLabels(out, width, height, isVertical) {
                 .text(divergence)
         }
     } else {
-        const barY = height + titleOffset + 10 // 10px below horizontal bar
+        const barY = height + titleOffset + 18 // below the horizontal bar, the text baseline clear of it
 
         if (low) {
             container.append('text').attr('class', 'em-legend-label').attr('x', 0).attr('y', barY).attr('text-anchor', 'start').text(low)
