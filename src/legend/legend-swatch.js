@@ -25,26 +25,45 @@ export function appendLegendSwatchLabel(row, { x, y, dy, anchor, text, className
 }
 
 /**
- * Lay out a vertical stack of swatch + label rows. Shared by the discrete choropleth "ranges" legend and the
- * flow colour legend so both space their rows identically.
+ * Geometry of a vertical stack of swatches. The single source of truth for where each row sits, so every
+ * discrete legend (choropleth ranges/thresholds, categorical, flow colour) spaces its swatches the same way
+ * and anything drawn after the rows (no-data box, diverging line, max/min ticks) can ask where the stack ends.
+ *
+ * @param {Object} o
+ * @param {number} o.count number of swatches
+ * @param {number} o.shapeHeight swatch height
+ * @param {number} [o.startY=0] y of the top of the first swatch
+ * @param {number} [o.gap=0] vertical gap between swatches (0 = contiguous)
+ * @returns {{rowY:(i:number)=>number, top:number, bottom:number}}
+ */
+export function swatchStackLayout({ count, shapeHeight, startY = 0, gap = 0 }) {
+    const rowY = (i) => startY + i * (shapeHeight + gap)
+    return { rowY, top: startY, bottom: count ? rowY(count - 1) + shapeHeight : startY }
+}
+
+/**
+ * Draw a vertical stack of swatch rows: one `<g>` per item holding the swatch, an optional label centred on the
+ * swatch, and whatever the caller's `decorate` hook adds (separator lines, ticks, boundary labels...).
+ * Layout is the only thing decided here; what each row means (class, ticks, hover) stays with the caller.
  *
  * @param {Object} container d3 selection to append the rows to
- * @param {Array<{color:string,label:string,yOffset?:number,onEnter?:Function,onLeave?:Function}>} items
+ * @param {Array<{color:string,label?:string,yOffset?:number,onEnter?:Function,onLeave?:Function}>} items
  * @param {Object} opts
  * @param {number} opts.shapeWidth swatch width
  * @param {number} opts.shapeHeight swatch height
  * @param {number} [opts.startY=0] y of the first row
  * @param {number} [opts.gap=0] vertical gap between rows
- * @param {number} opts.labelX x of the labels
- * @param {number} [opts.separatorLength] when set, draws a separator line above every row but the first
- * @param {string} [opts.rowClass='em-legend-item'] class of each row group
+ * @param {number} [opts.labelX] x of the centred labels (required when items have a label)
  * @param {string} [opts.labelDy='0.3em'] label dy
- * @returns {Array<{row:Object,swatch:Object,label:Object,y:number}>}
+ * @param {string} [opts.rowClass='em-legend-item'] class of each row group
+ * @param {(row:Object, info:{i:number,y:number,item:Object})=>void} [opts.decorate] runs after the swatch, before the label
+ * @returns {Array<{row:Object,swatch:Object,label:Object|null,y:number}>}
  */
 export function appendLegendSwatchRows(container, items, opts) {
-    const { shapeWidth, shapeHeight, startY = 0, gap = 0, labelX, separatorLength, rowClass = 'em-legend-item', labelDy = '0.3em' } = opts
+    const { shapeWidth, shapeHeight, startY = 0, gap = 0, labelX, labelDy = '0.3em', rowClass = 'em-legend-item', decorate } = opts
+    const layout = swatchStackLayout({ count: items.length, shapeHeight, startY, gap })
     return items.map((item, i) => {
-        const y = startY + i * (shapeHeight + gap) + (item.yOffset || 0)
+        const y = layout.rowY(i) + (item.yOffset || 0)
         const row = container.append('g').attr('class', rowClass)
         const swatch = appendLegendSwatch(row, {
             x: 0,
@@ -55,10 +74,8 @@ export function appendLegendSwatchRows(container, items, opts) {
             onEnter: item.onEnter,
             onLeave: item.onLeave,
         })
-        if (separatorLength != null && i > 0) {
-            row.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', separatorLength).attr('y2', y)
-        }
-        const label = appendLegendSwatchLabel(row, { x: labelX, y: y + shapeHeight / 2, dy: labelDy, text: item.label })
+        decorate?.(row, { i, y, item })
+        const label = item.label == null ? null : appendLegendSwatchLabel(row, { x: labelX, y: y + shapeHeight / 2, dy: labelDy, text: item.label })
         return { row, swatch, label, y }
     })
 }

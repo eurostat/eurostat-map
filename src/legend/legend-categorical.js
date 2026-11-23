@@ -3,6 +3,7 @@ import * as Legend from './legend'
 import { executeForAllInsets, getLegendRegionsSelector } from '../core/utils'
 import { appendPatternFillLegend } from './legend-pattern-fill'
 import { highlightRegions, unhighlightRegions } from './legend'
+import { appendLegendSwatchRows } from './legend-swatch'
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
 
@@ -74,46 +75,33 @@ export const legend = function (map, config) {
         const ecls = out.order ? out.order : domain
 
         //draw legend elements for classes: rectangle + label
-        for (let i = 0; i < ecls.length; i++) {
-            //the class
-            const ecl_ = ecls[i]
+        const items = ecls.map((ecl_) => {
             const ecl = map.classifier_(ecl_)
-            const fillColor = map.classToFillStyle_[ecl_]
-
-            //the vertical position of the legend element
-            const y = out.titlePadding + i * (out.shapeHeight + out.shapePadding)
-
-            //rectangle
-            container
-                .append('rect')
-                .attr('class', 'em-legend-rect')
-                .attr('x', 0)
-                .attr('y', y)
-                .attr('width', out.shapeWidth)
-                .attr('height', out.shapeHeight)
-                .style('fill', fillColor)
-                .on('mouseover', function () {
+            return {
+                color: map.classToFillStyle_[ecl_],
+                label: map.classToText() ? map.classToText()[ecl_] : ecl_,
+                onEnter: () => {
                     highlightRegions(out.map, ecl)
                     if (out.map.insetTemplates_) {
                         executeForAllInsets(out.map.insetTemplates_, out.svgId_, highlightRegions, ecl)
                     }
-                })
-                .on('mouseout', function () {
+                },
+                onLeave: () => {
                     unhighlightRegions(out.map, ecl)
                     if (out.map.insetTemplates_) {
                         executeForAllInsets(out.map.insetTemplates_, out.svgId_, unhighlightRegions, ecl)
                     }
-                })
-
-            //label
-            container
-                .append('text')
-                .attr('class', 'em-legend-label')
-                .attr('x', out.shapeWidth + out.labelOffsets.x)
-                .attr('y', y + out.shapeHeight * 0.5)
-                .attr('dy', '0.35em') // ~vertical centering
-                .text(map.classToText() ? map.classToText()[ecl_] : ecl_)
-        }
+                },
+            }
+        })
+        appendLegendSwatchRows(container, items, {
+            shapeWidth: out.shapeWidth,
+            shapeHeight: out.shapeHeight,
+            startY: out.titlePadding,
+            gap: out.shapePadding,
+            labelX: out.shapeWidth + out.labelOffsets.x,
+            labelDy: '0.35em',
+        })
     }
 
     return out

@@ -1,7 +1,7 @@
 // legends for discrete color scales
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
-import { appendLegendSwatch, appendLegendSwatchLabel, appendLegendSwatchRows } from './legend-swatch'
+import { appendLegendSwatch, appendLegendSwatchLabel, appendLegendSwatchRows, swatchStackLayout } from './legend-swatch'
 import { executeForAllInsets, getLegendRegionsSelector, spaceAsThousandSeparator, getFontSizeFromClass, toCategoryEcl } from '../core/utils'
 import { highlightRegions, getDimmedFill } from './legend.js'
 import { getCentroidsGroup } from '../core/geo/centroids'
@@ -124,7 +124,7 @@ export function drawDiscreteLegend(out, x, y) {
 
     // Optionally add no-data
     if (config.noData) {
-        let y = out.getNumberOfClasses(out) * config.shapeHeight + getTitlePadding(out) + 3 // 3px padding
+        let y = classStackBottom(out, config) + 3 // 3px padding
         const x = 0
         if (config.pointOfDivergence && config.pointOfDivergencePadding) y += config.pointOfDivergencePadding // shift legend items down after point of divergence
         const container = out._discreteLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
@@ -135,7 +135,7 @@ export function drawDiscreteLegend(out, x, y) {
 
     // Optionally add extra categorical classes mixed into this choropleth's classification
     // (e.g. a "no railway lines" class alongside numeric electrification-rate classes)
-    let categoryY = out.getNumberOfClasses(out) * config.shapeHeight + getTitlePadding(out) + 3
+    let categoryY = classStackBottom(out, config) + 3
     if (config.pointOfDivergence && config.pointOfDivergencePadding) categoryY += config.pointOfDivergencePadding
     if (config.noData) categoryY += out.noDataShapeHeight + out.noDataPadding // stack below the no-data box
     appendCategoryLegendItems(out, categoryY)
@@ -528,6 +528,11 @@ function appendHorizontalExtraItems(out, config) {
     }
 }
 
+/** y of the bottom of the class swatch stack (just below the title), before any divergence shift. */
+function classStackBottom(out, config) {
+    return swatchStackLayout({ count: out.getNumberOfClasses(out), shapeHeight: config.shapeHeight, startY: getTitlePadding(out) }).bottom
+}
+
 function getTitlePadding(out) {
     // Calculate the padding between the title and the first legend item
     const map = out.map
@@ -575,62 +580,44 @@ function createThresholdsLegend(out, config) {
         }
     }
 
+    const thresholdItems = []
     for (let i = 0; i < numberOfClasses; i++) {
-        const y = i * config.shapeHeight + titlePadding
-        const x = 0
         const ecl = out.ascending ? numberOfClasses - i - 1 : i
-        const fillColor = classToFillStyle(ecl, numberOfClasses)
-        const itemContainer = container.append('g').attr('class', 'em-legend-item')
-
-        // Append rectangle for each class
-        appendLegendSwatch(itemContainer, {
-            x,
-            y,
-            width: config.shapeWidth,
-            height: config.shapeHeight,
-            color: fillColor,
+        thresholdItems.push({
+            color: classToFillStyle(ecl, numberOfClasses),
             onEnter: () => highlightClass(map, highlightFunction, ecl),
             onLeave: () => highlightClass(map, unhighlightFunction, ecl),
+            ecl,
         })
-
-        // Append separation line
-        if (i > 0) {
-            itemContainer.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', sepLineLength).attr('y2', y)
-        }
-
-        // Append tick line at each internal boundary
-        if (i > 0) {
-            itemContainer
-                .append('line')
-                .attr('class', 'em-legend-tick')
-                .attr('x1', sepLineLength)
-                .attr('y1', y)
-                .attr('x2', sepLineLength + config.tickLength)
-                .attr('y2', y)
-        }
-
-        // Append label at internal boundaries
-        if (i < numberOfClasses - 1) {
-            // mark label so we can move it in drawDivergingLine
-            const label = appendLegendSwatchLabel(itemContainer, {
-                x: Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0),
-                y: y + config.shapeHeight,
-                dy: '0.3em',
-                text: () => {
-                    if (config.labels) return config.labels[i]
-
-                    if (classifier?.invertExtent) {
-                        const range = classifier.invertExtent(ecl)
-                        return labelFormatter(range[out.ascending ? 0 : 1])
-                    }
-                    return map.noDataText_ || ''
-                },
-            })
-
-            // mark label so we can move it in drawDivergingLine
-            if (config.pointOfDivergenceLabel && i == config.pointOfDivergence - 1) label.attr('class', 'em-legend-label em-legend-label-divergence')
-        }
     }
+    const thresholdLabelX = Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0)
+    appendLegendSwatchRows(container, thresholdItems, {
+        shapeWidth: config.shapeWidth,
+        shapeHeight: config.shapeHeight,
+        startY: titlePadding,
+        decorate: (row, { i, y, item }) => {
+            if (i > 0) {
+                appendSeparator(row, y, sepLineLength)
+                // tick at each internal boundary
+                row.append('line').attr('class', 'em-legend-tick').attr('x1', sepLineLength).attr('y1', y).attr('x2', sepLineLength + config.tickLength).attr('y2', y)
+            }
+            // label at internal boundaries, below the swatch
+            if (i < numberOfClasses - 1) {
+                const label = appendLegendSwatchLabel(row, {
+                    x: thresholdLabelX,
+                    y: y + config.shapeHeight,
+                    dy: '0.3em',
+                    text: () => {
+                        if (config.labels) return config.labels[i]
+                        if (classifier?.invertExtent) return labelFormatter(classifier.invertExtent(item.ecl)[out.ascending ? 0 : 1])
+                        return map.noDataText_ || ''
+                    },
+                })
+                // mark label so we can move it in drawDivergingLine
+                if (config.pointOfDivergenceLabel && i == config.pointOfDivergence - 1) label.attr('class', 'em-legend-label em-legend-label-divergence')
+            }
+        },
+    })
 
     // Add MIN and MAX ticks at the ends of the scale using statData extent
     if ((out.maxMin || config.maxMin) && Number.isFinite(globalMin) && Number.isFinite(globalMax)) {
@@ -700,7 +687,7 @@ function createThresholdsLegend(out, config) {
 
         if (showMin) {
             // Bottom boundary (MIN)
-            const yBottom = numberOfClasses * config.shapeHeight + titlePadding
+            const yBottom = swatchStackLayout({ count: numberOfClasses, shapeHeight: config.shapeHeight, startY: titlePadding }).bottom
             maxMinGroup
                 .append('line')
                 .attr('class', 'em-legend-tick em-legend-tick-min')
@@ -735,7 +722,7 @@ function createThresholdsLegend(out, config) {
     // the max length of the legend labels so it doesnt cover them
     if (config.pointOfDivergenceLabel) {
         const scaleTopY = titlePadding
-        const scaleBottomY = numberOfClasses * config.shapeHeight + titlePadding
+        const scaleBottomY = swatchStackLayout({ count: numberOfClasses, shapeHeight: config.shapeHeight, startY: titlePadding }).bottom
         for (let i = 0; i < numberOfClasses; i++) {
             let y = i * config.shapeHeight + titlePadding
             // point of divergence indicator
@@ -744,6 +731,11 @@ function createThresholdsLegend(out, config) {
             }
         }
     }
+}
+
+/** Thin line across the top of a swatch, separating it from the one above. */
+function appendSeparator(row, y, length) {
+    return row.append('line').attr('class', 'em-legend-separator').attr('x1', 0).attr('y1', y).attr('x2', length).attr('y2', y)
 }
 
 function createRangesLegend(out, config) {
@@ -775,13 +767,15 @@ function createRangesLegend(out, config) {
         shapeHeight: config.shapeHeight,
         startY: titlePadding,
         labelX: Math.max(config.shapeWidth, sepLineLength + config.tickLength) + (config.labelOffsets.x || 0),
-        separatorLength: sepLineLength,
+        decorate: (row, { i, y }) => {
+            if (i > 0) appendSeparator(row, y, sepLineLength)
+        },
     })
 
     // Draw diverging line if applicable. We draw it afterwards so that we can calculate the max length of the legend labels so it doesnt cover them
     if (config.pointOfDivergenceLabel) {
         const scaleTopY = titlePadding
-        const scaleBottomY = numberOfClasses * config.shapeHeight + titlePadding
+        const scaleBottomY = swatchStackLayout({ count: numberOfClasses, shapeHeight: config.shapeHeight, startY: titlePadding }).bottom
         for (let i = 0; i < numberOfClasses; i++) {
             let y = i * config.shapeHeight + titlePadding
             // point of divergence indicator
