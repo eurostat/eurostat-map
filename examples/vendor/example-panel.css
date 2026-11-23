@@ -141,3 +141,24 @@
     padding-top: 6px;
     padding-bottom: 6px;
 }
+
+/* a native dropdown (phones): Eurostat look, 16px text so that iOS does not zoom in on it */
+.ex-native-select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 40px 8px 12px;
+    border: 1px solid #404040;
+    border-radius: 4px;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%230e47cb' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 14px center / 14px;
+    color: #383838;
+    font: inherit;
+    font-size: 16px;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.ex-native-select:focus {
+    outline: 2px solid #0e47cb;
+    outline-offset: 1px;
+}

@@ -119,6 +119,27 @@ export function createPanel({ map = '#map', title = 'Settings', width = 280 } = 
             const groups = Array.isArray(options[0]) ? options : [options]
             const row = el('div', 'ex-control')
             row.appendChild(el('div', 'ex-label', escapeHtml(label)))
+
+            // On a phone the native picker is the right control: the dropdown component opens a search box (and with it
+            // the keyboard, which covers the panel) and its list is cut off by the scrolling bottom sheet.
+            if (narrow.matches) {
+                const native = el('select', 'ex-native-select')
+                const initialValue = String(value ?? groups[0][0].value)
+                groups.forEach((g, i) => {
+                    if (i) native.appendChild(Object.assign(el('option', '', '\u2500\u2500\u2500\u2500\u2500\u2500'), { disabled: true }))
+                    g.forEach((o) => {
+                        const option = el('option', '', escapeHtml(o.label))
+                        option.value = String(o.value)
+                        native.appendChild(option)
+                    })
+                })
+                native.value = initialValue
+                row.appendChild(native)
+                const values = new Map(groups.flat().map((o) => [String(o.value), o.value]))
+                native.addEventListener('change', () => onChange && onChange(values.get(native.value) ?? native.value))
+                return register(id, row, { get: () => values.get(native.value) ?? native.value, set: (v) => (native.value = String(v)) })
+            }
+
             const select = document.createElement('ewc-singleselect')
             const json = groups.map((g) => g.map((o) => ({ name: o.label, code: String(o.value), status: 'active' })))
             const initial = String(value ?? groups[0][0].value)
