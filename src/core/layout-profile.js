@@ -99,6 +99,10 @@ export const isCompact = function (out, breakpoint = COMPACT_BREAKPOINT) {
 export const observeContainer = function (out) {
     out._layoutObserver?.disconnect()
     out._layoutObserver = undefined
+    // a map built again into the same svg (a new map() call) replaces the one before: its observer must go
+    const previousSvg = out.svg_?.node?.()
+    previousSvg?.__emLayoutObserver?.disconnect()
+    if (previousSvg) previousSvg.__emLayoutObserver = undefined
     if (out.isInset || out.layout_ !== 'auto' || out._widthExplicit_ || typeof ResizeObserver === 'undefined') return
     const svg = out.svg_?.node?.()
     let host = svg?.parentNode
@@ -123,4 +127,5 @@ export const observeContainer = function (out) {
     })
     observer.observe(host)
     out._layoutObserver = observer
+    if (svg) svg.__emLayoutObserver = observer
 }

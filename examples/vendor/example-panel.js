@@ -65,6 +65,25 @@ export function createPanel({ map = '#map', title = 'Settings', width = 280 } = 
     mapBox.appendChild(mapEl)
     layout.append(mapBox, aside)
 
+    // On a narrow screen the panel is a sheet at the bottom of the window, closed to its title bar, so the map can fill the screen
+    const title_ = aside.querySelector('.ex-panel-title')
+    const narrow = window.matchMedia('(max-width: 900px)')
+    const setOpen = (open) => {
+        aside.classList.toggle('ex-collapsed', !open)
+        title_.setAttribute('aria-expanded', String(open))
+    }
+    title_.setAttribute('role', 'button')
+    title_.setAttribute('tabindex', '0')
+    title_.addEventListener('click', () => setOpen(aside.classList.contains('ex-collapsed')))
+    title_.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            setOpen(aside.classList.contains('ex-collapsed'))
+        }
+    })
+    setOpen(!narrow.matches)
+    narrow.addEventListener('change', (e) => setOpen(!e.matches))
+
     const controls = new Map()
 
     // wraps a control in a row that can be shown, hidden and looked up by id

@@ -1,6 +1,6 @@
 import { isCompact } from './layout-profile'
 
-const EDGE = 8 // px between the legend and the edge of the map
+export const EDGE = 8 // px between the legend and the edge of the map
 const GAP = 8 // px between the map and the first legend, and between legends
 
 /**

@@ -30015,6 +30015,10 @@ const isCompact = function (out, breakpoint = COMPACT_BREAKPOINT) {
 const observeContainer = function (out) {
     out._layoutObserver?.disconnect()
     out._layoutObserver = undefined
+    // a map built again into the same svg (a new map() call) replaces the one before: its observer must go
+    const previousSvg = out.svg_?.node?.()
+    previousSvg?.__emLayoutObserver?.disconnect()
+    if (previousSvg) previousSvg.__emLayoutObserver = undefined
     if (out.isInset || out.layout_ !== 'auto' || out._widthExplicit_ || typeof ResizeObserver === 'undefined') return
     const svg = out.svg_?.node?.()
     let host = svg?.parentNode
@@ -30039,6 +30043,7 @@ const observeContainer = function (out) {
     })
     observer.observe(host)
     out._layoutObserver = observer
+    if (svg) svg.__emLayoutObserver = observer
 }
 
 
@@ -30290,6 +30295,7 @@ const recalculateLayout = function (out) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   EDGE: () => (/* binding */ EDGE),
 /* harmony export */   legendsBelowMap: () => (/* binding */ legendsBelowMap),
 /* harmony export */   placeLegendsBelow: () => (/* binding */ placeLegendsBelow)
 /* harmony export */ });
@@ -31051,7 +31057,16 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
 
     const setHeight = out.height
     out.height = function (v) {
-        if (arguments.length) out._heightExplicit_ = true
+        // a function is asked for the height at every build, e.g. to fill the window: height(() => innerHeight - 60)
+        if (typeof v === 'function') {
+            out._heightFn_ = v
+            out._heightExplicit_ = false
+            return out
+        }
+        if (arguments.length) {
+            out._heightExplicit_ = true
+            out._heightFn_ = undefined
+        }
         return setHeight.apply(out, arguments)
     }
 
@@ -31386,7 +31401,10 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         svg.classed('em--compact', (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.isCompact)(out))
 
         //set SVG dimensions
-        if (!out._heightExplicit_ || !out.height()) {
+        const requestedHeight = out._heightFn_ ? +out._heightFn_(out) : NaN
+        if (requestedHeight > 0) {
+            out.height_ = Math.max(150, requestedHeight)
+        } else if (!out._heightExplicit_ || !out.height()) {
             // Get available height constrained to 99% of screen/container height
             const availableHeight = getAvailableHeight(out)
             const maxTotalHeight = 0.99 * availableHeight
@@ -49861,7 +49879,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _legend_continuous__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../legend-continuous */ "./src/legend/legend-continuous.js");
 /* harmony import */ var _legend_discrete__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../legend-discrete */ "./src/legend/legend-discrete.js");
 /* harmony import */ var _legend_value_by_alpha__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./legend-value-by-alpha */ "./src/legend/choropleth/legend-value-by-alpha.js");
+/* harmony import */ var _core_legend_below__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../core/legend-below */ "./src/core/legend-below.js");
 //legend-choropleth.js
+
 
 
 
@@ -49934,9 +49954,19 @@ const legend = function (map, config = {}) {
         }
     }
 
+    // what the caller set, which the compact layout must not override
+    const configuredOrientation = out.orientation
+    const configuredWidth = out.width
+    const orientationIsExplicit = config.orientation != null
+    const widthIsExplicit = config.width != null
+
     //@override
     out.update = function () {
         out.updateConfig()
+        // Under the map (compact layout) a legend runs along it, as wide as the map allows; elsewhere it is as configured
+        const below = (0,_core_legend_below__WEBPACK_IMPORTED_MODULE_6__.legendsBelowMap)(out.map) && !out.histogram
+        out.orientation = below && !orientationIsExplicit ? 'horizontal' : configuredOrientation
+        out.width = below && !widthIsExplicit ? Math.max(120, Math.min(out.map.width() - 2 * (_core_legend_below__WEBPACK_IMPORTED_MODULE_6__.EDGE + out.boxPadding), 480)) : configuredWidth
         out.updateContainer()
 
         if (out.lgg.node()) {
@@ -53086,7 +53116,7 @@ function drawLowHighLabels(out, width, height, isVertical) {
                 .text(divergence)
         }
     } else {
-        const barY = height + titleOffset + 10 // 10px below horizontal bar
+        const barY = height + titleOffset + 18 // below the horizontal bar, the text baseline clear of it
 
         if (low) {
             container.append('text').attr('class', 'em-legend-label').attr('x', 0).attr('y', barY).attr('text-anchor', 'start').text(low)

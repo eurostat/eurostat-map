@@ -46,6 +46,12 @@ export interface MapInstance {
     /** Logical map height in pixels. 0 = auto (85% of width). */
     height(): number
     height(h: number): this
+    /**
+     * A function asked for the height (px) of the map at every build, e.g. to fill the window on a phone:
+     * `height(() => (compact ? window.innerHeight - 60 : undefined))`. A result that is not a positive
+     * number leaves the height automatic.
+     */
+    height(h: (map: MapInstance) => number | undefined): this
 
     /**
      * Scale a standalone root SVG down to its container width, preserving its aspect ratio and

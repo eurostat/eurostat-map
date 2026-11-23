@@ -6,6 +6,7 @@ import { createHistogramLegend } from './legend-histogram'
 import { createContinuousLegend } from '../legend-continuous'
 import { drawDiscreteLegend, buildDiscreteLabelFormatter, resolveDecimals } from '../legend-discrete'
 import { createAlphaLegend } from './legend-value-by-alpha'
+import { EDGE, legendsBelowMap } from '../../core/legend-below'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/legend/choropleth/ChoroplethLegendConfig').ChoroplethLegendConfig} ChoroplethLegendConfig */
@@ -71,9 +72,19 @@ export const legend = function (map, config = {}) {
         }
     }
 
+    // what the caller set, which the compact layout must not override
+    const configuredOrientation = out.orientation
+    const configuredWidth = out.width
+    const orientationIsExplicit = config.orientation != null
+    const widthIsExplicit = config.width != null
+
     //@override
     out.update = function () {
         out.updateConfig()
+        // Under the map (compact layout) a legend runs along it, as wide as the map allows; elsewhere it is as configured
+        const below = legendsBelowMap(out.map) && !out.histogram
+        out.orientation = below && !orientationIsExplicit ? 'horizontal' : configuredOrientation
+        out.width = below && !widthIsExplicit ? Math.max(120, Math.min(out.map.width() - 2 * (EDGE + out.boxPadding), 480)) : configuredWidth
         out.updateContainer()
 
         if (out.lgg.node()) {
