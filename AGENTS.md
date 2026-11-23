@@ -122,6 +122,9 @@ the regions that end up with a classified/sized value from whatever data was jus
   owning map/services) and `legend.layer` (the thematic state). Type-specific legends must read
   classifier, scale, date, color, and other decorator-owned state from `legend.layer`.
 - Discrete colour legends share the SVG swatch and label renderer in `src/legend/legend-swatch.js`.
+  Every vertical swatch stack (choropleth ranges/thresholds, categorical, flow colour) is laid out by
+  `appendLegendSwatchRows`/`swatchStackLayout` there; add separators or ticks through its `decorate` hook and
+  never position swatches by hand (the flow legend once had a different gap from the choropleth one).
   Scope flow legend highlights to the owning SVG and match custom colour entries against the stable
   `data-color` on each route. Route hover and gradients can change the visible fill or stroke.
 - Flow rendering writes projected coordinates into graph nodes. On redraw, project from the original
