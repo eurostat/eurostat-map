@@ -34,6 +34,15 @@
             const isDiverging = () => state.palette.includes('-')
             let map
 
+            // Class breaks for population change (‰), evenly spaced and always including 0, so 0 (the default
+            // point of divergence) is a break: the classes below it step to one hue, those above to the other.
+            function changeBreaks(classes) {
+                const step = { 3: 5, 4: 5, 5: 5, 6: 4, 7: 3, 8: 3, 9: 2.5 }[classes]
+                const count = classes - 1 // number of breaks
+                const below = Math.floor(count / 2)
+                return Array.from({ length: count }, (_, i) => (i - below) * step)
+            }
+
             // single hues suit a measure that only increases (density); diverging schemes need a midpoint (change)
             const datasets = {
                 sequential: {
@@ -213,6 +222,7 @@
                     .numberOfClasses(state.classes)
                     .colors(state.palette) // a palette name, e.g. 'teal' or 'cobalt-plum'
                 if (dataset.nutsYear) map.nutsYear(dataset.nutsYear)
+                if (isDiverging() && state.type === 'discrete') map.classificationMethod('threshold').threshold(changeBreaks(state.classes))
                 if (isDiverging()) map.pointOfDivergence(state.pivot) // where the neutral colour sits
                 map.callback(() => {
                     // once the data has arrived and the classes are known
