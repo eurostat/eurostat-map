@@ -463,7 +463,7 @@ const scaleStrokeWidths = function (transform, map) {
                 startRatio: 1, // flat start for non-gradient sankey
                 samples: 48,
                 minStartWidth: scaledWidth,
-                pointedTip: true,
+                pointedTip: el.attr('data-pointed-tip') === 'true',
             },
             extraPad
         )

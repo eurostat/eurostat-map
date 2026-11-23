@@ -35279,7 +35279,7 @@ const scaleStrokeWidths = function (transform, map) {
                 startRatio: 1, // flat start for non-gradient sankey
                 samples: 48,
                 minStartWidth: scaledWidth,
-                pointedTip: true,
+                pointedTip: el.attr('data-pointed-tip') === 'true',
             },
             extraPad
         )
@@ -43831,13 +43831,14 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
                     startRatio: out.flowWidthGradient_ ? (out.flowWidthGradientSettings_.startRatio ?? 0.25) : 1,
                     samples: out.flowWidthGradientSettings_?.samples ?? 48,
                     minStartWidth: out.flowWidthGradient_ ? minStartWidth : link.width,
-                    pointedTip: true,
+                    pointedTip: !!out.flowArrows_,
                 },
                 outlineWidth
             )
             flowsGroup
                 .append('path')
                 .attr('d', dPolyOutline)
+                .attr('data-pointed-tip', out.flowArrows_ ? 'true' : null)
                 .attr('fill', out.flowOutlineColor_)
                 .attr('class', 'em-flow-link-outline')
                 .attr('data-center-path', dCenter)
@@ -43854,7 +43855,7 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
                 startRatio: out.flowWidthGradient_ ? (out.flowWidthGradientSettings_.startRatio ?? 0.25) : 1,
                 samples: out.flowWidthGradientSettings_?.samples ?? 48,
                 minStartWidth: out.flowWidthGradient_ ? minStartWidth : link.width,
-                pointedTip: true,
+                pointedTip: !!out.flowArrows_, // a point only when arrows are on, flat ends otherwise
             },
             0
         )
@@ -43870,6 +43871,7 @@ function addSankeyFlows(out, container, nodes, links, arrowIds, gradientIds) {
             .attr('data-link-index', i)
             .attr('data-center-path', dCenter) // ← store center path
             .attr('data-link-width', link.width) // ← store original width
+            .attr('data-pointed-tip', out.flowArrows_ ? 'true' : null) // zoom redraws the polygon with the same end
 
         addMouseEvents(out, mainSel, {
             usesGradient,
