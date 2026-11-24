@@ -249,7 +249,7 @@
             /**
              * Anchor every callout on the edge of its port's circle, so the line touches it, and touches only it.
              * The note keeps the place it was given; only the end of the line moves, to the point of the circle's edge
-             * nearest the direction of the note that no other port circle is drawn over (the big ports overlap their
+             * nearest the direction of the note that no other port circle is drawn over or right beside (the big ports overlap their
              * neighbours: Rotterdam's edge is largely covered by Antwerp-Bruges and the smaller ports around it, and a
              * line ending there would look like it belonged to them). Positions come from the drawn circles (insets
              * included), so this stays right when the data, the symbol sizes or the map position change.
@@ -267,14 +267,10 @@
                 for (const a of annotations) {
                     const own = circles.find((c) => c.circle.parentNode.id === `ps${a.portCode}`)
                     if (!own) continue
-                    // circles drawn after this one (later in the document) are on top of it
-                    const above = circles.filter(
-                        (c) =>
-                            c !== own &&
-                            Math.hypot(c.x - own.x, c.y - own.y) < c.r + own.r &&
-                            own.circle.compareDocumentPosition(c.circle) & Node.DOCUMENT_POSITION_FOLLOWING
-                    )
-                    const covered = (x, y) => above.some((c) => Math.hypot(x - c.x, y - c.y) < c.r + 0.5)
+                    // every circle overlapping this one, drawn over it or under it: a line ending on or right beside one of them
+                    // reads as pointing at it, so the end keeps a gap from all of them
+                    const neighbours = circles.filter((c) => c !== own && Math.hypot(c.x - own.x, c.y - own.y) < c.r + own.r)
+                    const covered = (x, y) => neighbours.some((c) => Math.hypot(x - c.x, y - c.y) < c.r + 5)
                     const noteX = a.x + a.dx
                     const noteY = a.y + a.dy
                     const facing = Math.atan2(noteY - own.y, noteX - own.x)
