@@ -492,7 +492,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* Ranked bar chart - a standalone map
        visible behind the box, so it blocks pointer events reaching the map underneath instead of
        letting them pass through to a hidden tooltip. See updateBackgroundBoxOpacity(). */
     pointer-events: none;
-    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
 }
 
 /* titles */
@@ -1810,7 +1810,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-legend-background {
     stroke-width: 1;
 }
 .em-legend-background {
-    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
     opacity: 0.9;
 }
 `, ""]);
