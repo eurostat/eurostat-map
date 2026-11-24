@@ -234,6 +234,8 @@
                                 .attr('text-anchor', 'middle')
                                 .attr('x', (d) => d.x)
                                 .attr('y', (d) => d.y + shift(d))
+                            // North Africa: the name sits right under its (centred) value, left edges aligned, not off to the side of it
+                            alignRegionNameToValue('#air-passengers-map', 'North Africa', 'start', 'below')
 
                             //add cartography text
                             // --- REMOVE if it already exists ---
