@@ -2,12 +2,13 @@
   {
     "note": {
       "title": "Rotterdam",
-      "wrap": 150
+      "wrap": 150,
+      "align": "left"
     },
-    "x": 387.85,
-    "y": 476.27,
-    "dy": 17.73,
-    "dx": 49.15,
+    "x": 386.5,
+    "y": 479.43,
+    "dy": 14.57,
+    "dx": 29.35,
     "portCode": "NL00NLRTM"
   },
   {
