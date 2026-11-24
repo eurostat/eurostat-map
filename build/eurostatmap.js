@@ -1717,34 +1717,14 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-legend-background {
     pointer-events: none;
 }
 
-/* titles */
-.em-legend-title {
-    font-weight: bold;
-    font-size: 15px;
-    fill: #4c4b4b;
-}
-
-.em-size-legend-title {
-    font-size: 15px;
-    fill: #666;
-    font-weight: bold;
-}
-
-.em-color-legend-title {
-    font-size: 15px;
-    fill: #696969;
-    font-weight: bold;
-}
-
-.em-width-legend-title {
-    font-size: 15px;
-    fill: #696969;
-    font-weight: bold;
-}
-
+/* titles: every legend title (main, size, colour, width, time) shares one colour and weight */
+.em-legend-title,
+.em-size-legend-title,
+.em-color-legend-title,
+.em-width-legend-title,
 .em-time-legend-title {
     font-size: 15px;
-    fill: #666;
+    fill: #4c4b4b;
     font-weight: bold;
 }
 
