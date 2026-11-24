@@ -333,6 +333,9 @@ hand-rolling markup in an example. Not every older example has been converted ye
 - The 2026 extra-EU air maps share a muted regional palette in `examples/statistics-explained/transport/air/regional-palette.js`.
   When changing country groups or fills, check for duplicate country assignments and verify that groups sharing
   a border arc in the GISCO world geometry have distinct fills.
+  The fills only tell region groups apart, so keep them the quietest the map can carry: light (L* ~91), chroma <= 6,
+  no saturated hue (the flows use a blue/red ramp), >= ~20 L* of headroom under the lightest flow, and neighbouring
+  groups >= ~5 apart in CIE76 dE. The EU hub is a neutral grey, not a blue.
 
 - Audit each 2026 map's colour legend against its data: every class should appear on the map (the passengers change
   legend had an empty "< -5" class, so it is 5 classes now), and a colour-coded value should also be written on the map
