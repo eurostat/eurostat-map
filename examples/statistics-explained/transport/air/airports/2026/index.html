@@ -241,6 +241,7 @@
                                     label: `${madridFlows.length} of the top 10 routes either started or ended in Madrid, with a total of over ${Math.floor(madridTotal / 1e5) / 10} million passengers carried.`,
                                     wrap: 210,
                                     bgPadding: 8,
+                                    lineType: 'none', // d3-annotation draws a note line only for 'horizontal'/'vertical' (null falls back to the type's): none, so the connector ends at the box
                                 },
                                 subject: { radius: 30 },
                                 connector: { end: 'dot', type: 'curve', points: [[-62, -58]] },
