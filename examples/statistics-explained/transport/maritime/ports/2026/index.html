@@ -197,7 +197,7 @@
                 })
                 .zoomButtons(false)
                 // Estonia reports maritime transport (so it has the maritime-country green) but does not disseminate port data: hatch it
-                .patternFill({ regionIds: ['EE'], pattern: 'hatching', color: '#7fbf96', strokeWidth: 1.2, spacing: 5, legendLabel: 'Port data not disseminated', legendBackground: 'rgba(162, 221, 178,0.4)' })
+                .patternFill({ regionIds: ['EE'], pattern: 'hatching', color: '#9ccfae', strokeWidth: 1, spacing: 9, legendLabel: 'Port data not disseminated', legendBackground: 'rgba(162, 221, 178,0.4)' })
                 .onBuild(() => {
                     const portKeys = Object.keys(portsSizeData)
                     //color regions
