@@ -676,6 +676,14 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-inset .em-zoom-buttons {
     stroke: grey;
     stroke-width: 0.3px !important;
 }
+/* inset boxes share the legend's drop shadow (see .em-legend-background in legend/legend.css). The 'image' preset
+   draws one background box for all its insets instead, so the shadow goes on that and not on each inset */
+.em-insets:not(.em-insets-image) .em-frame {
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
+}
+.em-insets-background {
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
+}
 
 /* 'default' overseas inset layout decoration (see buildOverseasInsetsDecoration in insets.js) */
 .em-insets-background {

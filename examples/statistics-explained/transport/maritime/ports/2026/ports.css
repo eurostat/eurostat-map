@@ -22,12 +22,6 @@ circle {
     stroke-opacity: 0.9;
 }
 
-.map-ranking rect,
-.em-legend-background {
-    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.5)) !important;
-    opacity: 0.9 !important;
-}
-
 #ports-map .em-zoom-buttons {
     transform: translate(94%, 86%) !important;
 }
@@ -69,7 +63,6 @@ circle {
 .em-insets .em-frame {
     stroke-width: 1px !important;
     stroke-opacity: 0.4;
-    filter: drop-shadow(1px 1px 1px rgba(0, 0, 0, 0.2)) !important;
 }
 
 .em-inset-title {
