@@ -1,4 +1,5 @@
 import { select } from 'd3-selection'
+import { BOX_CORNER_RADIUS } from './corner-radius'
 import { getButtonPadding, getButtonSize, getMapDrawingExtent } from './button-utils'
 
 export const appendInsetsButton = (map) => {
@@ -18,7 +19,7 @@ export const appendInsetsButton = (map) => {
     //tooltip
     insetButton.append('title').text('Show/hide inset maps')
     // Add rectangle for button background
-    insetButton.append('rect').attr('width', buttonSize).attr('height', buttonSize)
+    insetButton.append('rect').attr('width', buttonSize).attr('height', buttonSize).attr('rx', BOX_CORNER_RADIUS).attr('ry', BOX_CORNER_RADIUS)
     // Add Font Awesome copyright comment
     const comment = document.createComment(
         '!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.'

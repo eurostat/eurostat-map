@@ -1,4 +1,5 @@
 import { select } from 'd3-selection'
+import { BOX_CORNER_RADIUS } from './corner-radius'
 import { getButtonPadding, getButtonSize, getMapDrawingExtent } from './button-utils'
 
 export const appendLegendButton = (map) => {
@@ -16,7 +17,13 @@ export const appendLegendButton = (map) => {
     positionLegendButton(map, legendButton, buttonSize, padding)
 
     legendButton.append('title').text('Show/hide legend')
-    legendButton.append('rect').attr('width', buttonSize).attr('height', buttonSize).attr('class', 'em-button-rect')
+    legendButton
+        .append('rect')
+        .attr('width', buttonSize)
+        .attr('height', buttonSize)
+        .attr('rx', BOX_CORNER_RADIUS)
+        .attr('ry', BOX_CORNER_RADIUS)
+        .attr('class', 'em-button-rect')
 
     const iconPadding = Math.round(buttonSize * 0.22)
     const lineWidth = buttonSize - iconPadding * 2

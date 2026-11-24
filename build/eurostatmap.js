@@ -2596,7 +2596,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.em-tooltip {
     background: white;
     padding: 0px;
     border: 1px solid #d5d5d5;
-    border-radius: 6px;
+    border-radius: 5px; /* BOX_CORNER_RADIUS (core/buttons/corner-radius.js) */
     box-shadow:
         0px 4px 6px rgba(0, 0, 0, 0.1),
         0px 1px 3px rgba(0, 0, 0, 0.08);
@@ -20520,14 +20520,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   updateInsetsButtonPosition: () => (/* binding */ updateInsetsButtonPosition)
 /* harmony export */ });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var _button_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./button-utils */ "./src/core/buttons/button-utils.js");
+/* harmony import */ var _corner_radius__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./corner-radius */ "./src/core/buttons/corner-radius.js");
+/* harmony import */ var _button_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./button-utils */ "./src/core/buttons/button-utils.js");
+
 
 
 
 const appendInsetsButton = (map) => {
     const svg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])('#' + map.svgId())
 
-    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)(map)
+    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonSize)(map)
 
     const insetButton = svg.append('g').attr('class', 'em-insets-button em-button').attr('id', 'em-insets-button')
 
@@ -20541,7 +20543,7 @@ const appendInsetsButton = (map) => {
     //tooltip
     insetButton.append('title').text('Show/hide inset maps')
     // Add rectangle for button background
-    insetButton.append('rect').attr('width', buttonSize).attr('height', buttonSize)
+    insetButton.append('rect').attr('width', buttonSize).attr('height', buttonSize).attr('rx', _corner_radius__WEBPACK_IMPORTED_MODULE_1__.BOX_CORNER_RADIUS).attr('ry', _corner_radius__WEBPACK_IMPORTED_MODULE_1__.BOX_CORNER_RADIUS)
     // Add Font Awesome copyright comment
     const comment = document.createComment(
         '!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.'
@@ -20580,12 +20582,12 @@ function updateInsetsButtonPosition(map) {
     const insetButton = svg.select('#em-insets-button')
     if (insetButton.empty()) return
 
-    positionInsetsButton(map, insetButton, (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)(map))
+    positionInsetsButton(map, insetButton, (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonSize)(map))
 }
 
 function positionInsetsButton(map, insetButton, buttonSize) {
-    const padding = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonPadding)(map)
-    const extent = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getMapDrawingExtent)(map)
+    const padding = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonPadding)(map)
+    const extent = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getMapDrawingExtent)(map)
     const legendButtonPosition = getCornerPosition(map.legendObj_?.position) || 'top left'
     const reserveLegendButton = map.legendButton_ && !map.legendButtonPosition_ && legendButtonPosition === 'top right'
     const y = extent.y + padding + (reserveLegendButton ? buttonSize + padding : 0)
@@ -20614,7 +20616,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   updateLegendButtonPosition: () => (/* binding */ updateLegendButtonPosition)
 /* harmony export */ });
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var _button_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./button-utils */ "./src/core/buttons/button-utils.js");
+/* harmony import */ var _corner_radius__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./corner-radius */ "./src/core/buttons/corner-radius.js");
+/* harmony import */ var _button_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./button-utils */ "./src/core/buttons/button-utils.js");
+
 
 
 
@@ -20625,15 +20629,21 @@ const appendLegendButton = (map) => {
     const svg = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])('#' + map.svgId())
     if (svg.empty()) return
 
-    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)(map)
-    const padding = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonPadding)(map)
+    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonSize)(map)
+    const padding = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonPadding)(map)
 
     const legendButton = svg.append('g').attr('class', 'em-legend-button em-button').attr('id', 'em-legend-button')
 
     positionLegendButton(map, legendButton, buttonSize, padding)
 
     legendButton.append('title').text('Show/hide legend')
-    legendButton.append('rect').attr('width', buttonSize).attr('height', buttonSize).attr('class', 'em-button-rect')
+    legendButton
+        .append('rect')
+        .attr('width', buttonSize)
+        .attr('height', buttonSize)
+        .attr('rx', _corner_radius__WEBPACK_IMPORTED_MODULE_1__.BOX_CORNER_RADIUS)
+        .attr('ry', _corner_radius__WEBPACK_IMPORTED_MODULE_1__.BOX_CORNER_RADIUS)
+        .attr('class', 'em-button-rect')
 
     const iconPadding = Math.round(buttonSize * 0.22)
     const lineWidth = buttonSize - iconPadding * 2
@@ -20692,8 +20702,8 @@ const updateLegendButtonPosition = (map) => {
     const legendButton = svg.select('#em-legend-button')
     if (legendButton.empty()) return
 
-    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonSize)(map)
-    positionLegendButton(map, legendButton, buttonSize, (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getButtonPadding)(map))
+    const buttonSize = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonSize)(map)
+    positionLegendButton(map, legendButton, buttonSize, (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getButtonPadding)(map))
 }
 
 function positionLegendButton(map, legendButton, buttonSize, padding) {
@@ -20703,7 +20713,7 @@ function positionLegendButton(map, legendButton, buttonSize, padding) {
         return
     }
 
-    const extent = (0,_button_utils__WEBPACK_IMPORTED_MODULE_1__.getMapDrawingExtent)(map)
+    const extent = (0,_button_utils__WEBPACK_IMPORTED_MODULE_2__.getMapDrawingExtent)(map)
     const position = getCornerPosition(map.legendObj_?.position) || 'top left'
     const [vertical, horizontal] = position.split(' ')
 
