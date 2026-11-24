@@ -1577,6 +1577,8 @@ const map = eurostatmap
     .build()
 ```
 
+Besides the d3-svg-annotation note options, a note accepts `textAlign` (`'left'` by default, `'middle'` or `'right'`) to align the title and label lines inside the note box. d3-svg-annotation's own `align` only decides which side of the anchor point the box sits on, so for a note to the left of its point use `align: 'right', textAlign: 'right'` to get a right-aligned block ending at the point.
+
 ### Stamps
 
 Stamps are intended to be used to highlight a particular value, usually the EU average:

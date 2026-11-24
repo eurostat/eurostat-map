@@ -42,7 +42,8 @@
   },
   {
     "note": {
-      "title": "Izmit"
+      "title": "Izmit",
+      "align": "left"
     },
     "x": 799,
     "y": 690,
@@ -133,7 +134,9 @@
   },
   {
     "note": {
-      "title": "Constanța"
+      "title": "Constanța",
+      "align": "right",
+      "textAlign": "right"
     },
     "x": 738,
     "y": 604,
