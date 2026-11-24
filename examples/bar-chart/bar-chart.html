@@ -116,7 +116,12 @@
                         },
                     })
 
-                if (useGridCartogram) map.gridCartogram(true).gridCartogramSettings({ chartOffset: { x: 0, y: 20 } })
+                // the offset moves the bars down (room for the country labels in the wide cells); in the small cells of a
+                // phone it would push them out of the cell
+                if (useGridCartogram) {
+                    const narrow = window.matchMedia('(max-width: 900px)').matches
+                    map.gridCartogram(true).gridCartogramSettings({ chartOffset: { x: 0, y: narrow ? 0 : 20 } })
+                }
 
                 map.build()
             }
