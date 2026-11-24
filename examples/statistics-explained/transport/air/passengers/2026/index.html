@@ -29,6 +29,7 @@
         <script src="./regionLabels.js"></script>
         <script src="./regions.js"></script>
         <script src="../../regional-palette.js"></script>
+        <script src="../../label-alignment.js"></script>
         <script src="./configs.js"></script>
         <script>
             const year = 2025
@@ -214,11 +215,13 @@
                             // raise labels (fixed in next version of estatmap)
                             const labels = d3.selectAll('#em-labels')
                             labels.raise()
+                            // Central Asia: the name starts at the same x as its value, sitting on top of it
+                            alignRegionNameToValue('#air-passengers-map', 'Central Asia')
 
                             // some values sit centred on their flow end, not beside it over a neighbouring flow:
                             // above a flow that points up, or underneath a flow that points down
                             const shift = (d) =>
-                                d.name === 'Europe except EU' ? -8 : d.name === 'North Africa' ? 16 : null
+                                d.name === 'Europe except EU' ? -18 : d.name === 'North Africa' ? 16 : null
                             const centred = (d) => shift(d) !== null
                             d3.selectAll('#air-passengers-map .em-flow-label g')
                                 .filter(centred)

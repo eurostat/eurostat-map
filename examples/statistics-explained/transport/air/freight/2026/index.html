@@ -29,6 +29,7 @@
         <script src="./regionLabels.js"></script>
         <script src="./regions.js"></script>
         <script src="../../regional-palette.js"></script>
+        <script src="../../label-alignment.js"></script>
         <script src="./configs.js"></script>
         <script>
             const year = 2025
@@ -254,6 +255,8 @@
                             // raise labels (fixed in next version of estatmap)
                             const labels = d3.selectAll('#em-labels')
                             labels.raise()
+                            // Central Asia: the name starts at the same x as its value, sitting on top of it
+                            alignRegionNameToValue('#air-freight-map', 'Central Asia')
 
                             // these values sit centred on their region name (above or under it), not beside their flow end
                             // where they would run over a neighbouring flow
