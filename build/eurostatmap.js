@@ -54475,9 +54475,10 @@ function appendPatternFillLegend(out, container) {
         const patternColor = cfg.color || '#000' // fallback to black if no color provided
         const isWhitePattern = patternColor.toLowerCase() === '#fff' || patternColor.toLowerCase() === 'white'
 
-        // Add background if pattern is white
-        if (isWhitePattern) {
-            item.append('rect').attr('x', 0).attr('y', y).attr('width', out.shapeWidth).attr('height', out.shapeHeight).attr('fill', '#ddd') // light gray background
+        // Background behind the pattern: the configured one, or light grey for a white pattern (which would otherwise vanish)
+        const background = cfg.legendBackground || (isWhitePattern ? '#ddd' : null)
+        if (background) {
+            item.append('rect').attr('x', 0).attr('y', y).attr('width', out.shapeWidth).attr('height', out.shapeHeight).attr('fill', background)
         }
 
         // Add pattern overlay

@@ -1962,6 +1962,7 @@ _map_.**patternFill**([*value*]) accepts one object or an array of objects with 
 | **spacing**       | Number   | _8_           | Distance between repeated pattern elements, in pixels.                                                                 |
 | **customPattern** | String   | _undefined_   | Raw SVG markup of a custom `<pattern>` element, which must have an `id` attribute. Used instead of a built-in pattern. |
 | **legendLabel**   | String   | _undefined_   | Label of the pattern in the legend. Patterns without a label are left out of the legend.                               |
+| **legendBackground** | String | _undefined_ | Fill drawn behind the pattern in the legend swatch; set it to the patterned regions' fill so the swatch matches the map. |
 
 ```javascript
 map.patternFill([{ pattern: 'hatching', regionIds: ['DE', 'FR'], color: '#333', legendLabel: 'Estimated' }])
