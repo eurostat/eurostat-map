@@ -112,6 +112,15 @@ dropdown, image-repo issue #176) should leave `nutsLevel('mixed')` alone and onl
 `geoLevel` stat filter on refetch - `styleMixedNUTS`/`styleMixedNUTSRegions` already show exactly
 the regions that end up with a classified/sized value from whatever data was just fetched.
 
+## Use the library's API in examples; fix the library instead of working around it
+
+Never hand-roll a workaround in an example (own SVG patterns, injected rects, manual legend boxes, per-element
+restyling in `onBuild`). Search `src/`, `docs/reference.md` and the bundled d3-annotation options first (e.g.
+`patternFill()` for hatching with its own legend item; `note.bgPadding` for a callout box). If the API is missing or
+misbehaves, fix or extend the library, rebuild the bundles and commit them. Example: `patternFill` overlays were
+invisible on proportional-symbol maps because the map type's CSS overrode their `fill` attribute; the fix was in
+`core/decoration/pattern-fill.js` (inline style), not in the example.
+
 ## Layer decorators and map services
 
 - Every public `MapType` alias must be registered in `core/layer-registry.js` by its module and
