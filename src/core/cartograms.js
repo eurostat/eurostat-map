@@ -209,7 +209,20 @@ const MIN_CELL_FOR_NAMES = 60 // px: below it country names overlap, codes are s
 export const getGridCartogramMargins = function (out) {
     const margins = out.gridCartogramSettings_.margins
     const isDefault = margins && Object.keys(DEFAULT_MARGINS).every((side) => margins[side] === DEFAULT_MARGINS[side])
-    return isCompact(out) && isDefault ? COMPACT_MARGINS : margins
+    if (!(isCompact(out) && isDefault)) return margins
+    // the title and subtitle are drawn over the map (unless there is a header), so the grid starts below them
+    return { ...COMPACT_MARGINS, top: Math.max(COMPACT_MARGINS.top, getTitleBottom(out) + 8) }
+}
+
+/** The lowest edge of the title and subtitle, in px from the top of the svg (0 when there are none, or in a header). */
+const getTitleBottom = function (out) {
+    if (out.header_ || out.isInset || !out.svg_) return 0
+    let bottom = 0
+    out.svg_.selectAll('.em-title, .em-subtitle').each(function () {
+        const box = this.getBBox?.()
+        if (box && box.height) bottom = Math.max(bottom, box.y + box.height)
+    })
+    return bottom
 }
 
 const getGridCellPadding = function (out) {
