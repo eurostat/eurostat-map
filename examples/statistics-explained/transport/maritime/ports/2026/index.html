@@ -205,8 +205,22 @@
                         // Check if ANY port key starts with this ISO
                         const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL' || iso == 'EE' // Estonia reports maritime transport but not port data
 
+                        // Estonia: the maritime-country green with a hatch on top, since it has no port data to draw circles for
+                        if (iso == 'EE') return 'url(#em-no-port-data)'
                         return hasPort ? 'rgba(162, 221, 178,0.4)' : '#f2f2f2'
                     })
+
+                    // hatch pattern and its key, in a small box under the size legend
+                    const svg = d3.select('#ports-map')
+                    const defs = svg.select('defs').empty() ? svg.insert('defs', ':first-child') : svg.select('defs')
+                    const hatch = defs.append('pattern').attr('id', 'em-no-port-data').attr('width', 5).attr('height', 5).attr('patternUnits', 'userSpaceOnUse').attr('patternTransform', 'rotate(45)')
+                    hatch.append('rect').attr('width', 5).attr('height', 5).attr('fill', '#d6eddc')
+                    hatch.append('line').attr('x1', 0).attr('y1', 0).attr('x2', 0).attr('y2', 5).attr('stroke', '#7fbf96').attr('stroke-width', 1.6)
+                    svg.select('#em-no-port-data-key').remove()
+                    const key = svg.append('g').attr('id', 'em-no-port-data-key').attr('transform', 'translate(10, 380)')
+                    key.append('rect').attr('class', 'em-legend-background').attr('width', 212).attr('height', 34).attr('rx', 5).attr('ry', 5)
+                    key.append('rect').attr('x', 10).attr('y', 8).attr('width', 18).attr('height', 18).attr('fill', 'url(#em-no-port-data)').attr('stroke', '#a3a3a3').attr('stroke-width', 0.5)
+                    key.append('text').attr('class', 'em-legend-label').attr('x', 36).attr('y', 17).attr('dominant-baseline', 'central').text('Port data not disseminated')
                     // --- REMOVE if it already exists ---
                     d3.select('#ports-map #em-footnote-2').remove()
 
