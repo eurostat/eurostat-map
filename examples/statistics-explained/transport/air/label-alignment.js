@@ -15,5 +15,12 @@ function alignRegionNameToValue(svgSelector, regionName, edge = 'start') {
     const datum = value.datum()
     const box = value.node().getBBox()
     const x = datum.x + (edge === 'start' ? box.x : box.x + box.width)
-    names.attr('text-anchor', edge === 'start' ? 'start' : 'end').attr('x', x)
+    // each name is drawn twice: a halo copy at absolute coordinates, and the label itself inside a group that carries the
+    // position as a translate (its own x is 0). Both must land on x, so remove the group's offset from each one's x
+    names
+        .attr('text-anchor', edge === 'start' ? 'start' : 'end')
+        .attr('x', function () {
+            const offset = this.parentNode.transform?.baseVal?.consolidate?.()?.matrix.e ?? 0
+            return x - offset
+        })
 }
