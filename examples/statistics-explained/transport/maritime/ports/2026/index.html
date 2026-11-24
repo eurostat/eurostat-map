@@ -205,7 +205,7 @@
                         // Check if ANY port key starts with this ISO
                         const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL' || iso == 'EE' // Estonia reports maritime transport but not port data
 
-                        return hasPort ? 'rgba(162, 221, 178,0.4)' : '#e9e9e9'
+                        return hasPort ? 'rgba(162, 221, 178,0.4)' : '#f2f2f2'
                     })
                     // --- REMOVE if it already exists ---
                     d3.select('#ports-map #em-footnote-2').remove()
