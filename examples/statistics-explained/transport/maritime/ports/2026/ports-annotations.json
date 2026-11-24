@@ -4,40 +4,40 @@
       "title": "Rotterdam",
       "wrap": 150
     },
-    "x": 379,
-    "y": 494,
-    "dy": 0,
-    "dx": 58,
+    "x": 387.85,
+    "y": 476.27,
+    "dy": 17.73,
+    "dx": 49.15,
     "portCode": "NL00NLRTM"
   },
   {
     "note": {
       "title": "Antwerp-Bruges"
     },
-    "x": 348,
-    "y": 506,
-    "dy": 40,
-    "dx": -14,
+    "x": 348.95,
+    "y": 503.14,
+    "dy": 42.86,
+    "dx": -14.95,
     "portCode": "BE00BE003"
   },
   {
     "note": {
       "title": "Hamburg"
     },
-    "x": 454,
-    "y": 446,
-    "dy": 9,
-    "dx": 8,
+    "x": 452.32,
+    "y": 444.17,
+    "dy": 10.83,
+    "dx": 9.68,
     "portCode": "DE01DEHAM"
   },
   {
     "note": {
       "title": "Aliaga"
     },
-    "x": 734,
-    "y": 726,
-    "dy": -24,
-    "dx": -27,
+    "x": 736.3,
+    "y": 727.73,
+    "dy": -25.73,
+    "dx": -29.3,
     "portCode": "TR02TRALI"
   },
   {
@@ -45,50 +45,50 @@
       "title": "Izmit",
       "align": "left"
     },
-    "x": 799,
-    "y": 690,
-    "dy": 7,
-    "dx": 10,
+    "x": 797.03,
+    "y": 688.84,
+    "dy": 8.16,
+    "dx": 11.97,
     "portCode": "TR02TRIZT"
   },
   {
     "note": {
       "title": "Algeciras"
     },
-    "x": 162,
-    "y": 789,
-    "dy": -20,
-    "dx": 10,
+    "x": 161.19,
+    "y": 790.86,
+    "dy": -21.86,
+    "dx": 10.81,
     "portCode": "ES02ESALG"
   },
   {
     "note": {
       "title": "Amsterdam"
     },
-    "x": 372,
-    "y": 436,
-    "dy": -12,
-    "dx": 1,
+    "x": 371.58,
+    "y": 442.91,
+    "dy": -18.91,
+    "dx": 1.42,
     "portCode": "NL00NLAMS"
   },
   {
     "note": {
       "title": "HAROPA"
     },
-    "x": 291,
-    "y": 514,
-    "dy": -7,
-    "dx": -10,
+    "x": 293.12,
+    "y": 515.32,
+    "dy": -8.32,
+    "dx": -12.12,
     "portCode": "FR01FR001"
   },
   {
     "note": {
       "title": "Gdańsk"
     },
-    "x": 571,
-    "y": 416,
-    "dy": 8,
-    "dx": 9,
+    "x": 569.46,
+    "y": 415.01,
+    "dy": 8.99,
+    "dx": 10.54,
     "portCode": "PL00PLGDN"
   },
   {
@@ -96,40 +96,40 @@
       "title": "İskenderun",
       "align": "left"
     },
-    "x": 918,
-    "y": 723,
-    "dy": 16,
-    "dx": 51,
+    "x": 933.73,
+    "y": 737.76,
+    "dy": 1.24,
+    "dx": 35.27,
     "portCode": "TR02TRISK"
   },
   {
     "note": {
       "title": "Bergen"
     },
-    "x": 376,
-    "y": 278,
-    "dy": 6,
-    "dx": -19,
+    "x": 377.38,
+    "y": 277.44,
+    "dy": 6.56,
+    "dx": -20.38,
     "portCode": "NO00NOBGO"
   },
   {
     "note": {
       "title": "Marseille"
     },
-    "x": 368,
-    "y": 672,
-    "dy": 8,
-    "dx": 9,
+    "x": 366.56,
+    "y": 670.71,
+    "dy": 9.29,
+    "dx": 10.44,
     "portCode": "FR02FRMRS"
   },
   {
     "note": {
       "title": "Valencia"
     },
-    "x": 251,
-    "y": 732,
-    "dy": -10,
-    "dx": -7,
+    "x": 252.17,
+    "y": 734.19,
+    "dy": -12.19,
+    "dx": -8.17,
     "portCode": "ES02ESVLC"
   },
   {
@@ -138,30 +138,30 @@
       "align": "right",
       "textAlign": "right"
     },
-    "x": 738,
-    "y": 604,
-    "dy": -7,
-    "dx": -10,
+    "x": 739.72,
+    "y": 605.18,
+    "dy": -8.18,
+    "dx": -11.72,
     "portCode": "RO00ROCND"
   },
   {
     "note": {
       "title": "Barcelona"
     },
-    "x": 299,
-    "y": 694,
-    "dy": -10,
-    "dx": -7,
+    "x": 300.64,
+    "y": 696.66,
+    "dy": -12.66,
+    "dx": -8.64,
     "portCode": "ES02ESBCN"
   },
   {
     "note": {
       "title": "Trieste"
     },
-    "x": 493,
-    "y": 606,
-    "dy": -16,
-    "dx": 13,
+    "x": 504.89,
+    "y": 602.35,
+    "dy": -12.35,
+    "dx": 1.11,
     "portCode": "IT00ITTRS"
   },
   {
@@ -169,20 +169,20 @@
       "title": "Tekirdağ",
       "align": "left"
     },
-    "x": 754,
-    "y": 677,
-    "dy": -29,
-    "dx": 16,
+    "x": 751.56,
+    "y": 677.27,
+    "dy": -29.27,
+    "dx": 18.44,
     "portCode": "TR02TRTEK"
   },
   {
     "note": {
       "title": "Botaş"
     },
-    "x": 937,
-    "y": 737,
-    "dy": -26,
-    "dx": -21,
+    "x": 918.1,
+    "y": 724.94,
+    "dy": -13.94,
+    "dx": -2.1,
     "portCode": "TR02TRBOT"
   }
 ]
