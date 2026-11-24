@@ -39,6 +39,14 @@
                 pointer-events: none !important;
             }
 
+            /* the callouts sit on a white box, rounded like the legend, so the flows under them do not run through the text */
+            .em-annotations .annotation-note-bg {
+                fill-opacity: 1;
+                rx: 5px;
+                ry: 5px;
+                filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
+            }
+
             /* Kosovo stays thinner than the national borders */
             #airport-pairs-map .em-kosovo-bn {
                 stroke: grey !important;
@@ -232,6 +240,7 @@
                                     title: 'Madrid moves millions',
                                     label: `${madridFlows.length} of the top 10 routes either started or ended in Madrid, with a total of over ${Math.floor(madridTotal / 1e5) / 10} million passengers carried.`,
                                     wrap: 210,
+                                    bgPadding: 8,
                                 },
                                 subject: { radius: 30 },
                                 x: projection([-3.57, 40.49])[0],
@@ -245,6 +254,7 @@
                                     title: 'Busiest intra-EU route',
                                     label: `Barcelona to Mallorca was the busiest route in 2025, with ${formatPassengers.format(largestFlow)} passengers carried.`,
                                     wrap: 210,
+                                    bgPadding: 8,
                                 },
                                 connector: { end: 'dot', type: 'curve', points: [[-10, 50]] },
                                 x: projection([2.5, 40.3])[0],
@@ -281,26 +291,6 @@
                                 const [passengers, change] = flowLabel(graph.links[linkIndex])
                                 label.append('tspan').attr('x', middle.x).attr('dy', '-0.55em').text(passengers)
                                 label.append('tspan').attr('x', middle.x).attr('dy', '1.1em').text(change)
-                            })
-                        // the callouts sit on a white box, rounded like the legend, so the flows under them do not run through the text
-                        map.svg()
-                            .selectAll('.em-annotations .annotation-note')
-                            .each(function () {
-                                const content = this.querySelector('.annotation-note-content')
-                                if (!content) return
-                                const box = content.getBBox()
-                                const padding = 8
-                                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
-                                rect.setAttribute('class', 'em-annotation-background')
-                                rect.setAttribute('x', box.x - padding)
-                                rect.setAttribute('y', box.y - padding)
-                                rect.setAttribute('width', box.width + 2 * padding)
-                                rect.setAttribute('height', box.height + 2 * padding)
-                                rect.setAttribute('rx', 5)
-                                rect.setAttribute('ry', 5)
-                                rect.setAttribute('fill', 'white')
-                                rect.setAttribute('style', 'filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25))')
-                                content.insertBefore(rect, content.firstChild)
                             })
                         map.svg().select('.em-annotations').raise()
                         map.svg().select('#em-labels').raise()
