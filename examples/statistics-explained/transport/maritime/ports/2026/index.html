@@ -85,7 +85,7 @@
                 .title('Main cargo ports by gross weight of goods handled, 2025')
                 .subtitle('(million tonnes)')
                 .footnote(
-                    "Note: the map shows data for the ports with at least 2 million tonnes of freight handled (inward and outward combined). Ports reporting more than 47 million tonnes are labelled. &nbsp;&nbsp;&nbsp; <tspan style='font-style: italic;'>Source</tspan>: Eurostat (mar_mg_aa_pwhd)"
+                    "Note: the map shows data for the ports with at least 2 million tonnes of freight handled (inward and outward combined). Ports reporting more than 47 million tonnes are labelled. Estonia does not disseminate port data. &nbsp;&nbsp;&nbsp; <tspan style='font-style: italic;'>Source</tspan>: Eurostat (mar_mg_aa_pwhd)"
                 )
                 .footnoteWrap(100)
                 //.footnotePosition([15, portsHeight - 15])
@@ -203,7 +203,7 @@
                         const iso = d.properties.id // e.g. "NL"
 
                         // Check if ANY port key starts with this ISO
-                        const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL'
+                        const hasPort = portKeys.some((k) => k.startsWith(iso)) || iso == 'EL' || iso == 'EE' // Estonia reports maritime transport but not port data
 
                         return hasPort ? 'rgba(162, 221, 178,0.4)' : '#e9e9e9'
                     })
