@@ -11,8 +11,8 @@ const regionLabels = [
     },
     {
         "text": "Western Asia",
-        "x": 45,
-        "y": 21
+        "x": 44,
+        "y": 17
     },
     {
         "text": "Europe except EU",

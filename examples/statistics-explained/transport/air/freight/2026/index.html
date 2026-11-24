@@ -270,6 +270,30 @@
                                 .attr('x', (d) => d.x)
                                 .attr('y', (d) => d.y - 8)
 
+                            // the value of Western Asia sits directly above its region name
+                            const westernAsia = d3
+                                .selectAll('#air-freight-map #em-labels text')
+                                .filter(function () {
+                                    return this.textContent.trim() === 'Western Asia' && !this.closest('.em-flow-label')
+                                })
+                                .node()
+                            if (westernAsia) {
+                                const box = westernAsia.getBBox()
+                                const at = (d) => ({ x: box.x + box.width / 2 - d.x, y: box.y - 7 - d.y })
+                                const isWA = (d) => d.name === 'Western Asia'
+                                d3.selectAll('#air-freight-map .em-flow-label g')
+                                    .filter(isWA)
+                                    .select('text')
+                                    .attr('text-anchor', 'middle')
+                                    .attr('x', (d) => at(d).x)
+                                    .attr('y', (d) => at(d).y)
+                                d3.selectAll('#air-freight-map .em-flow-label-halo text')
+                                    .filter(isWA)
+                                    .attr('text-anchor', 'middle')
+                                    .attr('x', (d) => d.x + at(d).x)
+                                    .attr('y', (d) => d.y + at(d).y)
+                            }
+
                             //add cartography text
                             // --- REMOVE if it already exists ---
                             d3.select('#air-freight-map #em-footnote-2').remove()
