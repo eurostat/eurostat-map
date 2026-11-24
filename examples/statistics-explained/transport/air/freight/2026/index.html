@@ -255,44 +255,36 @@
                             const labels = d3.selectAll('#em-labels')
                             labels.raise()
 
-                            // the value of Europe except EU sits centred above its flow end, under the region name,
-                            // not beside it over the North America flow
-                            const centred = (d) => d.name === 'Europe except EU'
-                            d3.selectAll('#air-freight-map .em-flow-label g')
-                                .filter(centred)
-                                .select('text')
-                                .attr('text-anchor', 'middle')
-                                .attr('x', 0)
-                                .attr('y', -8)
-                            d3.selectAll('#air-freight-map .em-flow-label-halo text')
-                                .filter(centred)
-                                .attr('text-anchor', 'middle')
-                                .attr('x', (d) => d.x)
-                                .attr('y', (d) => d.y - 8)
-
-                            // the value of Western Asia sits directly above its region name
-                            const westernAsia = d3
-                                .selectAll('#air-freight-map #em-labels text')
-                                .filter(function () {
-                                    return this.textContent.trim() === 'Western Asia' && !this.closest('.em-flow-label')
+                            // these values sit centred on their region name (above or under it), not beside their flow end
+                            // where they would run over a neighbouring flow
+                            const centreValueOnName = (regionName, placement) => {
+                                const nameText = d3
+                                    .selectAll('#air-freight-map #em-labels text')
+                                    .filter(function () {
+                                        return this.textContent.trim() === regionName && !this.closest('.em-flow-label')
+                                    })
+                                    .node()
+                                if (!nameText) return
+                                const box = nameText.getBBox()
+                                const at = (d) => ({
+                                    x: box.x + box.width / 2 - d.x,
+                                    y: (placement === 'above' ? box.y - 7 : box.y + box.height + 11) - d.y,
                                 })
-                                .node()
-                            if (westernAsia) {
-                                const box = westernAsia.getBBox()
-                                const at = (d) => ({ x: box.x + box.width / 2 - d.x, y: box.y - 7 - d.y })
-                                const isWA = (d) => d.name === 'Western Asia'
+                                const matches = (d) => d.name === regionName
                                 d3.selectAll('#air-freight-map .em-flow-label g')
-                                    .filter(isWA)
+                                    .filter(matches)
                                     .select('text')
                                     .attr('text-anchor', 'middle')
                                     .attr('x', (d) => at(d).x)
                                     .attr('y', (d) => at(d).y)
                                 d3.selectAll('#air-freight-map .em-flow-label-halo text')
-                                    .filter(isWA)
+                                    .filter(matches)
                                     .attr('text-anchor', 'middle')
                                     .attr('x', (d) => d.x + at(d).x)
                                     .attr('y', (d) => d.y + at(d).y)
                             }
+                            centreValueOnName('Europe except EU', 'below')
+                            centreValueOnName('Western Asia', 'above')
 
                             //add cartography text
                             // --- REMOVE if it already exists ---
