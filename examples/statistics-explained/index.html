@@ -4,74 +4,52 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Statistics Explained maps</title>
-        <style>
-            body {
-                max-width: 50rem;
-                margin: 2rem auto;
-                padding: 0 1rem;
-                font-family: system-ui, sans-serif;
-                line-height: 1.5;
-            }
-
-            li + li {
-                margin-top: 0.5rem;
-            }
-        </style>
+        <link rel="stylesheet" href="index.css" />
     </head>
     <body>
+        <header class="se-header">
+            <div class="se-header-inner">
+                <h1>Statistics Explained maps</h1>
+                <p>
+                    The maps published in Eurostat's Statistics Explained articles, built with eurostat-map. Each opens as a live map you can
+                    hover, zoom and export.
+                </p>
+            </div>
+        </header>
         <main>
-            <h1>Statistics Explained maps</h1>
-            <h2>Business</h2>
-            <ul>
-                <li>Construction — <a href="business/construction/choropleth/index.html">Choropleth</a>, <a href="business/construction/proportional-circle/index.html">Proportional circles</a></li>
-                <li>Distributive trade — <a href="business/distributive-trade/choropleth/index.html">Choropleth</a>, <a href="business/distributive-trade/proportional-circle/index.html">Proportional circles</a></li>
-                <li>Human services — <a href="business/human-services/choropleth/index.html">Choropleth</a>, <a href="business/human-services/proportional-circle/index.html">Proportional circles</a></li>
-                <li>Manufacturing — <a href="business/manufacturing/choropleth/index.html">Choropleth</a>, <a href="business/manufacturing/proportional-circle/index.html">Proportional circles</a></li>
-                <li>Non-manufacturing industries (NACE) — <a href="business/NACE/choropleth/index.html">Choropleth</a>, <a href="business/NACE/proportional-circle/index.html">Proportional circles</a></li>
-                <li>Service industries — <a href="business/services/choropleth/index.html">Choropleth</a>, <a href="business/services/proportional-circle/index.html">Proportional circles</a></li>
-            </ul>
-            <h2>Transport</h2>
-            <h3>Air</h3>
-            <ul>
-                <li>
-                    Airport pairs
+            <div class="se-sections">
+                <section class="se-section">
+                    <h2>Business</h2>
+                    <p>Businesses by region, as choropleth maps and proportional circles, with a dropdown for the sector.</p>
                     <ul>
-                        <li><a href="transport/air/airports/2026/index.html">2026 edition</a></li>
-                        <li><a href="transport/air/airports/2025/index.html">2025 edition</a></li>
+                        <li><a href="business/construction/choropleth/index.html">Construction</a></li>
+                        <li><a href="business/distributive-trade/choropleth/index.html">Distributive trade</a></li>
+                        <li><a href="business/human-services/choropleth/index.html">Human services</a></li>
+                        <li><a href="business/manufacturing/choropleth/index.html">Manufacturing</a></li>
+                        <li><a href="business/NACE/choropleth/index.html">Non-manufacturing industries (NACE)</a></li>
+                        <li><a href="business/services/choropleth/index.html">Service industries</a></li>
                     </ul>
-                </li>
-                <li>
-                    Air freight and mail
+                    <a class="se-button" href="business/index.html">All business maps</a>
+                </section>
+
+                <section class="se-section">
+                    <h2>Transport</h2>
+                    <p>Extra-EU air and maritime transport: passengers, freight, airports and ports, by edition.</p>
                     <ul>
-                        <li><a href="transport/air/freight/2026/index.html">2026 edition</a></li>
-                        <li><a href="transport/air/freight/2025/index.html">2025 edition</a></li>
+                        <li><a href="transport/air/passengers/2026/index.html">Air passengers</a></li>
+                        <li><a href="transport/air/freight/2026/index.html">Air freight and mail</a></li>
+                        <li><a href="transport/air/airports/2026/index.html">Airport pairs</a></li>
+                        <li><a href="transport/maritime/flows/2026/index.html">Maritime flows</a></li>
+                        <li><a href="transport/maritime/ports/2026/index.html">Maritime ports</a></li>
                     </ul>
-                </li>
-                <li>
-                    Air passengers
-                    <ul>
-                        <li><a href="transport/air/passengers/2026/index.html">2026 edition</a></li>
-                        <li><a href="transport/air/passengers/2025/index.html">2025 edition</a></li>
-                    </ul>
-                </li>
-            </ul>
-            <h3>Maritime</h3>
-            <ul>
-                <li>
-                    Maritime flows
-                    <ul>
-                        <li><a href="transport/maritime/flows/2026/index.html">2026 edition</a></li>
-                        <li><a href="transport/maritime/flows/2025/index.html">2025 edition</a></li>
-                    </ul>
-                </li>
-                <li>
-                    Maritime ports
-                    <ul>
-                        <li><a href="transport/maritime/ports/2026/index.html">2026 edition</a></li>
-                        <li><a href="transport/maritime/ports/2025/index.html">2025 edition</a></li>
-                    </ul>
-                </li>
-            </ul>
+                    <a class="se-button" href="transport/index.html">All transport maps</a>
+                </section>
+            </div>
+
+            <p class="se-note">
+                Back to the <a href="../index.html">example gallery</a>. The links above open the 2026 edition of the transport maps, the
+                earlier editions are on the <a href="transport/index.html">transport page</a>.
+            </p>
         </main>
     </body>
 </html>

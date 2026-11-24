@@ -1,0 +1,248 @@
+/* Shared by the Statistics Explained index pages (index.html, business/index.html, transport/index.html) */
+:root {
+    --blue: #0e47cb;
+    --blue-dark: #0b3a9f;
+    --text: #1d2433;
+    --muted: #5b6475;
+    --line: #dde2ec;
+    --tint: #f3f6fc;
+    --card: #fff;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.5;
+    color: var(--text);
+    background: #fff;
+}
+
+a {
+    color: var(--blue);
+}
+
+a:hover {
+    color: var(--blue-dark);
+}
+
+a:focus-visible {
+    outline: 3px solid #ffc700;
+    outline-offset: 2px;
+}
+
+.se-header {
+    background: var(--blue);
+    color: #fff;
+}
+
+.se-header-inner,
+main {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.se-header-inner {
+    padding-top: 1.25rem;
+    padding-bottom: 1.75rem;
+}
+
+.se-crumbs {
+    margin: 0 0 0.75rem;
+    font-size: 0.875rem;
+    opacity: 0.9;
+}
+
+.se-crumbs a {
+    color: #fff;
+}
+
+.se-crumbs span[aria-hidden] {
+    margin: 0 0.4rem;
+}
+
+.se-header h1 {
+    margin: 0;
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    line-height: 1.2;
+}
+
+.se-header p {
+    margin: 0.5rem 0 0;
+    max-width: 44rem;
+    opacity: 0.92;
+}
+
+main {
+    padding-top: 1.5rem;
+    padding-bottom: 3rem;
+}
+
+h2 {
+    margin: 2rem 0 0.25rem;
+    font-size: 1.35rem;
+}
+
+h2 + .se-lead {
+    margin: 0 0 1rem;
+    color: var(--muted);
+}
+
+h3 {
+    margin: 1.5rem 0 0.75rem;
+    font-size: 1.05rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.se-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.se-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.se-thumb {
+    display: block;
+    aspect-ratio: 16 / 10;
+    background: var(--tint);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+}
+
+.se-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+}
+
+/* a map without a preview image */
+.se-thumb-none {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blue);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.se-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    padding: 0.85rem 1rem 1rem;
+}
+
+.se-card h2,
+.se-card h3,
+.se-card h4 {
+    margin: 0;
+    font-size: 1.05rem;
+    line-height: 1.3;
+    color: var(--text);
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.se-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.se-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: auto 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.se-links a {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--blue);
+    border-radius: 999px;
+    font-size: 0.875rem;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.se-links a:hover {
+    background: var(--blue);
+    color: #fff;
+}
+
+/* the sections on the front page */
+.se-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+    gap: 1.25rem;
+}
+
+.se-section {
+    padding: 1.25rem;
+    background: var(--tint);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+}
+
+.se-section h2 {
+    margin-top: 0;
+}
+
+.se-section ul {
+    margin: 0.5rem 0 1rem;
+    padding-left: 1.2rem;
+}
+
+.se-section li + li {
+    margin-top: 0.25rem;
+}
+
+.se-button {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: var(--blue);
+    color: #fff;
+    border-radius: 4px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.se-button:hover {
+    background: var(--blue-dark);
+    color: #fff;
+}
+
+.se-note {
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.875rem;
+    color: var(--muted);
+}
