@@ -67,8 +67,8 @@ export function applyPatternFill(map, configs = []) {
                     const clone = target.node().cloneNode(true)
 
                     select(clone)
-                        .style('fill', null) // clear any inline fill style (e.g. from transitions or no data)
-                        .attr('fill', `url(#${patternId})`)
+                        // an inline style, not the fill attribute: the map type's CSS (e.g. .em--ps .em-cntrg) would override an attribute
+                        .style('fill', `url(#${patternId})`)
                         .attr('pointer-events', 'none')
                         .attr('class', (select(clone).attr('class') || '') + ' pattern-fill-overlay')
 

@@ -23309,8 +23309,8 @@ function applyPatternFill(map, configs = []) {
                     const clone = target.node().cloneNode(true)
 
                     ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(clone)
-                        .style('fill', null) // clear any inline fill style (e.g. from transitions or no data)
-                        .attr('fill', `url(#${patternId})`)
+                        // an inline style, not the fill attribute: the map type's CSS (e.g. .em--ps .em-cntrg) would override an attribute
+                        .style('fill', `url(#${patternId})`)
                         .attr('pointer-events', 'none')
                         .attr('class', ((0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(clone).attr('class') || '') + ' pattern-fill-overlay')
 
