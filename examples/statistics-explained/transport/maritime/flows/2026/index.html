@@ -141,7 +141,7 @@
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
 
                 // Morocco and Algeria sit side by side under their flow ends, instead of Algeria's label trailing off to the left of Morocco's
-                labelMaritimePartners(map, maritimeFlowGraph, { positions: { MA: [446, 376], DZ: [519, 367], RU: [716, 212], TR: [680, 253], IQ: [760, 292] } })
+                labelMaritimePartners(map, maritimeFlowGraph, { positions: { MA: [450, 338], DZ: [519, 367], RU: [716, 212], TR: [680, 253], IQ: [760, 292] } })
 
             })
             .annotations({
@@ -187,15 +187,17 @@
         function flowOrderFunction(a, b) {
             const srcA = a.link.originId ?? (a.link.source && a.link.source.id);
             const srcB = b.link.originId ?? (b.link.source && b.link.source.id);
-            const morocco = a.link.target.id === 'MA' || b.link.target.id === 'MA';
+            const isMA = (l) => l.target.id === 'MA' || (l.originId ?? (l.source && l.source.id)) === 'MA';
+            const maA = isMA(a.link);
+            const maB = isMA(b.link);
 
             // India above Turkey
             if (srcA === 'IN' && srcB === 'TR') return -1;
             if (srcA === 'TR' && srcB === 'IN') return 1;
 
             // Brasil above Algeria and Morocco
-            if (srcA === 'BR' && (srcB === 'DZ' || morocco)) return -1;
-            if ((srcA === 'DZ' || morocco) && srcB === 'BR') return 1;
+            if (srcA === 'BR' && (srcB === 'DZ' || maB)) return -1;
+            if ((srcA === 'DZ' || maA) && srcB === 'BR') return 1;
 
             // Canada should go below the UK
             if (srcA === 'CA' && srcB === 'UK') return 1;   // CA after UK
