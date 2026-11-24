@@ -2,7 +2,7 @@ const regionLabels = [
     {
         "text": "Europe except EU",
         "x": 8,
-        "y": 62.7
+        "y": 68
     },
     {
         "text": "Rest of Africa",
@@ -12,7 +12,7 @@ const regionLabels = [
     {
         "text": "North Africa",
         "x": -4,
-        "y": 22
+        "y": 15
     },
     {
         "text": "Northern America",
@@ -36,8 +36,8 @@ const regionLabels = [
     },
     {
         "text": "Eastern Asia",
-        "x": 116,
-        "y": 31.7
+        "x": 120,
+        "y": 23.5
     },
     {
         "text": "Southern Asia",

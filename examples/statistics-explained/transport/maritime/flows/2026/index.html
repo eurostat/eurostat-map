@@ -31,8 +31,8 @@
             .geoAzimuthalEquidistant()
             .rotate([10, -10])
             //.center([10, 52])       // center on Europe
-            .scale(350)
-            .translate([width / 2.4, width / 2.3])
+            .scale(325)
+            .translate([457, 453])
 
         const map = eurostatmap
             .map("flow")
@@ -141,7 +141,7 @@
                     .html('Cartography: GISCO. Boundaries: ©EuroGeographics ©OSM');
 
                 // Morocco and Algeria sit side by side under their flow ends, instead of Algeria's label trailing off to the left of Morocco's
-                labelMaritimePartners(map, maritimeFlowGraph, { positions: { MA: [438, 386], DZ: [517, 376], RU: [729, 209], TR: [690, 254], IQ: [776, 295] } })
+                labelMaritimePartners(map, maritimeFlowGraph, { positions: { MA: [446, 376], DZ: [519, 367], RU: [716, 212], TR: [680, 253], IQ: [760, 292] } })
 
             })
             .annotations({

@@ -215,6 +215,23 @@
                             const labels = d3.selectAll('#em-labels')
                             labels.raise()
 
+                            // some values sit centred on their flow end, not beside it over a neighbouring flow:
+                            // above a flow that points up, or underneath a flow that points down
+                            const shift = (d) =>
+                                d.name === 'Europe except EU' ? -8 : d.name === 'North Africa' ? 16 : null
+                            const centred = (d) => shift(d) !== null
+                            d3.selectAll('#air-passengers-map .em-flow-label g')
+                                .filter(centred)
+                                .select('text')
+                                .attr('text-anchor', 'middle')
+                                .attr('x', 0)
+                                .attr('y', shift)
+                            d3.selectAll('#air-passengers-map .em-flow-label-halo text')
+                                .filter(centred)
+                                .attr('text-anchor', 'middle')
+                                .attr('x', (d) => d.x)
+                                .attr('y', (d) => d.y + shift(d))
+
                             //add cartography text
                             // --- REMOVE if it already exists ---
                             d3.select('#air-passengers-map #em-footnote-2').remove()
