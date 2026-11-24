@@ -282,6 +282,26 @@
                                 label.append('tspan').attr('x', middle.x).attr('dy', '-0.55em').text(passengers)
                                 label.append('tspan').attr('x', middle.x).attr('dy', '1.1em').text(change)
                             })
+                        // the callouts sit on a white box, rounded like the legend, so the flows under them do not run through the text
+                        map.svg()
+                            .selectAll('.em-annotations .annotation-note')
+                            .each(function () {
+                                const content = this.querySelector('.annotation-note-content')
+                                if (!content) return
+                                const box = content.getBBox()
+                                const padding = 8
+                                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+                                rect.setAttribute('class', 'em-annotation-background')
+                                rect.setAttribute('x', box.x - padding)
+                                rect.setAttribute('y', box.y - padding)
+                                rect.setAttribute('width', box.width + 2 * padding)
+                                rect.setAttribute('height', box.height + 2 * padding)
+                                rect.setAttribute('rx', 5)
+                                rect.setAttribute('ry', 5)
+                                rect.setAttribute('fill', 'white')
+                                rect.setAttribute('style', 'filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25))')
+                                content.insertBefore(rect, content.firstChild)
+                            })
                         map.svg().select('.em-annotations').raise()
                         map.svg().select('#em-labels').raise()
                         map.svg()
