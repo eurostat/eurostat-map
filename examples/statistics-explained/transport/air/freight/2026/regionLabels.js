@@ -17,7 +17,7 @@ const regionLabels = [
     {
         "text": "Europe except EU",
         "x": 12,
-        "y": 62.7
+        "y": 68
     },
     {
         "text": "South America",

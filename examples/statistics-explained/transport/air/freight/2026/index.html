@@ -255,6 +255,21 @@
                             const labels = d3.selectAll('#em-labels')
                             labels.raise()
 
+                            // the value of Europe except EU sits centred above its flow end, under the region name,
+                            // not beside it over the North America flow
+                            const centred = (d) => d.name === 'Europe except EU'
+                            d3.selectAll('#air-freight-map .em-flow-label g')
+                                .filter(centred)
+                                .select('text')
+                                .attr('text-anchor', 'middle')
+                                .attr('x', 0)
+                                .attr('y', -8)
+                            d3.selectAll('#air-freight-map .em-flow-label-halo text')
+                                .filter(centred)
+                                .attr('text-anchor', 'middle')
+                                .attr('x', (d) => d.x)
+                                .attr('y', (d) => d.y - 8)
+
                             //add cartography text
                             // --- REMOVE if it already exists ---
                             d3.select('#air-freight-map #em-footnote-2').remove()
