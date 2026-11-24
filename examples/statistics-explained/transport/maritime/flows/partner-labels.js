@@ -2,6 +2,8 @@
 // e.g. { MA: [[-1, 1], [-1, 0]] } tries below-left of Morocco, then left, before the usual order. dx, dy are -1, 0 or 1.
 // options.positions: { PARTNER_ID: [x, y] }, the centre of the label's first line in map pixels, used as it is (no search) for
 // the few labels the automatic placement cannot put well.
+// options.leftAligned: ['ID', ...], partners whose label lines start at the same x (their position's x is the left edge) instead of
+// being centred on it; use it with positions.
 function labelMaritimePartners(map, graph, options = {}) {
     const svg = map.svg()
     const zoomGroup = svg.select('#em-zoom-group-' + map.svgId())
@@ -59,7 +61,7 @@ function labelMaritimePartners(map, graph, options = {}) {
         const label = labels
             .append('text')
             .attr('data-partner', partner.id)
-            .attr('text-anchor', 'middle')
+            .attr('text-anchor', options.leftAligned?.includes(partner.id) ? 'start' : 'middle')
             .attr('font-family', 'Arial, sans-serif')
             .attr('font-size', 13)
             .attr('fill', '#292929')
