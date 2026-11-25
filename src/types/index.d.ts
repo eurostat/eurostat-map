@@ -277,6 +277,31 @@ export function isLayerTypeRegistered(type: string): boolean
  */
 export function projectFromMap(map: MapInstance, x: number, y: number): [number, number] | null
 
+/** Options of {@link exportSvgToPNG}. */
+export interface ExportSvgToPNGOptions {
+    /** Output width in pixels. Defaults to the SVG's width times `scale`. */
+    width?: number
+    /** Output height in pixels. Defaults to the SVG's height times `scale`. */
+    height?: number
+    /** Pixel density multiplier (2 doubles the resolution) when width/height are not given. @default 1 */
+    scale?: number
+    /** File name, without extension. @default 'eurostat-map' */
+    filename?: string
+    /** Background colour behind the SVG. @default '#ffffff' */
+    background?: string
+}
+
+/**
+ * Render any SVG element, with its computed CSS styles inlined, to a PNG and download it. Unlike `map.exportMapToPNG()`
+ * it works for a composite SVG made of several maps (nested `<svg>` elements, captions, a legend).
+ * The SVG has to be in the document so that its styles resolve.
+ *
+ * @param svg - The SVG element to render
+ * @param options - Size, pixel density, file name and background
+ * @returns The PNG, once the download has started
+ */
+export function exportSvgToPNG(svg: SVGSVGElement, options?: ExportSvgToPNGOptions): Promise<Blob>
+
 /**
  * Project geographic coordinates to map pixel space
  *
@@ -307,6 +332,8 @@ declare const eurostatmap: {
     projectFromMap: typeof projectFromMap
     /** Project to map. */
     projectToMap: typeof projectToMap
+    /** Render any SVG element (for example several maps) to a PNG and download it. */
+    exportSvgToPNG: typeof exportSvgToPNG
     /** Register a custom layer type. */
     registerLayerType: typeof registerLayerType
     /** Check whether a layer type is registered. */

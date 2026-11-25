@@ -68,7 +68,7 @@
             }
 
             /* pale land, so that the calm routes stay visible and the red ones stand out */
-            #grid .em-cntrg {
+            svg[id^='map-'] .em-cntrg {
                 fill: #efefef;
             }
 
@@ -311,6 +311,109 @@
             legendSvg.setAttribute('width', 230)
             legendSvg.setAttribute('height', 250)
             panel.add(legendSvg)
+            // ---- download: all the maps, a title and the legend in one picture, sized for social media ----
+            const SVG_NS = 'http://www.w3.org/2000/svg'
+            const svgEl = (name, attrs = {}, text) => {
+                const node = document.createElementNS(SVG_NS, name)
+                for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v)
+                if (text !== undefined) node.textContent = text
+                return node
+            }
+
+            /** One SVG with the maps in their current order (5 per row), the legend in the last cells and a header. */
+            function buildPoster() {
+                const COLS = 5
+                const [W, MARGIN, GAP, HEADER, FOOTER, CAPTION] = [1600, 40, 14, 120, 50, 26]
+                const cellW = (W - 2 * MARGIN - (COLS - 1) * GAP) / COLS
+                const mapH = Math.round(cellW * 0.85)
+                const rowH = CAPTION + mapH + GAP
+                const figures = [...grid.querySelectorAll('figure')]
+                const rows = Math.ceil((figures.length + 2) / COLS) // the legend takes two cells
+                const H = HEADER + rows * rowH + FOOTER
+
+                const poster = svgEl('svg', {
+                    xmlns: SVG_NS,
+                    width: W,
+                    height: H,
+                    viewBox: `0 0 ${W} ${H}`,
+                    'font-family': 'Arial, Helvetica, sans-serif',
+                })
+                poster.appendChild(svgEl('rect', { width: W, height: H, fill: '#fff' }))
+                poster.appendChild(
+                    svgEl(
+                        'text',
+                        { x: MARGIN, y: 58, 'font-size': 38, 'font-weight': 'bold', fill: '#222' },
+                        'Empty seats on flights to and from capital city airports'
+                    )
+                )
+                poster.appendChild(
+                    svgEl(
+                        'text',
+                        { x: MARGIN, y: 92, 'font-size': 20, fill: '#555' },
+                        'Share of seats that were not filled on each route, 2024. Line width shows the passengers carried.'
+                    )
+                )
+
+                figures.forEach((figure, i) => {
+                    const x = MARGIN + (i % COLS) * (cellW + GAP)
+                    const y = HEADER + Math.floor(i / COLS) * rowH
+                    const original = figure.querySelector('svg')
+                    const hub = hubs.find((h) => original.id === 'map-' + h.code)
+                    poster.appendChild(
+                        svgEl('text', { x, y: y + 18, 'font-size': 17, 'font-weight': 'bold', fill: '#222' }, `${hub.city} (${hub.iata})`)
+                    )
+                    poster.appendChild(
+                        svgEl(
+                            'text',
+                            { x: x + cellW, y: y + 18, 'font-size': 13, fill: '#666', 'text-anchor': 'end' },
+                            `${hub.emptyPct.toFixed()}% empty · ${hub.routes.length} routes`
+                        )
+                    )
+                    poster.appendChild(svgEl('line', { x1: x, x2: x + cellW, y1: y + CAPTION - 3, y2: y + CAPTION - 3, stroke: '#ccc' }))
+
+                    const nested = original.cloneNode(true)
+                    nested.setAttribute('viewBox', `0 0 ${original.getAttribute('width')} ${original.getAttribute('height')}`)
+                    nested.setAttribute('x', x)
+                    nested.setAttribute('y', y + CAPTION)
+                    nested.setAttribute('width', cellW)
+                    nested.setAttribute('height', mapH)
+                    poster.appendChild(nested)
+                })
+
+                const legend = legendSvg.cloneNode(true)
+                legend.setAttribute('x', MARGIN + (figures.length % COLS) * (cellW + GAP))
+                legend.setAttribute('y', HEADER + Math.floor(figures.length / COLS) * rowH + CAPTION)
+                poster.appendChild(legend)
+
+                poster.appendChild(
+                    svgEl(
+                        'text',
+                        { x: MARGIN, y: H - 18, 'font-size': 14, fill: '#666' },
+                        'Source: Eurostat, avia_par (2024), routes between the busiest airports. Made with eurostat-map.'
+                    )
+                )
+                return poster
+            }
+
+            const download = Object.assign(document.createElement('button'), {
+                type: 'button',
+                className: 'ecl-button ecl-button--primary',
+                textContent: 'Download PNG',
+            })
+            download.addEventListener('click', async () => {
+                download.disabled = true
+                download.textContent = 'Preparing the image...'
+                try {
+                    await eurostatmap.exportSvgToPNG(buildPoster(), { scale: 2.5, filename: 'capital-airports-empty-seats' }) // 4000 px wide
+                } catch (e) {
+                    console.error(e)
+                    alert('The image could not be created: ' + e.message)
+                } finally {
+                    download.disabled = false
+                    download.textContent = 'Download PNG'
+                }
+            })
+            panel.add(download)
             panel.add(
                 Object.assign(document.createElement('p'), {
                     className: 'ex-note',

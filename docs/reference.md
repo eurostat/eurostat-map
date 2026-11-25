@@ -2432,6 +2432,8 @@ Export the map as a PNG image or a SVG file.
 | _map_.**exportMapToPNG**() | _this_ | Export the map as a PNG image. |
 | _map_.**exportMapToSVG**() | _this_ | Export the map as a SVG image. |
 
+`eurostatmap.exportSvgToPNG(svg, { scale, width, height, filename, background })` renders any SVG element in the page to a PNG and downloads it, with the computed CSS inlined. Use it when the picture is not a single map: a composite SVG that nests several map SVGs, captions and a legend (see `examples/flow/flights/capital-airports.html`, a "Download PNG" button for sharing on social media). `scale: 3` triples the pixel density.
+
 ## Miscellaneous
 
 | Method                                         | Type         | Default value        | Description                                                                                                                                                                                                                                                                                                                                                      |

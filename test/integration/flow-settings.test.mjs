@@ -40,3 +40,6 @@ const library = eurostatmap.default || eurostatmap.eurostatmap || globalThis.eur
 }
 
 console.log('flow-settings.test: ok')
+
+// Any SVG (for example a composite of several maps) can be exported to PNG.
+assert.strictEqual(typeof library.exportSvgToPNG, 'function', 'exportSvgToPNG is public')

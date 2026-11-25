@@ -154,6 +154,7 @@ export const getDefaultLabels = function () {
 }
 
 export { projectFromMap, projectToMap } from './core/geo/proj4.js'
+export { exportSvgToPNG } from './core/export.js'
 export { registerLayerType, isLayerTypeRegistered } from './core/layer-registry.js'
 
 import pkg from '../package.json'

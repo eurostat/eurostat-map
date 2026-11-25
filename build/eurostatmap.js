@@ -25905,7 +25905,8 @@ function dorlingWorkerD3URL(url) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   exportMapToPNG: () => (/* binding */ exportMapToPNG),
-/* harmony export */   exportMapToSVG: () => (/* binding */ exportMapToSVG)
+/* harmony export */   exportMapToSVG: () => (/* binding */ exportMapToSVG),
+/* harmony export */   exportSvgToPNG: () => (/* binding */ exportSvgToPNG)
 /* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/core/utils.js");
 
@@ -25960,8 +25961,30 @@ const exportMapToSVG = function (out, filename) {
  * @returns {Promise<object>} Resolves to the map instance.
  */
 const exportMapToPNG = async function (out, width, height, filename) {
+    await exportSvgToPNG(out.svg_.node(), { width, height, filename })
+    return out
+}
+
+/**
+ * Renders any SVG element (with its computed CSS styles inlined) to a PNG and triggers a browser download.
+ * It works for a composite SVG made of several maps (nested `<svg>` elements, captions, a legend): the element is
+ * cloned, so the page is not touched. Fonts and external resources must be accessible without CORS restrictions for
+ * the canvas to remain untainted.
+ *
+ * @param {SVGSVGElement} svgNode - The SVG to render. It has to be in the document, so that its styles resolve.
+ * @param {object} [options]
+ * @param {number} [options.width] - Output width in pixels. Defaults to the SVG's width times `scale`.
+ * @param {number} [options.height] - Output height in pixels. Defaults to the SVG's height times `scale`.
+ * @param {number} [options.scale=1] - Pixel density multiplier (2 doubles the resolution) when width/height are not given.
+ * @param {string} [options.filename='eurostat-map'] - File name, without extension.
+ * @param {string} [options.background='#ffffff'] - Background colour behind the SVG (PNG is otherwise transparent).
+ * @returns {Promise<Blob>} Resolves to the PNG once the download has started.
+ */
+const exportSvgToPNG = async function (svgNode, options = {}) {
+    const { width, height, scale = 1, filename = 'eurostat-map', background = '#ffffff' } = options
+
     // Clone original SVG
-    const svgNodeClone = out.svg_.node().cloneNode(true)
+    const svgNodeClone = svgNode.cloneNode(true)
 
     // Ensure xml namespaces
     if (!svgNodeClone.hasAttribute('xmlns')) svgNodeClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
@@ -25983,110 +26006,65 @@ const exportMapToPNG = async function (out, width, height, filename) {
     (0,_utils__WEBPACK_IMPORTED_MODULE_0__.applyComputedStylesToSVG)(svgNodeClone)
     ;(0,_utils__WEBPACK_IMPORTED_MODULE_0__.ensureSvgSize)(svgNodeClone)
 
-    // Insert white background rect as first child if none present
+    // Insert a background rect as first child if none present
+    const svgWidth =
+        parseFloat(svgNodeClone.getAttribute('width')) || svgNodeClone.viewBox.baseVal.width || svgNodeClone.getBoundingClientRect().width
+    const svgHeight =
+        parseFloat(svgNodeClone.getAttribute('height')) || svgNodeClone.viewBox.baseVal.height || svgNodeClone.getBoundingClientRect().height
     if (!svgNodeClone.querySelector('rect[data-export-background]')) {
-        const w = svgNodeClone.getAttribute('width') || svgNodeClone.viewBox.baseVal.width || svgNodeClone.getBoundingClientRect().width
-        const h = svgNodeClone.getAttribute('height') || svgNodeClone.viewBox.baseVal.height || svgNodeClone.getBoundingClientRect().height
         const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
         bg.setAttribute('x', 0)
         bg.setAttribute('y', 0)
-        bg.setAttribute('width', String(w))
-        bg.setAttribute('height', String(h))
-        bg.setAttribute('fill', '#ffffff')
+        bg.setAttribute('width', String(svgWidth))
+        bg.setAttribute('height', String(svgHeight))
+        bg.setAttribute('fill', background)
         bg.setAttribute('data-export-background', 'true')
         svgNodeClone.insertBefore(bg, svgNodeClone.firstElementChild)
     }
 
-    // Serialize while still in DOM
-    const serializer = new XMLSerializer()
-    const svgString = serializer.serializeToString(svgNodeClone)
-
-    // Remove clone from DOM now
+    // Serialize while still in DOM, then remove the clone
+    const svgString = new XMLSerializer().serializeToString(svgNodeClone)
     document.body.removeChild(svgNodeClone)
 
-    // Create blob URL
-    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' })
-    const url = URL.createObjectURL(svgBlob)
-
     // Determine pixel dimensions
-    const w = Math.round(width || parseFloat(svgNodeClone.getAttribute('width')) || 800)
-    const h = Math.round(height || parseFloat(svgNodeClone.getAttribute('height')) || 600)
+    const w = Math.round(width || (svgWidth || 800) * scale)
+    const h = Math.round(height || (svgHeight || 600) * scale)
 
-    // Create image and set crossOrigin (best-effort)
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
+    const url = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' }))
+    let pngUrl
+    try {
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        await new Promise((resolve, reject) => {
+            img.onload = resolve
+            img.onerror = () => reject(new Error('The SVG could not be loaded for export (invalid SVG or blocked external resource).'))
+            img.src = url
+        })
 
-    // Helper to revoke and cleanup
-    const cleanup = (pngUrl) => {
-        try {
-            URL.revokeObjectURL(url)
-        } catch (e) {}
-        if (pngUrl) {
-            try {
-                URL.revokeObjectURL(pngUrl)
-            } catch (e) {}
-        }
+        const canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext('2d')
+        // Fill the background to avoid transparent -> black in some viewers
+        ctx.fillStyle = background
+        ctx.fillRect(0, 0, w, h)
+        ctx.drawImage(img, 0, 0, w, h)
+
+        const pngBlob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
+        if (!pngBlob) throw new Error('canvas.toBlob returned null: the canvas is probably tainted by a cross-origin resource, or too large.')
+
+        pngUrl = URL.createObjectURL(pngBlob)
+        const a = document.createElement('a')
+        a.href = pngUrl
+        a.download = filename + '.png'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        return pngBlob
+    } finally {
+        URL.revokeObjectURL(url)
+        if (pngUrl) setTimeout(() => URL.revokeObjectURL(pngUrl), 10000) // after the download has started
     }
-
-    img.onload = function () {
-        try {
-            const canvas = document.createElement('canvas')
-            canvas.width = w
-            canvas.height = h
-            const ctx = canvas.getContext('2d')
-
-            // Fill white background to avoid transparent -> black in some viewers
-            ctx.fillStyle = '#ffffff'
-            ctx.fillRect(0, 0, w, h)
-
-            ctx.drawImage(img, 0, 0, w, h)
-
-            canvas.toBlob(function (pngBlob) {
-                if (!pngBlob) {
-                    console.error('canvas.toBlob returned null — likely CORS/taint issue.')
-                    // open the serialized SVG for debugging
-                    const debugWin = window.open()
-                    debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>')
-                    cleanup()
-                    return
-                }
-
-                const pngUrl = URL.createObjectURL(pngBlob)
-                const a = document.createElement('a')
-                a.href = pngUrl
-                a.download = filename + '.png' || 0
-                document.body.appendChild(a)
-                a.click()
-                document.body.removeChild(a)
-
-                cleanup(pngUrl)
-            }, 'image/png')
-        } catch (err) {
-            console.error('Error drawing SVG to canvas:', err)
-            // open serialized SVG for debugging
-            const debugWin = window.open()
-            debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>')
-            cleanup()
-        }
-    }
-
-    img.onerror = function (err) {
-        console.error('Image failed to load for export. Likely CORS or invalid SVG. Error:', err)
-        // open serialized SVG for debugging
-        const debugWin = window.open()
-        debugWin.document.write('<pre>' + escapeHtml(svgString) + '</pre>')
-        cleanup()
-    }
-
-    // start loading
-    img.src = url
-
-    return out
-}
-
-// small helper to escape HTML for debug window
-function escapeHtml(str) {
-    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 
@@ -79342,14 +79320,15 @@ var __webpack_exports__ = {};
   \**********************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   exportSvgToPNG: () => (/* reexport safe */ _core_export_js__WEBPACK_IMPORTED_MODULE_19__.exportSvgToPNG),
 /* harmony export */   getDefaultLabels: () => (/* binding */ getDefaultLabels),
 /* harmony export */   getFillPatternDefinitionFun: () => (/* binding */ getFillPatternDefinitionFun),
 /* harmony export */   getFillPatternDefinitionFunction: () => (/* binding */ getFillPatternDefinitionFunction),
-/* harmony export */   isLayerTypeRegistered: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_19__.isLayerTypeRegistered),
+/* harmony export */   isLayerTypeRegistered: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__.isLayerTypeRegistered),
 /* harmony export */   map: () => (/* binding */ map),
 /* harmony export */   projectFromMap: () => (/* reexport safe */ _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__.projectFromMap),
 /* harmony export */   projectToMap: () => (/* reexport safe */ _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__.projectToMap),
-/* harmony export */   registerLayerType: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_19__.registerLayerType),
+/* harmony export */   registerLayerType: () => (/* reexport safe */ _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__.registerLayerType),
 /* harmony export */   version: () => (/* binding */ version)
 /* harmony export */ });
 /* harmony import */ var _css_index_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./css/index.css */ "./src/css/index.css");
@@ -79371,8 +79350,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./core/stat-map */ "./src/core/stat-map.js");
 /* harmony import */ var d3_format__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! d3-format */ "./node_modules/d3-format/src/defaultLocale.js");
 /* harmony import */ var _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./core/geo/proj4.js */ "./src/core/geo/proj4.js");
-/* harmony import */ var _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./core/layer-registry.js */ "./src/core/layer-registry.js");
-/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../package.json */ "./package.json");
+/* harmony import */ var _core_export_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./core/export.js */ "./src/core/export.js");
+/* harmony import */ var _core_layer_registry_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./core/layer-registry.js */ "./src/core/layer-registry.js");
+/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../package.json */ "./package.json");
 
 
 
@@ -79531,9 +79511,10 @@ const getDefaultLabels = function () {
 
 
 
+
 ;
 
-const version = _package_json__WEBPACK_IMPORTED_MODULE_20__.version
+const version = _package_json__WEBPACK_IMPORTED_MODULE_21__.version
 
 })();
 
