@@ -44,6 +44,7 @@
         'flow/commuting-corridors.html',
         'flow/flights/flights.html',
         'flow/flowmap.html',
+        'flow/great-circles.html',
         'flow/immigration.html',
         'misc/annotations.html',
         'misc/custom-geometries.html',

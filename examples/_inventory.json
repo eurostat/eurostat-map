@@ -215,6 +215,12 @@
             "flow"
         ]
     },
+    "flow/great-circles.html": {
+        "path": "flow/great-circles.html",
+        "types": [
+            "flow"
+        ]
+    },
     "flow/immigration.html": {
         "path": "flow/immigration.html",
         "types": [

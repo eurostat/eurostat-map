@@ -247,6 +247,12 @@
                 border-top: 1px solid #e3e3e3;
             }
 
+            .hint {
+                margin: -4px 0 0;
+                font-size: 0.85em;
+                color: var(--eu-muted);
+            }
+
             #summary {
                 margin: 0;
                 color: var(--eu-muted);
@@ -371,6 +377,11 @@
                     <fieldset>
                         <legend>Display</legend>
                         <label class="switch"><span>Edge bundling</span><input id="bundling" type="checkbox" role="switch" checked /></label>
+                        <label class="field">
+                            <span class="field-head">Bundling strength <output id="strength-out" for="strength"></output></span>
+                            <input id="strength" type="range" min="-40" max="30" step="5" value="10" />
+                        </label>
+                        <p class="hint">Positive values pull routes together, negative values push them apart.</p>
                         <label class="switch"><span>Merge directions (to and from)</span><input id="merge" type="checkbox" role="switch" checked /></label>
                         <label class="switch"><span>Voronoi cells</span><input id="voronoi" type="checkbox" role="switch" /></label>
                         <label class="switch"><span>Animate</span><input id="animate" type="checkbox" role="switch" /></label>
@@ -414,6 +425,7 @@
                     opacity: +$('opacity').value,
                     colourBy: document.querySelector('input[name=colourBy]:checked').value, // 'none' | 'empty' (share of empty seats) | 'scope' (domestic vs international)
                     bundling: $('bundling').checked && $('merge').checked, // bundling has no side-by-side layout, so it is off for separate directions
+                    strength: +$('strength').value, // > 0 bundles routes, < 0 pushes them apart
                     merge: $('merge').checked, // merge both directions of a route
                     voronoi: $('voronoi').checked,
                     animate: $('animate').checked,
@@ -541,6 +553,8 @@
                 stopAnimation = () => {}
                 const s = readSettings()
                 $('bundling').disabled = !$('merge').checked
+                $('strength').disabled = !s.bundling
+                $('strength-out').textContent = s.strength
                 $('topN-out').textContent = s.topN || 'all'
                 $('maxWidth-out').textContent = s.maxWidth
                 $('opacity-out').textContent = s.opacity
@@ -602,7 +616,7 @@
                     .flowSettings({
                         bundleSettings: {
                             alphaDecay: 0.1,
-                            chargeStrength: 10,
+                            chargeStrength: s.strength, // negative: routes are pushed apart instead of bundled
                             distanceMax: null, // use the default bundling distance
                             linkStrength: 0.7,
                             linkIterations: 1,

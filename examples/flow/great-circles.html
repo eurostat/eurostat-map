@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Flow map: great circles and un-bundling</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            body {
+                margin: 0;
+            }
+            #map .em-flow-link {
+                mix-blend-mode: multiply;
+            }
+        </style>
+    </head>
+
+    <body>
+        <svg id="map"></svg>
+        <script src="../../build/eurostatmap.js"></script>
+        <script type="module">
+            import { createPanel } from '../vendor/example-panel.js'
+
+            // Illustrative long-haul routes between hub cities (made-up volumes, not statistics).
+            // Node coordinates are lon/lat, the coordinate system of world maps.
+            const cities = {
+                LON: { name: 'London', x: -0.45, y: 51.47 },
+                NYC: { name: 'New York', x: -73.78, y: 40.64 },
+                LAX: { name: 'Los Angeles', x: -118.41, y: 33.94 },
+                SAO: { name: 'Sao Paulo', x: -46.47, y: -23.43 },
+                DXB: { name: 'Dubai', x: 55.36, y: 25.25 },
+                SIN: { name: 'Singapore', x: 103.99, y: 1.36 },
+                TYO: { name: 'Tokyo', x: 139.78, y: 35.55 },
+                SYD: { name: 'Sydney', x: 151.18, y: -33.94 },
+                JNB: { name: 'Johannesburg', x: 28.24, y: -26.13 },
+                DEL: { name: 'Delhi', x: 77.1, y: 28.56 },
+                PEK: { name: 'Beijing', x: 116.6, y: 40.08 },
+                FRA: { name: 'Frankfurt', x: 8.57, y: 50.03 },
+                PAR: { name: 'Paris', x: 2.55, y: 49.01 },
+                MAD: { name: 'Madrid', x: -3.57, y: 40.49 },
+            }
+            const routes = [
+                ['LON', 'NYC', 9],
+                ['FRA', 'NYC', 6],
+                ['PAR', 'NYC', 5],
+                ['MAD', 'NYC', 3],
+                ['LON', 'LAX', 4],
+                ['FRA', 'LAX', 2],
+                ['NYC', 'SAO', 3],
+                ['MAD', 'SAO', 4],
+                ['LON', 'SAO', 2],
+                ['LON', 'DXB', 7],
+                ['FRA', 'DXB', 4],
+                ['PAR', 'DXB', 3],
+                ['DXB', 'SIN', 5],
+                ['DXB', 'DEL', 6],
+                ['DXB', 'JNB', 3],
+                ['LON', 'JNB', 3],
+                ['LON', 'SIN', 4],
+                ['FRA', 'PEK', 3],
+                ['LON', 'DEL', 4],
+                ['PAR', 'PEK', 2],
+                ['LAX', 'TYO', 5],
+                ['LAX', 'SYD', 3],
+                ['NYC', 'TYO', 3],
+                ['SIN', 'SYD', 4],
+                ['TYO', 'SYD', 2],
+                ['PEK', 'LAX', 3],
+                ['DEL', 'SIN', 3],
+                ['NYC', 'DEL', 2],
+                ['LON', 'TYO', 3],
+                ['SAO', 'JNB', 2],
+            ]
+            const graph = {
+                nodes: Object.entries(cities).map(([id, c]) => ({ id, name: c.name, x: c.x, y: c.y })),
+                links: routes.map(([source, target, value]) => ({ source, target, value })),
+            }
+
+            const settings = { geometry: 'greatCircle', bundling: 0, arrows: false }
+
+            function draw() {
+                const svg = document.getElementById('map')
+                svg.replaceChildren()
+                delete svg.__zoom // the zoom state of the previous map
+
+                eurostatmap
+                    .map('flow')
+                    .height((m) => Math.round(m.width() * 0.55))
+                    .title('Long-haul routes (illustrative)')
+                    .subtitle(settings.bundling < 0 ? 'Un-bundled' : settings.bundling > 0 ? 'Bundled' : 'Not bundled')
+                    .geo('WORLD')
+                    .drawGraticule(true)
+                    .zoomButtons(true)
+                    .flowGraph(JSON.parse(JSON.stringify(graph)))
+                    .flowSettings({
+                        lineType: 'straight',
+                        lineGeometry: settings.geometry,
+                        bidirectional: false,
+                        edgeBundling: settings.bundling !== 0,
+                        bundleSettings: { chargeStrength: settings.bundling },
+                        arrows: settings.arrows,
+                        color: '#0e47cb',
+                        opacity: 0.55,
+                        minWidth: 1,
+                        maxWidth: 8,
+                        nodes: true,
+                        nodeType: 'circle',
+                        nodeLabels: true,
+                    })
+                    .build()
+            }
+
+            const panel = createPanel({ map: '#map', title: 'Routes' })
+            panel.radio({
+                id: 'geometry',
+                label: 'Line shape',
+                options: [
+                    { value: 'straight', label: 'Straight' },
+                    { value: 'greatCircle', label: 'Great circle' },
+                ],
+                value: settings.geometry,
+                onChange: (v) => {
+                    settings.geometry = v
+                    draw()
+                },
+            })
+            panel.range({
+                id: 'bundling',
+                label: 'Bundling (+) / un-bundling (-)',
+                min: -40,
+                max: 30,
+                step: 5,
+                value: settings.bundling,
+                onChange: (v) => {
+                    settings.bundling = +v
+                    draw()
+                },
+            })
+            panel.checkbox({
+                id: 'arrows',
+                label: 'Arrows',
+                checked: settings.arrows,
+                onChange: (v) => {
+                    settings.arrows = v
+                    draw()
+                },
+            })
+            draw()
+        </script>
+    </body>
+</html>
