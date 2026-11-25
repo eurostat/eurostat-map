@@ -106,21 +106,23 @@ _overlay_ layers (symbols, pies, flows...). See [docs/multi-layer-guide.md](../.
 
 ## Common customisation
 
-| Need                 | Use                                                                                                                                                                               |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Classes and colours  | `numberOfClasses`, `classificationMethod` (`quantile`, `equinter`, `ckmeans`, `jenks`, `threshold` + `thresholds`), `colors('teal')` or an array, `colorSchemeType('continuous')` |
-| Diverging data       | `colors('cobalt-plum')` plus `pointOfDivergence(0)`                                                                                                                               |
-| Missing data         | `noDataFillStyle`, `noDataText`, legend `noData: false` to hide the entry                                                                                                         |
-| Size and position    | `width`, `height`, `position({ x, y, z })`, `scale('60M')` for smaller, simpler geometry                                                                                          |
-| Zoom                 | `zoomExtent([1, 8])`, `zoomButtons(true)`                                                                                                                                         |
-| Overseas territories | `insets('default')`                                                                                                                                                               |
-| Legend               | `legend({ title, position: 'top right', x, y, boxOpacity, decimals })`                                                                                                            |
-| Tooltip              | `tooltip({ textFunction: (region, map) => html, showFlags: false })`                                                                                                              |
-| Events               | `onRegionClick((event, regionId, props) => ...)`                                                                                                                                  |
-| Own geometries       | `geometries([{ id, class, statisticalRegions: true, features }])`                                                                                                                 |
-| World map            | `geo('WORLD')`, `proj('54030')` (choropleth only)                                                                                                                                 |
-| Export               | `exportMapToPNG()`, `exportMapToSVG()`                                                                                                                                            |
-| Styling              | CSS classes (`em-*`, see [docs/css.md](../../docs/css.md)); `darkMode(true)`, `lightBorders(true)`                                                                                |
+| Need                 | Use                                                                                                                                                                                 |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Classes and colours  | `numberOfClasses`, `classificationMethod` (`quantile`, `equinter`, `ckmeans`, `jenks`, `threshold` + `thresholds`), `colors('teal')` or an array, `colorSchemeType('continuous')`   |
+| Diverging data       | `colors('cobalt-plum')` plus `pointOfDivergence(0)`; `colorStretch('sqrt')` (or `'cbrt'`, `'log'`) for skewed data with a continuous scheme                                         |
+| Reciprocal flows     | `flowSettings({ lineType: 'straight', bidirectional: true, bidirectionalLayout: 'parallel', arrows: true })` draws each direction side by side (not with edge bundling)             |
+| Responsive layout    | Layout follows the width the map is drawn at (its container, or an explicit `width()`); omit a fixed `width()` to let it reflow, see [docs/responsive.md](../../docs/responsive.md) |
+| Missing data         | `noDataFillStyle`, `noDataText`, legend `noData: false` to hide the entry                                                                                                           |
+| Size and position    | `width`, `height`, `position({ x, y, z })`, `scale('60M')` for smaller, simpler geometry                                                                                            |
+| Zoom                 | `zoomExtent([1, 8])`, `zoomButtons(true)`, `zoomTo({ x, y, z }, { duration })` glides to a view (needs zoom enabled)                                                                |
+| Overseas territories | `insets('default')`                                                                                                                                                                 |
+| Legend               | `legend({ title, position: 'top right', x, y, boxOpacity, decimals })`                                                                                                              |
+| Tooltip              | `tooltip({ textFunction: (region, map) => html, showFlags: false })`                                                                                                                |
+| Events               | `onRegionClick((event, regionId, props) => ...)`                                                                                                                                    |
+| Own geometries       | `geometries([{ id, class, statisticalRegions: true, features }])`                                                                                                                   |
+| World map            | `geo('WORLD')`, `proj('54030')` (choropleth only)                                                                                                                                   |
+| Export               | `exportMapToPNG()`, `exportMapToSVG()`                                                                                                                                              |
+| Styling              | CSS classes (`em-*`, see [docs/css.md](../../docs/css.md)); `darkMode(true)`, `lightBorders(true)`                                                                                  |
 
 ## Gotchas
 

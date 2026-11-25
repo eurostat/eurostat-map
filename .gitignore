@@ -11,3 +11,5 @@ input/
 *.xlsx
 __pycache__/
 to-do.md
+# Browser/tool debug output
+debug.log

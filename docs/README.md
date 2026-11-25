@@ -6,7 +6,7 @@ eurostat-map.js is now bundled and compiled using webpack & babel.
 
 -- Clone the repository
 -- cd into eurostat-map.js
--- with node.js installed run "npm install"
+-- with node.js installed run "npm ci" (installs the locked toolchain from package-lock.json; a bare "npm install" re-resolves the versions and changes the built bundles)
 
 ### To run a development build
 

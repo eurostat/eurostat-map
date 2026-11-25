@@ -59,6 +59,12 @@ Plain Node scripts that import `build/eurostatmap.js` after `helpers/dom-shim.js
 
 ## End-to-end tests
 
+- `e2e/flow-color-legend.test.mjs` renders flow maps (bundled routes, parallel bidirectional flows, internal-traffic circles)
+  and checks that the flow colour legend highlights the matching routes on its own map.
+- `e2e/responsive-map.test.mjs` checks that maps scale to their container without changing their layout or exports, and
+  leave nested IMAGE-style SVGs and existing viewBoxes alone.
+- `e2e/story-map-scroll.test.mjs` drives `examples/misc/story-map` through step changes and random scrolling. It loads
+  d3 and flubber from a CDN and the real GISCO data, so it needs network and is **not** part of `npm test`.
 - `e2e/kosovo-border.test.mjs` measures border prominence per map type and border mode
   (`--verbose`, `--mode <name>`).
 - `e2e/legend-layout.test.mjs` renders the swatch legends (choropleth ranges/thresholds, horizontal, diverging, max/min,

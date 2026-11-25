@@ -89,6 +89,16 @@ root cause, so check for it first when a symptom looks similar:
   a formatter supplied in the constructor config. For a single-layer choropleth example, assign
   `map.tooltip().textFunction` after construction and before `build()`.
 
+## Known bug class: behaviour gated on a flag that only the public setter sets
+
+Insets copy their config with `mt[key + '_'] = config[key]` (`core/insets.js`), which bypasses the fluent setters. A flag
+set only inside a setter (`_widthExplicit_`, the old `_heightExplicit_`) is therefore unset for every inset, and logic
+like "recompute the default unless the caller set it" silently overrides the inset's own size (every inset became 0.85 x
+its width tall, caught by `test/e2e/inset-regression.test.mjs`). Track the *auto-computed* case instead
+(`_heightAuto_`, set only by the code that computes the default), so a value that arrived any other way is kept.
+Likewise, `core/deprecated.js` shims must target the classes the library really draws (`.em-bn-<lvl>`, not the old
+`.bn_<lvl>`); a shim that updates a class nothing carries is a silent no-op.
+
 ## `nutsLevel_ === 'mixed'` and remote stat refetches
 
 `stat-map.js`'s `updateStatData()` used to unconditionally force the fetch level to country
@@ -265,7 +275,7 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   classes after build has to do the same.
 - `ps-background.js` writes id-specific fill rules (`#svgId.em--ps ...`) that beat any class rule,
   so it writes separate light and `.em--dark` variants.
-- `package-lock.json` is committed and is the build toolchain: it reproduces the 4.14.1 bundles
+- `package-lock.json` is committed and is the build toolchain: it reproduces the committed bundles (first the 4.14.1 ones, re-checked on 4.15.0 + later source in 2026-11)
   (`build/eurostatmap.min.js` and its map byte for byte, third-party code in `build/eurostatmap.js`
   with zero diff). Install with `npm ci` (never a bare `npm install`, which re-resolves `^` ranges
   and changes the bundles with no source change). Playwright is locked to the version whose browser

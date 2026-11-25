@@ -1,5 +1,8 @@
 # Responsive map sizing plan
 
+> **Status: implemented.** The behaviour this plan led to is described in [responsive.md](../responsive.md) and checked by
+> `test/e2e/responsive-map.test.mjs`. Kept for the reasoning behind it.
+
 ## Goal
 
 Make the on-screen map adapt when its available space changes, including when a
