@@ -110,6 +110,7 @@ _overlay_ layers (symbols, pies, flows...). See [docs/multi-layer-guide.md](../.
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Classes and colours  | `numberOfClasses`, `classificationMethod` (`quantile`, `equinter`, `ckmeans`, `jenks`, `threshold` + `thresholds`), `colors('teal')` or an array, `colorSchemeType('continuous')`   |
 | Diverging data       | `colors('cobalt-plum')` plus `pointOfDivergence(0)`; `colorStretch('sqrt')` (or `'cbrt'`, `'log'`) for skewed data with a continuous scheme                                         |
+| Flow route shape     | `flowSettings({ lineType: 'straight', lineGeometry: 'greatCircle' })` for world maps. `edgeBundling` + `bundleSettings.chargeStrength`: > 0 bundles, < 0 un-bundles (fans routes out) |
 | Reciprocal flows     | `flowSettings({ lineType: 'straight', bidirectional: true, bidirectionalLayout: 'parallel', arrows: true })` draws each direction side by side (not with edge bundling)             |
 | Responsive layout    | Layout follows the width the map is drawn at (its container, or an explicit `width()`); omit a fixed `width()` to let it reflow, see [docs/responsive.md](../../docs/responsive.md) |
 | Missing data         | `noDataFillStyle`, `noDataText`, legend `noData: false` to hide the entry                                                                                                           |

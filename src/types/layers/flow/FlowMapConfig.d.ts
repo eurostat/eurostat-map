@@ -81,13 +81,19 @@ export interface FlowWidthGradientSettings {
     curvatureFollow?: boolean
 }
 
+/** Shape of straight flow routes. */
+export type FlowLineGeometry = 'straight' | 'greatCircle'
+
 /**
  * Force settings for optional edge bundling.
  */
 export interface FlowBundleSettings {
     /** Alpha decay. */
     alphaDecay?: number
-    /** Charge strength. */
+    /**
+     * Charge strength of the bundling force. Positive values attract routes to each other (bundling, the default is 10);
+     * negative values repel them (un-bundling: routes fan out into arcs, try -10 to -40); 0 leaves them straight.
+     */
     chargeStrength?: number
     /** Distance max. */
     distanceMax?: number | null
@@ -128,6 +134,8 @@ export interface FlowMapConfig extends MapConfig {
         nodeLabelPosition?: 'top' | 'bottom' | 'left' | 'right'
         labelOffsets?: { x?: number; y?: number }
         lineType?: 'curved' | 'straight' | 'sankey'
+        /** Shape of straight routes: `'straight'` (a line in the map projection) or `'greatCircle'` (the shortest path on the globe, which curves on world maps). Not applied to tapered (`widthGradient`) or parallel routes. @default 'straight' */
+        lineGeometry?: FlowLineGeometry
         nodeSizeScale?: (value: number) => number
         opacity?: number
         internal?: boolean

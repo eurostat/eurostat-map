@@ -154,6 +154,12 @@ invisible on proportional-symbol maps because the map type's CSS overrode their 
 - Flow rendering writes projected coordinates into graph nodes. On redraw, project from the original
   coordinates rather than reprojecting the previous screen positions. In parallel layouts, use the
   same rendered circle radii for connector clearance and for the node symbols.
+- Flow great circles (`lineGeometry: 'greatCircle'`, `flow/great-circle.js`) work from the node's *raw* coordinates
+  (`out._flowNodeCoordinates`): lon/lat on world maps and custom projection functions, the map CRS (EPSG:3035...)
+  otherwise, converted with `projectFromMap`/`projectToMap`. d3's `geoPath` cuts routes at the antimeridian; an
+  edge-bundled route is one polyline, so those start straight. Tapered and parallel routes are straight-segment
+  geometry and stay straight. `bundleSettings` merges with the defaults (a partial object once made every bundled
+  route NaN); a negative `chargeStrength` un-bundles.
 - A custom flow `nodeSizeScale` used with a size legend needs a `domain()` method, including when
   the example supplies explicit legend values.
 - Edge bundling must choose its charge distance independently of the node size scale.

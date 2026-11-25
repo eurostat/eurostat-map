@@ -1,5 +1,5 @@
 import type { MapInstance } from '../../core/MapInstance'
-import type { FlowGraph, FlowColor, FlowCurvatureSettings, FlowWidthGradientSettings, FlowBundleSettings } from './FlowMapConfig'
+import type { FlowGraph, FlowColor, FlowCurvatureSettings, FlowWidthGradientSettings, FlowBundleSettings, FlowLineGeometry } from './FlowMapConfig'
 
 /**
  * Flow map type.
@@ -28,6 +28,7 @@ export interface FlowMap extends MapInstance {
         nodeLabelPosition: 'top' | 'bottom' | 'left' | 'right'
         labelOffsets: { x: number; y: number }
         lineType: 'curved' | 'straight' | 'sankey'
+        lineGeometry: FlowLineGeometry
         nodeSizeScale: ((value: number) => number) | null
         opacity: number
         internal: boolean
@@ -63,6 +64,7 @@ export interface FlowMap extends MapInstance {
         nodeLabelPosition?: 'top' | 'bottom' | 'left' | 'right'
         labelOffsets?: { x: number; y: number }
         lineType?: 'curved' | 'straight' | 'sankey'
+        lineGeometry?: FlowLineGeometry
         nodeSizeScale?: (value: number) => number
         opacity?: number
         internal?: boolean

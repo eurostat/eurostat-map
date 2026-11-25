@@ -3,6 +3,7 @@ import { arrowHeadLength, ensureArrowMarkers, applyArrow, setHoverArrow } from '
 import { buildBidirectionalRouteMap, parallelFlowPath } from './flow-bidirectional.js'
 import { generateUniqueId } from '../../core/utils.js'
 import { drawEdgeBundleLines } from './edge-bundling.js'
+import { greatCircle, greatCirclePath, trimmedRange } from './great-circle.js'
 import { getResponsiveSymbolSize } from '../../core/responsive'
 
 /**
@@ -79,6 +80,7 @@ function buildSegments(out) {
                     nodeA,
                     nodeB,
                     parallel,
+                    fromMidpoint: !parallel,
                 })
                 segs.push({
                     originId: idB,
@@ -92,6 +94,7 @@ function buildSegments(out) {
                     nodeA,
                     nodeB,
                     parallel,
+                    fromMidpoint: !parallel,
                 })
             } else if (flowAB > 0) {
                 segs.push({
@@ -268,10 +271,13 @@ function drawSegments(out, container, segments, gradientIds, arrowIds) {
 
         if (s.parallel) {
             paths = drawParallelSegment(out, lineGroup, s, paint, colorKey, baseColor)
-        } else if (out.flowWidthGradient_) {
-            paths = drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor)
         } else {
-            paths = drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor)
+            paths = greatCircleWanted(out) ? drawArcSegment(out, lineGroup, s, paint, colorKey, baseColor) : null
+            if (!paths) {
+                paths = out.flowWidthGradient_
+                    ? drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor)
+                    : drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor)
+            }
         }
 
         //mouse events
@@ -284,6 +290,52 @@ function drawSegments(out, container, segments, gradientIds, arrowIds) {
         //arrows
         if (markers) applyArrow(paths, markers, 'normal')
     }
+}
+
+// Great circles apply to plain stroked routes. Tapered and side-by-side (parallel) routes are built from straight-segment
+// geometry, so they stay straight (said once, so the setting is not silently ignored).
+function greatCircleWanted(out) {
+    if (out.flowLineGeometry_ !== 'greatCircle') return false
+    if (out.flowWidthGradient_ || (out.flowBidirectional_ && out.flowBidirectionalLayout_ === 'parallel')) {
+        if (!out._greatCircleWarned) {
+            out._greatCircleWarned = true
+            console.warn("flowSettings({ lineGeometry: 'greatCircle' }) is not applied to tapered (widthGradient) or parallel routes, which stay straight.")
+        }
+        return false
+    }
+    return true
+}
+
+// One stroked path along the great circle from origin to destination (from the geodesic midpoint for the
+// two halves of a reciprocal route). Returns null when the route has no arc, so the caller draws a straight line.
+function drawArcSegment(out, lineGroup, s, paint, colorKey, baseColor) {
+    const origin = out._nodeById?.get(s.originId)
+    const destination = out._nodeById?.get(s.destId)
+    if (!origin || !destination) return null
+    const arc = greatCircle(out, origin, destination)
+    if (!arc) return null
+
+    // Leave room for the arrow head, as straight lines do
+    const backoff = out.flowArrows_ ? 1.6 * arrowHeadLength(s.width, getResponsiveSymbolSize(out.flowArrowScale_ || 1, 0.35)) : 0
+    const range = trimmedRange(out, arc, 0, backoff, s.fromMidpoint ? 0.5 : 0) || [s.fromMidpoint ? 0.5 : 0, 1]
+    const d = greatCirclePath(out, arc, range[0], range[1])
+    if (!d) return null
+
+    return lineGroup
+        .append('path')
+        .datum(s)
+        .attr('d', d)
+        .attr('class', 'em-flow-link em-flow-link-arc')
+        .attr('fill', 'none')
+        .attr('data-nb', s.value)
+        .attr('data-origin', s.originId)
+        .attr('data-dest', s.destId)
+        .attr('stroke', paint)
+        .attr('stroke-width', s.width)
+        .attr('stroke-opacity', out.flowOpacity_ ?? 1)
+        .attr('stroke-linecap', 'butt')
+        .attr('data-color', baseColor)
+        .attr('data-color-key', colorKey)
 }
 
 function drawParallelSegment(out, lineGroup, segment, paint, colorKey, baseColor) {

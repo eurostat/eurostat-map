@@ -11,6 +11,7 @@ import { select } from 'd3-selection'
 import { createSankeyFlowMap } from './sankey'
 import { getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
 import { createFlowMap } from './straight'
+import { DEFAULT_BUNDLE_SETTINGS } from './edge-bundling'
 import { drawNodeDonuts } from './donuts'
 import { drawNodeCircles, prepareCircleNodes } from './circles'
 import { buildBidirectionalRouteMap } from './flow-bidirectional'
@@ -40,6 +41,7 @@ export const decorateFlowLayer = function (out, config) {
 
     // flow type settings
     out.flowLineType_ = 'curved' // type of flow map values: curved || straight
+    out.flowLineGeometry_ = 'straight' // shape of straight routes: 'straight' (a line in the map projection) | 'greatCircle' (the shortest path on the globe)
     out.flowBidirectional_ = true // Whether flows should be bidirectional (true) or unidirectional (false). If there are flows to and from 2 nodes and flowBidirectional is set to false, then these flows will be merged into one line.
     out.flowBidirectionalLayout_ = 'midpoint'
     out.flowNodeSizeBy_ = 'total'
@@ -106,13 +108,7 @@ export const decorateFlowLayer = function (out, config) {
         capEnd: true, // closes the end cleanly (flat tail)
         curvatureFollow: true, // keeps offset normal perpendicular to local tangent
     }
-    out.flowBundleSettings_ = {
-        alphaDecay: 0.1,
-        chargeStrength: 10,
-        distanceMax: null, // defaults to a zoom-independent, responsive distance
-        linkStrength: 0.7,
-        linkIterations: 1,
-    }
+    out.flowBundleSettings_ = { ...DEFAULT_BUNDLE_SETTINGS } // chargeStrength > 0 bundles routes, < 0 un-bundles them (they fan out into arcs)
 
     /**
      * flowmap-specific setters/getters
@@ -135,6 +131,7 @@ export const decorateFlowLayer = function (out, config) {
         'flowNodeType_',
         'flowLabelOffsets_',
         'flowLineType_',
+        'flowLineGeometry_',
         'flowNodeSizeScale_',
         'flowOpacity_',
         'flowInternal_',
@@ -178,6 +175,7 @@ export const decorateFlowLayer = function (out, config) {
             nodeLabelPosition: out.flowNodeLabelPosition_,
             labelOffsets: out.flowLabelOffsets_,
             lineType: out.flowLineType_,
+            lineGeometry: out.flowLineGeometry_,
             nodeSizeScale: out.flowNodeSizeScale_,
             opacity: out.flowOpacity_,
             internal: out.flowInternal_,
@@ -215,6 +213,7 @@ export const decorateFlowLayer = function (out, config) {
         if (v.nodeLabelPosition !== undefined) out.flowNodeLabelPosition_ = v.nodeLabelPosition
         if (v.labelOffsets !== undefined) out.flowLabelOffsets_ = v.labelOffsets
         if (v.lineType !== undefined) out.flowLineType_ = v.lineType
+        if (v.lineGeometry !== undefined) out.flowLineGeometry_ = v.lineGeometry
         if (v.nodeSizeScale !== undefined) out.flowNodeSizeScale_ = v.nodeSizeScale
         if (v.opacity !== undefined) out.flowOpacity_ = v.opacity
         if (v.internal !== undefined) out.flowInternal_ = v.internal
@@ -228,7 +227,7 @@ export const decorateFlowLayer = function (out, config) {
         if (v.bidirectional !== undefined) out.flowBidirectional_ = v.bidirectional
         if (v.bidirectionalLayout !== undefined) out.flowBidirectionalLayout_ = v.bidirectionalLayout
         if (v.edgeBundling !== undefined) out.flowEdgeBundling_ = v.edgeBundling
-        if (v.bundleSettings !== undefined) out.flowBundleSettings_ = v.bundleSettings
+        if (v.bundleSettings !== undefined) out.flowBundleSettings_ = { ...out.flowBundleSettings_, ...v.bundleSettings }
     }
 
     //override attribute values with config values
@@ -575,6 +574,7 @@ function addOverlayPolygons(out) {
 
     if (!features) return
 
+    const unmatched = []
     graph.nodes.forEach((node) => {
         // Compute totals for this node
         const outgoing = node.sourceLinks.reduce((sum, l) => sum + l.value, 0)
@@ -583,7 +583,7 @@ function addOverlayPolygons(out) {
         // Skip nodes that aren't in the geometry features
         const overlay = features.find((f) => f.properties.id === node.id)
         if (!overlay) {
-            console.warn('could not find region geometry for', node.id)
+            unmatched.push(node.id)
             return
         }
 
@@ -596,11 +596,16 @@ function addOverlayPolygons(out) {
         // optional: else neither if incoming == outgoing
     })
 
+    // Nodes at custom coordinates (cities, airports...) have no region by design. Only a partial match suggests a typo.
+    const customCoordinatesOnly = unmatched.length === graph.nodes.length
+    if (unmatched.length && !customCoordinatesOnly) {
+        console.warn(`flow nodes without a region geometry (drawn at their coordinates, not shaded as importers/exporters): ${unmatched.join(', ')}`)
+    }
     out.importerRegionIds = importerIds
     out.exporterRegionIds = exporterIds
 
     if (importerIds.length === 0 && exporterIds.length === 0) {
-        console.warn('No importer or exporter regions found in the flow graph.')
+        if (!customCoordinatesOnly) console.warn('No importer or exporter regions found in the flow graph.')
         return
     }
 

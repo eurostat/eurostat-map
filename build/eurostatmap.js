@@ -42944,6 +42944,7 @@ function computeDonutValues(out) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DEFAULT_BUNDLE_SETTINGS: () => (/* binding */ DEFAULT_BUNDLE_SETTINGS),
 /* harmony export */   drawEdgeBundleLines: () => (/* binding */ drawEdgeBundleLines)
 /* harmony export */ });
 /* harmony import */ var d3_force__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-force */ "./node_modules/d3-force/src/link.js");
@@ -42956,6 +42957,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var _straight_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./straight.js */ "./src/layers/flow/straight.js");
 /* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
+/* harmony import */ var _great_circle_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./great-circle.js */ "./src/layers/flow/great-circle.js");
 
 
 
@@ -42964,17 +42966,31 @@ __webpack_require__.r(__webpack_exports__);
  // reuse your helpers
 
 
+
+/**
+ * Force settings of edge bundling. `chargeStrength` > 0 pulls routes together (bundling), < 0 pushes them apart
+ * (un-bundling: routes fan out into arcs), 0 leaves them as drawn.
+ */
+const DEFAULT_BUNDLE_SETTINGS = {
+    alphaDecay: 0.1,
+    chargeStrength: 10,
+    distanceMax: null, // defaults to a zoom-independent, responsive distance
+    linkStrength: 0.7,
+    linkIterations: 1,
+}
+
 function drawEdgeBundleLines(out, lineGroup) {
     const width = out.width_ || out.innerWidth_ || 1000
     const height = out.height_ || out.innerHeight_ || 800
     const hypotenuse = Math.sqrt(width * width + height * height)
 
     const segmentScale = (0,d3_scale__WEBPACK_IMPORTED_MODULE_5__["default"])().domain([0, hypotenuse]).range([1, 10])
-    const bundleSettings = out.flowBundleSettings_
+    // a partial settings object (only chargeStrength, say) keeps the defaults for the rest
+    const bundleSettings = { ...DEFAULT_BUNDLE_SETTINGS, ...out.flowBundleSettings_ }
     const distanceMax = bundleSettings.distanceMax ?? 2 * (0,_core_responsive__WEBPACK_IMPORTED_MODULE_9__.getResponsiveSymbolSize)(18, 4)
 
     // Build the bundled network
-    const bundle = generateSegments(out.flowGraph_.nodes, out.flowGraph_.links, segmentScale)
+    const bundle = generateSegments(out, out.flowGraph_.nodes, out.flowGraph_.links, segmentScale)
 
     // --- Style setup: compute stroke, width, and colors for each path ---
     const arrowIds = out.flowArrows_
@@ -43057,8 +43073,9 @@ function drawEdgeBundleLines(out, lineGroup) {
     layout.force('link').links(bundle.links)
 }
 
-// --- same segment generator as before ---
-function generateSegments(nodes, links, segmentScale) {
+// Each route starts as a straight chain of points (or a great circle, with lineGeometry: 'greatCircle'), which the force
+// simulation then pulls together (positive chargeStrength) or pushes apart (negative).
+function generateSegments(out, nodes, links, segmentScale) {
     const bundle = { nodes: [], links: [], paths: [] }
 
     bundle.nodes = nodes.map((d) => {
@@ -43077,10 +43094,11 @@ function generateSegments(nodes, links, segmentScale) {
             .domain([0, total + 1])
             .range([d.source.y, d.target.y])
 
+        const arcPoints = out.flowLineGeometry_ === 'greatCircle' ? (0,_great_circle_js__WEBPACK_IMPORTED_MODULE_10__.arcScreenPoints)(out, d.source, d.target, total) : null
         let src = d.source
         const local = [src]
         for (let j = 1; j <= total; j++) {
-            const tgt = { x: xscale(j), y: yscale(j) }
+            const tgt = arcPoints ? arcPoints[j - 1] : { x: xscale(j), y: yscale(j) }
             local.push(tgt)
             bundle.nodes.push(tgt)
             bundle.links.push({ source: src, target: tgt })
@@ -43291,6 +43309,167 @@ function expandRoutesToSankeyMidpointGraph(nodes, links) {
 
 /***/ },
 
+/***/ "./src/layers/flow/great-circle.js"
+/*!*****************************************!*\
+  !*** ./src/layers/flow/great-circle.js ***!
+  \*****************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   arcScreenPoints: () => (/* binding */ arcScreenPoints),
+/* harmony export */   greatCircle: () => (/* binding */ greatCircle),
+/* harmony export */   greatCirclePath: () => (/* binding */ greatCirclePath),
+/* harmony export */   nodeLonLat: () => (/* binding */ nodeLonLat),
+/* harmony export */   trimmedRange: () => (/* binding */ trimmedRange)
+/* harmony export */ });
+/* harmony import */ var d3_geo__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-geo */ "./node_modules/d3-geo/src/distance.js");
+/* harmony import */ var d3_geo__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-geo */ "./node_modules/d3-geo/src/interpolate.js");
+/* harmony import */ var d3_geo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-geo */ "./node_modules/d3-geo/src/path/index.js");
+/* harmony import */ var d3_geo__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-geo */ "./node_modules/d3-geo/src/transform.js");
+/* harmony import */ var _core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../core/geo/proj4.js */ "./src/core/geo/proj4.js");
+
+
+
+/**
+ * Great-circle routes for flow maps.
+ *
+ * A great circle is the shortest path on the globe. Flow nodes carry raw coordinates in the map's own
+ * coordinate system (lon/lat on world maps and with a custom projection function, the map CRS - EPSG:3035,
+ * for example - otherwise), so each route is converted to lon/lat, densified along the geodesic and then sent
+ * through the map's projection. d3's geoPath does the clipping and antimeridian cutting for projections
+ * that have a sphere; for CRS maps the points are projected one by one.
+ */
+
+/** Angular spacing (degrees) between the points a route is densified to before projecting. */
+const STEP_DEGREES = 1.5
+const MAX_STEPS = 512
+
+/** true if the raw node coordinates of this map are lon/lat (world maps and custom projection functions). */
+const rawIsLonLat = (map) => map.geo_ === 'WORLD' || !!map.projectionFunction_
+
+/** Raw (pre-projection) coordinates of a flow node. */
+function rawCoordinates(out, node) {
+    return out._flowNodeCoordinates?.get(node)?.raw || null
+}
+
+/** Lon/lat of a flow node, or null if it has no usable coordinates. */
+function nodeLonLat(out, node) {
+    const raw = rawCoordinates(out, node)
+    if (!raw || !Number.isFinite(raw[0]) || !Number.isFinite(raw[1])) return null
+    const lonLat = rawIsLonLat(out.map) ? raw : (0,_core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_4__.projectFromMap)(out.map, raw[0], raw[1])
+    return lonLat && Number.isFinite(lonLat[0]) && Number.isFinite(lonLat[1]) ? lonLat : null
+}
+
+/** Screen position of a lon/lat position. */
+function toScreen(out, lon, lat) {
+    const map = out.map
+    return map._projection(rawIsLonLat(map) ? [lon, lat] : (0,_core_geo_proj4_js__WEBPACK_IMPORTED_MODULE_4__.projectToMap)(map, lon, lat))
+}
+
+/**
+ * A great-circle arc between two flow nodes.
+ * @returns {{a: number[], b: number[], at: (t:number)=>number[], screenAt: (t:number)=>number[], length: number}|null}
+ *   `null` when either node has no coordinates or both ends coincide (the caller then draws a straight line).
+ */
+function greatCircle(out, nodeA, nodeB) {
+    const a = nodeLonLat(out, nodeA)
+    const b = nodeLonLat(out, nodeB)
+    if (!a || !b) return null
+    const angle = (0,d3_geo__WEBPACK_IMPORTED_MODULE_0__["default"])(a, b)
+    if (!(angle > 1e-9)) return null
+    const at = (0,d3_geo__WEBPACK_IMPORTED_MODULE_1__["default"])(a, b)
+    return { a, b, angle, at, screenAt: (t) => toScreen(out, ...at(t)) }
+}
+
+/** Number of segments a route of this angular length is densified to. */
+const stepsFor = (angle) => Math.min(MAX_STEPS, Math.max(8, Math.ceil((angle * 180) / Math.PI / STEP_DEGREES)))
+
+/**
+ * Parameter range [t0, t1] of the arc left once `startPx` / `endPx` screen pixels are cut from its two ends
+ * (to clear node circles and arrow heads). Measured along the projected route.
+ */
+function trimmedRange(out, arc, startPx = 0, endPx = 0, from = 0) {
+    if (!(startPx > 0 || endPx > 0)) return [from, 1]
+    const steps = 96
+    const points = []
+    for (let i = 0; i <= steps; i++) points.push(arc.screenAt(from + ((1 - from) * i) / steps))
+    const cumulative = [0]
+    for (let i = 1; i < points.length; i++) {
+        cumulative.push(cumulative[i - 1] + Math.hypot(points[i][0] - points[i - 1][0], points[i][1] - points[i - 1][1]))
+    }
+    const total = cumulative[steps]
+    if (!(total > startPx + endPx)) return null
+    const tAt = (distance) => {
+        let i = 1
+        while (i < steps && cumulative[i] < distance) i++
+        const span = cumulative[i] - cumulative[i - 1] || 1
+        const f = (distance - cumulative[i - 1]) / span
+        return from + ((1 - from) * (i - 1 + f)) / steps
+    }
+    return [startPx > 0 ? tAt(startPx) : from, endPx > 0 ? tAt(total - endPx) : 1]
+}
+
+/**
+ * SVG path data of the arc between parameters t0 and t1, in screen space.
+ * @returns {string|null}
+ */
+function greatCirclePath(out, arc, t0 = 0, t1 = 1) {
+    const steps = Math.max(2, Math.round(stepsFor(arc.angle) * (t1 - t0)))
+    const coordinates = []
+    for (let i = 0; i <= steps; i++) coordinates.push(arc.at(t0 + ((t1 - t0) * i) / steps))
+    const line = { type: 'LineString', coordinates }
+
+    const map = out.map
+    const projection = rawIsLonLat(map)
+        ? map._projection
+        : // CRS maps: project each (already dense) point; there is no antimeridian to cut in a regional CRS
+          (0,d3_geo__WEBPACK_IMPORTED_MODULE_3__["default"])({
+              point(lon, lat) {
+                  const [x, y] = toScreen(out, lon, lat)
+                  this.stream.point(x, y)
+              },
+          })
+    return (0,d3_geo__WEBPACK_IMPORTED_MODULE_2__["default"])(projection)(line)
+}
+
+/** true if the route jumps across the +-180 degree meridian (consecutive longitudes more than 180 degrees apart). */
+function crossesAntimeridian(arc, count) {
+    let previous = arc.a[0]
+    for (let j = 1; j <= count + 1; j++) {
+        const lon = arc.at(j / (count + 1))[0]
+        if (Math.abs(lon - previous) > 180) return true
+        previous = lon
+    }
+    return false
+}
+
+/**
+ * Screen-space points along a route, used as the starting shape of edge bundling.
+ * Falls back to a straight sampling when the route has no arc, or when it crosses the antimeridian: a bundled route is
+ * one polyline, which cannot be cut at the map edge the way a plain arc is.
+ */
+function arcScreenPoints(out, source, target, count) {
+    let arc = greatCircle(out, source, target)
+    if (arc && crossesAntimeridian(arc, count)) arc = null
+    const points = []
+    for (let j = 1; j <= count; j++) {
+        const t = j / (count + 1)
+        if (arc) {
+            const [x, y] = arc.screenAt(t)
+            if (Number.isFinite(x) && Number.isFinite(y)) {
+                points.push({ x, y })
+                continue
+            }
+        }
+        points.push({ x: source.x + (target.x - source.x) * t, y: source.y + (target.y - source.y) * t })
+    }
+    return points
+}
+
+
+/***/ },
+
 /***/ "./src/layers/flow/map-flow.js"
 /*!*************************************!*\
   !*** ./src/layers/flow/map-flow.js ***!
@@ -43314,14 +43493,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _sankey__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./sankey */ "./src/layers/flow/sankey.js");
 /* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
 /* harmony import */ var _straight__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./straight */ "./src/layers/flow/straight.js");
-/* harmony import */ var _donuts__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./donuts */ "./src/layers/flow/donuts.js");
-/* harmony import */ var _circles__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./circles */ "./src/layers/flow/circles.js");
-/* harmony import */ var _flow_bidirectional__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./flow-bidirectional */ "./src/layers/flow/flow-bidirectional.js");
-/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/ordinal.js");
-/* harmony import */ var _core_decoration_labels__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../core/decoration/labels */ "./src/core/decoration/labels.js");
-/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
+/* harmony import */ var _edge_bundling__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./edge-bundling */ "./src/layers/flow/edge-bundling.js");
+/* harmony import */ var _donuts__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./donuts */ "./src/layers/flow/donuts.js");
+/* harmony import */ var _circles__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./circles */ "./src/layers/flow/circles.js");
+/* harmony import */ var _flow_bidirectional__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./flow-bidirectional */ "./src/layers/flow/flow-bidirectional.js");
+/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/ordinal.js");
+/* harmony import */ var _core_decoration_labels__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../core/decoration/labels */ "./src/core/decoration/labels.js");
+/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
 // Import required D3 modules
 // import { sankey, sankeyLinkHorizontal } from 'd3-sankey'
+
 
 
 
@@ -43362,6 +43543,7 @@ const decorateFlowLayer = function (out, config) {
 
     // flow type settings
     out.flowLineType_ = 'curved' // type of flow map values: curved || straight
+    out.flowLineGeometry_ = 'straight' // shape of straight routes: 'straight' (a line in the map projection) | 'greatCircle' (the shortest path on the globe)
     out.flowBidirectional_ = true // Whether flows should be bidirectional (true) or unidirectional (false). If there are flows to and from 2 nodes and flowBidirectional is set to false, then these flows will be merged into one line.
     out.flowBidirectionalLayout_ = 'midpoint'
     out.flowNodeSizeBy_ = 'total'
@@ -43428,13 +43610,7 @@ const decorateFlowLayer = function (out, config) {
         capEnd: true, // closes the end cleanly (flat tail)
         curvatureFollow: true, // keeps offset normal perpendicular to local tangent
     }
-    out.flowBundleSettings_ = {
-        alphaDecay: 0.1,
-        chargeStrength: 10,
-        distanceMax: null, // defaults to a zoom-independent, responsive distance
-        linkStrength: 0.7,
-        linkIterations: 1,
-    }
+    out.flowBundleSettings_ = { ..._edge_bundling__WEBPACK_IMPORTED_MODULE_11__.DEFAULT_BUNDLE_SETTINGS } // chargeStrength > 0 bundles routes, < 0 un-bundles them (they fan out into arcs)
 
     /**
      * flowmap-specific setters/getters
@@ -43457,6 +43633,7 @@ const decorateFlowLayer = function (out, config) {
         'flowNodeType_',
         'flowLabelOffsets_',
         'flowLineType_',
+        'flowLineGeometry_',
         'flowNodeSizeScale_',
         'flowOpacity_',
         'flowInternal_',
@@ -43500,6 +43677,7 @@ const decorateFlowLayer = function (out, config) {
             nodeLabelPosition: out.flowNodeLabelPosition_,
             labelOffsets: out.flowLabelOffsets_,
             lineType: out.flowLineType_,
+            lineGeometry: out.flowLineGeometry_,
             nodeSizeScale: out.flowNodeSizeScale_,
             opacity: out.flowOpacity_,
             internal: out.flowInternal_,
@@ -43537,6 +43715,7 @@ const decorateFlowLayer = function (out, config) {
         if (v.nodeLabelPosition !== undefined) out.flowNodeLabelPosition_ = v.nodeLabelPosition
         if (v.labelOffsets !== undefined) out.flowLabelOffsets_ = v.labelOffsets
         if (v.lineType !== undefined) out.flowLineType_ = v.lineType
+        if (v.lineGeometry !== undefined) out.flowLineGeometry_ = v.lineGeometry
         if (v.nodeSizeScale !== undefined) out.flowNodeSizeScale_ = v.nodeSizeScale
         if (v.opacity !== undefined) out.flowOpacity_ = v.opacity
         if (v.internal !== undefined) out.flowInternal_ = v.internal
@@ -43550,7 +43729,7 @@ const decorateFlowLayer = function (out, config) {
         if (v.bidirectional !== undefined) out.flowBidirectional_ = v.bidirectional
         if (v.bidirectionalLayout !== undefined) out.flowBidirectionalLayout_ = v.bidirectionalLayout
         if (v.edgeBundling !== undefined) out.flowEdgeBundling_ = v.edgeBundling
-        if (v.bundleSettings !== undefined) out.flowBundleSettings_ = v.bundleSettings
+        if (v.bundleSettings !== undefined) out.flowBundleSettings_ = { ...out.flowBundleSettings_, ...v.bundleSettings }
     }
 
     //override attribute values with config values
@@ -43652,7 +43831,7 @@ const decorateFlowLayer = function (out, config) {
         // Show importer/exporter regions by coloring them
         addOverlayPolygons(out)
 
-        const circleNodes = out.flowNodes_ && out.flowNodeType_ === 'circle' ? (0,_circles__WEBPACK_IMPORTED_MODULE_12__.prepareCircleNodes)(out) : null
+        const circleNodes = out.flowNodes_ && out.flowNodeType_ === 'circle' ? (0,_circles__WEBPACK_IMPORTED_MODULE_13__.prepareCircleNodes)(out) : null
         if (out.flowLineType_ === 'curved' || out.flowLineType_ === 'sankey') {
             // Create the sankey layout
             (0,_sankey__WEBPACK_IMPORTED_MODULE_8__.createSankeyFlowMap)(out, flowContainer)
@@ -43667,17 +43846,17 @@ const decorateFlowLayer = function (out, config) {
         // draw nodes
         if (out.flowNodes_) {
             if (out.flowNodeType_ === 'donut') {
-                (0,_donuts__WEBPACK_IMPORTED_MODULE_11__.drawNodeDonuts)(out, flowContainer)
+                (0,_donuts__WEBPACK_IMPORTED_MODULE_12__.drawNodeDonuts)(out, flowContainer)
             } else {
-                (0,_circles__WEBPACK_IMPORTED_MODULE_12__.drawNodeCircles)(out, flowContainer, circleNodes)
-                if (out.flowNodeLabels_) (0,_core_decoration_labels__WEBPACK_IMPORTED_MODULE_15__.addFlowNodeLabels)(out, circleNodes)
+                (0,_circles__WEBPACK_IMPORTED_MODULE_13__.drawNodeCircles)(out, flowContainer, circleNodes)
+                if (out.flowNodeLabels_) (0,_core_decoration_labels__WEBPACK_IMPORTED_MODULE_16__.addFlowNodeLabels)(out, circleNodes)
             }
         }
 
         // Add labels to nodes
         if (out.labels_?.values) {
             const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
-            ;(0,_core_decoration_labels__WEBPACK_IMPORTED_MODULE_15__.addFlowValueLabels)(out, zoomGroup)
+            ;(0,_core_decoration_labels__WEBPACK_IMPORTED_MODULE_16__.addFlowValueLabels)(out, zoomGroup)
         }
     }
 
@@ -43699,8 +43878,8 @@ function defineWidthScale(out) {
     const upper = out.maxFlowCount
 
     // visual params
-    const minW = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_16__.getResponsiveSymbolSize)(Math.max(0, out.flowMinWidth_ || 0), 0) // visible floor (px)
-    const maxW = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_16__.getResponsiveSymbolSize)(out.flowMaxWidth_, 2) // max stroke width (px)
+    const minW = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_17__.getResponsiveSymbolSize)(Math.max(0, out.flowMinWidth_ || 0), 0) // visible floor (px)
+    const maxW = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_17__.getResponsiveSymbolSize)(out.flowMaxWidth_, 2) // max stroke width (px)
 
     // Base linear scale for positives only
     const base = (0,d3_scale__WEBPACK_IMPORTED_MODULE_2__["default"])().domain([0, upper]).range([0, maxW]).clamp(true)
@@ -43741,7 +43920,7 @@ function computeMaxMinFlowCounts(out) {
     const { nodes, links } = out.flowGraph_
     const parallel = out.flowLineType_ === 'straight' && out.flowBidirectional_ && out.flowBidirectionalLayout_ === 'parallel' && !out.flowEdgeBundling_
     const values = (parallel
-        ? Array.from((0,_flow_bidirectional__WEBPACK_IMPORTED_MODULE_13__.buildBidirectionalRouteMap)(nodes, links).values())
+        ? Array.from((0,_flow_bidirectional__WEBPACK_IMPORTED_MODULE_14__.buildBidirectionalRouteMap)(nodes, links).values())
               .filter(({ idA, idB }) => idA !== idB)
               .flatMap(({ flowAB, flowBA }) => [flowAB, flowBA])
         : links.map((link) => link.value)
@@ -43786,7 +43965,7 @@ function computeTopFlowLocations(out) {
     out.topLocationKeys = new Set(topLocations.map((loc) => loc.id))
 
     // Assign colors to top locations
-    out.topLocationColorScale = (0,d3_scale__WEBPACK_IMPORTED_MODULE_14__["default"])()
+    out.topLocationColorScale = (0,d3_scale__WEBPACK_IMPORTED_MODULE_15__["default"])()
         .domain(topLocations.map((d) => d.id))
         .range([
             '#00B3E3', // bright turquoise
@@ -43897,6 +44076,7 @@ function addOverlayPolygons(out) {
 
     if (!features) return
 
+    const unmatched = []
     graph.nodes.forEach((node) => {
         // Compute totals for this node
         const outgoing = node.sourceLinks.reduce((sum, l) => sum + l.value, 0)
@@ -43905,7 +44085,7 @@ function addOverlayPolygons(out) {
         // Skip nodes that aren't in the geometry features
         const overlay = features.find((f) => f.properties.id === node.id)
         if (!overlay) {
-            console.warn('could not find region geometry for', node.id)
+            unmatched.push(node.id)
             return
         }
 
@@ -43918,11 +44098,16 @@ function addOverlayPolygons(out) {
         // optional: else neither if incoming == outgoing
     })
 
+    // Nodes at custom coordinates (cities, airports...) have no region by design. Only a partial match suggests a typo.
+    const customCoordinatesOnly = unmatched.length === graph.nodes.length
+    if (unmatched.length && !customCoordinatesOnly) {
+        console.warn(`flow nodes without a region geometry (drawn at their coordinates, not shaded as importers/exporters): ${unmatched.join(', ')}`)
+    }
     out.importerRegionIds = importerIds
     out.exporterRegionIds = exporterIds
 
     if (importerIds.length === 0 && exporterIds.length === 0) {
-        console.warn('No importer or exporter regions found in the flow graph.')
+        if (!customCoordinatesOnly) console.warn('No importer or exporter regions found in the flow graph.')
         return
     }
 
@@ -44744,7 +44929,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _flow_bidirectional_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./flow-bidirectional.js */ "./src/layers/flow/flow-bidirectional.js");
 /* harmony import */ var _core_utils_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/utils.js */ "./src/core/utils.js");
 /* harmony import */ var _edge_bundling_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./edge-bundling.js */ "./src/layers/flow/edge-bundling.js");
-/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
+/* harmony import */ var _great_circle_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./great-circle.js */ "./src/layers/flow/great-circle.js");
+/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
+
 
 
 
@@ -44773,7 +44960,7 @@ function drawStraightLinesByFlow(out, container, circleNodes) {
     const arrowIds = out.flowArrows_
         ? (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.ensureArrowMarkers)(svgRoot, {
               cacheKey: out.flowWidthGradient_ ? 'straight-tapered' : 'straight',
-              scale: (0,_core_responsive__WEBPACK_IMPORTED_MODULE_5__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35),
+              scale: (0,_core_responsive__WEBPACK_IMPORTED_MODULE_6__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35),
               joinAtBase: !out.flowWidthGradient_,
               markerUnits: 'strokeWidth',
               hoverColor: out.hoverColor_ || 'black',
@@ -44826,6 +45013,7 @@ function buildSegments(out) {
                     nodeA,
                     nodeB,
                     parallel,
+                    fromMidpoint: !parallel,
                 })
                 segs.push({
                     originId: idB,
@@ -44839,6 +45027,7 @@ function buildSegments(out) {
                     nodeA,
                     nodeB,
                     parallel,
+                    fromMidpoint: !parallel,
                 })
             } else if (flowAB > 0) {
                 segs.push({
@@ -45015,10 +45204,13 @@ function drawSegments(out, container, segments, gradientIds, arrowIds) {
 
         if (s.parallel) {
             paths = drawParallelSegment(out, lineGroup, s, paint, colorKey, baseColor)
-        } else if (out.flowWidthGradient_) {
-            paths = drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor)
         } else {
-            paths = drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor)
+            paths = greatCircleWanted(out) ? drawArcSegment(out, lineGroup, s, paint, colorKey, baseColor) : null
+            if (!paths) {
+                paths = out.flowWidthGradient_
+                    ? drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor)
+                    : drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor)
+            }
         }
 
         //mouse events
@@ -45033,8 +45225,54 @@ function drawSegments(out, container, segments, gradientIds, arrowIds) {
     }
 }
 
+// Great circles apply to plain stroked routes. Tapered and side-by-side (parallel) routes are built from straight-segment
+// geometry, so they stay straight (said once, so the setting is not silently ignored).
+function greatCircleWanted(out) {
+    if (out.flowLineGeometry_ !== 'greatCircle') return false
+    if (out.flowWidthGradient_ || (out.flowBidirectional_ && out.flowBidirectionalLayout_ === 'parallel')) {
+        if (!out._greatCircleWarned) {
+            out._greatCircleWarned = true
+            console.warn("flowSettings({ lineGeometry: 'greatCircle' }) is not applied to tapered (widthGradient) or parallel routes, which stay straight.")
+        }
+        return false
+    }
+    return true
+}
+
+// One stroked path along the great circle from origin to destination (from the geodesic midpoint for the
+// two halves of a reciprocal route). Returns null when the route has no arc, so the caller draws a straight line.
+function drawArcSegment(out, lineGroup, s, paint, colorKey, baseColor) {
+    const origin = out._nodeById?.get(s.originId)
+    const destination = out._nodeById?.get(s.destId)
+    if (!origin || !destination) return null
+    const arc = (0,_great_circle_js__WEBPACK_IMPORTED_MODULE_5__.greatCircle)(out, origin, destination)
+    if (!arc) return null
+
+    // Leave room for the arrow head, as straight lines do
+    const backoff = out.flowArrows_ ? 1.6 * (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.arrowHeadLength)(s.width, (0,_core_responsive__WEBPACK_IMPORTED_MODULE_6__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35)) : 0
+    const range = (0,_great_circle_js__WEBPACK_IMPORTED_MODULE_5__.trimmedRange)(out, arc, 0, backoff, s.fromMidpoint ? 0.5 : 0) || [s.fromMidpoint ? 0.5 : 0, 1]
+    const d = (0,_great_circle_js__WEBPACK_IMPORTED_MODULE_5__.greatCirclePath)(out, arc, range[0], range[1])
+    if (!d) return null
+
+    return lineGroup
+        .append('path')
+        .datum(s)
+        .attr('d', d)
+        .attr('class', 'em-flow-link em-flow-link-arc')
+        .attr('fill', 'none')
+        .attr('data-nb', s.value)
+        .attr('data-origin', s.originId)
+        .attr('data-dest', s.destId)
+        .attr('stroke', paint)
+        .attr('stroke-width', s.width)
+        .attr('stroke-opacity', out.flowOpacity_ ?? 1)
+        .attr('stroke-linecap', 'butt')
+        .attr('data-color', baseColor)
+        .attr('data-color-key', colorKey)
+}
+
 function drawParallelSegment(out, lineGroup, segment, paint, colorKey, baseColor) {
-    const scale = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_5__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35)
+    const scale = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_6__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35)
     return lineGroup
         .append('path')
         .datum(segment)
@@ -45056,7 +45294,7 @@ function drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor) {
         ny = dx / L
 
     const startRatio = out.flowWidthGradientSettings_?.startRatio ?? 0.25
-    const minStartWidth = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_5__.getResponsiveSymbolSize)(out.flowWidthGradientSettings_?.minStartWidth ?? s.width * 0.25, 0)
+    const minStartWidth = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_6__.getResponsiveSymbolSize)(out.flowWidthGradientSettings_?.minStartWidth ?? s.width * 0.25, 0)
     const wStart = Math.max(minStartWidth, s.width * startRatio)
     const wEnd = s.width
 
@@ -45086,7 +45324,7 @@ function drawTaperedSegment(out, lineGroup, s, paint, colorKey, baseColor) {
 
 function drawStraightSegment(out, lineGroup, s, paint, colorKey, baseColor) {
     // Leave room for the entire head plus clearance where routes converge on a node.
-    const backoff = out.flowArrows_ ? 1.6 * (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.arrowHeadLength)(s.width, (0,_core_responsive__WEBPACK_IMPORTED_MODULE_5__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35)) : 0
+    const backoff = out.flowArrows_ ? 1.6 * (0,_arrows_js__WEBPACK_IMPORTED_MODULE_1__.arrowHeadLength)(s.width, (0,_core_responsive__WEBPACK_IMPORTED_MODULE_6__.getResponsiveSymbolSize)(out.flowArrowScale_ || 1, 0.35)) : 0
 
     let x2 = s.x2,
         y2 = s.y2
@@ -62555,6 +62793,32 @@ Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", co
 
 /***/ },
 
+/***/ "./node_modules/d3-geo/src/distance.js"
+/*!*********************************************!*\
+  !*** ./node_modules/d3-geo/src/distance.js ***!
+  \*********************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
+/* harmony import */ var _length_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./length.js */ "./node_modules/d3-geo/src/length.js");
+
+
+var coordinates = [null, null],
+    object = {type: "LineString", coordinates: coordinates};
+
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b) {
+  coordinates[0] = a;
+  coordinates[1] = b;
+  return (0,_length_js__WEBPACK_IMPORTED_MODULE_0__["default"])(object);
+}
+
+
+/***/ },
+
 /***/ "./node_modules/d3-geo/src/graticule.js"
 /*!**********************************************!*\
   !*** ./node_modules/d3-geo/src/graticule.js ***!
@@ -62689,6 +62953,130 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (x => x);
 (Object.getOwnPropertyDescriptor(__WEBPACK_DEFAULT_EXPORT__, "name") || {}).writable || Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
+
+
+/***/ },
+
+/***/ "./node_modules/d3-geo/src/interpolate.js"
+/*!************************************************!*\
+  !*** ./node_modules/d3-geo/src/interpolate.js ***!
+  \************************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
+/* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo/src/math.js");
+
+
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(a, b) {
+  var x0 = a[0] * _math_js__WEBPACK_IMPORTED_MODULE_0__.radians,
+      y0 = a[1] * _math_js__WEBPACK_IMPORTED_MODULE_0__.radians,
+      x1 = b[0] * _math_js__WEBPACK_IMPORTED_MODULE_0__.radians,
+      y1 = b[1] * _math_js__WEBPACK_IMPORTED_MODULE_0__.radians,
+      cy0 = (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.cos)(y0),
+      sy0 = (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.sin)(y0),
+      cy1 = (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.cos)(y1),
+      sy1 = (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.sin)(y1),
+      kx0 = cy0 * (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.cos)(x0),
+      ky0 = cy0 * (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.sin)(x0),
+      kx1 = cy1 * (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.cos)(x1),
+      ky1 = cy1 * (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.sin)(x1),
+      d = 2 * (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.asin)((0,_math_js__WEBPACK_IMPORTED_MODULE_0__.sqrt)((0,_math_js__WEBPACK_IMPORTED_MODULE_0__.haversin)(y1 - y0) + cy0 * cy1 * (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.haversin)(x1 - x0))),
+      k = (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.sin)(d);
+
+  var interpolate = d ? function(t) {
+    var B = (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.sin)(t *= d) / k,
+        A = (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.sin)(d - t) / k,
+        x = A * kx0 + B * kx1,
+        y = A * ky0 + B * ky1,
+        z = A * sy0 + B * sy1;
+    return [
+      (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.atan2)(y, x) * _math_js__WEBPACK_IMPORTED_MODULE_0__.degrees,
+      (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.atan2)(z, (0,_math_js__WEBPACK_IMPORTED_MODULE_0__.sqrt)(x * x + y * y)) * _math_js__WEBPACK_IMPORTED_MODULE_0__.degrees
+    ];
+  } : function() {
+    return [x0 * _math_js__WEBPACK_IMPORTED_MODULE_0__.degrees, y0 * _math_js__WEBPACK_IMPORTED_MODULE_0__.degrees];
+  };
+
+  interpolate.distance = d;
+
+  return interpolate;
+}
+
+
+/***/ },
+
+/***/ "./node_modules/d3-geo/src/length.js"
+/*!*******************************************!*\
+  !*** ./node_modules/d3-geo/src/length.js ***!
+  \*******************************************/
+(__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* export default binding */ __WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+Object.defineProperty(__WEBPACK_DEFAULT_EXPORT__, "name", { value: "default", configurable: true });
+/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/fsum.js");
+/* harmony import */ var _math_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./math.js */ "./node_modules/d3-geo/src/math.js");
+/* harmony import */ var _noop_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./noop.js */ "./node_modules/d3-geo/src/noop.js");
+/* harmony import */ var _stream_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./stream.js */ "./node_modules/d3-geo/src/stream.js");
+
+
+
+
+
+var lengthSum,
+    lambda0,
+    sinPhi0,
+    cosPhi0;
+
+var lengthStream = {
+  sphere: _noop_js__WEBPACK_IMPORTED_MODULE_2__["default"],
+  point: _noop_js__WEBPACK_IMPORTED_MODULE_2__["default"],
+  lineStart: lengthLineStart,
+  lineEnd: _noop_js__WEBPACK_IMPORTED_MODULE_2__["default"],
+  polygonStart: _noop_js__WEBPACK_IMPORTED_MODULE_2__["default"],
+  polygonEnd: _noop_js__WEBPACK_IMPORTED_MODULE_2__["default"]
+};
+
+function lengthLineStart() {
+  lengthStream.point = lengthPointFirst;
+  lengthStream.lineEnd = lengthLineEnd;
+}
+
+function lengthLineEnd() {
+  lengthStream.point = lengthStream.lineEnd = _noop_js__WEBPACK_IMPORTED_MODULE_2__["default"];
+}
+
+function lengthPointFirst(lambda, phi) {
+  lambda *= _math_js__WEBPACK_IMPORTED_MODULE_1__.radians, phi *= _math_js__WEBPACK_IMPORTED_MODULE_1__.radians;
+  lambda0 = lambda, sinPhi0 = (0,_math_js__WEBPACK_IMPORTED_MODULE_1__.sin)(phi), cosPhi0 = (0,_math_js__WEBPACK_IMPORTED_MODULE_1__.cos)(phi);
+  lengthStream.point = lengthPoint;
+}
+
+function lengthPoint(lambda, phi) {
+  lambda *= _math_js__WEBPACK_IMPORTED_MODULE_1__.radians, phi *= _math_js__WEBPACK_IMPORTED_MODULE_1__.radians;
+  var sinPhi = (0,_math_js__WEBPACK_IMPORTED_MODULE_1__.sin)(phi),
+      cosPhi = (0,_math_js__WEBPACK_IMPORTED_MODULE_1__.cos)(phi),
+      delta = (0,_math_js__WEBPACK_IMPORTED_MODULE_1__.abs)(lambda - lambda0),
+      cosDelta = (0,_math_js__WEBPACK_IMPORTED_MODULE_1__.cos)(delta),
+      sinDelta = (0,_math_js__WEBPACK_IMPORTED_MODULE_1__.sin)(delta),
+      x = cosPhi * sinDelta,
+      y = cosPhi0 * sinPhi - sinPhi0 * cosPhi * cosDelta,
+      z = sinPhi0 * sinPhi + cosPhi0 * cosPhi * cosDelta;
+  lengthSum.add((0,_math_js__WEBPACK_IMPORTED_MODULE_1__.atan2)((0,_math_js__WEBPACK_IMPORTED_MODULE_1__.sqrt)(x * x + y * y), z));
+  lambda0 = lambda, sinPhi0 = sinPhi, cosPhi0 = cosPhi;
+}
+
+/* harmony default export */ function __WEBPACK_DEFAULT_EXPORT__(object) {
+  lengthSum = new d3_array__WEBPACK_IMPORTED_MODULE_0__.Adder();
+  (0,_stream_js__WEBPACK_IMPORTED_MODULE_3__["default"])(object, lengthStream);
+  return +lengthSum;
+}
 
 
 /***/ },

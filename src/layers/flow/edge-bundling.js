@@ -5,6 +5,19 @@ import { applyArrow } from './arrows.js'
 import { select } from 'd3-selection'
 import { getFlowStroke, computeColorKey, onFlowLineMouseOver, onFlowLineMouseOut } from './straight.js' // reuse your helpers
 import { getResponsiveSymbolSize } from '../../core/responsive'
+import { arcScreenPoints } from './great-circle.js'
+
+/**
+ * Force settings of edge bundling. `chargeStrength` > 0 pulls routes together (bundling), < 0 pushes them apart
+ * (un-bundling: routes fan out into arcs), 0 leaves them as drawn.
+ */
+export const DEFAULT_BUNDLE_SETTINGS = {
+    alphaDecay: 0.1,
+    chargeStrength: 10,
+    distanceMax: null, // defaults to a zoom-independent, responsive distance
+    linkStrength: 0.7,
+    linkIterations: 1,
+}
 
 export function drawEdgeBundleLines(out, lineGroup) {
     const width = out.width_ || out.innerWidth_ || 1000
@@ -12,11 +25,12 @@ export function drawEdgeBundleLines(out, lineGroup) {
     const hypotenuse = Math.sqrt(width * width + height * height)
 
     const segmentScale = scaleLinear().domain([0, hypotenuse]).range([1, 10])
-    const bundleSettings = out.flowBundleSettings_
+    // a partial settings object (only chargeStrength, say) keeps the defaults for the rest
+    const bundleSettings = { ...DEFAULT_BUNDLE_SETTINGS, ...out.flowBundleSettings_ }
     const distanceMax = bundleSettings.distanceMax ?? 2 * getResponsiveSymbolSize(18, 4)
 
     // Build the bundled network
-    const bundle = generateSegments(out.flowGraph_.nodes, out.flowGraph_.links, segmentScale)
+    const bundle = generateSegments(out, out.flowGraph_.nodes, out.flowGraph_.links, segmentScale)
 
     // --- Style setup: compute stroke, width, and colors for each path ---
     const arrowIds = out.flowArrows_
@@ -99,8 +113,9 @@ export function drawEdgeBundleLines(out, lineGroup) {
     layout.force('link').links(bundle.links)
 }
 
-// --- same segment generator as before ---
-function generateSegments(nodes, links, segmentScale) {
+// Each route starts as a straight chain of points (or a great circle, with lineGeometry: 'greatCircle'), which the force
+// simulation then pulls together (positive chargeStrength) or pushes apart (negative).
+function generateSegments(out, nodes, links, segmentScale) {
     const bundle = { nodes: [], links: [], paths: [] }
 
     bundle.nodes = nodes.map((d) => {
@@ -119,10 +134,11 @@ function generateSegments(nodes, links, segmentScale) {
             .domain([0, total + 1])
             .range([d.source.y, d.target.y])
 
+        const arcPoints = out.flowLineGeometry_ === 'greatCircle' ? arcScreenPoints(out, d.source, d.target, total) : null
         let src = d.source
         const local = [src]
         for (let j = 1; j <= total; j++) {
-            const tgt = { x: xscale(j), y: yscale(j) }
+            const tgt = arcPoints ? arcPoints[j - 1] : { x: xscale(j), y: yscale(j) }
             local.push(tgt)
             bundle.nodes.push(tgt)
             bundle.links.push({ source: src, target: tgt })
