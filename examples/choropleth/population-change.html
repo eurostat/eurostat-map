@@ -10,7 +10,7 @@
         <svg id="map"></svg>
         <script src="../../build/eurostatmap.js"></script>
         <!-- <script src="../../build/eurostatmap.js"></script> -->
-        <!-- for eurostatmap.colorFun() -->
+        <!-- for eurostatmap.colorFunction() -->
         <script src="https://d3js.org/d3-color.v2.min.js"></script>
         <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
@@ -30,7 +30,7 @@
                 .encoding('fill', { stat: 'value' })
                 .colors(['#B2182B', '#D6604D', '#F4A582', '#FDDBC7', '#D1E5F0', '#92C5DE', '#4393C3', '#2166AC'])
                 .classificationMethod('threshold')
-                .threshold([-15, -10, -5, 0, 5, 10, 15])
+                .thresholds([-15, -10, -5, 0, 5, 10, 15])
                 .legend({
                     x: 550,
                     y: 70,

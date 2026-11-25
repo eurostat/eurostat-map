@@ -18,11 +18,10 @@
             const map = eurostatmap
                 .map('waffle')
                 .gridCartogram(true)
-                .gridCartogramCellPadding(30)
+                .gridCartogramSettings({ cellPadding: 30 })
 
                 //if all sizes are the same
-                .waffleMinSize(40)
-                .waffleMaxSize(40)
+                .waffleSettings({ minSize: 40, maxSize: 40 })
 
                 //population by age
                 .nutsLevel(0)
@@ -47,8 +46,7 @@
                     sizeLegend: false,
                     colorLegend: { title: 'Age groups', noData: false },
                 })
-                .seaFillStyle('white')
-                .coastalMarginColor('lightgray')
+                .coastalMarginSettings({ color: 'lightgray' })
                 .drawGraticule(false)
 
                 //population by age

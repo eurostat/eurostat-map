@@ -83,6 +83,12 @@
             "ct"
         ]
     },
+    "categorical/coastal-typology.html": {
+        "path": "categorical/coastal-typology.html",
+        "types": [
+            "categorical"
+        ]
+    },
     "choropleth/annotations.html": {
         "path": "choropleth/annotations.html",
         "types": [
@@ -95,8 +101,20 @@
             "choropleth"
         ]
     },
+    "choropleth/continuous.html": {
+        "path": "choropleth/continuous.html",
+        "types": [
+            "choropleth"
+        ]
+    },
     "choropleth/EU_only.html": {
         "path": "choropleth/EU_only.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "choropleth/eurostat-colour-palettes.html": {
+        "path": "choropleth/eurostat-colour-palettes.html",
         "types": [
             "choropleth"
         ]
@@ -109,6 +127,12 @@
     },
     "choropleth/labelling.html": {
         "path": "choropleth/labelling.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "choropleth/labels.html": {
+        "path": "choropleth/labels.html",
         "types": [
             "choropleth"
         ]
@@ -167,6 +191,18 @@
             "choropleth"
         ]
     },
+    "flow/commuting-corridors-insee.html": {
+        "path": "flow/commuting-corridors-insee.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "flow/commuting-corridors.html": {
+        "path": "flow/commuting-corridors.html",
+        "types": [
+            "flow"
+        ]
+    },
     "flow/flights/flights.html": {
         "path": "flow/flights/flights.html",
         "types": [
@@ -175,6 +211,12 @@
     },
     "flow/flowmap.html": {
         "path": "flow/flowmap.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "flow/immigration.html": {
+        "path": "flow/immigration.html",
         "types": [
             "flow"
         ]
@@ -221,6 +263,12 @@
             "choropleth"
         ]
     },
+    "misc/mixed-nuts-levels.html": {
+        "path": "misc/mixed-nuts-levels.html",
+        "types": [
+            "ps"
+        ]
+    },
     "misc/placenames.html": {
         "path": "misc/placenames.html",
         "types": [
@@ -251,8 +299,26 @@
             "choropleth"
         ]
     },
+    "multi-layer/choropleth-with-proportional-symbols.html": {
+        "path": "multi-layer/choropleth-with-proportional-symbols.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "multi-layer/renewable-electricity.html": {
+        "path": "multi-layer/renewable-electricity.html",
+        "types": [
+            "choropleth"
+        ]
+    },
     "mushroom/mushroom.html": {
         "path": "mushroom/mushroom.html",
+        "types": [
+            "mushroom"
+        ]
+    },
+    "mushroom/population-age-groups.html": {
+        "path": "mushroom/population-age-groups.html",
         "types": [
             "mushroom"
         ]
@@ -265,6 +331,12 @@
     },
     "proportional-symbols/population-change.html": {
         "path": "proportional-symbols/population-change.html",
+        "types": [
+            "proportionalSymbol"
+        ]
+    },
+    "proportional-symbols/population-ring.html": {
+        "path": "proportional-symbols/population-ring.html",
         "types": [
             "proportionalSymbol"
         ]
@@ -287,6 +359,115 @@
             "ps"
         ]
     },
+    "RYB/2026/CH02/CH02M02.html": {
+        "path": "RYB/2026/CH02/CH02M02.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "RYB/2026/CH02/CH02M03.html": {
+        "path": "RYB/2026/CH02/CH02M03.html",
+        "types": [
+            "pie"
+        ]
+    },
+    "RYB/2026/CH02/static/CH02M03.html": {
+        "path": "RYB/2026/CH02/static/CH02M03.html",
+        "types": [
+            "pie"
+        ]
+    },
+    "RYB/2026/CH03/CH03M02.html": {
+        "path": "RYB/2026/CH03/CH03M02.html",
+        "types": [
+            "trivariateChoropleth"
+        ]
+    },
+    "RYB/2026/CH03/static/static.html": {
+        "path": "RYB/2026/CH03/static/static.html",
+        "types": [
+            "trivariateChoropleth",
+            "choropleth"
+        ]
+    },
+    "RYB/2026/CH04/CH04M03.html": {
+        "path": "RYB/2026/CH04/CH04M03.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "RYB/2026/CH08/CH08M03.html": {
+        "path": "RYB/2026/CH08/CH08M03.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "RYB/2026/CH08/CH08M04.html": {
+        "path": "RYB/2026/CH08/CH08M04.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "RYB/2026/CH10/CH10M02.html": {
+        "path": "RYB/2026/CH10/CH10M02.html",
+        "types": [
+            "coxcomb"
+        ]
+    },
+    "RYB/2026/CH10/CH10M06.html": {
+        "path": "RYB/2026/CH10/CH10M06.html",
+        "types": [
+            "coxcomb"
+        ]
+    },
+    "RYB/2026/CH10/static/CH10M02.html": {
+        "path": "RYB/2026/CH10/static/CH10M02.html",
+        "types": [
+            "coxcomb"
+        ]
+    },
+    "RYB/2026/CH10/static/CH10M06.html": {
+        "path": "RYB/2026/CH10/static/CH10M06.html",
+        "types": [
+            "coxcomb"
+        ]
+    },
+    "RYB/2026/CH11/CH11M04.html": {
+        "path": "RYB/2026/CH11/CH11M04.html",
+        "types": [
+            "mushroom"
+        ]
+    },
+    "RYB/2026/CH11/CH11M05.html": {
+        "path": "RYB/2026/CH11/CH11M05.html",
+        "types": [
+            "mushroom"
+        ]
+    },
+    "RYB/2026/CH11/static/CH11M04.html": {
+        "path": "RYB/2026/CH11/static/CH11M04.html",
+        "types": [
+            "mushroom"
+        ]
+    },
+    "RYB/2026/CH11/static/CH11M05.html": {
+        "path": "RYB/2026/CH11/static/CH11M05.html",
+        "types": [
+            "mushroom"
+        ]
+    },
+    "RYB/2026/CH13/CH13M02.html": {
+        "path": "RYB/2026/CH13/CH13M02.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "RYB/2026/index.html": {
+        "path": "RYB/2026/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
     "sparklines/sparklines-grid-cartogram.html": {
         "path": "sparklines/sparklines-grid-cartogram.html",
         "types": [
@@ -297,6 +478,186 @@
         "path": "sparklines/sparklines.html",
         "types": [
             "sparkline"
+        ]
+    },
+    "statistics-explained/business/construction/choropleth/index.html": {
+        "path": "statistics-explained/business/construction/choropleth/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/construction/proportional-circle/index.html": {
+        "path": "statistics-explained/business/construction/proportional-circle/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/distributive-trade/choropleth/index.html": {
+        "path": "statistics-explained/business/distributive-trade/choropleth/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/distributive-trade/proportional-circle/index.html": {
+        "path": "statistics-explained/business/distributive-trade/proportional-circle/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/human-services/choropleth/index.html": {
+        "path": "statistics-explained/business/human-services/choropleth/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/human-services/proportional-circle/index.html": {
+        "path": "statistics-explained/business/human-services/proportional-circle/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/index.html": {
+        "path": "statistics-explained/business/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/manufacturing/choropleth/index.html": {
+        "path": "statistics-explained/business/manufacturing/choropleth/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/manufacturing/proportional-circle/index.html": {
+        "path": "statistics-explained/business/manufacturing/proportional-circle/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/NACE/choropleth/index.html": {
+        "path": "statistics-explained/business/NACE/choropleth/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/NACE/proportional-circle/index.html": {
+        "path": "statistics-explained/business/NACE/proportional-circle/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/services/choropleth/index.html": {
+        "path": "statistics-explained/business/services/choropleth/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/business/services/proportional-circle/index.html": {
+        "path": "statistics-explained/business/services/proportional-circle/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/index.html": {
+        "path": "statistics-explained/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/transport/air/airports/2025/index.html": {
+        "path": "statistics-explained/transport/air/airports/2025/index.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "statistics-explained/transport/air/airports/2026/index.html": {
+        "path": "statistics-explained/transport/air/airports/2026/index.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "statistics-explained/transport/air/airports/index.html": {
+        "path": "statistics-explained/transport/air/airports/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/transport/air/freight/2025/index.html": {
+        "path": "statistics-explained/transport/air/freight/2025/index.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "statistics-explained/transport/air/freight/2026/index.html": {
+        "path": "statistics-explained/transport/air/freight/2026/index.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "statistics-explained/transport/air/freight/index.html": {
+        "path": "statistics-explained/transport/air/freight/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/transport/air/passengers/2025/index.html": {
+        "path": "statistics-explained/transport/air/passengers/2025/index.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "statistics-explained/transport/air/passengers/2026/index.html": {
+        "path": "statistics-explained/transport/air/passengers/2026/index.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "statistics-explained/transport/air/passengers/index.html": {
+        "path": "statistics-explained/transport/air/passengers/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/transport/index.html": {
+        "path": "statistics-explained/transport/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "statistics-explained/transport/maritime/flows/2025/index.html": {
+        "path": "statistics-explained/transport/maritime/flows/2025/index.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "statistics-explained/transport/maritime/flows/2026/index.html": {
+        "path": "statistics-explained/transport/maritime/flows/2026/index.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "statistics-explained/transport/maritime/flows/index.html": {
+        "path": "statistics-explained/transport/maritime/flows/index.html",
+        "types": [
+            "flow"
+        ]
+    },
+    "statistics-explained/transport/maritime/ports/2025/index.html": {
+        "path": "statistics-explained/transport/maritime/ports/2025/index.html",
+        "types": [
+            "ps"
+        ]
+    },
+    "statistics-explained/transport/maritime/ports/2026/index.html": {
+        "path": "statistics-explained/transport/maritime/ports/2026/index.html",
+        "types": [
+            "ps"
+        ]
+    },
+    "statistics-explained/transport/maritime/ports/index.html": {
+        "path": "statistics-explained/transport/maritime/ports/index.html",
+        "types": [
+            "choropleth"
         ]
     },
     "stripe/farm_size.html": {
@@ -317,6 +678,78 @@
             "trivariateChoropleth"
         ]
     },
+    "trivariate/venn.html": {
+        "path": "trivariate/venn.html",
+        "types": [
+            "trivariateChoropleth"
+        ]
+    },
+    "URE/2026/gdp-change.html": {
+        "path": "URE/2026/gdp-change.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "URE/2026/index.html": {
+        "path": "URE/2026/index.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "URE/2026/natural-population-change.html": {
+        "path": "URE/2026/natural-population-change.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "URE/2026/net-migration.html": {
+        "path": "URE/2026/net-migration.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "URE/2026/old-age-dependency-ratio.html": {
+        "path": "URE/2026/old-age-dependency-ratio.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "URE/2026/population-change.html": {
+        "path": "URE/2026/population-change.html",
+        "types": [
+            "choropleth"
+        ]
+    },
+    "URE/2026/poverty-or-social-exclusion-rate.html": {
+        "path": "URE/2026/poverty-or-social-exclusion-rate.html",
+        "types": [
+            "bar"
+        ]
+    },
+    "URE/2026/poverty-rate.html": {
+        "path": "URE/2026/poverty-rate.html",
+        "types": [
+            "bar"
+        ]
+    },
+    "URE/2026/severe-material-social-deprivation-rate.html": {
+        "path": "URE/2026/severe-material-social-deprivation-rate.html",
+        "types": [
+            "bar"
+        ]
+    },
+    "URE/2026/unemployment.html": {
+        "path": "URE/2026/unemployment.html",
+        "types": [
+            "bar"
+        ]
+    },
+    "URE/2026/very-low-work-intensity.html": {
+        "path": "URE/2026/very-low-work-intensity.html",
+        "types": [
+            "bar"
+        ]
+    },
     "waffle/livestock.html": {
         "path": "waffle/livestock.html",
         "types": [
@@ -327,13 +760,6 @@
         "path": "waffle/waffle.html",
         "types": [
             "waffle"
-        ]
-    },
-    "multi-layer/choropleth-with-proportional-symbols.html": {
-        "path": "multi-layer/choropleth-with-proportional-symbols.html",
-        "types": [
-            "choropleth",
-            "proportionalSymbol"
         ]
     }
 }

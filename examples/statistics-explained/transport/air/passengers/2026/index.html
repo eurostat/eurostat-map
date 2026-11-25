@@ -209,7 +209,7 @@
                         // zoom min/max
                         .zoomExtent([0.6, 10])
 
-                        .callback(() => {
+                        .onBuild(() => {
                             // set fill of regions
                             const countries = d3.selectAll('#air-passengers-map .em-worldrg path')
                             countries.style('fill', (d) => regionalColors[regionByCountry.get(d.properties.id)] ?? '#efefef')

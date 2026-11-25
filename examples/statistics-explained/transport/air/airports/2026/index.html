@@ -73,6 +73,9 @@
                 stroke-linejoin: round;
                 opacity: 0.9;
             }
+            .em-map {
+                font-family: Arial;
+            }
         </style>
     </head>
     <body style="margin: 0">
@@ -152,7 +155,6 @@
                 const svg = document.getElementById('export-svg-btn')
                 eurostatmap
                     .map('flow')
-                    .fontFamily('Arial')
                     .svgId('airport-pairs-map')
                     .width(width)
                     .height(height)

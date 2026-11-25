@@ -9,7 +9,7 @@
     <body>
         <svg id="map"></svg>
         <script src="../../build/eurostatmap.js"></script>
-        <!-- for eurostatmap.colorFun() -->
+        <!-- for eurostatmap.colorFunction() -->
         <script src="https://d3js.org/d3-color.v2.min.js"></script>
         <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
@@ -27,31 +27,23 @@
                     },
                     scale: '10M',
                     position: { x: 3100000, y: 1970000, z: 1900 },
-                    labelling: true,
-                    labelsToShow: ['values'],
-                    labelShadow: ['values'],
+                    labels: { values: true, shadows: true },
                     classificationMethod: 'threshold',
                     thresholds: [6, 8, 10, 12, 14, 17.8],
                     //colorFunction: d3.interpolateReds,
-                    seaFillStyle: 'white',
-                    coastalMarginColor: '#bbb',
                     drawGraticule: false,
                     insets: [
                         {
                             geo: 'IC',
-                            pixSize: 2900,
                             width: 200,
                             height: 90,
                             title: 'Canary islands',
-                            titleFontSize: 12,
-                            titleFontWeight: '',
                             frameStrokeWidth: 1,
-                            frameStroke: 'black',
                         },
                     ],
                     insetBoxPosition: [10, 550],
                     legend: { decimals: 1, x: 5, y: 60, boxOpacity: 0, boxPadding: 7, title: '% people aged 20-64', noData: false },
-                    callback: function () {
+                    onBuild: function () {
                         //set title with date
                         //map.title(map.title() + ' in ' + map.getTime())
                     },

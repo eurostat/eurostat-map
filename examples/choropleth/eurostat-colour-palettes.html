@@ -233,9 +233,9 @@
                     .numberOfClasses(state.classes)
                     .colors(state.palette) // a palette name, e.g. 'teal' or 'cobalt-plum'
                 if (dataset.nutsYear) map.nutsYear(dataset.nutsYear)
-                if (isDiverging() && state.type === 'discrete') map.classificationMethod('threshold').threshold(changeBreaks(state.classes))
+                if (isDiverging() && state.type === 'discrete') map.classificationMethod('threshold').thresholds(changeBreaks(state.classes))
                 if (isDiverging()) map.pointOfDivergence(state.pivot) // where the neutral colour sits
-                map.callback(() => {
+                map.onBuild(() => {
                     // once the data has arrived and the classes are known
                     if (isDiverging()) updatePivotSlider()
                     showSwatches()

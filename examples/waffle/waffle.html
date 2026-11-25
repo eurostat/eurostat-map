@@ -24,13 +24,15 @@
                 .subtitle('Nights spent in tourist accommodation, 2022')
 
                 //waffle settings
-                .waffleMinSize(10)
-                .waffleMaxSize(40)
-                .waffleCellPadding(0)
-                .waffleStrokeWidth(0)
-                .waffleRoundedCorners(0)
-                .waffleGridSize(10) //cells per row
-                .waffleTooltipSize(100)
+                .waffleSettings({
+                    minSize: 10,
+                    maxSize: 40,
+                    cellPadding: 0,
+                    strokeWidth: 0,
+                    roundedCorners: 0,
+                    gridSize: 10, // cells per row
+                    tooltipSize: 100,
+                })
 
                 //population by age
                 .nutsLevel(0)

@@ -166,7 +166,7 @@
 
             map.statData().setData(stats)
 
-            map.callback(() => {
+            map.onBuild(() => {
                 setTimeout(() => {
                     setSelectedCell()
                     const cells = d3.selectAll('#em-grid-container g')

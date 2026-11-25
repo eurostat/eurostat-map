@@ -8,6 +8,17 @@
             .em-cntbn {
                 stroke-width: 2px !important;
             }
+            .em-map {
+                font-family: 'Source serif pro';
+            }
+            #spain .em-title {
+                font-size: 20px;
+                fill: #333;
+            }
+            #spain .em-subtitle {
+                font-size: 16px;
+                font-weight: 100;
+            }
         </style>
     </head>
 
@@ -25,10 +36,7 @@
                 .map('choropleth', {
                     title: 'Productivity in Spain',
                     projectionFunction: spainProjection,
-                    titleFontSize: 20,
                     subtitle: 'GDP per inhabitant, 2022',
-                    subtitleFontSize: 16,
-                    subtitleFontWeight: 100,
                     svgId: 'spain',
                     nutsLevel: 3,
                     zoomButtons: true,
@@ -39,7 +47,6 @@
                         unitText: ' Euro per inhabitant',
                         filters: { TIME: '2021', UNIT: 'EUR_HAB' },
                     },
-                    titleFill: '#333',
                     titlePosition: [15, 27],
                     subtitlePosition: [15, 47],
                     insetBoxPosition: [5, 550],
@@ -47,14 +54,9 @@
                         {
                             geo: 'IC',
                             projectionFunction: null, //force it to use default (EPSG3035)
-                            geoCenter: [420000, 3170000],
-                            pixSize: 3100,
                             width: 170,
                             height: 90,
                             title: 'Canary islands',
-                            titleFontSize: 12,
-                            titleFontWeight: '',
-                            frameStroke: 'grey',
                             frameStrokeWidth: '0.3px',
                         },
                     ],
@@ -71,12 +73,8 @@
                         sepLineLength: 30,
                         noData: true,
                     },
-                    labelling: true,
-                    labelsToShow: ['values'],
-                    labelShadow: ['values'],
+                    labels: { values: true, shadows: true },
                 })
-                .labelValuesFontSize(16)
-                .fontFamily('Source serif pro')
                 .classificationMethod('threshold')
                 .thresholds([20000, 22000, 24000, 26000, 28000, 30000, 34000])
                 .minimap({

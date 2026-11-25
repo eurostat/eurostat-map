@@ -20,8 +20,8 @@
             const map = eurostatmap
                 .map('proportionalSymbol')
                 .dorling(true)
-                //.animateDorling(false)
-                .dorlingWorker(true) // use web worker to not block the main thread during the dorling algorithm
+                //.dorlingSettings({ animate: false })
+                .dorlingSettings({ worker: true }) // use web worker to not block the main thread during the dorling algorithm
                 .title('Total population & population change')
                 .subtitle('2023')
                 .nutsLevel(nutsLevel)

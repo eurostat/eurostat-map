@@ -4,6 +4,12 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Small Multiples</title>
+        <style>
+            .em-map .em-title {
+                font-size: 18px;
+                fill: #333333;
+            }
+        </style>
     </head>
 
     <body>
@@ -16,7 +22,7 @@
         <!-- <script src="../../build/eurostatmap.js"></script> -->
         <script src="../../build/eurostatmap.js"></script>
 
-        <!-- for eurostatmap.colorFun() -->
+        <!-- for eurostatmap.colorFunction() -->
         <script src="https://d3js.org/d3-color.v2.min.js"></script>
         <script src="https://d3js.org/d3-interpolate.v2.min.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v2.min.js"></script>
@@ -32,8 +38,6 @@
                         .map('choropleth')
                         .svgId('map_' + year + '_Q' + q)
                         .title(year + ' ' + 'Q' + q)
-                        .titleFontSize(18)
-                        .titleFill('#333333')
                         .scale('60M')
                         .width(250)
                         .nutsLevel(0)
@@ -48,7 +52,7 @@
                         .classificationMethod('threshold')
                         .thresholds([-15, -10, -8, -6, -4, -2, -1, -0.5, 0, 0.5, , 1, 2, 4, 6, 7, 10, 15])
 
-                        .bottomText(false)
+                        .footnote(false)
                         .showSourceLink(false)
                         .transitionDuration(0)
                         .zoomButtons(false)
