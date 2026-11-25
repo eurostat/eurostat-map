@@ -56,8 +56,9 @@
                         Object.entries(regions).flatMap(([region, codes]) => codes.map((code) => [code, region.toLowerCase()]))
                     )
 
-                    const compactValue = d3.format('.3~s')
-                    // each flow label reads "63.7M (+3.6%)": the amount, then the change since the year before, so the colour classes are not all a reader has
+                    // one decimal everywhere: 3.3M, 812.4K
+                    const compactValue = (value) => (value >= 1e6 ? `${(value / 1e6).toFixed(1)}M` : `${(value / 1e3).toFixed(1)}K`)
+                    // each flow label reads "3.3M (+3.6%)": the amount, then the change since the year before, so the colour classes are not all a reader has
                     const changeByValue = new Map(graphData.nodes.filter((n) => n.change).map((n) => [n.value, n.change]))
                     const signedChange = (change) => {
                         const pct = parseChangeToPct(change)

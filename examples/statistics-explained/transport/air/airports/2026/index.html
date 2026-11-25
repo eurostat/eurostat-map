@@ -99,8 +99,8 @@
                     .scale(1500)
                     .translate([width / 2.4, width / 2.3])
                 const formatPassengers = new Intl.NumberFormat('en')
-                const millions = (value) => `${(value / 1e6).toFixed(2)}M`
-                // "1.77M" over "−13.2%": passengers carried, then the change since 2024, so the colour classes are not all a reader has
+                const millions = (value) => `${(value / 1e6).toFixed(1)}M`
+                // "1.8M" over "−13.2%": passengers carried, then the change since 2024, so the colour classes are not all a reader has
                 const signedChange = (link) => formatChange.format(link.changePct / 100).replace('-', '−')
                 const flowLabel = (link) => [millions(link.value), signedChange(link)]
                 const flowValues = graph.links.map((link) => link.value)
@@ -111,6 +111,7 @@
                 const formatChange = new Intl.NumberFormat('en', {
                     style: 'percent',
                     signDisplay: 'exceptZero',
+                    minimumFractionDigits: 1,
                     maximumFractionDigits: 1,
                 })
                 // Diverging, centred on zero: reds fall, blues rise, grey is little change. The grey is darker than the
@@ -122,7 +123,7 @@
                     LEMD: 'Madrid-Barajas',
                     LEBL: 'Barcelona-El Prat',
                     LEPA: 'Palma de Mallorca',
-                    LIRF: 'Rome-Fiumicino',
+                    LIRF: 'Roma-Fiumicino',
                     LICC: 'Catania',
                     LPPT: 'Lisbon',
                     GCLP: 'Gran Canaria',
@@ -226,7 +227,7 @@
                             <div class="em-tooltip-bar"><b>${airportNames[link.source.id]} and ${airportNames[link.target.id]}</b></div>
                             <div class="em-tooltip-text">
                                 <table class="em-tooltip-table">
-                                    <tr><td>Passengers carried: ${formatPassengers.format(link.value)}</td></tr>
+                                    <tr><td>Passengers carried: ${(link.value / 1e6).toFixed(1)} million</td></tr>
                                     <tr><td>Change since 2024: ${formatChange.format(link.changePct / 100)}</td></tr>
                                 </table>
                             </div>`,
@@ -254,7 +255,7 @@
                             {
                                 note: {
                                     title: 'Busiest intra-EU route',
-                                    label: `Barcelona to Mallorca was the busiest route in 2025, with ${formatPassengers.format(largestFlow)} passengers carried.`,
+                                    label: `Barcelona to Mallorca was the busiest route in 2025, with ${(largestFlow / 1e6).toFixed(1)} million passengers carried.`,
                                     wrap: 210,
                                     bgPadding: 8,
                                 },
@@ -267,7 +268,7 @@
                             },
                         ],
                     })
-                    .footnote("Intra-EU flights only. <tspan font-style='italic'>Source</tspan>: Eurostat (avia_pa)")
+                    .footnote("Note: intra-EU flights only. <tspan font-style='italic'>Source</tspan>: Eurostat (avia_pa)")
                     .onBuild((map) => {
                         // write each flow's passengers and change on the flow, half way along its centre line unless that would put
                         // two labels on top of each other: the fraction of the way along the flow, by index in the graph's links

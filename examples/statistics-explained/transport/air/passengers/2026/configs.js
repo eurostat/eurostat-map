@@ -25,14 +25,14 @@ const airMapConfigs = {
                 ],
                 "sizeLegend": {
                     "values": [
-                        350000,
+                        400000,
                         50000000,
-                        300000000
+                        304344207
                     ],
                     "labels": [
-                        "350K",
-                        "50M",
-                        "300M"
+                        "0.4 million",
+                        "50.0 million",
+                        "304.3 million"
                     ]
                 }
             }

@@ -33,8 +33,8 @@ const airMapConfigs = {
                         3300000
                     ],
                     "labels": [
-                        "5K",
-                        "1M",
+                        "5.0K",
+                        "1.0M",
                         "3.3M"
                     ]
                 }

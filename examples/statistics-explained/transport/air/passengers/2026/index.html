@@ -39,7 +39,7 @@
                 .geoAzimuthalEquidistant()
                 .rotate([-10, -10])
                 .scale(200)
-                .translate([width / 2.4, width / 2.6])
+                .translate([width / 2.4 + 6, width / 2.6])
 
             const makeLegendItems = () =>
                 airMapConfigs[year].passengers.legend.labels
@@ -56,8 +56,9 @@
                         Object.entries(regions).flatMap(([region, codes]) => codes.map((code) => [code, region.toLowerCase()]))
                     )
 
-                    const compactValue = d3.format('.3~s')
-                    // each flow label reads "63.7M (+3.6%)": the amount, then the change since the year before, so the colour classes are not all a reader has
+                    // every figure in millions with one decimal: "63.7 million"
+                    const compactValue = (value) => `${(value / 1e6).toFixed(1)} million`
+                    // each flow label reads "63.7 million (+3.6%)": the amount, then the change since the year before, so the colour classes are not all a reader has
                     const changeByValue = new Map(graphData.nodes.filter((n) => n.change).map((n) => [n.value, n.change]))
                     const signedChange = (change) => {
                         const pct = parseChangeToPct(change)
@@ -100,7 +101,7 @@
                         buf.push(`<div class='em-tooltip-text'>
                         <table class="em-tooltip-table">
                             <tbody>
-                                <tr><td>Passengers: ${spaceAsThousandSeparator(link.value)}</td></tr>
+                                <tr><td>Passengers: ${compactValue(link.value)}</td></tr>
                                 <tr>
                             <td>
                                 Change since ${year - 1}:
@@ -170,14 +171,14 @@
 
                         // legend
                         .legend({
-                            x: width - 205,
+                            x: width - 199,
                             y: 60,
                             boxPadding: 10,
                             boxOpacity: 1,
                             title: 'Passengers carried',
                             flowWidthLegend: {
                                 marginTop: -10,
-                                //orientation:'vertical',
+                                orientation: 'vertical',
                                 values: airMapConfigs[year].passengers.legend.sizeLegend.values,
                                 labels: airMapConfigs[year].passengers.legend.sizeLegend.labels,
                             },
@@ -201,7 +202,7 @@
                         })
 
                         .footnote(
-                            "Note: Passengers carried includes both arrivals and departures. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tspan style='font-style: italic;'>Source</tspan>: Eurostat (avia_paexcc)"
+                            "Note: passengers carried includes both arrivals and departures. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <tspan style='font-style: italic;'>Source</tspan>: Eurostat (avia_paexcc)"
                         )
                         .footnoteWrap(150)
 
