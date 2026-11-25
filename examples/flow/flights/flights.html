@@ -361,7 +361,7 @@
                     <fieldset>
                         <legend>Display</legend>
                         <label class="switch"><span>Edge bundling</span><input id="bundling" type="checkbox" role="switch" checked /></label>
-                        <label class="switch"><span>Merge flows (to and from)</span><input id="merge" type="checkbox" role="switch" checked /></label>
+                        <label class="switch"><span>Merge directions (to and from)</span><input id="merge" type="checkbox" role="switch" checked /></label>
                         <label class="switch"><span>Voronoi cells</span><input id="voronoi" type="checkbox" role="switch" /></label>
                         <label class="switch"><span>Animate</span><input id="animate" type="checkbox" role="switch" /></label>
                     </fieldset>
@@ -403,7 +403,7 @@
                     maxWidth: +$('maxWidth').value,
                     opacity: +$('opacity').value,
                     emptySeats: $('emptySeats').checked, // colour lines by share of empty seats
-                    bundling: $('bundling').checked,
+                    bundling: $('bundling').checked && $('merge').checked, // bundling has no side-by-side layout, so it is off for separate directions
                     merge: $('merge').checked, // merge both directions of a route
                     voronoi: $('voronoi').checked,
                     animate: $('animate').checked,
@@ -414,32 +414,37 @@
             function selectFlights(s) {
                 let flights = data.flights.filter((d) => d.count && d.availableCount && (!s.airport || d.origin === s.airport || d.destination === s.airport))
 
-                if (s.merge) {
-                    const merged = new Map()
-                    for (const d of flights) {
-                        const [a, b] = d.origin < d.destination ? [d.origin, d.destination] : [d.destination, d.origin]
-                        const m = merged.get(a + '|' + b) || { origin: a, destination: b, count: 0, availableCount: 0 }
-                        m.count += d.count
-                        m.availableCount += d.availableCount
-                        merged.set(a + '|' + b, m)
+                const withValues = (d) => {
+                    const empty = d.availableCount - d.count
+                    return {
+                        ...d,
+                        empty,
+                        emptyPct: (empty / d.availableCount) * 100,
+                        value: s.theme === 'Passengers carried' ? d.count : empty,
                     }
-                    flights = [...merged.values()]
                 }
 
-                flights = flights
-                    .map((d) => {
-                        const empty = d.availableCount - d.count
-                        return {
-                            ...d,
-                            empty,
-                            emptyPct: (empty / d.availableCount) * 100,
-                            value: s.theme === 'Passengers carried' ? d.count : empty,
-                        }
-                    })
-                    .filter((d) => d.value > 0)
-                    .sort((a, b) => b.value - a.value)
+                // Group both directions of each route. The top-N cut is made on routes (ranked by their
+                // combined value), so the number of routes shown is the same whether or not directions are merged.
+                const routes = new Map()
+                for (const d of flights) {
+                    const [a, b] = d.origin < d.destination ? [d.origin, d.destination] : [d.destination, d.origin]
+                    const key = a + '|' + b
+                    const r = routes.get(key) || { origin: a, destination: b, count: 0, availableCount: 0, directions: [] }
+                    r.count += d.count
+                    r.availableCount += d.availableCount
+                    r.directions.push(d)
+                    routes.set(key, r)
+                }
 
-                return s.topN > 0 ? flights.slice(0, s.topN) : flights
+                let ranked = [...routes.values()]
+                    .map((r) => ({ ...withValues(r), directions: r.directions.map(withValues).filter((d) => d.value > 0) }))
+                    .filter((r) => r.value > 0)
+                    .sort((a, b) => b.value - a.value)
+                if (s.topN > 0) ranked = ranked.slice(0, s.topN)
+
+                // merged: one line per route; otherwise one per direction (drawn side by side by the library)
+                return s.merge ? ranked.map(({ directions, ...route }) => route) : ranked.flatMap((r) => r.directions)
             }
 
             // ---- tooltip ----
@@ -524,6 +529,7 @@
                 stopAnimation()
                 stopAnimation = () => {}
                 const s = readSettings()
+                $('bundling').disabled = !$('merge').checked
                 $('topN-out').textContent = s.topN || 'all'
                 $('maxWidth-out').textContent = s.maxWidth
                 $('opacity-out').textContent = s.opacity
@@ -567,7 +573,8 @@
                     .flowGraph(graph)
 
                     // line type
-                    .flowSettings({ lineType: 'straight', bidirectional: false, edgeBundling: s.bundling })
+                    // merged: one line per route. Separate directions: both drawn side by side (not with edge bundling)
+                    .flowSettings({ lineType: 'straight', bidirectional: !s.merge, bidirectionalLayout: 'parallel', edgeBundling: s.bundling })
                     .flowSettings({
                         bundleSettings: {
                             alphaDecay: 0.1,
@@ -580,7 +587,7 @@
                     .flowSettings({ maxWidth: s.maxWidth, minWidth: 0.6, internal: false })
 
                     // flow accessories
-                    .flowSettings({ arrows: false, outlines: false })
+                    .flowSettings({ arrows: !s.merge && !s.bundling, outlines: false })
 
                     //nodes
                     .flowSettings({ nodes: true })
