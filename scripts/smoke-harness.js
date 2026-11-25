@@ -427,7 +427,16 @@ async function run() {
             // Extract serialized outerHTML of the SVG map(s)
             const serialized = await page.evaluate(() => {
                 const svgs = Array.from(document.querySelectorAll('svg'));
-                return svgs.map(svg => svg.outerHTML).join('\n');
+                // attributes are set in a timing-dependent order (e.g. style vs fill___), so sort them to keep the snapshot stable
+                return svgs.map(svg => {
+                    const clone = svg.cloneNode(true);
+                    [clone, ...clone.querySelectorAll('*')].forEach(el => {
+                        const attrs = Array.from(el.attributes).map(a => [a.name, a.value]).sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+                        attrs.forEach(([name]) => el.removeAttribute(name));
+                        attrs.forEach(([name, value]) => el.setAttribute(name, value));
+                    });
+                    return clone.outerHTML;
+                }).join('\n');
             });
 
             const masked = maskRandomIds(serialized);

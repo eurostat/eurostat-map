@@ -142,7 +142,6 @@ export const decorateBivariateChoroplethLayer = function (out, config) {
                     if (!sv) return
                     const v = sv.value
                     if ((v != 0 && !v) || v == ':') return 'nd'
-                    // if (rg.properties.id.length == 4) console.log(rg)
                     return +out.classifier1_(+v)
                 })
                 .attr('ecl2', function (rg) {

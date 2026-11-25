@@ -37,7 +37,6 @@ export const appendMinimap = (map) => {
 }
 
 const onMiniUpdate = (map) => {
-    //console.log('Updating minimap...')
     applyMinimapRotation(map)
     applyMinimapScale(map)
     map._minimapGlobe.selectAll('path').attr('d', map._minimapPath)

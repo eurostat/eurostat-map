@@ -421,7 +421,8 @@ export interface MapInstance {
      * `annotations` is an array of d3-svg-annotation annotation objects; each object's `type`
      * may be one of 'annotationLabel' (default), 'annotationCallout', 'annotationCalloutRect',
      * 'annotationCalloutCircle', 'annotationXYThreshold', resolved to the matching d3-svg-annotation
-     * function internally.
+     * function internally. A note may also set `textAlign: 'left' | 'middle' | 'right'` to align the lines of its title and
+     * label inside the note box (d3-svg-annotation's `align` only places the box). @default 'left'
      */
     annotations(): { annotations: any[]; editMode?: boolean } | undefined
     annotations(config: { annotations: any[]; editMode?: boolean } | false): this

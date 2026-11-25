@@ -55,7 +55,6 @@ export function updateCSSRule(selector, property, value) {
             }
         } catch (e) {
             // Some stylesheets (e.g., cross-origin) may not be accessible
-            //console.log(`Could not access rules in stylesheet:`, e)
         }
     }
 
@@ -724,7 +723,11 @@ export const getTextColorForBackground = function (backgroundColor) {
 }
 
 // get css selector for data-driven regions. Different maps have different selectors for their regions.
-export const getRegionsSelector = (map) => {
+// patternFill() overlays are clones of region paths (same id, no bound datum, decoration only), so they never count as regions:
+// code that reads a region's datum would otherwise fail on them.
+export const getRegionsSelector = (map) => selectorForRegions(map).replace(/\bpath\b/g, 'path:not(.pattern-fill-overlay)')
+
+const selectorForRegions = (map) => {
     if (map.Geometries.userGeometries) return '#em-user-regions path'
     if (map.gridCartogram_) return '#em-grid-container .em-grid-cell'
     if (map.geo_ === 'WORLD') return '#em-worldrg path'

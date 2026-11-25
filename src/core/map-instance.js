@@ -290,11 +290,11 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         // a function is asked for the height at every build, e.g. to fill the window: height(() => innerHeight - 60)
         if (typeof v === 'function') {
             out._heightFn_ = v
-            out._heightExplicit_ = false
+            out._heightAuto_ = true
             return out
         }
         if (arguments.length) {
-            out._heightExplicit_ = true
+            out._heightAuto_ = false
             out._heightFn_ = undefined
         }
         return setHeight.apply(out, arguments)
@@ -634,7 +634,9 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         const requestedHeight = out._heightFn_ ? +out._heightFn_(out) : NaN
         if (requestedHeight > 0) {
             out.height_ = Math.max(150, requestedHeight)
-        } else if (!out._heightExplicit_ || !out.height()) {
+        } else if (out._heightAuto_ || !out.height()) {
+            // Computed from the width, and again on every build. A height put there any other way (the setter, or an inset's
+            // config, which assigns height_ directly) is kept: _heightAuto_ is only set by this branch.
             // Get available height constrained to 99% of screen/container height
             const availableHeight = getAvailableHeight(out)
             const maxTotalHeight = 0.99 * availableHeight
@@ -650,6 +652,7 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             if (out.gridCartogram_ && mobile) defaultHeight = (out.width() - 12) * 0.92 + 40
             if (defaultHeight > maxMapHeight) defaultHeight = maxMapHeight
             out.height_ = defaultHeight
+            out._heightAuto_ = true
         }
 
         if (out.geo_.toUpperCase() == 'WORLD') {

@@ -57,9 +57,9 @@ export function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter)
     const symbolGroup = itemContainer
         .append('g')
         .style('fill', map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_)
-        .style('fill-opacity', map.psFillOpacity())
-        .style('stroke', out.sizeLegend.shapeStroke || map.psStroke())
-        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psStrokeWidth())
+        .style('fill-opacity', map.psSettings().fillOpacity)
+        .style('stroke', out.sizeLegend.shapeStroke || map.psSettings().stroke)
+        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psSettings().strokeWidth)
 
     const symbolPath = symbolGroup.append('path').attr('d', d)
 

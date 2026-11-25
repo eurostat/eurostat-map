@@ -25213,34 +25213,34 @@ const defineDeprecatedFunctions = (out) => {
     out.cntrgFillStyle = (v) => (console.warn('cntrgFillStyle() is now DEPRECATED, please use the .em-cntrg CSS class'),(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.em-cntrg','fill',v), out);
     out.nutsrgFillStyle = (v) => (console.warn('nutsrgFillStyle() is now DEPRECATED, please use the .em-nutsrg CSS class'),(0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.em-nutsrg','fill',v), out);
     out.nutsbnStroke = (v) => {
-        console.warn('nutsbnStroke() is now DEPRECATED, please use the .bn_0, .bn_1, .bn_2, .bn_3 CSS classes')
+        console.warn('nutsbnStroke() is now DEPRECATED, please use the .em-bn-0, .em-bn-1, .em-bn-2, .em-bn-3 CSS classes')
         if (v['0']) {
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.bn_0','stroke',v['0'])
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.em-bn-0','stroke',v['0'])
         }
         if (v['1']) {
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.bn_1','stroke',v['1'])
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.em-bn-1','stroke',v['1'])
         }
         if (v['2']) {
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.bn_2','stroke',v['2'])
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.em-bn-2','stroke',v['2'])
         }
         if (v['3']) {
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.bn_3','stroke',v['3'])
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.em-bn-3','stroke',v['3'])
         }
         return out
     };
     out.nutsbnStrokeWidth = (v) => {
-        console.warn('nutsbnStrokeWidth() is now DEPRECATED, please use the .bn_0, .bn_1, .bn_2, .bn_3 CSS classes')
+        console.warn('nutsbnStrokeWidth() is now DEPRECATED, please use the .em-bn-0, .em-bn-1, .em-bn-2, .em-bn-3 CSS classes')
         if (v['0']) {
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.bn_0','stroke-width',v['0'])
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.em-bn-0','stroke-width',v['0'])
         }
         if (v['1']) {
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.bn_1','stroke-width',v['1'])
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.em-bn-1','stroke-width',v['1'])
         }
         if (v['2']) {
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.bn_2','stroke-width',v['2'])
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.em-bn-2','stroke-width',v['2'])
         }
         if (v['3']) {
-            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.bn_3','stroke-width',v['3'])
+            (0,_utils_js__WEBPACK_IMPORTED_MODULE_0__.updateCSSRule)('.em-bn-3','stroke-width',v['3'])
         }
         return out
     };
@@ -31141,11 +31141,11 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         // a function is asked for the height at every build, e.g. to fill the window: height(() => innerHeight - 60)
         if (typeof v === 'function') {
             out._heightFn_ = v
-            out._heightExplicit_ = false
+            out._heightAuto_ = true
             return out
         }
         if (arguments.length) {
-            out._heightExplicit_ = true
+            out._heightAuto_ = false
             out._heightFn_ = undefined
         }
         return setHeight.apply(out, arguments)
@@ -31485,7 +31485,9 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         const requestedHeight = out._heightFn_ ? +out._heightFn_(out) : NaN
         if (requestedHeight > 0) {
             out.height_ = Math.max(150, requestedHeight)
-        } else if (!out._heightExplicit_ || !out.height()) {
+        } else if (out._heightAuto_ || !out.height()) {
+            // Computed from the width, and again on every build. A height put there any other way (the setter, or an inset's
+            // config, which assigns height_ directly) is kept: _heightAuto_ is only set by this branch.
             // Get available height constrained to 99% of screen/container height
             const availableHeight = getAvailableHeight(out)
             const maxTotalHeight = 0.99 * availableHeight
@@ -31501,6 +31503,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             if (out.gridCartogram_ && mobile) defaultHeight = (out.width() - 12) * 0.92 + 40
             if (defaultHeight > maxMapHeight) defaultHeight = maxMapHeight
             out.height_ = defaultHeight
+            out._heightAuto_ = true
         }
 
         if (out.geo_.toUpperCase() == 'WORLD') {
@@ -31933,7 +31936,6 @@ const appendMinimap = (map) => {
 }
 
 const onMiniUpdate = (map) => {
-    //console.log('Updating minimap...')
     applyMinimapRotation(map)
     applyMinimapScale(map)
     map._minimapGlobe.selectAll('path').attr('d', map._minimapPath)
@@ -34303,7 +34305,6 @@ function updateCSSRule(selector, property, value) {
             }
         } catch (e) {
             // Some stylesheets (e.g., cross-origin) may not be accessible
-            //console.log(`Could not access rules in stylesheet:`, e)
         }
     }
 
@@ -34972,7 +34973,11 @@ const getTextColorForBackground = function (backgroundColor) {
 }
 
 // get css selector for data-driven regions. Different maps have different selectors for their regions.
-const getRegionsSelector = (map) => {
+// patternFill() overlays are clones of region paths (same id, no bound datum, decoration only), so they never count as regions:
+// code that reads a region's datum would otherwise fail on them.
+const getRegionsSelector = (map) => selectorForRegions(map).replace(/\bpath\b/g, 'path:not(.pattern-fill-overlay)')
+
+const selectorForRegions = (map) => {
     if (map.Geometries.userGeometries) return '#em-user-regions path'
     if (map.gridCartogram_) return '#em-grid-container .em-grid-cell'
     if (map.geo_ === 'WORLD') return '#em-worldrg path'
@@ -35877,7 +35882,6 @@ const decorateBivariateChoroplethLayer = function (out, config) {
                     if (!sv) return
                     const v = sv.value
                     if ((v != 0 && !v) || v == ':') return 'nd'
-                    // if (rg.properties.id.length == 4) console.log(rg)
                     return +out.classifier1_(+v)
                 })
                 .attr('ecl2', function (rg) {
@@ -56776,9 +56780,9 @@ function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter) {
     const symbolGroup = itemContainer
         .append('g')
         .style('fill', map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_)
-        .style('fill-opacity', map.psFillOpacity())
-        .style('stroke', out.sizeLegend.shapeStroke || map.psStroke())
-        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psStrokeWidth())
+        .style('fill-opacity', map.psSettings().fillOpacity)
+        .style('stroke', out.sizeLegend.shapeStroke || map.psSettings().stroke)
+        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psSettings().strokeWidth)
 
     const symbolPath = symbolGroup.append('path').attr('d', d)
 
@@ -57348,9 +57352,9 @@ function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
         .append('g')
         .attr('class', 'em-size-legend-symbol')
         .style('fill', map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_)
-        .style('fill-opacity', map.psFillOpacity())
-        .style('stroke', out.sizeLegend.shapeStroke || map.psStroke())
-        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psStrokeWidth())
+        .style('fill-opacity', map.psSettings().fillOpacity)
+        .style('stroke', out.sizeLegend.shapeStroke || map.psSettings().stroke)
+        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psSettings().strokeWidth)
 
     // SVG content
     const svgGroup = symbolGroup.append('g').html(map.psCustomSVG_).attr('transform', `scale(${symbolSize})`)
@@ -57400,9 +57404,9 @@ function buildBarsItem(out, value, symbolSize, index, labelFormatter) {
     itemContainer
         .append('g')
         .style('fill', map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_)
-        .style('fill-opacity', map.psFillOpacity())
-        .style('stroke', out.sizeLegend.shapeStroke ? out.sizeLegend.shapeStroke : map.psStroke())
-        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psStrokeWidth())
+        .style('fill-opacity', map.psSettings().fillOpacity)
+        .style('stroke', out.sizeLegend.shapeStroke ? out.sizeLegend.shapeStroke : map.psSettings().stroke)
+        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psSettings().strokeWidth)
         .append('path')
         .attr('d', d)
         .attr('transform', `translate(${out.sizeLegend.shapeOffsets.x},${out.sizeLegend.shapeOffsets.y})`)

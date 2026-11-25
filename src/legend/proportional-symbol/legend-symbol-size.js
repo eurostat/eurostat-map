@@ -161,9 +161,9 @@ function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
         .append('g')
         .attr('class', 'em-size-legend-symbol')
         .style('fill', map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_)
-        .style('fill-opacity', map.psFillOpacity())
-        .style('stroke', out.sizeLegend.shapeStroke || map.psStroke())
-        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psStrokeWidth())
+        .style('fill-opacity', map.psSettings().fillOpacity)
+        .style('stroke', out.sizeLegend.shapeStroke || map.psSettings().stroke)
+        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psSettings().strokeWidth)
 
     // SVG content
     const svgGroup = symbolGroup.append('g').html(map.psCustomSVG_).attr('transform', `scale(${symbolSize})`)
@@ -213,9 +213,9 @@ function buildBarsItem(out, value, symbolSize, index, labelFormatter) {
     itemContainer
         .append('g')
         .style('fill', map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_)
-        .style('fill-opacity', map.psFillOpacity())
-        .style('stroke', out.sizeLegend.shapeStroke ? out.sizeLegend.shapeStroke : map.psStroke())
-        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psStrokeWidth())
+        .style('fill-opacity', map.psSettings().fillOpacity)
+        .style('stroke', out.sizeLegend.shapeStroke ? out.sizeLegend.shapeStroke : map.psSettings().stroke)
+        .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psSettings().strokeWidth)
         .append('path')
         .attr('d', d)
         .attr('transform', `translate(${out.sizeLegend.shapeOffsets.x},${out.sizeLegend.shapeOffsets.y})`)

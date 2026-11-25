@@ -26,6 +26,13 @@ export interface PatternFillConfig {
      */
     customPattern?: string
 
+    /**
+     * Fill drawn behind the pattern in the legend swatch. Set it to the fill of the patterned regions so the swatch
+     * matches the map. Only the legend uses it: on the map the pattern sits on each region's own fill.
+     * @default none ('#ddd' for a white pattern)
+     */
+    legendBackground?: string
+
     /** Label shown for this pattern in the legend. Patterns without a label are omitted from the legend. */
     legendLabel?: string
 
