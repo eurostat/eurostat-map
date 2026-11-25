@@ -16,7 +16,7 @@ export const legend = function (map, config) {
 
     out.flowWidthLegend = {
         title: null,
-        titlePadding: 20,
+        titlePadding: 8, // gap between the title and the labels
         values: null,
         marginTop: 15,
         labelFormatter: undefined, // function to format legend labels
@@ -43,6 +43,11 @@ export const legend = function (map, config) {
         marginTop: 50,
         items: [], // user-defined legend items for custom flow color function,
         ticks: false, // use labels as ticks
+        orientation: 'vertical', // 'vertical' | 'horizontal'
+        width: null, // width of the bar of a horizontal legend (default: the legend width)
+        thresholds: null, // labels at the boundaries between the classes (one fewer than the items): a threshold scale
+        minLabel: null, // label at the start of a horizontal bar (the lower bound)
+        maxLabel: null, // label at the end of a horizontal bar (the upper bound)
     }
 
     out.regionColorLegend = {

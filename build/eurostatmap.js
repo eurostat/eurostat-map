@@ -52287,7 +52287,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   drawFlowColorLegend: () => (/* binding */ drawFlowColorLegend)
 /* harmony export */ });
 /* harmony import */ var d3_color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-color */ "./node_modules/d3-color/src/color.js");
-/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../legend-swatch */ "./src/legend/legend-swatch.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../legend-swatch */ "./src/legend/legend-swatch.js");
+
 
 
 
@@ -52295,6 +52297,7 @@ __webpack_require__.r(__webpack_exports__);
 function drawFlowColorLegend(out, x, y) {
     // out.map is the top-level facade; flow-specific state lives on the actual layer (out.layer).
     const map = out.layer
+    const cfg = out.flowColorLegend
 
     // Create/clear container
     out._flowColorContainer?.remove()
@@ -52306,13 +52309,13 @@ function drawFlowColorLegend(out, x, y) {
         .attr('id', 'em-color-legend-title')
         .attr('y', 0)
         .attr('dy', '0.8em')
-        .text(out.flowColorLegend.title || 'Destination')
+        .text(cfg.title || 'Destination')
 
     let legendItems = []
     const customColors = typeof map.flowColor_ === 'function'
     if (customColors) {
-        if (out.flowColorLegend.items && out.flowColorLegend.items.length > 0) {
-            legendItems = out.flowColorLegend.items
+        if (cfg.items && cfg.items.length > 0) {
+            legendItems = cfg.items
         } else {
             legendItems = [{ label: 'please specify legend items ...', color: '#888', key: null }]
         }
@@ -52330,28 +52333,26 @@ function drawFlowColorLegend(out, x, y) {
 
     // Draw each legend row. Keep layout consistent with other swatch legends.
     const titleBoxHeight = title.node()?.getBBox()?.height || 0
-    const titlePadding = out.flowColorLegend.titlePadding ?? 10
+    const titlePadding = cfg.titlePadding ?? 10
     const shapeWidth = out.shapeWidth || 18
     const shapeHeight = out.shapeHeight || 18
     // Contiguous swatches by default, like the discrete choropleth legend (not the 5px categorical gap)
-    const rowGap = out.flowColorLegend.shapePadding ?? 0
+    const rowGap = cfg.shapePadding ?? 0
     const labelOffsetX = out.labelOffsets?.x ?? 5
-    const titleOffset = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_1__.swatchStackStart)({ titleHeight: titleBoxHeight, titlePadding })
+    const titleOffset = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.swatchStackStart)({ titleHeight: titleBoxHeight, titlePadding })
+
+    // labels at the boundaries between the classes (a threshold scale), instead of one label per swatch
+    const thresholds = Array.isArray(cfg.thresholds) && cfg.thresholds.length ? cfg.thresholds : null
+
+    const swatches =
+        cfg.orientation === 'horizontal'
+            ? drawHorizontalColorBar(out, legendItems, { thresholds, shapeHeight, top: titleOffset })
+            : drawVerticalColorStack(out, legendItems, { thresholds, shapeWidth, shapeHeight, rowGap, labelOffsetX, top: titleOffset })
 
     const scopedLinks = () => out.map.svg().selectAll('.em-flow-container .em-flow-link, .em-flow-container .em-flow-link-bundled')
 
-    const rows = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_1__.appendLegendSwatchRows)(out._flowColorContainer, legendItems, {
-        shapeWidth,
-        shapeHeight,
-        startY: titleOffset,
-        gap: rowGap,
-        labelX: shapeWidth + labelOffsetX,
-        rowClass: 'em-color-legend-item em-legend-item',
-        labelDy: '0.35em',
-    })
-
     legendItems.forEach((item, i) => {
-        const { row, swatch, label } = rows[i]
+        const { row, swatch, label } = swatches[i]
         const colorKey = normalizeColor(item.color)
         const matches = (link) => {
             if (!customColors) return link.getAttribute('data-color-key') === String(item.key)
@@ -52369,15 +52370,116 @@ function drawFlowColorLegend(out, x, y) {
 
                 links.classed('highlighted', false).classed('dimmed', true)
                 matchingLinks.classed('highlighted', true).classed('dimmed', false)
-                label.style('font-weight', 'bold')
+                label?.style('font-weight', 'bold')
                 swatch.attr('stroke', 'black').attr('stroke-width', 2)
             })
             .on('mouseleave', () => {
                 scopedLinks().classed('highlighted', false).classed('dimmed', false)
-                label.style('font-weight', null)
+                label?.style('font-weight', null)
                 swatch.attr('stroke', null).attr('stroke-width', null)
             })
     })
+}
+
+/** The default layout: a column of swatches, each with its label (or with threshold labels at the seams). */
+function drawVerticalColorStack(out, items, { thresholds, shapeWidth, shapeHeight, rowGap, labelOffsetX, top }) {
+    const cfg = out.flowColorLegend
+    const tickLength = 4
+    const rows = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchRows)(out._flowColorContainer, thresholds ? items.map((item) => ({ ...item, label: null })) : items, {
+        shapeWidth,
+        shapeHeight,
+        startY: top,
+        gap: rowGap,
+        labelX: shapeWidth + labelOffsetX,
+        rowClass: 'em-color-legend-item em-legend-item',
+        labelDy: '0.35em',
+        decorate: thresholds
+            ? (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.thresholdsDecorator)({
+                  count: items.length,
+                  sepLength: shapeWidth,
+                  tickLength,
+                  labelX: shapeWidth + tickLength + labelOffsetX,
+                  shapeHeight,
+                  labelText: (i) => thresholds[i] ?? '',
+              })
+            : undefined,
+    })
+    return rows
+}
+
+/**
+ * A horizontal bar of contiguous swatches running low to high. Threshold labels sit under the seams between the
+ * swatches, `minLabel` / `maxLabel` under the two ends of the bar (or each swatch's own label, centred under it, when
+ * there are no thresholds). Labels that would touch are moved onto a second row, so they can never overlap.
+ */
+function drawHorizontalColorBar(out, items, { thresholds, shapeHeight, top }) {
+    const cfg = out.flowColorLegend
+    const container = out._flowColorContainer
+    const count = items.length
+    const barWidth = cfg.width ?? out.width ?? 200
+    const tickLength = 4
+    const barBottom = top + shapeHeight
+    const bar = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.swatchBarLayout)({ count, width: barWidth })
+    const labelFontSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-legend-label') || 12
+
+    const rows = items.map((item, j) => {
+        const row = container.append('g').attr('class', 'em-color-legend-item em-legend-item')
+        const swatch = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatch)(row, { x: bar.itemX(j), y: top, width: bar.itemWidth, height: shapeHeight, color: item.color })
+        if (j > 0)
+            row.append('line')
+                .attr('class', 'em-legend-separator')
+                .attr('x1', bar.itemX(j))
+                .attr('y1', top)
+                .attr('x2', bar.itemX(j))
+                .attr('y2', barBottom)
+        return { row, swatch, label: null }
+    })
+
+    // labels, left to right: min bound, thresholds (or swatch labels), max bound
+    const labelled = []
+    const add = (x, anchor, text) => {
+        if (text == null || text === '') return
+        const tick = container
+            .append('line')
+            .attr('class', 'em-legend-tick')
+            .attr('x1', x)
+            .attr('y1', barBottom)
+            .attr('x2', x)
+            .attr('y2', barBottom + tickLength)
+        const label = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchLabel)(container, { x, y: barBottom + tickLength + 2, dy: '0.9em', anchor, text })
+        labelled.push({ label, tick })
+    }
+    add(0, 'start', cfg.minLabel)
+    if (thresholds) thresholds.forEach((text, j) => j < count - 1 && add(bar.seamX(j), 'middle', text))
+    else {
+        items.forEach((item, j) => {
+            const label = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchLabel)(rows[j].row, {
+                x: bar.itemX(j) + bar.itemWidth / 2,
+                y: barBottom + 4,
+                dy: '0.9em',
+                anchor: 'middle',
+                text: item.label,
+            })
+            rows[j].label = label
+            labelled.push({ label })
+        })
+    }
+    add(barWidth, 'end', cfg.maxLabel)
+
+    // never let two labels touch: those that would, go on a second row. Their tick is lengthened to reach them,
+    // unless it would run through a label on a row above.
+    const { rows: labelRow } = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.assignLabelRows)(labelled.map(({ label }) => label.node()))
+    const boxes = labelled.map(({ label }) => label.node().getBBox())
+    labelled.forEach(({ label, tick }, k) => {
+        if (!labelRow[k]) return
+        const shift = labelRow[k] * (labelFontSize + 2)
+        label.attr('y', parseFloat(label.attr('y')) + shift)
+        if (!tick) return
+        const tickX = parseFloat(tick.attr('x1'))
+        const blocked = boxes.some((box, m) => labelRow[m] < labelRow[k] && tickX >= box.x - 1 && tickX <= box.x + box.width + 1)
+        if (!blocked) tick.attr('y2', barBottom + tickLength + shift)
+    })
+    return rows
 }
 
 function normalizeColor(value) {
@@ -52401,6 +52503,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var d3_format__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-format */ "./node_modules/d3-format/src/defaultLocale.js");
 /* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../legend-swatch */ "./src/legend/legend-swatch.js");
+
 
 
 
@@ -52422,17 +52526,22 @@ function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
     const cfg = out.flowWidthLegend
     out._flowWidthContainer = out.lgg.append('g').attr('class', 'em-flow-width-legend-horizontal').attr('transform', `translate(${baseX}, ${baseY})`)
 
+    // The layout is stacked from the top, measured as it goes: title, label rows, then the line. Nothing is placed
+    // from a fixed offset, so the pieces cannot overlap whatever the title, the font or the line widths are.
+    let top = 0
     if (cfg.title) {
-        out._flowWidthContainer
+        const title = out._flowWidthContainer
             .append('text')
             .attr('class', 'em-width-legend-title')
             .text(cfg.title || 'Flow width')
+        const box = title.node().getBBox()
+        top = box.y + box.height + (cfg.titlePadding ?? 8)
     }
 
     const x = cfg.x ?? 0
     const totalWidth = cfg.width || out.width
     const segments = cfg.segments ?? 5
-    const labelOffset = cfg.labelOffset ?? 12
+    const gap = cfg.labelOffset ?? 4 // between the labels and the thickest line
     const pad = cfg.pad ?? 0
 
     const innerStart = x + pad
@@ -52455,10 +52564,26 @@ function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
     const strokeWidths = values.map((v) => Math.max(0.5, map.strokeWidthScale(v)))
     const maxStroke = Math.max(...strokeWidths)
 
-    const lineY = map.strokeWidthScale(max) + cfg.titlePadding
-
     const texts = out._flowWidthContainer.append('g').attr('class', 'em-flow-legend-texts')
     const lines = out._flowWidthContainer.append('g').attr('class', 'em-flow-legend-lines')
+
+    // labels first, to know how much room they need: labels that would touch go on a second row
+    const labels = values.map((val, i) => {
+        const text = cfg.labels?.[i] ?? (cfg.labelFormatter ? cfg.labelFormatter(val) : fmt(val))
+        return texts
+            .append('text')
+            .attr('x', innerStart + (i + 0.5) * slabWidth)
+            .attr('y', 0)
+            .attr('class', 'em-legend-label em-flow-legend-label em-flow-width-horizontal-label')
+            .text(text)
+    })
+    const { rows: labelRow, count: labelRows } = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.assignLabelRows)(labels.map((l) => l.node()))
+    const box = labels[0]?.node().getBBox() || { y: 0, height: 0 }
+    const rowHeight = box.height + 2
+    const labelsBottom = top + labelRows * rowHeight - 2
+    labels.forEach((label, i) => label.attr('y', labelsBottom - labelRow[i] * rowHeight - (box.y + box.height))) // row 0 is nearest the line
+
+    const lineY = labelsBottom + gap + maxStroke / 2
 
     // baseline (visual guide)
     lines
@@ -52472,48 +52597,34 @@ function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
         .attr('stroke-width', 1)
 
     for (let i = 0; i < values.length; i++) {
-        const s = innerStart + i * slabWidth
-        const e = innerStart + (i + 1) * slabWidth
-        const sw = strokeWidths[i]
-        const val = values[i]
-
         lines
             .append('line')
-            .style('stroke-width', sw)
-            .attr('x1', s)
-            .attr('x2', e)
+            .style('stroke-width', strokeWidths[i])
+            .attr('x1', innerStart + i * slabWidth)
+            .attr('x2', innerStart + (i + 1) * slabWidth)
             .attr('y1', lineY)
             .attr('y2', lineY)
             .style('stroke', cfg.color ?? '#000')
             .style('stroke-opacity', cfg.strokeOpacity ?? 1)
-
-        const cx = (s + e) / 2
-        const label = cfg.labels?.[i] ?? fmt(val)
-        texts
-            .append('text')
-            .attr('x', cx)
-            .attr('y', lineY - sw / 2 - labelOffset) // ← offset from top edge of bar
-            .attr('dy', '-0.35em')
-            .attr('class', 'em-legend-label em-flow-legend-label em-flow-width-horizontal-label')
-            .text(label)
     }
 
     // captions for min/max aligned with baseline ends
     if (!cfg.maxMin) return
+    const captionY = lineY + maxStroke / 2 + 4
     texts
         .append('text')
         .attr('x', innerStart)
-        .attr('y', lineY + maxStroke + 6)
+        .attr('y', captionY)
         .attr('class', 'em-legend-label em-flow-legend-min-label')
-        .attr('dy', '0.5em')
+        .attr('dy', '0.9em')
         .text(comma(Math.round(min)))
 
     texts
         .append('text')
         .attr('x', innerEnd)
-        .attr('y', lineY + maxStroke + 6)
+        .attr('y', captionY)
         .attr('class', 'em-legend-label em-flow-legend-max-label')
-        .attr('dy', '0.5em')
+        .attr('dy', '0.9em')
         .text(comma(Math.round(max)))
 }
 
@@ -52528,11 +52639,15 @@ function drawVerticalFlowWidthLegend(out, baseX, baseY) {
     const cfg = out.flowWidthLegend
     const segments = cfg.segments ?? 5
 
+    // stacked from the top, measured as it goes (see the horizontal legend): the title, then the lines
+    let top = 0
     if (cfg.title) {
-        out._flowWidthContainer
+        const title = out._flowWidthContainer
             .append('text')
             .attr('class', 'em-width-legend-title')
             .text(cfg.title || 'Flow width')
+        const box = title.node().getBBox()
+        top = box.y + box.height + (cfg.titlePadding ?? 8)
     }
 
     // Representative values (min, mid, max or user-defined)
@@ -52545,19 +52660,20 @@ function drawVerticalFlowWidthLegend(out, baseX, baseY) {
     }
     const values = cfg.values || sampleVals
 
-    let currentY = cfg.titlePadding || 10
-    const padding = 7 // extra spacing between items
-    let x = 0
+    const labelHeight = (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-legend-label') || 12
+    const padding = 7 // spacing between the lines
+    const x = 0
 
     const scale = map.strokeWidthScale
+    let currentY = top
     values.forEach((val, i) => {
         const strokeWidth = scale(val)
 
-        // Space relative to previous line (half previous + half current + padding)
-        if (i > 0) {
-            const prevStrokeWidth = scale(values[i - 1])
-            currentY += prevStrokeWidth / 2 + strokeWidth / i + padding
-        }
+        // the centre of this line: clear of the previous line and of its label, which is as tall as the font
+        const half = strokeWidth / 2
+        if (i === 0)
+            currentY = top + Math.max(half, labelHeight / 2) // the first label must clear the title too
+        else currentY += Math.max(scale(values[i - 1]) / 2 + half + padding, labelHeight + 2)
 
         let label = cfg.labelFormatter ? cfg.labelFormatter(val) : (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.spaceAsThousandSeparator)(val)
         if (cfg.labels && cfg.labels[i]) label = cfg.labels[i] //manual override
@@ -52616,7 +52732,7 @@ const legend = function (map, config) {
 
     out.flowWidthLegend = {
         title: null,
-        titlePadding: 20,
+        titlePadding: 8, // gap between the title and the labels
         values: null,
         marginTop: 15,
         labelFormatter: undefined, // function to format legend labels
@@ -52643,6 +52759,11 @@ const legend = function (map, config) {
         marginTop: 50,
         items: [], // user-defined legend items for custom flow color function,
         ticks: false, // use labels as ticks
+        orientation: 'vertical', // 'vertical' | 'horizontal'
+        width: null, // width of the bar of a horizontal legend (default: the legend width)
+        thresholds: null, // labels at the boundaries between the classes (one fewer than the items): a threshold scale
+        minLabel: null, // label at the start of a horizontal bar (the lower bound)
+        maxLabel: null, // label at the end of a horizontal bar (the upper bound)
     }
 
     out.regionColorLegend = {
@@ -55662,6 +55783,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   appendLegendSwatch: () => (/* binding */ appendLegendSwatch),
 /* harmony export */   appendLegendSwatchLabel: () => (/* binding */ appendLegendSwatchLabel),
 /* harmony export */   appendLegendSwatchRows: () => (/* binding */ appendLegendSwatchRows),
+/* harmony export */   assignLabelRows: () => (/* binding */ assignLabelRows),
 /* harmony export */   rangesDecorator: () => (/* binding */ rangesDecorator),
 /* harmony export */   swatchBarLayout: () => (/* binding */ swatchBarLayout),
 /* harmony export */   swatchStackLayout: () => (/* binding */ swatchStackLayout),
@@ -55779,7 +55901,12 @@ function thresholdsDecorator({ count, sepLength, tickLength, labelX, shapeHeight
     return (row, { i, y, item }) => {
         if (i > 0) {
             appendLegendSeparator(row, y, sepLength)
-            row.append('line').attr('class', 'em-legend-tick').attr('x1', sepLength).attr('y1', y).attr('x2', sepLength + tickLength).attr('y2', y)
+            row.append('line')
+                .attr('class', 'em-legend-tick')
+                .attr('x1', sepLength)
+                .attr('y1', y)
+                .attr('x2', sepLength + tickLength)
+                .attr('y2', y)
         }
         if (i < count - 1) {
             const label = appendLegendSwatchLabel(row, { x: labelX, y: y + shapeHeight, dy: '0.3em', text: () => labelText(i, item) })
@@ -55826,6 +55953,29 @@ function swatchBarLayout({ count, width, breakAt = null, breakSize = 0 }) {
         // middle of the break
         breakX: breakAt === null ? null : breakAt * itemWidth + size / 2,
     }
+}
+
+/**
+ * Spread text labels over rows so that none of them touches another. The labels have to be in the document (their
+ * bounding boxes are measured) and are taken left to right. A label goes on the first row where it clears the
+ * previous label of that row by `gap` pixels, and a new row is opened when there is none, so labels never touch
+ * (unless `maxRows` is reached, when the row whose last label ends first is reused).
+ *
+ * @param {SVGTextElement[]} nodes the labels, sorted by x
+ * @param {number} [gap=3] minimum space between two labels on the same row
+ * @param {number} [maxRows=Infinity] most rows to use
+ * @returns {{rows:number[], count:number}} the row of each label (0 = the first row) and the number of rows used
+ */
+function assignLabelRows(nodes, gap = 3, maxRows = Infinity) {
+    const ends = []
+    const rows = nodes.map((node) => {
+        const box = node.getBBox()
+        let row = ends.findIndex((end) => end + gap <= box.x)
+        if (row === -1) row = ends.length < maxRows ? ends.length : ends.indexOf(Math.min(...ends))
+        ends[row] = box.x + box.width
+        return row
+    })
+    return { rows, count: Math.max(1, ends.length) }
 }
 
 
@@ -79229,7 +79379,7 @@ function applyProjectionDefaults(wkt) {
   \**********************/
 (module) {
 
-module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node --test test/e2e/flow-color-legend.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/legend-layout.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0","typedoc":{"minimatch":"6.2.3"}},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node --test test/e2e/flow-color-legend.test.mjs test/e2e/flow-legend-overlap.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/legend-layout.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0","typedoc":{"minimatch":"6.2.3"}},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
 
 /***/ }
 

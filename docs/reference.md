@@ -2048,7 +2048,7 @@ In addition to [the default legend parameters](#map-legend), flow maps can show 
 | Parameter          | Type                       | Default value  | Description                                                |
 | ------------------ | -------------------------- | -------------- | ---------------------------------------------------------- |
 | **title**          | String                     | _null_         | Title of the flow width legend.                            |
-| **titlePadding**   | Number                     | _20_           | Padding between the title and legend body.                 |
+| **titlePadding**   | Number                     | _8_            | Gap between the title and the labels below it.            |
 | **marginTop**      | Number                     | _15_           | Margin top in pixels.                                      |
 | **values**         | Number[]                   | _null_         | Values to show. If null, they are generated automatically. |
 | **labels**         | String[]                   | _null_         | Manually override the labels.                              |
@@ -2080,6 +2080,12 @@ In addition to [the default legend parameters](#map-legend), flow maps can show 
 | **shapePadding** | Number  | _0_           | Vertical gap between swatches (0 = contiguous, like the choropleth legend). |
 | **items**        | Array   | _undefined_   | Entries `[{ label, color, key? }]` for a custom colour function. Hover highlights routes on this map by destination ID when a key is supplied, or by route colour otherwise. |
 | **ticks**        | Boolean | _false_       | Use the labels as ticks.                                               |
+| **orientation**  | 'vertical' or 'horizontal' | _'vertical'_ | `'horizontal'` draws one bar of contiguous swatches, low to high, like the horizontal choropleth legend. |
+| **width**        | Number  | _the legend width_ | Width of the bar of a horizontal legend, in pixels.                |
+| **thresholds**   | Array   | _null_        | A threshold scale: labels at the boundaries between the classes, one fewer than the `items` (the item labels are then not shown). |
+| **minLabel**, **maxLabel** | String | _null_ | Labels of the lower and upper bound, under the two ends of a horizontal bar. |
+
+The legend parts never overlap: the title, the labels and the lines are stacked from measured sizes, and labels that would touch move onto a second row.
 
 **regionColorLegend**
 

@@ -162,6 +162,9 @@ invisible on proportional-symbol maps because the map type's CSS overrode their 
   route NaN); a negative `chargeStrength` un-bundles.
 - Small multiples of flow maps need `flowSettings({ widthDomain })` (one shared width scale) and one legend: the first map draws it
   with `legend({ svgId })`, the others `legend(false)`. A flow legend part is left out with `false` (`nodeSizeLegend: false`).
+- Flow legends are stacked from measured sizes (title, then label rows, then the lines), never from fixed offsets, and labels that would touch
+  are moved onto another row (`assignLabelRows` in `legend/legend-swatch.js`). Keep it that way for any new legend: a fixed offset is how
+  the width legend's title once ended up over its labels. `test/e2e/flow-legend-overlap.test.mjs` checks that no two pieces overlap.
 - A custom flow `nodeSizeScale` used with a size legend needs a `domain()` method, including when
   the example supplies explicit legend values.
 - Edge bundling must choose its charge distance independently of the node size scale.

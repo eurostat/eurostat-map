@@ -7,7 +7,7 @@ export interface FlowWidthLegendConfig {
     /** Title for the flow width legend. */
     title?: string | null
 
-    /** Padding between title and legend content in pixels. @default 20 */
+    /** Gap between the title and the labels below it in pixels. @default 8 */
     titlePadding?: number
 
     /** Custom values to display in the flow width legend. If null, values are auto-generated. */
@@ -82,6 +82,21 @@ export interface FlowColorLegendConfig {
 
     /** Whether to use labels as ticks. @default false */
     ticks?: boolean
+
+    /** `'horizontal'` draws one bar of contiguous swatches, low to high (like the horizontal choropleth legend). @default 'vertical' */
+    orientation?: 'vertical' | 'horizontal'
+
+    /** Width of the bar of a horizontal legend in pixels. @default the legend width */
+    width?: number | null
+
+    /** A threshold scale: labels at the boundaries between the classes (one fewer than `items`). The item labels are then not shown. */
+    thresholds?: Array<string | number> | null
+
+    /** Label of the lower bound, under the start of a horizontal bar. */
+    minLabel?: string | null
+
+    /** Label of the upper bound, under the end of a horizontal bar. */
+    maxLabel?: string | null
 }
 
 /**

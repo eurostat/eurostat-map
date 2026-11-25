@@ -160,7 +160,8 @@
             const COLOURS = ['#c3c9d2', '#ead5cc', '#f6aa8f', '#ec6b4e', '#c92f22', '#86100f']
             const classOf = (pct) => d3.bisect(THRESHOLDS, pct)
             const colourOf = (pct) => COLOURS[classOf(pct)]
-            const classLabels = ['< 10%', '10 – 15%', '15 – 20%', '20 – 25%', '25 – 30%', '30% or more']
+            const allShares = hubs.flatMap((h) => h.routes.map((r) => r.emptyPct))
+            const bounds = [Math.floor(d3.min(allShares)) + '%', Math.ceil(d3.max(allShares)) + '%'] // the lowest and highest share of any route
             const widthDomain = [0, d3.max(hubs, (h) => d3.max(h.routes, (r) => r.passengers))]
 
             // ---- the page ----
@@ -248,8 +249,12 @@
                         nodeSizeLegend: false,
                         flowColorLegend: {
                             title: 'Share of seats that are empty',
-                            marginTop: 45,
-                            items: COLOURS.map((color, i) => ({ label: classLabels[i], color })),
+                            orientation: 'horizontal',
+                            width: 200,
+                            items: COLOURS.map((color) => ({ color })),
+                            thresholds: THRESHOLDS.map((t) => t + '%'), // a threshold scale: the class limits
+                            minLabel: bounds[0],
+                            maxLabel: bounds[1],
                         },
                         regionColorLegend: false,
                     })
@@ -309,7 +314,7 @@
             const legendSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
             legendSvg.id = 'legend'
             legendSvg.setAttribute('width', 230)
-            legendSvg.setAttribute('height', 250)
+            legendSvg.setAttribute('height', 200)
             panel.add(legendSvg)
             // ---- download: all the maps, a title and the legend in one picture, sized for social media ----
             const SVG_NS = 'http://www.w3.org/2000/svg'

@@ -109,7 +109,12 @@ export function thresholdsDecorator({ count, sepLength, tickLength, labelX, shap
     return (row, { i, y, item }) => {
         if (i > 0) {
             appendLegendSeparator(row, y, sepLength)
-            row.append('line').attr('class', 'em-legend-tick').attr('x1', sepLength).attr('y1', y).attr('x2', sepLength + tickLength).attr('y2', y)
+            row.append('line')
+                .attr('class', 'em-legend-tick')
+                .attr('x1', sepLength)
+                .attr('y1', y)
+                .attr('x2', sepLength + tickLength)
+                .attr('y2', y)
         }
         if (i < count - 1) {
             const label = appendLegendSwatchLabel(row, { x: labelX, y: y + shapeHeight, dy: '0.3em', text: () => labelText(i, item) })
@@ -156,4 +161,27 @@ export function swatchBarLayout({ count, width, breakAt = null, breakSize = 0 })
         // middle of the break
         breakX: breakAt === null ? null : breakAt * itemWidth + size / 2,
     }
+}
+
+/**
+ * Spread text labels over rows so that none of them touches another. The labels have to be in the document (their
+ * bounding boxes are measured) and are taken left to right. A label goes on the first row where it clears the
+ * previous label of that row by `gap` pixels, and a new row is opened when there is none, so labels never touch
+ * (unless `maxRows` is reached, when the row whose last label ends first is reused).
+ *
+ * @param {SVGTextElement[]} nodes the labels, sorted by x
+ * @param {number} [gap=3] minimum space between two labels on the same row
+ * @param {number} [maxRows=Infinity] most rows to use
+ * @returns {{rows:number[], count:number}} the row of each label (0 = the first row) and the number of rows used
+ */
+export function assignLabelRows(nodes, gap = 3, maxRows = Infinity) {
+    const ends = []
+    const rows = nodes.map((node) => {
+        const box = node.getBBox()
+        let row = ends.findIndex((end) => end + gap <= box.x)
+        if (row === -1) row = ends.length < maxRows ? ends.length : ends.indexOf(Math.min(...ends))
+        ends[row] = box.x + box.width
+        return row
+    })
+    return { rows, count: Math.max(1, ends.length) }
 }
