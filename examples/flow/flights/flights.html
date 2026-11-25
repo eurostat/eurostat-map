@@ -567,7 +567,7 @@
 
                 // line colour: black, the share of empty seats, or domestic vs international
                 const flightOf = (d) => flightsByKey.get((d.originId ?? d.source.id) + '|' + (d.destId ?? d.target.id))
-                const scopeColours = { international: '#2b2d42', domestic: '#c8a97e' }
+                const scopeColours = { international: '#2b2d42', domestic: '#d98324' }
                 const lineColour =
                     s.colourBy === 'empty'
                         ? (d) => {
