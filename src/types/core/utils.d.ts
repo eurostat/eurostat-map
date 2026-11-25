@@ -22,12 +22,6 @@ export function getFontSizeFromClass(className: string): number
 export function getCSSPropertyFromClass(className: string, propertyName: string): string
 
 /**
- * Applies inline styles from computed CSS to an SVG element and its descendants.
- * Useful for exporting SVGs with CSS styles.
- */
-export function applyInlineStylesFromCSS(svgElement: SVGElement): void
-
-/**
  * Applies computed styles to an SVG element for export.
  */
 export function applyComputedStylesToSVG(svg: SVGElement): void
@@ -191,11 +185,6 @@ export function getRegionById(map: MapInstance, id: string): any
  * Compact number formatter (e.g., 1000 → "1K").
  */
 export const compactFormatter: Intl.NumberFormat
-
-/**
- * Long number formatter.
- */
-export const longFormatter: Intl.NumberFormat
 
 /**
  * Formats a raw numeric value as a space-thousands-separated string (e.g. 1234567 -> "1 234 567").

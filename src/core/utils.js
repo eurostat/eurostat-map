@@ -123,67 +123,6 @@ export const getCSSPropertyFromClass = function (className, propertyName) {
     return propertyValue || null
 }
 
-// Helper function to get all CSS rules defined in the document
-function getAllCSSRules() {
-    let cssRules = []
-    for (let sheet of document.styleSheets) {
-        try {
-            // Some stylesheets may not be accessible due to CORS, so we catch any errors
-            for (let rule of sheet.cssRules) {
-                cssRules.push(rule)
-            }
-        } catch (e) {
-            console.warn('Unable to access stylesheet:', sheet.href, e)
-        }
-    }
-    return cssRules
-}
-
-// Helper function to get explicitly defined styles from CSS for an element
-function getStylesFromCSS(element) {
-    let matchedRules = []
-    const cssRules = getAllCSSRules()
-
-    cssRules.forEach((rule) => {
-        if (element.matches(rule.selectorText)) {
-            matchedRules.push(rule.style)
-        }
-    })
-
-    // Create an object of the explicitly set styles
-    let explicitStyles = {}
-    matchedRules.forEach((style) => {
-        for (let i = 0; i < style.length; i++) {
-            const property = style[i]
-            explicitStyles[property] = style.getPropertyValue(property)
-        }
-    })
-
-    return explicitStyles
-}
-
-// Helper function to apply inline styles explicitly set in CSS. Useful for exporting SVGs with CSS styles.
-export const applyInlineStylesFromCSS = (svgElement) => {
-    const allElements = svgElement.querySelectorAll('*')
-
-    allElements.forEach((element) => {
-        const cssStyles = getStylesFromCSS(element)
-
-        // Apply each explicitly defined CSS style as an inline style
-        Object.keys(cssStyles).forEach((property) => {
-            const value = cssStyles[property]
-
-            // Check if the property already has an inline style
-            const existingInlineStyle = element.style.getPropertyValue(property)
-
-            if (!existingInlineStyle && value) {
-                // If no existing inline style, set the new style
-                element.style.setProperty(property, value)
-            }
-        })
-    })
-}
-
 /**
  * Copy computed styles (a curated property list) into inline styles for all elements
  * so the serialized SVG renders the same as in-browser.
@@ -791,11 +730,6 @@ export function getRegionById(map, id) {
 export const compactFormatter = new Intl.NumberFormat('en', {
     notation: 'compact',
     compactDisplay: 'short',
-    maximumFractionDigits: 1,
-})
-export const longFormatter = new Intl.NumberFormat('en', {
-    notation: 'compact',
-    compactDisplay: 'long',
     maximumFractionDigits: 1,
 })
 

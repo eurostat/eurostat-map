@@ -577,16 +577,3 @@ export function unhighlightRegions(map, eclOrValue) {
             if (original) sel.style('fill', original)
         })
 }
-
-export function clearLegendHighlight(map) {
-    currentHighlight = null
-    const selector = getLegendRegionsSelector(map)
-    map.svg_
-        .selectAll(selector)
-        .selectAll('[ecl]')
-        .each(function () {
-            const sel = select(this)
-            const original = sel.attr('data-fill') || this.getAttribute('fill___')
-            if (original) sel.style('fill', original)
-        })
-}

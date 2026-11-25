@@ -1471,31 +1471,6 @@ map.psSettings({
 
 - **Level switch blank map** — switching NUTS levels (e.g. level 1 → level 2) no longer produces a blank symbol layer. `updateSymbolsDrawOrder` now reads from the authoritative `target.centroidsFeatures_` (level-filtered) instead of the stale `map.Geometries.centroidsFeatures`.
 
-## Unreleased
-
-### New
-
-- Expanded encoding-first API support across map types:
-    - `stat(name, config)` defines named datasets.
-    - `encoding(channel, config)` maps those datasets to visual channels.
-    - Added/standardized helpers such as `getEncodingStat*` for channel-aware data lookup.
-
-### Compatibility
-
-- Preserved legacy API paths:
-    - Channel-named stats (`stat('size', ...)`, `stat('color', ...)`, etc.).
-    - Composition helpers (`statPie`, `statWaffle`, `statBar`, `statStripe`).
-    - Legacy positional composition signatures (including `stat('composition', config, categoryParameter, ...)`).
-
-### Documentation and Typings
-
-- Updated `docs/reference.md` to document the preferred stat/encoding model and migration guidance.
-- Updated TypeScript definitions for:
-    - encoding helpers on map instances,
-    - `MapConfig.encoding`,
-    - broader `MapConfig.stat` composition support,
-    - composition helper overload parity.
-
 ## 4.5.0
 
 ### New
@@ -1760,6 +1735,31 @@ overlayLayer.updateStyle()
 ### Notes
 
 - Release tag format used: `4.5.0` (no `v` prefix)
+
+### Encoding API summary
+
+#### New
+
+- Expanded encoding-first API support across map types:
+    - `stat(name, config)` defines named datasets.
+    - `encoding(channel, config)` maps those datasets to visual channels.
+    - Added/standardized helpers such as `getEncodingStat*` for channel-aware data lookup.
+
+#### Compatibility
+
+- Preserved legacy API paths:
+    - Channel-named stats (`stat('size', ...)`, `stat('color', ...)`, etc.).
+    - Composition helpers (`statPie`, `statWaffle`, `statBar`, `statStripe`).
+    - Legacy positional composition signatures (including `stat('composition', config, categoryParameter, ...)`).
+
+#### Documentation and Typings
+
+- Updated `docs/reference.md` to document the preferred stat/encoding model and migration guidance.
+- Updated TypeScript definitions for:
+    - encoding helpers on map instances,
+    - `MapConfig.encoding`,
+    - broader `MapConfig.stat` composition support,
+    - composition helper overload parity.
 
 ## 4.4.5
 
