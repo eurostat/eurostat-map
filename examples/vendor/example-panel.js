@@ -52,15 +52,16 @@ let uid = 0
  * @param {string|Element} [config.map='#map'] the map's <svg> (or its container)
  * @param {string} [config.title='Settings'] heading of the panel
  * @param {number} [config.width=280] panel width in pixels
+ * @param {boolean} [config.fluid=false] let the map column fill the page (for a map that is a responsive grid of several maps)
  */
-export function createPanel({ map = '#map', title = 'Settings', width = 280 } = {}) {
+export function createPanel({ map = '#map', title = 'Settings', width = 280, fluid = false } = {}) {
     addStylesheet(ECL_CSS)
     addStylesheet(new URL('./example-panel.css', import.meta.url).href)
 
     const mapEl = typeof map === 'string' ? document.querySelector(map) : map
     if (!mapEl) throw new Error('example-panel: map element not found: ' + map)
 
-    const layout = el('div', 'ex-layout')
+    const layout = el('div', fluid ? 'ex-layout ex-fluid' : 'ex-layout')
     const mapBox = el('div', 'ex-map')
     const aside = el('aside', 'ex-panel')
     layout.style.setProperty('--ex-panel-width', width + 'px')

@@ -42,6 +42,7 @@
         'dot-density/population-dot-density.html',
         'flow/commuting-corridors-insee.html',
         'flow/commuting-corridors.html',
+        'flow/flights/capital-airports.html',
         'flow/flights/flights.html',
         'flow/flowmap.html',
         'flow/great-circles.html',

@@ -62,6 +62,10 @@ export const legend = function (map, config) {
                 key == 'flowColorLegend' ||
                 key == 'regionColorLegend'
             ) {
+                if (config[key] === false) {
+                    out[key] = false // e.g. nodeSizeLegend: false leaves that legend out
+                    continue
+                }
                 for (let p in out[key]) {
                     //override each property in size and color legend configs
                     if (config[key][p] !== undefined) {
@@ -92,6 +96,10 @@ export const legend = function (map, config) {
                     key == 'flowColorLegend' ||
                     key == 'regionColorLegend'
                 ) {
+                    if (m.legend_[key] === false) {
+                        out[key] = false
+                        continue
+                    }
                     for (let p in out[key]) {
                         //override each property in size and color legend m.legend_
                         if (m.legend_[key][p] !== undefined) {
@@ -139,11 +147,10 @@ export const legend = function (map, config) {
                 : drawHorizontalFlowWidthLegend(out, baseX, baseY + out.flowWidthLegend.marginTop)
         }
 
-        const flowWidthNode = out._flowWidthContainer.node()
-        const flowWidthLegendHeight = flowWidthNode.getBBox().height
+        const flowWidthLegendHeight = out.flowWidthLegend ? out._flowWidthContainer.node().getBBox().height : 0
 
         // node size legend
-        if (map.flowNodes_ && map._nodeSizeScale) {
+        if (out.nodeSizeLegend && map.flowNodes_ && map._nodeSizeScale) {
             // node legend container
             out._nodeLegendContainer = out.lgg
                 .append('g')

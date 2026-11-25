@@ -43565,6 +43565,7 @@ const decorateFlowLayer = function (out, config) {
     out.flowRegionLabels_ = ['Exporter', 'Importer']
     out.flowMaxWidth_ = 30
     out.flowMinWidth_ = 1
+    out.flowWidthDomain_ = null // [min, max] flow values the widths are scaled to (null: this map's own smallest and largest flow)
     out.flowArrows_ = false
     out.flowArrowScale_ = 0.7 // scale of arrow markers
     out.flowOutlines_ = true
@@ -43665,6 +43666,7 @@ const decorateFlowLayer = function (out, config) {
             arrowScale: out.flowArrowScale_,
             maxWidth: out.flowMaxWidth_,
             minWidth: out.flowMinWidth_,
+            widthDomain: out.flowWidthDomain_,
             outlines: out.flowOutlines_,
             outlineWidth: out.flowOutlineWidth_,
             outlineColor: out.flowOutlineColor_,
@@ -43703,6 +43705,7 @@ const decorateFlowLayer = function (out, config) {
         if (v.arrowScale !== undefined) out.flowArrowScale_ = v.arrowScale
         if (v.maxWidth !== undefined) out.flowMaxWidth_ = v.maxWidth
         if (v.minWidth !== undefined) out.flowMinWidth_ = v.minWidth
+        if (v.widthDomain !== undefined) out.flowWidthDomain_ = v.widthDomain
         if (v.outlines !== undefined) out.flowOutlines_ = v.outlines
         if (v.outlineWidth !== undefined) out.flowOutlineWidth_ = v.outlineWidth
         if (v.outlineColor !== undefined) out.flowOutlineColor_ = v.outlineColor
@@ -43925,8 +43928,10 @@ function computeMaxMinFlowCounts(out) {
               .flatMap(({ flowAB, flowBA }) => [flowAB, flowBA])
         : links.map((link) => link.value)
     ).filter((value) => value > 0)
-    out.maxFlowCount = values.length ? (0,d3_array__WEBPACK_IMPORTED_MODULE_0__["default"])(values) : 0
-    out.minFlowCount = values.length ? (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(values) : 0
+    const domain = out.flowWidthDomain_
+    const fixed = Array.isArray(domain) && domain.length === 2 && domain.every(Number.isFinite)
+    out.maxFlowCount = fixed ? Math.max(...domain) : values.length ? (0,d3_array__WEBPACK_IMPORTED_MODULE_0__["default"])(values) : 0
+    out.minFlowCount = fixed ? Math.min(...domain) : values.length ? (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(values) : 0
 }
 
 /**
@@ -52679,6 +52684,10 @@ const legend = function (map, config) {
                 key == 'flowColorLegend' ||
                 key == 'regionColorLegend'
             ) {
+                if (config[key] === false) {
+                    out[key] = false // e.g. nodeSizeLegend: false leaves that legend out
+                    continue
+                }
                 for (let p in out[key]) {
                     //override each property in size and color legend configs
                     if (config[key][p] !== undefined) {
@@ -52709,6 +52718,10 @@ const legend = function (map, config) {
                     key == 'flowColorLegend' ||
                     key == 'regionColorLegend'
                 ) {
+                    if (m.legend_[key] === false) {
+                        out[key] = false
+                        continue
+                    }
                     for (let p in out[key]) {
                         //override each property in size and color legend m.legend_
                         if (m.legend_[key][p] !== undefined) {
@@ -52756,11 +52769,10 @@ const legend = function (map, config) {
                 : (0,_legend_flow_width__WEBPACK_IMPORTED_MODULE_2__.drawHorizontalFlowWidthLegend)(out, baseX, baseY + out.flowWidthLegend.marginTop)
         }
 
-        const flowWidthNode = out._flowWidthContainer.node()
-        const flowWidthLegendHeight = flowWidthNode.getBBox().height
+        const flowWidthLegendHeight = out.flowWidthLegend ? out._flowWidthContainer.node().getBBox().height : 0
 
         // node size legend
-        if (map.flowNodes_ && map._nodeSizeScale) {
+        if (out.nodeSizeLegend && map.flowNodes_ && map._nodeSizeScale) {
             // node legend container
             out._nodeLegendContainer = out.lgg
                 .append('g')

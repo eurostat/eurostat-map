@@ -29,6 +29,7 @@ export interface FlowMap extends MapInstance {
         labelOffsets: { x: number; y: number }
         lineType: 'curved' | 'straight' | 'sankey'
         lineGeometry: FlowLineGeometry
+        widthDomain: [number, number] | null
         nodeSizeScale: ((value: number) => number) | null
         opacity: number
         internal: boolean
@@ -65,6 +66,7 @@ export interface FlowMap extends MapInstance {
         labelOffsets?: { x: number; y: number }
         lineType?: 'curved' | 'straight' | 'sankey'
         lineGeometry?: FlowLineGeometry
+        widthDomain?: [number, number] | null
         nodeSizeScale?: (value: number) => number
         opacity?: number
         internal?: boolean

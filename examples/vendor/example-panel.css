@@ -9,6 +9,10 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
+.ex-layout.ex-fluid {
+    grid-template-columns: minmax(0, 1fr) var(--ex-panel-width, 280px);
+}
+
 .ex-map {
     min-width: 0;
 }

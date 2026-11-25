@@ -160,6 +160,8 @@ invisible on proportional-symbol maps because the map type's CSS overrode their 
   edge-bundled route is one polyline, so those start straight. Tapered and parallel routes are straight-segment
   geometry and stay straight. `bundleSettings` merges with the defaults (a partial object once made every bundled
   route NaN); a negative `chargeStrength` un-bundles.
+- Small multiples of flow maps need `flowSettings({ widthDomain })` (one shared width scale) and one legend: the first map draws it
+  with `legend({ svgId })`, the others `legend(false)`. A flow legend part is left out with `false` (`nodeSizeLegend: false`).
 - A custom flow `nodeSizeScale` used with a size legend needs a `domain()` method, including when
   the example supplies explicit legend values.
 - Edge bundling must choose its charge distance independently of the node size scale.

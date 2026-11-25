@@ -136,6 +136,11 @@ export interface FlowMapConfig extends MapConfig {
         lineType?: 'curved' | 'straight' | 'sankey'
         /** Shape of straight routes: `'straight'` (a line in the map projection) or `'greatCircle'` (the shortest path on the globe, which curves on world maps). Not applied to tapered (`widthGradient`) or parallel routes. @default 'straight' */
         lineGeometry?: FlowLineGeometry
+        /**
+         * The [min, max] flow values that line widths (and the width legend) are scaled to. By default each map uses its own
+         * smallest and largest flow; pass the same domain to several maps (small multiples) to make their widths comparable.
+         */
+        widthDomain?: [number, number] | null
         nodeSizeScale?: (value: number) => number
         opacity?: number
         internal?: boolean

@@ -5,6 +5,14 @@ import assert from 'node:assert'
 const eurostatmap = await import('../../build/eurostatmap.js')
 const library = eurostatmap.default || eurostatmap.eurostatmap || globalThis.eurostatmap
 
+// Line widths can share one value domain across maps (small multiples).
+{
+    const m = library.map('flow')
+    assert.strictEqual(m.flowSettings().widthDomain, null)
+    m.flowSettings({ widthDomain: [0, 500] })
+    assert.deepStrictEqual(m.flowSettings().widthDomain, [0, 500])
+}
+
 // Routes are straight lines in the map projection unless great circles are asked for.
 {
     const m = library.map('flow')

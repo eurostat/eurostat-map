@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Capital city airports: empty seats</title>
+        <style>
+            html,
+            body {
+                margin: 0;
+                font:
+                    14px/1.4 Arial,
+                    sans-serif;
+                color: #383838;
+            }
+
+            .intro {
+                max-width: 760px;
+                padding: 8px 12px 0;
+            }
+
+            .intro h1 {
+                margin: 0 0 4px;
+                font-size: 20px;
+            }
+
+            .intro p {
+                margin: 0 0 6px;
+                color: #666;
+            }
+
+            /* one small map per capital city airport, in rows */
+            #grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 14px 10px;
+                padding: 8px 12px;
+            }
+
+            #grid figure {
+                margin: 0;
+                min-width: 0;
+            }
+
+            #grid figcaption {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                gap: 8px;
+                padding: 0 2px 2px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            #grid figcaption b {
+                font-size: 15px;
+            }
+
+            #grid figcaption span {
+                color: #666;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            #grid svg {
+                display: block;
+                width: 100%;
+                height: auto;
+            }
+
+            /* pale land, so that the calm routes stay visible and the red ones stand out */
+            #grid .em-cntrg {
+                fill: #efefef;
+            }
+
+            /* the hub airport: a ring, so the routes carry the colour */
+            .em-node-circle {
+                fill: #fff;
+                opacity: 0.9;
+                stroke: #252525;
+            }
+
+            #legend {
+                display: block;
+                max-width: 100%;
+                margin-top: 12px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="grid"></div>
+
+        <script src="../../../build/eurostatmap.js"></script>
+        <script src="https://unpkg.com/proj4@2.19.10/dist/proj4.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+
+        <script type="module">
+            import { toFlowGraph } from './parse.js'
+            import { createPanel } from '../../vendor/example-panel.js'
+
+            // Eurostat avia_par_XX, 2024: passengers carried and seats available on each route between the busiest airports
+            const data = await fetch('eurostat-flight-data.json').then((r) => r.json())
+            const airportByCode = new Map(data.airports.map((a) => [a.code, a]))
+            const fmt = (n) => Math.round(n).toLocaleString('en').replace(/,/g, ' ')
+
+            // the main airport of each capital city in the data (Bern, Luxembourg ... are not among the busiest airports)
+            const CAPITALS = {
+                LOWW: 'Vienna',
+                EBBR: 'Brussels',
+                EDDB: 'Berlin',
+                EKCH: 'Copenhagen',
+                LEMD: 'Madrid',
+                EFHK: 'Helsinki',
+                LFPG: 'Paris',
+                LGAV: 'Athens',
+                LHBP: 'Budapest',
+                EIDW: 'Dublin',
+                LIRF: 'Rome',
+                EHAM: 'Amsterdam',
+                ENGM: 'Oslo',
+                EPWA: 'Warsaw',
+                LPPT: 'Lisbon',
+                LROP: 'Bucharest',
+                ESSA: 'Stockholm',
+                LTAC: 'Ankara',
+            }
+
+            // ---- the routes of every capital airport: both directions merged into one line per partner airport ----
+            const flights = data.flights.filter((f) => f.count && f.availableCount)
+            const hubs = Object.entries(CAPITALS).map(([code, city]) => {
+                const routes = new Map()
+                for (const f of flights) {
+                    if (f.origin !== code && f.destination !== code) continue
+                    const partner = f.origin === code ? f.destination : f.origin
+                    const r = routes.get(partner) || { partner, passengers: 0, seats: 0 }
+                    r.passengers += f.count
+                    r.seats += f.availableCount
+                    routes.set(partner, r)
+                }
+                const list = [...routes.values()].map((r) => ({
+                    ...r,
+                    empty: r.seats - r.passengers,
+                    emptyPct: ((r.seats - r.passengers) / r.seats) * 100,
+                }))
+                const passengers = d3.sum(list, (r) => r.passengers)
+                const seats = d3.sum(list, (r) => r.seats)
+                return {
+                    code,
+                    city,
+                    iata: airportByCode.get(code).iata,
+                    routes: list.sort((a, b) => a.emptyPct - b.emptyPct), // red lines are drawn last, on top
+                    passengers,
+                    emptyPct: ((seats - passengers) / seats) * 100,
+                }
+            })
+
+            // ---- one colour scale and one width scale for all the maps, so that they can be compared ----
+            // Few classes: the calm routes fade into the background, the routes with many empty seats stand out in red.
+            const THRESHOLDS = [10, 15, 20, 25, 30]
+            const COLOURS = ['#c3c9d2', '#ead5cc', '#f6aa8f', '#ec6b4e', '#c92f22', '#86100f']
+            const classOf = (pct) => d3.bisect(THRESHOLDS, pct)
+            const colourOf = (pct) => COLOURS[classOf(pct)]
+            const classLabels = ['< 10%', '10 – 15%', '15 – 20%', '20 – 25%', '25 – 30%', '30% or more']
+            const widthDomain = [0, d3.max(hubs, (h) => d3.max(h.routes, (r) => r.passengers))]
+
+            // ---- the page ----
+            const grid = document.getElementById('grid')
+            const panel = createPanel({ map: grid, title: 'Settings', width: 250, fluid: true })
+            const settings = { order: 'empty', maxWidth: 16 }
+            const orders = {
+                empty: (a, b) => b.emptyPct - a.emptyPct,
+                passengers: (a, b) => b.passengers - a.passengers,
+                name: (a, b) => a.city.localeCompare(b.city),
+            }
+
+            function tooltipFor(hub) {
+                const byPartner = new Map(hub.routes.map((r) => [r.partner, r]))
+                return (link) => {
+                    const id = link.destId ?? link.target.id
+                    const r = byPartner.get(id)
+                    if (!r) return ''
+                    return `<div class="em-tooltip-bar"><b>${hub.city} – ${airportByCode.get(id)?.name || id}</b></div>
+                        <div class="em-tooltip-text"><table class="em-tooltip-table"><tbody>
+                        <tr><td>${fmt(r.passengers)} passengers (both directions)</td></tr>
+                        <tr><td>${fmt(r.seats)} seats</td></tr>
+                        <tr><td>${fmt(r.empty)} empty seats (${r.emptyPct.toFixed()}%)</td></tr>
+                        </tbody></table></div>`
+                }
+            }
+
+            /** One small map: the routes of a capital airport, great circles coloured by their share of empty seats. */
+            function drawHub(hub, index, width) {
+                const used = new Set(hub.routes.map((r) => r.partner))
+                used.add(hub.code)
+                const graph = toFlowGraph({
+                    airports: data.airports.filter((a) => used.has(a.code)),
+                    flights: hub.routes.map((r) => ({ origin: hub.code, destination: r.partner, count: r.passengers })),
+                })
+                const colourByPartner = new Map(hub.routes.map((r) => [r.partner, colourOf(r.emptyPct)]))
+                const first = index === 0
+
+                const map = eurostatmap
+                    .map('flow')
+                    .svgId('map-' + hub.code)
+                    .width(width)
+                    .height(Math.round(width * 0.85))
+                    .position({ x: 3900000, y: 2900000, z: Math.round((6400 * 795) / width) }) // the same view of Europe in every map
+                    .flowGraph(graph)
+                    .flowSettings({
+                        lineType: 'straight',
+                        lineGeometry: 'greatCircle',
+                        edgeBundling: false,
+                        bidirectional: false,
+                        arrows: false,
+                        outlines: false,
+                        maxWidth: settings.maxWidth,
+                        minWidth: 1,
+                        widthDomain, // the same passengers-to-width scale in every map
+                        opacity: 0.85,
+                        color: (link) => colourByPartner.get(link.destId ?? link.target.id) || '#999',
+                        nodes: true,
+                        nodeType: 'circle',
+                    })
+                    .tooltip({ textFunction: tooltipFor(hub) })
+                    .nutsLevel(0)
+                    .drawCoastalMargin(false)
+                    .insets(false)
+                    .footnote(false)
+                    .showSourceLink(false)
+                    .zoomButtons(false)
+                    .zoomExtent(null)
+                    .transitionDuration(0)
+
+                // one legend for the whole page, drawn by the first map into its own svg
+                if (first) {
+                    map.legend({
+                        svgId: 'legend',
+                        x: 0,
+                        y: 0,
+                        boxOpacity: 0,
+                        flowWidthLegend: {
+                            title: 'Passengers (line width)',
+                            values: [500000, 2000000, 4000000],
+                            labelFormatter: (v) => v / 1e6 + 'M',
+                            width: 180,
+                            orientation: 'horizontal',
+                        },
+                        nodeSizeLegend: false,
+                        flowColorLegend: {
+                            title: 'Share of seats that are empty',
+                            marginTop: 45,
+                            items: COLOURS.map((color, i) => ({ label: classLabels[i], color })),
+                        },
+                        regionColorLegend: false,
+                    })
+                } else {
+                    map.legend(false)
+                }
+                map.build()
+            }
+
+            function draw() {
+                grid.replaceChildren()
+                document.getElementById('legend').replaceChildren()
+                const cell = document.createElement('figure')
+                cell.style.visibility = 'hidden'
+                grid.appendChild(cell)
+                const width = Math.floor(cell.clientWidth) || 280
+                cell.remove()
+
+                hubs.slice()
+                    .sort(orders[settings.order])
+                    .forEach((hub, i) => {
+                        const figure = document.createElement('figure')
+                        figure.innerHTML = `<figcaption><b>${hub.city} (${hub.iata})</b><span>${hub.emptyPct.toFixed()}% empty · ${hub.routes.length} routes</span></figcaption><svg id="map-${hub.code}"></svg>`
+                        grid.appendChild(figure)
+                        drawHub(hub, i, width)
+                    })
+            }
+
+            panel.select({
+                id: 'order',
+                label: 'Order the maps by',
+                options: [
+                    { value: 'empty', label: 'Share of empty seats' },
+                    { value: 'passengers', label: 'Passengers' },
+                    { value: 'name', label: 'City name' },
+                ],
+                value: settings.order,
+                onChange: (v) => {
+                    settings.order = v
+                    draw()
+                },
+            })
+            panel.range({
+                id: 'maxWidth',
+                label: 'Max line width',
+                min: 4,
+                max: 30,
+                step: 1,
+                value: settings.maxWidth,
+                unit: 'px',
+                onChange: (v) => {
+                    settings.maxWidth = +v
+                    draw()
+                },
+            })
+            // the legend lives in the panel, which stays in view while the maps scroll
+            const legendSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+            legendSvg.id = 'legend'
+            legendSvg.setAttribute('width', 230)
+            legendSvg.setAttribute('height', 250)
+            panel.add(legendSvg)
+            panel.add(
+                Object.assign(document.createElement('p'), {
+                    className: 'ex-note',
+                    textContent:
+                        'One map per capital city airport, showing its routes to the other busiest airports in the data (Eurostat avia_par, 2024). Line width is passengers carried in both directions, colour is the share of seats that were empty.',
+                })
+            )
+            draw()
+        </script>
+    </body>
+</html>
