@@ -344,7 +344,7 @@
                         </div>
                         <label class="field">
                             <span class="field-head">Show top flights <output id="topN-out" for="topN"></output></span>
-                            <input id="topN" type="range" min="0" max="1600" step="10" value="800" />
+                            <input id="topN" type="range" min="1" max="1600" step="1" value="800" />
                         </label>
                     </fieldset>
                     <fieldset>
@@ -420,7 +420,7 @@
                 return {
                     airport: $('airport').value,
                     theme: document.querySelector('input[name=theme]:checked').value, // 'Passengers carried' | 'Empty seats'
-                    topN: +$('topN').value, // 0 = all flights
+                    topN: +$('topN').value,
                     maxWidth: +$('maxWidth').value,
                     opacity: +$('opacity').value,
                     colourBy: document.querySelector('input[name=colourBy]:checked').value, // 'none' | 'empty' (share of empty seats) | 'scope' (domestic vs international)
@@ -468,6 +468,16 @@
 
                 // merged: one line per route; otherwise one per direction (drawn side by side by the library)
                 return s.merge ? ranked.map(({ directions, ...route }) => route) : ranked.flatMap((r) => r.directions)
+            }
+
+            /** Limit the "top flights" slider to the number of routes the selected airport has (all routes for "All airports"). */
+            function updateTopNRange() {
+                const slider = $('topN')
+                const max = selectFlights({ ...readSettings(), topN: 0, merge: true }).length
+                if (max === +slider.max) return
+                const showingAll = slider.value === slider.max // if so, keep showing all under the new maximum
+                slider.max = max // lowering the maximum also clamps the value
+                if (showingAll) slider.value = max
             }
 
             // ---- tooltip ----
@@ -551,11 +561,12 @@
             function render() {
                 stopAnimation()
                 stopAnimation = () => {}
+                updateTopNRange()
                 const s = readSettings()
                 $('bundling').disabled = !$('merge').checked
                 $('strength').disabled = !s.bundling
                 $('strength-out').textContent = s.strength
-                $('topN-out').textContent = s.topN || 'all'
+                $('topN-out').textContent = s.topN
                 $('maxWidth-out').textContent = s.maxWidth
                 $('opacity-out').textContent = s.opacity
 
@@ -597,7 +608,7 @@
                 svg.selectAll('*').remove()
                 svg.property('__zoom', d3.zoomIdentity)
 
-                const label = s.airport ? `Flights from ${nameOf(s.airport)} (${s.airport})` : `Top ${s.topN || 'all'} flights by ${s.theme.toLowerCase()}`
+                const label = s.airport ? `Flights from ${nameOf(s.airport)} (${s.airport})` : `Top ${s.topN} flights by ${s.theme.toLowerCase()}`
 
                 eurostatmap
                     .map('flow')
@@ -701,6 +712,8 @@
             })
             $('reset-controls').addEventListener('click', () => {
                 $('controls').reset()
+                updateTopNRange()
+                $('topN').value = $('topN').defaultValue // reset() clamped it to the previous airport's maximum
                 render()
             })
             render()
