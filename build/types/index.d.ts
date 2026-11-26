@@ -279,11 +279,11 @@ export function projectFromMap(map: MapInstance, x: number, y: number): [number,
 
 /** Options of {@link exportSvgToPNG}. */
 export interface ExportSvgToPNGOptions {
-    /** Output width in pixels. Defaults to the SVG's width times `scale`. */
+    /** Output width in pixels. Defaults to the SVG's width times `scale`, or in proportion to `height`. */
     width?: number
-    /** Output height in pixels. Defaults to the SVG's height times `scale`. */
+    /** Output height in pixels. Defaults to the SVG's height times `scale`, or in proportion to `width`. */
     height?: number
-    /** Pixel density multiplier (2 doubles the resolution) when width/height are not given. @default 1 */
+    /** Pixel density multiplier when width/height are not given. By default the PNG is HD: twice the SVG's size, and at least 1920 px wide. */
     scale?: number
     /** File name, without extension. @default 'eurostat-map' */
     filename?: string

@@ -307,7 +307,7 @@
 
                     const exportBtnPNG = document.getElementById('export-png-btn')
                     exportBtnPNG.addEventListener('click', function () {
-                        map.exportMapToPNG(1080, Number(map.svg().attr('height')), 'air-freight-2025')
+                        map.exportMapToPNG(undefined, undefined, 'air-freight-2025')
                     })
 
                     const exportBtnSVG = document.getElementById('export-svg-btn')

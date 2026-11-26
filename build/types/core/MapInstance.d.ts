@@ -687,8 +687,8 @@ export interface MapInstance {
 
     /**
      * Exports the map as a PNG file and triggers a browser download.
-     * @param width - Output width in pixels. Defaults to SVG width.
-     * @param height - Output height in pixels. Defaults to SVG height.
+     * @param width - Output width in pixels. By default the PNG is HD: twice the SVG's width, and at least 1920 px.
+     * @param height - Output height in pixels. Defaults to the width's proportional height.
      * @param filename - Download filename without extension. @default 'eurostatmap'
      */
     exportMapToPNG(width?: number, height?: number, filename?: string): Promise<this>

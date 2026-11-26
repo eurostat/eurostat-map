@@ -45,14 +45,16 @@ export const exportMapToSVG = function (out, filename) {
  * Renders via an off-screen canvas. Fonts and external resources must be
  * accessible without CORS restrictions for the canvas to remain untainted.
  *
- * @param {number} [width] - Output width in pixels. Defaults to the SVG's current width.
- * @param {number} [height] - Output height in pixels. Defaults to the SVG's current height.
+ * @param {number} [width] - Output width in pixels. Defaults to HD: see exportSvgToPNG.
+ * @param {number} [height] - Output height in pixels. Defaults to the width's proportional height.
  * @returns {Promise<object>} Resolves to the map instance.
  */
 export const exportMapToPNG = async function (out, width, height, filename) {
     await exportSvgToPNG(out.svg_.node(), { width, height, filename })
     return out
 }
+
+const HD_WIDTH = 1920 // smallest default width of an exported PNG, in pixels
 
 /**
  * Renders any SVG element (with its computed CSS styles inlined) to a PNG and triggers a browser download.
@@ -62,15 +64,17 @@ export const exportMapToPNG = async function (out, width, height, filename) {
  *
  * @param {SVGSVGElement} svgNode - The SVG to render. It has to be in the document, so that its styles resolve.
  * @param {object} [options]
- * @param {number} [options.width] - Output width in pixels. Defaults to the SVG's width times `scale`.
- * @param {number} [options.height] - Output height in pixels. Defaults to the SVG's height times `scale`.
- * @param {number} [options.scale=1] - Pixel density multiplier (2 doubles the resolution) when width/height are not given.
+ * @param {number} [options.width] - Output width in pixels. Defaults to the SVG's width times `scale` (or, with only
+ * `height` given, to the proportional width).
+ * @param {number} [options.height] - Output height in pixels, likewise.
+ * @param {number} [options.scale] - Pixel density multiplier when width/height are not given. By default the PNG is HD:
+ * twice the SVG's size, and at least 1920 px wide.
  * @param {string} [options.filename='eurostat-map'] - File name, without extension.
  * @param {string} [options.background='#ffffff'] - Background colour behind the SVG (PNG is otherwise transparent).
  * @returns {Promise<Blob>} Resolves to the PNG once the download has started.
  */
 export const exportSvgToPNG = async function (svgNode, options = {}) {
-    const { width, height, scale = 1, filename = 'eurostat-map', background = '#ffffff' } = options
+    const { width, height, scale, filename = 'eurostat-map', background = '#ffffff' } = options
 
     // Clone original SVG
     const svgNodeClone = svgNode.cloneNode(true)
@@ -111,13 +115,21 @@ export const exportSvgToPNG = async function (svgNode, options = {}) {
         svgNodeClone.insertBefore(bg, svgNodeClone.firstElementChild)
     }
 
+    // Determine pixel dimensions: HD unless a size or scale was asked for, keeping the SVG's proportions
+    const sourceWidth = svgWidth || 800
+    const sourceHeight = svgHeight || 600
+    const factor = width ? width / sourceWidth : height ? height / sourceHeight : (scale ?? Math.max(2, HD_WIDTH / sourceWidth))
+    const w = Math.round(width || sourceWidth * factor)
+    const h = Math.round(height || sourceHeight * factor)
+
+    // Give the image that size itself, so the browser draws the vectors at full resolution instead of enlarging a smaller picture
+    svgNodeClone.setAttribute('width', String(w))
+    svgNodeClone.setAttribute('height', String(h))
+    for (const property of ['width', 'height', 'max-width', 'max-height']) svgNodeClone.style.removeProperty(property)
+
     // Serialize while still in DOM, then remove the clone
     const svgString = new XMLSerializer().serializeToString(svgNodeClone)
     document.body.removeChild(svgNodeClone)
-
-    // Determine pixel dimensions
-    const w = Math.round(width || (svgWidth || 800) * scale)
-    const h = Math.round(height || (svgHeight || 600) * scale)
 
     const url = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' }))
     let pngUrl

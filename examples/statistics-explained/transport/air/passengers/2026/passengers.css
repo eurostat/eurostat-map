@@ -37,9 +37,15 @@
 .em-flow-label-halo {
     font-family: 'Arial' !important;
     font-size: 15px !important;
-    opacity: 0.8 !important;
+    opacity: 1 !important;
     font-weight: bold;
     fill: #333333 !important;
+}
+
+/* halos are only the white outline: filled as well, they show as a second, slightly offset copy of the text (blur) */
+.em-label-halo,
+.em-flow-label-halo {
+    fill: none !important;
 }
 
 #air-passengers-map .em-zoom-buttons {
