@@ -60,3 +60,10 @@
 .em-flow-node-stems {
     opacity: 0.6 !important;
 }
+
+/* the EU is named large on the middle of its stack line, where all the flows meet */
+.maritime-partner-labels [data-partner='EU'] {
+    font-size: 19px;
+    font-weight: 600;
+    stroke-width: 4px;
+}
