@@ -26,7 +26,7 @@ describe('rounded background boxes', () => {
     })
 
     it('rounds the inset sea, frame and clipPath rects with the same radius', () => {
-        const src = readFileSync(new URL('../../../src/core/map-instance.js', import.meta.url), 'utf8')
+        const src = readFileSync(new URL('../../../src/core/map-template.js', import.meta.url), 'utf8')
         assert.match(src, /import \{ BOX_CORNER_RADIUS \} from '\.\/buttons\/corner-radius'/)
         assert.match(src, /roundInsetCorners = \(out\) => \(sel\) => \{\s*if \(out\.isInset\) sel\.attr\('rx', BOX_CORNER_RADIUS\)\.attr\('ry', BOX_CORNER_RADIUS\)/)
         // clipPath rect, frame rect and sea rect all go through it

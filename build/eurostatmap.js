@@ -31440,52 +31440,25 @@ const attachLocationsApi = (out) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DEFAULT_MAX_WIDTH: () => (/* binding */ DEFAULT_MAX_WIDTH),
 /* harmony export */   createMapInstance: () => (/* binding */ createMapInstance),
-/* harmony export */   updateGeoMapTemplate: () => (/* binding */ updateGeoMapTemplate)
+/* harmony export */   updateGeoMapTemplate: () => (/* reexport safe */ _map_template__WEBPACK_IMPORTED_MODULE_14__.updateGeoMapTemplate)
 /* harmony export */ });
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/selectAll.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/core/utils.js");
-/* harmony import */ var _decoration_annotations__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./decoration/annotations */ "./src/core/decoration/annotations.js");
-/* harmony import */ var _decoration_labels__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./decoration/labels */ "./src/core/decoration/labels.js");
-/* harmony import */ var _deprecated__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./deprecated */ "./src/core/deprecated.js");
-/* harmony import */ var _geo_geometries__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./geo/geometries */ "./src/core/geo/geometries.js");
-/* harmony import */ var _insets__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./insets */ "./src/core/insets.js");
-/* harmony import */ var _decoration_stamps__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./decoration/stamps */ "./src/core/decoration/stamps.js");
-/* harmony import */ var _cartograms__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./cartograms */ "./src/core/cartograms.js");
-/* harmony import */ var _minimaps__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./minimaps */ "./src/core/minimaps.js");
-/* harmony import */ var _zoom__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./zoom */ "./src/core/zoom.js");
-/* harmony import */ var _buttons_zoom_buttons__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./buttons/zoom-buttons */ "./src/core/buttons/zoom-buttons.js");
-/* harmony import */ var _buttons_insets_button__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./buttons/insets-button */ "./src/core/buttons/insets-button.js");
-/* harmony import */ var _buttons_legend_button__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./buttons/legend-button */ "./src/core/buttons/legend-button.js");
-/* harmony import */ var _decoration_placenames_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./decoration/placenames.js */ "./src/core/decoration/placenames.js");
-/* harmony import */ var _geo_proj4_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./geo/proj4.js */ "./src/core/geo/proj4.js");
-/* harmony import */ var _decoration_logo_js__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./decoration/logo.js */ "./src/core/decoration/logo.js");
-/* harmony import */ var _decoration_coastal_margin_js__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./decoration/coastal-margin.js */ "./src/core/decoration/coastal-margin.js");
-/* harmony import */ var _decoration_texts_js__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./decoration/texts.js */ "./src/core/decoration/texts.js");
-/* harmony import */ var _decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./decoration/scalebar.js */ "./src/core/decoration/scalebar.js");
-/* harmony import */ var _locations_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./locations.js */ "./src/core/locations.js");
-/* harmony import */ var _accessibility_js__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./accessibility.js */ "./src/core/accessibility.js");
-/* harmony import */ var _errors_js__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./errors.js */ "./src/core/errors.js");
-/* harmony import */ var _toast_js__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./toast.js */ "./src/core/toast.js");
-/* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./layout */ "./src/core/layout.js");
-/* harmony import */ var _geo_projection__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./geo/projection */ "./src/core/geo/projection.js");
-/* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
-/* harmony import */ var _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./buttons/corner-radius */ "./src/core/buttons/corner-radius.js");
-/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/core/utils.js");
+/* harmony import */ var _decoration_annotations__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./decoration/annotations */ "./src/core/decoration/annotations.js");
+/* harmony import */ var _decoration_labels__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./decoration/labels */ "./src/core/decoration/labels.js");
+/* harmony import */ var _deprecated__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./deprecated */ "./src/core/deprecated.js");
+/* harmony import */ var _geo_geometries__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./geo/geometries */ "./src/core/geo/geometries.js");
+/* harmony import */ var _decoration_stamps__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./decoration/stamps */ "./src/core/decoration/stamps.js");
+/* harmony import */ var _minimaps__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./minimaps */ "./src/core/minimaps.js");
+/* harmony import */ var _zoom__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./zoom */ "./src/core/zoom.js");
+/* harmony import */ var _decoration_coastal_margin_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./decoration/coastal-margin.js */ "./src/core/decoration/coastal-margin.js");
+/* harmony import */ var _decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./decoration/scalebar.js */ "./src/core/decoration/scalebar.js");
+/* harmony import */ var _locations_js__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./locations.js */ "./src/core/locations.js");
+/* harmony import */ var _accessibility_js__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./accessibility.js */ "./src/core/accessibility.js");
+/* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./layout */ "./src/core/layout.js");
+/* harmony import */ var _geo_projection__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./geo/projection */ "./src/core/geo/projection.js");
+/* harmony import */ var _map_template__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./map-template */ "./src/core/map-template.js");
 
 
 
@@ -31511,15 +31484,6 @@ __webpack_require__.r(__webpack_exports__);
  * @param {string} mapType
  * @returns {MapInstance}
  */
-/**
- * Inset maps are rounded boxes (same radius as the legend and insets background). The frame stroke, the
- * sea and the clipPath rect that clips the inset's contents must all share the radius, otherwise the
- * contents poke out of the rounded frame. Attributes, not CSS, so SVG/PNG/HTML export keep them.
- */
-const roundInsetCorners = (out) => (sel) => {
-    if (out.isInset) sel.attr('rx', _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_27__.BOX_CORNER_RADIUS).attr('ry', _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_27__.BOX_CORNER_RADIUS)
-}
-
 /** Widest a map gets by default (px), when its container offers more. */
 const DEFAULT_MAX_WIDTH = 795
 
@@ -31530,7 +31494,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     out.isInset_ = false
 
     // expose imported function to other modules
-    out.updateValuesLabels = _decoration_labels__WEBPACK_IMPORTED_MODULE_3__.updateValuesLabels
+    out.updateValuesLabels = _decoration_labels__WEBPACK_IMPORTED_MODULE_2__.updateValuesLabels
 
     //map
     out.svgId_ = 'map'
@@ -31560,7 +31524,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     // Divides the exact bbox-fit pixel size when z is not set explicitly, so the default
     // view is zoomed in a bit tighter than an exact fit (which tends to look too zoomed out).
     // Higher = more zoomed in by default; 1 = exact fit.
-    out.defaultFitZoom_ = _geo_projection__WEBPACK_IMPORTED_MODULE_25__.DEFAULT_FIT_ZOOM
+    out.defaultFitZoom_ = _geo_projection__WEBPACK_IMPORTED_MODULE_13__.DEFAULT_FIT_ZOOM
     out.scale_ = '20M' //TODO choose automatically?
     out.position_ = { x: undefined, y: undefined, z: undefined } // initial map view
     out.placenames_ = false // load placenames from placenames.js
@@ -31789,10 +31753,10 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             if (!arguments.length) return out[name + '_']
             out[name + '_'] = v
             if (out.svg_) {
-                (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.applyMapAccessibility)(out)
+                (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_11__.applyMapAccessibility)(out)
                 if (name === 'keyboardNavigation') {
-                    (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.setupKeyboardNavigation)(out)
-                    out.layers_?.forEach((layer) => layer.legendObj_ && (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.setupLegendNavigation)(layer.legendObj_))
+                    (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_11__.setupKeyboardNavigation)(out)
+                    out.layers_?.forEach((layer) => layer.legendObj_ && (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_11__.setupLegendNavigation)(layer.legendObj_))
                 }
             }
             return out
@@ -31800,7 +31764,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     })
 
     // warn existing users of functions that have been banished to the shadow realm.
-    ;(0,_deprecated__WEBPACK_IMPORTED_MODULE_4__.defineDeprecatedFunctions)(out)
+    ;(0,_deprecated__WEBPACK_IMPORTED_MODULE_3__.defineDeprecatedFunctions)(out)
 
     // convert geo to uppercase
     out.geo = function (v) {
@@ -31812,7 +31776,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     out.responsive = function (v) {
         if (!arguments.length) return out.responsive_
         out.responsive_ = !!v
-        ;(0,_layout__WEBPACK_IMPORTED_MODULE_24__.updateResponsiveMap)(out)
+        ;(0,_layout__WEBPACK_IMPORTED_MODULE_12__.updateResponsiveMap)(out)
         return out
     }
 
@@ -31832,7 +31796,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
 
             //recursive call to inset components
             if (out.insetTemplates_) {
-                (0,_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(
+                (0,_utils__WEBPACK_IMPORTED_MODULE_0__.executeForAllInsets)(
                     out.insetTemplates_,
                     out.svgId_,
                     (inset, value) => {
@@ -31852,8 +31816,8 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         out[name] = function (v) {
             if (!arguments.length) return out[att]
             out[att] = !!v
-            if (out.insetTemplates_) (0,_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(out.insetTemplates_, out.svgId_, (inset) => inset[name](out[att]))
-            ;(0,_layout__WEBPACK_IMPORTED_MODULE_24__.applyBorderModeClasses)(out, true)
+            if (out.insetTemplates_) (0,_utils__WEBPACK_IMPORTED_MODULE_0__.executeForAllInsets)(out.insetTemplates_, out.svgId_, (inset) => inset[name](out[att]))
+            ;(0,_layout__WEBPACK_IMPORTED_MODULE_12__.applyBorderModeClasses)(out, true)
             return out
         }
     })
@@ -32002,14 +31966,14 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         }
 
         if (v === true) {
-            out.scalebar_ = out.scalebar_ || (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__.getDefaultScalebarConfig)()
+            out.scalebar_ = out.scalebar_ || (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_9__.getDefaultScalebarConfig)()
             return out
         }
 
         if (typeof v === 'object' && v !== null) {
             // mergeScalebarConfig (not a raw Object.assign) so a `v` built with `a ?? b` fallback
             // chains can't clobber existing/default values via explicitly-undefined keys.
-            out.scalebar_ = (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__.mergeScalebarConfig)(v, (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__.mergeScalebarConfig)(out.scalebar_))
+            out.scalebar_ = (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_9__.mergeScalebarConfig)(v, (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_9__.mergeScalebarConfig)(out.scalebar_))
             return out
         }
 
@@ -32023,7 +31987,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         //set
         out.drawCoastalMargin_ = v
         //update
-        ;(0,_decoration_coastal_margin_js__WEBPACK_IMPORTED_MODULE_17__.appendCoastalMargin)(out)
+        ;(0,_decoration_coastal_margin_js__WEBPACK_IMPORTED_MODULE_8__.appendCoastalMargin)(out)
         return out
     }
 
@@ -32034,7 +31998,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         //set
         out.annotations_ = v
         //update
-        ;(0,_decoration_annotations__WEBPACK_IMPORTED_MODULE_2__.appendAnnotations)(out)
+        ;(0,_decoration_annotations__WEBPACK_IMPORTED_MODULE_1__.appendAnnotations)(out)
         return out
     }
 
@@ -32045,7 +32009,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         //set
         out.stamp_ = v
         //update
-        ;(0,_decoration_stamps__WEBPACK_IMPORTED_MODULE_7__.appendStamp)(out.stamp_, out)
+        ;(0,_decoration_stamps__WEBPACK_IMPORTED_MODULE_5__.appendStamp)(out.stamp_, out)
         return out
     }
 
@@ -32056,7 +32020,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         //set
         out.minimap_ = v
         //update
-        ;(0,_minimaps__WEBPACK_IMPORTED_MODULE_9__.appendMinimap)(out)
+        ;(0,_minimaps__WEBPACK_IMPORTED_MODULE_6__.appendMinimap)(out)
         return out
     }
 
@@ -32077,37 +32041,128 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             out.labels_.scaleOnZoom = true
         }
         //update
-        (0,_decoration_labels__WEBPACK_IMPORTED_MODULE_3__.updateLabels)(out)
+        (0,_decoration_labels__WEBPACK_IMPORTED_MODULE_2__.updateLabels)(out)
         return out
     }
 
     out.position = function (v) {
         if (!arguments.length) return out.position_
         out.position_ = v
-        ;(0,_zoom__WEBPACK_IMPORTED_MODULE_10__.setMapView)(out, v)
+        ;(0,_zoom__WEBPACK_IMPORTED_MODULE_7__.setMapView)(out, v)
         return out
     }
 
     out.zoomTo = function (pos, options) {
-        ;(0,_zoom__WEBPACK_IMPORTED_MODULE_10__.zoomMapTo)(out, pos, options)
+        ;(0,_zoom__WEBPACK_IMPORTED_MODULE_7__.zoomMapTo)(out, pos, options)
         return out
     }
 
     // initiate Geometries class
-    out.Geometries = (0,_geo_geometries__WEBPACK_IMPORTED_MODULE_5__.Geometries)(out, withCenterPoints)
+    out.Geometries = (0,_geo_geometries__WEBPACK_IMPORTED_MODULE_4__.Geometries)(out, withCenterPoints)
 
-    ;(0,_locations_js__WEBPACK_IMPORTED_MODULE_20__.attachLocationsApi)(out)
+    ;(0,_locations_js__WEBPACK_IMPORTED_MODULE_10__.attachLocationsApi)(out)
 
+    ;(0,_map_template__WEBPACK_IMPORTED_MODULE_14__.attachMapTemplate)(out, withCenterPoints)
+
+    return out
+}
+
+
+
+
+/***/ },
+
+/***/ "./src/core/map-template.js"
+/*!**********************************!*\
+  !*** ./src/core/map-template.js ***!
+  \**********************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   attachMapTemplate: () => (/* binding */ attachMapTemplate),
+/* harmony export */   updateGeoMapTemplate: () => (/* binding */ updateGeoMapTemplate)
+/* harmony export */ });
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/selectAll.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/core/utils.js");
+/* harmony import */ var _decoration_annotations__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./decoration/annotations */ "./src/core/decoration/annotations.js");
+/* harmony import */ var _decoration_labels__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./decoration/labels */ "./src/core/decoration/labels.js");
+/* harmony import */ var _insets__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./insets */ "./src/core/insets.js");
+/* harmony import */ var _decoration_stamps__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./decoration/stamps */ "./src/core/decoration/stamps.js");
+/* harmony import */ var _cartograms__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./cartograms */ "./src/core/cartograms.js");
+/* harmony import */ var _minimaps__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./minimaps */ "./src/core/minimaps.js");
+/* harmony import */ var _zoom__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./zoom */ "./src/core/zoom.js");
+/* harmony import */ var _buttons_zoom_buttons__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./buttons/zoom-buttons */ "./src/core/buttons/zoom-buttons.js");
+/* harmony import */ var _buttons_insets_button__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./buttons/insets-button */ "./src/core/buttons/insets-button.js");
+/* harmony import */ var _buttons_legend_button__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./buttons/legend-button */ "./src/core/buttons/legend-button.js");
+/* harmony import */ var _decoration_placenames_js__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./decoration/placenames.js */ "./src/core/decoration/placenames.js");
+/* harmony import */ var _decoration_logo_js__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./decoration/logo.js */ "./src/core/decoration/logo.js");
+/* harmony import */ var _decoration_coastal_margin_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./decoration/coastal-margin.js */ "./src/core/decoration/coastal-margin.js");
+/* harmony import */ var _decoration_texts_js__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./decoration/texts.js */ "./src/core/decoration/texts.js");
+/* harmony import */ var _decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./decoration/scalebar.js */ "./src/core/decoration/scalebar.js");
+/* harmony import */ var _locations_js__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./locations.js */ "./src/core/locations.js");
+/* harmony import */ var _accessibility_js__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./accessibility.js */ "./src/core/accessibility.js");
+/* harmony import */ var _errors_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./errors.js */ "./src/core/errors.js");
+/* harmony import */ var _toast_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./toast.js */ "./src/core/toast.js");
+/* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./layout */ "./src/core/layout.js");
+/* harmony import */ var _geo_projection__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./geo/projection */ "./src/core/geo/projection.js");
+/* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./buttons/corner-radius */ "./src/core/buttons/corner-radius.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
+/* harmony import */ var _map_instance__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./map-instance */ "./src/core/map-instance.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * Inset maps are rounded boxes (same radius as the legend and insets background). The frame stroke, the
+ * sea and the clipPath rect that clips the inset's contents must all share the radius, otherwise the
+ * contents poke out of the rounded frame. Attributes, not CSS, so SVG/PNG/HTML export keep them.
+ */
+const roundInsetCorners = (out) => (sel) => {
+    if (out.isInset) sel.attr('rx', _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_24__.BOX_CORNER_RADIUS).attr('ry', _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_24__.BOX_CORNER_RADIUS)
+}
+
+/**
+ * Builds the map's svg skeleton and, once the geometry is there, its contents.
+ * @param {*} out the map
+ * @param {boolean} withCenterPoints
+ */
+const attachMapTemplate = function (out, withCenterPoints) {
     /**
      * Build a map object, including container, frame, map svg, insets and d3 zoom
      */
     out.buildMapTemplateBase = function () {
-        const svg = (0,_layout__WEBPACK_IMPORTED_MODULE_24__.createMapSVG)(out)
+        const svg = (0,_layout__WEBPACK_IMPORTED_MODULE_21__.createMapSVG)(out)
         out.svg_ = svg
 
         // Wrap SVG so HTML overlays (spinner, tooltip) can sit above it
         if (!out.isInset) {
-            out._wrapper_ = (0,_layout__WEBPACK_IMPORTED_MODULE_24__.wrapMapSvg)(svg)
+            out._wrapper_ = (0,_layout__WEBPACK_IMPORTED_MODULE_21__.wrapMapSvg)(svg)
         }
 
         //set container for cases where container contains various maps
@@ -32122,10 +32177,10 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
 
         // how much room the container offers decides the layout profile, and the width unless it was set
         if (!out.isInset) {
-            const containerWidth = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_28__.resolveContainerWidth)(out)
-            if (containerWidth && !out._widthExplicit_) out.width_ = Math.min(DEFAULT_MAX_WIDTH, containerWidth)
+            const containerWidth = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.resolveContainerWidth)(out)
+            if (containerWidth && !out._widthExplicit_) out.width_ = Math.min(_map_instance__WEBPACK_IMPORTED_MODULE_26__.DEFAULT_MAX_WIDTH, containerWidth)
         }
-        svg.classed('em--compact', (0,_layout_profile__WEBPACK_IMPORTED_MODULE_28__.isCompact)(out))
+        svg.classed('em--compact', (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.isCompact)(out))
 
         //set SVG dimensions
         const requestedHeight = out._heightFn_ ? +out._heightFn_(out) : NaN
@@ -32139,7 +32194,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             const maxTotalHeight = 0.99 * availableHeight
 
             // Estimate header/footer/padding overhead to find maximum allowed map height
-            const mobile = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_28__.isCompact)(out)
+            const mobile = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.isCompact)(out)
             const overhead = mobile ? (out.header_ ? 60 : 0) + (out.footnote_ ? 20 : 0) + 5 : (out.header_ ? 80 : 0) + (out.footnote_ ? 40 : 0) + 15
             const maxMapHeight = Math.max(150, maxTotalHeight - overhead)
             // the shape of the map follows its width, not the height of the screen: a compact map filling the window left bands of empty space
@@ -32157,7 +32212,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             out.proj_ = 54030
         }
         svg.attr('width', out.width()).attr('height', out.height())
-        ;(0,_layout__WEBPACK_IMPORTED_MODULE_24__.updateResponsiveMap)(out)
+        ;(0,_layout__WEBPACK_IMPORTED_MODULE_21__.updateResponsiveMap)(out)
 
         // define clipPath relative to the drawing group (map area)
         const defs = svg.append('defs').attr('class', 'em-defs')
@@ -32214,8 +32269,8 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             .attr('class', 'em-footer')
 
         // build insets
-        ;(0,_insets__WEBPACK_IMPORTED_MODULE_6__.removeInsets)(out) //remove existing
-        ;(0,_insets__WEBPACK_IMPORTED_MODULE_6__.buildInsets)(out, withCenterPoints, out._mapType) //build new
+        ;(0,_insets__WEBPACK_IMPORTED_MODULE_4__.removeInsets)(out) //remove existing
+        ;(0,_insets__WEBPACK_IMPORTED_MODULE_4__.buildInsets)(out, withCenterPoints, out._mapType) //build new
 
         //draw frame
         dg.append('rect')
@@ -32228,10 +32283,10 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             .call(roundInsetCorners(out))
 
         if (out.stamp_) {
-            (0,_decoration_stamps__WEBPACK_IMPORTED_MODULE_7__.appendStamp)(out.stamp_, out)
+            (0,_decoration_stamps__WEBPACK_IMPORTED_MODULE_5__.appendStamp)(out.stamp_, out)
         }
 
-        (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.applyMapAccessibility)(out)
+        (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_18__.applyMapAccessibility)(out)
 
         return out
     }
@@ -32247,7 +32302,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
 
         // separate logic for cartograms
         if (out.gridCartogram_ == true) {
-            (0,_cartograms__WEBPACK_IMPORTED_MODULE_8__.buildGridCartogramBase)(out)
+            (0,_cartograms__WEBPACK_IMPORTED_MODULE_6__.buildGridCartogramBase)(out)
             if (out.footnote_ == out.defaultFootnote_) out.footnote_ = false //dont need copyright for grid cartograms
             if (out.footnoteTooltipText_ == out.defaultFootnoteTooltipText_) out.footnoteTooltipText_ = false
         } else {
@@ -32255,13 +32310,13 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
 
             // position
             if (!out.position_.x || !out.position_.y) {
-                (0,_geo_projection__WEBPACK_IMPORTED_MODULE_25__.defineDefaultPosition)(out)
+                (0,_geo_projection__WEBPACK_IMPORTED_MODULE_22__.defineDefaultPosition)(out)
             }
-            out.position_.z = out.position_.z || (0,_geo_projection__WEBPACK_IMPORTED_MODULE_25__.getDefaultZ)(out)
+            out.position_.z = out.position_.z || (0,_geo_projection__WEBPACK_IMPORTED_MODULE_22__.getDefaultZ)(out)
 
             // d3 projection/path functions
-            ;(0,_geo_projection__WEBPACK_IMPORTED_MODULE_25__.defineProjection)(out)
-            ;(0,_geo_projection__WEBPACK_IMPORTED_MODULE_25__.definePathFunction)(out)
+            ;(0,_geo_projection__WEBPACK_IMPORTED_MODULE_22__.defineProjection)(out)
+            ;(0,_geo_projection__WEBPACK_IMPORTED_MODULE_22__.definePathFunction)(out)
 
             if (out.backgroundMap_) {
                 drawBackgroundMap(out)
@@ -32272,24 +32327,24 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         // resolved here (it's only known once geo data has loaded, for maps without an explicit
         // z), leaving pixelSizeM undefined and baking NaN coordinates into the scalebar. Redraw it
         // now that position_.z is final, instead of waiting for a zoom event that may never come.
-        (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__.updateScalebar)(out)
+        (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_16__.updateScalebar)(out)
 
         // d3 zoom
         if (out.zoomExtent_ || out.zoomButtons_) {
             if (!out.zoomExtent_) {
                 out.zoomExtent_ = [1, 10]
             }
-            (0,_zoom__WEBPACK_IMPORTED_MODULE_10__.defineMapZoom)(out)
+            (0,_zoom__WEBPACK_IMPORTED_MODULE_8__.defineMapZoom)(out)
         }
 
         // prepare group for proportional symbols, with centroids
         // IMPORTANT: Skip for grid cartograms - they use grid cells as anchors instead
         if (withCenterPoints && !out.gridCartogram_) {
-            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_26__.addCentroidsToMap)(out)
+            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_23__.addCentroidsToMap)(out)
         }
 
         // add user locations (points)
-        if (out._locations_?.length) (0,_locations_js__WEBPACK_IMPORTED_MODULE_20__.updateLocations)(out)
+        if (out._locations_?.length) (0,_locations_js__WEBPACK_IMPORTED_MODULE_17__.updateLocations)(out)
 
         // add geographical labels to map
         if (out.labels_ && !out.gridCartogram_) {
@@ -32304,36 +32359,36 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
 
         //placenames
         if (out.placenames_ && !out.gridCartogram_) {
-            (0,_decoration_placenames_js__WEBPACK_IMPORTED_MODULE_14__.addPlacenameLabels)(out)
+            (0,_decoration_placenames_js__WEBPACK_IMPORTED_MODULE_12__.addPlacenameLabels)(out)
         }
 
         //title
         if (out.title()) {
-            (0,_decoration_texts_js__WEBPACK_IMPORTED_MODULE_18__.addTitle)(out)
+            (0,_decoration_texts_js__WEBPACK_IMPORTED_MODULE_15__.addTitle)(out)
         }
 
         //subtitle
         if (out.subtitle()) {
-            (0,_decoration_texts_js__WEBPACK_IMPORTED_MODULE_18__.addSubtitle)(out)
+            (0,_decoration_texts_js__WEBPACK_IMPORTED_MODULE_15__.addSubtitle)(out)
         }
 
         //bottom text
         if (out.footnote_) {
-            (0,_decoration_texts_js__WEBPACK_IMPORTED_MODULE_18__.addFootnote)(out)
+            (0,_decoration_texts_js__WEBPACK_IMPORTED_MODULE_15__.addFootnote)(out)
         }
 
         //logo
         if (out.showEstatLogo_) {
-            (0,_decoration_logo_js__WEBPACK_IMPORTED_MODULE_16__.addEurostatLogo)(out)
+            (0,_decoration_logo_js__WEBPACK_IMPORTED_MODULE_13__.addEurostatLogo)(out)
         }
 
         if (out.showEstatRibbon_) {
-            (0,_decoration_logo_js__WEBPACK_IMPORTED_MODULE_16__.addEurostatRibbon)(out)
+            (0,_decoration_logo_js__WEBPACK_IMPORTED_MODULE_13__.addEurostatRibbon)(out)
         }
 
         //source dataset URL
         if (out.showSourceLink_) {
-            (0,_decoration_texts_js__WEBPACK_IMPORTED_MODULE_18__.addSourceLink)(out, withCenterPoints)
+            (0,_decoration_texts_js__WEBPACK_IMPORTED_MODULE_15__.addSourceLink)(out, withCenterPoints)
         }
 
         // scalebar - not applicable for grid cartograms
@@ -32344,17 +32399,17 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
                 sb.position = [15, out.height_ - 50]
             }
 
-            (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__.addScalebarToMap)(out)
+            (0,_decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_16__.addScalebarToMap)(out)
         }
 
         //minimap
         if (out.minimap_) {
-            (0,_minimaps__WEBPACK_IMPORTED_MODULE_9__.appendMinimap)(out)
+            (0,_minimaps__WEBPACK_IMPORTED_MODULE_7__.appendMinimap)(out)
         }
 
         //zoom buttons
         if (out.zoomButtons_ && !out.gridCartogram_) {
-            (0,_buttons_zoom_buttons__WEBPACK_IMPORTED_MODULE_11__.appendZoomButtons)(out)
+            (0,_buttons_zoom_buttons__WEBPACK_IMPORTED_MODULE_9__.appendZoomButtons)(out)
         }
 
         //insets buttons
@@ -32362,28 +32417,28 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         // auto-show the toggle button whenever insets exist and the user hasn't explicitly
         // configured insetsButton themselves - otherwise there would be no way to reveal them.
         {
-            const isMobileForInsetsButton = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_28__.isCompact)(out, out.insetsVisibilityBreakpoint_)
+            const isMobileForInsetsButton = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.isCompact)(out, out.insetsVisibilityBreakpoint_)
             const hasInsets = Array.isArray(out.insets_) ? out.insets_.length > 0 : !!out.insets_
             if (out.insetsButton_ || (!out._insetsButtonExplicit_ && isMobileForInsetsButton && hasInsets)) {
-                (0,_buttons_insets_button__WEBPACK_IMPORTED_MODULE_12__.appendInsetsButton)(out)
+                (0,_buttons_insets_button__WEBPACK_IMPORTED_MODULE_10__.appendInsetsButton)(out)
             }
         }
 
         // legend button
         if (out.legendButton_ && typeof out.legendObj_ !== 'undefined' && out.legendObj_) {
-            (0,_buttons_legend_button__WEBPACK_IMPORTED_MODULE_13__.appendLegendButton)(out)
+            (0,_buttons_legend_button__WEBPACK_IMPORTED_MODULE_11__.appendLegendButton)(out)
         }
 
         // after drawBackgroundMap, geometries, labels, etc.
         if (out.drawCoastalMargin_ && !out.gridCartogram_) {
-            (0,_decoration_coastal_margin_js__WEBPACK_IMPORTED_MODULE_17__.appendCoastalMargin)(out)
+            (0,_decoration_coastal_margin_js__WEBPACK_IMPORTED_MODULE_14__.appendCoastalMargin)(out)
         }
 
-        (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.applyMapAccessibility)(out)
-        ;(0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.setupKeyboardNavigation)(out)
+        (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_18__.applyMapAccessibility)(out)
+        ;(0,_accessibility_js__WEBPACK_IMPORTED_MODULE_18__.setupKeyboardNavigation)(out)
 
         //header/footer
-        setTimeout(() => (0,_layout__WEBPACK_IMPORTED_MODULE_24__.recalculateLayout)(out), 20)
+        setTimeout(() => (0,_layout__WEBPACK_IMPORTED_MODULE_21__.recalculateLayout)(out), 20)
         return out
     }
 
@@ -32412,8 +32467,6 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
 
         return out
     }
-
-    return out
 }
 
 const drawBackgroundMap = function (out) {
@@ -32490,13 +32543,13 @@ const updateGeoMapTemplate = function (callback, map, root = map) {
                 // other map/inset loaded fine. This map/inset just won't have geometry to draw.
                 console.error(`[eurostat-map] Failed to load geo data for "${map.svgId_ || map.geo_}":`, err)
                 if (loaded) {
-                    (0,_errors_js__WEBPACK_IMPORTED_MODULE_22__.reportMapError)(root, { type: 'render', message: err?.message || String(err), cause: err })
+                    (0,_errors_js__WEBPACK_IMPORTED_MODULE_19__.reportMapError)(root, { type: 'render', message: err?.message || String(err), cause: err })
                 } else {
                     if (map === root) {
-                        (0,_errors_js__WEBPACK_IMPORTED_MODULE_22__.showMapErrorMessage)(map)
-                        ;(0,_toast_js__WEBPACK_IMPORTED_MODULE_23__.showEurostatApiErrorToast)(_errors_js__WEBPACK_IMPORTED_MODULE_22__.GEO_ERROR_MESSAGE)
+                        (0,_errors_js__WEBPACK_IMPORTED_MODULE_19__.showMapErrorMessage)(map)
+                        ;(0,_toast_js__WEBPACK_IMPORTED_MODULE_20__.showEurostatApiErrorToast)(_errors_js__WEBPACK_IMPORTED_MODULE_19__.GEO_ERROR_MESSAGE)
                     }
-                    (0,_errors_js__WEBPACK_IMPORTED_MODULE_22__.reportMapError)(root, { type: 'geometry', message: _errors_js__WEBPACK_IMPORTED_MODULE_22__.GEO_ERROR_MESSAGE, geo: map.geo_, cause: err })
+                    (0,_errors_js__WEBPACK_IMPORTED_MODULE_19__.reportMapError)(root, { type: 'geometry', message: _errors_js__WEBPACK_IMPORTED_MODULE_19__.GEO_ERROR_MESSAGE, geo: map.geo_, cause: err })
                 }
                 if (callback) callback()
             })

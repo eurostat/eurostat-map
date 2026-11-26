@@ -337,7 +337,8 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
 ## Where things live (split in 2026-11)
 
 - `core/stat-map.js`: map lifecycle (build, updates, legends). `stat()`/`statData()` and category datasets are in
-  `core/stat-api.js`; `buildSingleLayerMap` is in `core/single-layer-map.js`.
+  `core/stat-api.js`; `buildSingleLayerMap` is in `core/single-layer-map.js`. Map setters are in `core/map-instance.js`;
+  building the svg template and loading geometry is in `core/map-template.js`.
 - Coxcomb: numbers in `composition/coxcomb-data.js`, hover in `coxcomb-interactions.js`. Bivariate legend call-outs and
   highlight: `legend/choropleth/bivariate-annotations.js`, `bivariate-highlight.js`. Default country labels:
   `core/decoration/default-labels.js`.
