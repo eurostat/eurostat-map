@@ -14,6 +14,8 @@ sitting uncommitted in the working tree.
   unrelated in-progress work from elsewhere in the tree — check `git status` first, since
   multiple agents/sessions may be working in this repo concurrently).
 - Build with the locked toolchain (`npm ci` first in a new checkout or worktree), then `npm run build`.
+- A checkout from before 2026-11-26 still has `build/` tracked: if pulling or rebasing across that change is refused,
+  discard or move the built files (`git checkout -- build`, or move them aside), pull, then `npm run build`.
 - **`build/` is not committed** (only `build/package.json`, a source file). CI, the Publish site workflow and
   `npm pack`/`publish` (through `prepack`) build it. After changing `src/`, rebuild before testing or opening examples.
 - Push after committing — don't leave commits local-only.
