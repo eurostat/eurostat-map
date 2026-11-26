@@ -93,12 +93,12 @@ map.colorSchemeType('continuous').colorStretch('sqrt')
 Example
 
 ```javascript
-map.annotations([{ x: 300, y: 200, align: 'right', note: { label: 'Constanta', textAlign: 'right' } }])
+map.annotations({ annotations: [{ x: 300, y: 200, align: 'right', note: { label: 'Constanta', textAlign: 'right' } }] })
 ```
 
 ### Improvements
 
-- **A real ES module build for bundlers.** The package's `module` entry (`build/eurostatmap.mjs`) imports D3 and most other dependencies instead of containing them (proj4 and the annotation library excepted): in a test application that also uses D3, the bundle is about 13% smaller gzipped than with 4.15.0. `import eurostatmap from 'eurostat-map'` now works in webpack, where it returned `undefined` before. The `build/eurostatmap.js` and `build/eurostatmap.min.js` files are unchanged in kind.
+- **A real ES module build for bundlers.** The package's `module` entry (`build/eurostatmap.mjs`) imports D3 and most other dependencies instead of containing them (proj4 and the annotation library excepted): in a test application that also uses D3, the bundle is about 12% smaller gzipped than with 4.15.0. `import eurostatmap from 'eurostat-map'` now works in webpack, where it returned `undefined` before. The `build/eurostatmap.js` and `build/eurostatmap.min.js` files are unchanged in kind.
 
 Example
 
