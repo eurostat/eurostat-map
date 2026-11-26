@@ -930,6 +930,15 @@ function ignoreHiddenTooltipPlacement(line) {
     })
 }
 
+// The legend's background box is sized from measured text, which differs by a pixel between platforms' fonts (the
+// baseline is captured on Windows, CI runs on Linux). Legend geometry has its own test (legend-layout.test.mjs).
+function ignoreLegendBackgroundSize(line) {
+    if (!line.includes('class="em-legend-background"')) return line
+    return line.replace(/ (x|y|width|height)="[^"]*"/g, ' $1="*"')
+}
+
+const normaliseLine = (line) => ignoreLegendBackgroundSize(ignoreHiddenTooltipPlacement(line))
+
 function compare(name, base, cur) {
     const diffs = []
     if (!base) return [`no baseline for this scenario (run with --capture)`]
@@ -948,8 +957,8 @@ function compare(name, base, cur) {
         }
         for (const key of ['onBuildCount', 'loading']) if (J(b[key]) !== J(c[key])) diffs.push(`${where} ${key}: ${J(b[key])} -> ${J(c[key])}`)
         for (const key of ['lines', 'liveRules', 'tooltips']) {
-            const bl = key === 'lines' ? b[key].map(ignoreHiddenTooltipPlacement) : b[key]
-            const cl = key === 'lines' ? c[key].map(ignoreHiddenTooltipPlacement) : c[key]
+            const bl = key === 'lines' ? b[key].map(normaliseLine) : b[key]
+            const cl = key === 'lines' ? c[key].map(normaliseLine) : c[key]
             if (J(bl) === J(cl)) continue
             let shown = 0
             let count = 0
