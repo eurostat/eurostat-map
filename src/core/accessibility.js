@@ -113,6 +113,7 @@ const flowTargets = (drawing) => {
  */
 const swatchName = (element, legend) => {
     if (element.__emName) return element.__emName // set by a legend whose items carry no text (the bivariate square)
+    if (element.tagName !== 'rect') return element.textContent?.trim().replace(/\s+/g, ' ') ?? '' // lines and cells have no level labels
     const own = element.textContent?.trim()
     if (own) return own.replace(/\s+/g, ' ')
     const row = element.parentNode
@@ -135,9 +136,12 @@ const sideBySide = (group) => {
     return Math.abs(a.getBoundingClientRect().top - b.getBoundingClientRect().top) < 1
 }
 
+/** An element of a legend that reacts to the pointer and is not focusable by itself. */
+const isLegendItem = (element) => hasListener(element, 'mouseover', 'mouseenter', 'mousemove') && !element.hasAttribute('tabindex')
+
 /** A legend's hoverable items, in drawing order. A swatch and the label that does the same thing count once. */
 const legendTargets = (legend) => {
-    const hoverable = [...legend.querySelectorAll('*')].filter((element) => hasListener(element, 'mouseover', 'mouseenter', 'mousemove') && !element.hasAttribute('tabindex') && isShown(element))
+    const hoverable = [...legend.querySelectorAll('*')].filter((element) => isLegendItem(element) && isShown(element))
     const targets = []
     hoverable.forEach((element) => {
         if (element.tagName === 'text' && hoverable.some((other) => other !== element && other.tagName !== 'text' && other.parentNode === element.parentNode)) return
@@ -294,7 +298,8 @@ export const setupLegendNavigation = function (legend) {
     if (!map || !node) return
 
     removeNavigation(container)
-    if (map.keyboardNavigation_ === false || !legendTargets(node).length) return
+    // only look for one item: this runs at every legend redraw, and naming and measuring them all waits for a key press
+    if (map.keyboardNavigation_ === false || !Array.prototype.some.call(node.querySelectorAll('*'), isLegendItem)) return
 
     // the legend's own words, so that they are still read when the group takes the keyboard
     const text = blockText(node)
