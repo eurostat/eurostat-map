@@ -38,6 +38,8 @@ This package is consumed by `image` (the sibling `image` repo, dependency
   it. Do the other release-flow steps (bump version, rebuild, update `docs/release-notes.md`,
   commit, tag, push), tell the user the version is ready for them to publish, and wait. Once they
   say it is done, verify with `npm view eurostat-map version` and create the GitHub Release.
+- **No publish is coming unless the maintainer asks for a release to be prepared.** Until then, don't bump or tag, and
+  don't defer work to "the next version": it all goes into the pending release.
 - **Always confirm the semver level explicitly** (patch/minor/major) before bumping the version
   or publishing — don't infer it silently, even for a change that looks obviously non-breaking.
 - **Don't bump the version once per fix.** While iterating on a batch of not-yet-published
