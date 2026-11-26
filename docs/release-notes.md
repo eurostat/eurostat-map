@@ -1,5 +1,218 @@
 # Release notes
 
+## 4.16.0
+
+### New
+
+- **Maps work with a keyboard and a screen reader.** A built map is a named group, its zoom, legend and inset buttons are keyboard-operable, and one tab stop on the map lets the arrow keys move between regions, showing and announcing each tooltip (Page Up and Page Down change country, Escape leaves). Turn region navigation off with `keyboardNavigation(false)`. Flow maps have no region navigation.
+
+Example
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .title('Population density in 2024')
+    .ariaDescription('Density is highest in the Benelux countries and lowest in northern Scandinavia.')
+    .build()
+```
+
+- **`map.onError()` reports failures.** It is called when boundary data (`geometry`) or statistics (`data`) cannot be loaded, or drawing fails (`render`). A map whose boundaries fail now also shows a message instead of staying blank.
+
+Example
+
+```javascript
+map.onError((error) => {
+    document.querySelector('#status').textContent = error.message
+})
+```
+
+- **Great-circle flow routes** and documented un-bundling (a negative `chargeStrength` fans routes out).
+
+Example
+
+```javascript
+map.flowSettings({ lineType: 'straight', lineGeometry: 'greatCircle' })
+// or
+map.flowSettings({ edgeBundling: true, bundleSettings: { chargeStrength: -20 } })
+```
+
+- **Reciprocal flows side by side**, with half-arrows and circles for internal traffic.
+
+Example
+
+```javascript
+map.flowSettings({ lineType: 'straight', bidirectional: true, bidirectionalLayout: 'parallel', arrows: true, nodes: true, nodeSizeBy: 'internal' })
+```
+
+- **Comparable small multiples and in-place flow updates**: `widthDomain` gives several maps one width scale, `updateFlowWidths()` restyles a built map, and `updateStyle()` redraws only the flows.
+
+Example
+
+```javascript
+map.flowSettings({ widthDomain: [0, 5_000_000] })
+map.flowSettings({ maxWidth: 14 })
+map.updateFlowWidths()
+```
+
+- **Export any SVG as an HD PNG** with `eurostatmap.exportSvgToPNG()`, for pictures made of several maps.
+
+Example
+
+```javascript
+eurostatmap.exportSvgToPNG(document.querySelector('#poster'), { scale: 3, filename: 'poster.png' })
+```
+
+- **Percentage rings on proportional circles**, labelled in the legend.
+
+Example
+
+```javascript
+map.encoding('size', { stat: 'population' }).encoding('ring', { stat: 'share65Plus' }).psSettings({ ringWidth: 4 })
+```
+
+- **Venn choropleths**: colour each region by which of three variables meet their thresholds.
+
+Example
+
+```javascript
+map.addLayer('trivariateChoropleth').encoding('color', { stats: ['young', 'middle', 'older'] }).vennSettings({})
+```
+
+- **Eurostat colour palettes by name**, including diverging pairs, and stretching for skewed continuous data.
+
+Example
+
+```javascript
+map.colors('teal')
+map.colors('cobalt-plum').pointOfDivergence(0)
+map.colorSchemeType('continuous').colorStretch('sqrt')
+```
+
+- **Aligned annotation text and matching hatching legends**: `note.textAlign`, and `legendBackground` for `patternFill`.
+
+Example
+
+```javascript
+map.annotations([{ x: 300, y: 200, align: 'right', note: { label: 'Constanta', textAlign: 'right' } }])
+```
+
+### Improvements
+
+- **The layout follows the width the map is drawn at**, not the window. In narrow containers the map is drawn at real size, legends sit under it, buttons are larger and a finger scrolls the page. `height()` accepts a function. Force a profile with `layout()`.
+
+Example
+
+```javascript
+map.layout('desktop').legendCompactPosition('keep')
+map.height(() => window.innerHeight - 60)
+```
+
+- **Legends do not overlap themselves** in any map type: titles, labels and sub-legends are placed from their measured sizes, discrete swatches share one layout, and every sub-legend can be switched off with `false`. The flow colour legend takes the choropleth's `orientation`, `labels`, `maxMin` and `maxMinLabels`.
+
+Example
+
+```javascript
+map.legend({ flowColorLegend: { orientation: 'horizontal', width: 320, maxMin: true }, nodeSizeLegend: false })
+```
+
+- **PNG exports are HD by default** (twice the map's size and at least 1920 px wide) and keep the halos of labels readable.
+
+Example
+
+```javascript
+map.exportMapToPNG()
+```
+
+- **Readers who ask for reduced motion get no transitions**, unless you set a duration.
+
+Example
+
+```javascript
+map.transitionDuration(500) // always animate
+```
+
+- **Mistakes are reported in the console**: an unknown classification method (the map then uses `quantile`, where it used to crash) and legend options that look misspelt.
+
+Example
+
+```javascript
+map.classificationMethod('quantil') // warns and draws quantile classes
+map.legend({ titel: 'Density' }) // warns: did you mean "title"?
+```
+
+- **The package can be imported in Node** (server-side rendering, tests). Drawing a map still needs a browser.
+
+Example
+
+```javascript
+const eurostatmap = require('eurostat-map') // no longer throws "self is not defined"
+```
+
+- **Smoother zooming**, with place names and strokes keeping a constant size.
+
+Example
+
+```javascript
+map.zoomExtent([1, 10]).placenames(true)
+```
+
+- **Boundary attribution** appears when hovering or focusing **Credits**.
+
+Example
+
+```javascript
+map.footnoteTooltipText(false) // keep only the attribution
+```
+
+### Fixes
+
+- Insets keep their configured height, and bar, spike, shape and custom proportional symbols are now drawn in insets.
+
+Example
+
+```javascript
+eurostatmap.map('proportionalSymbol').psSettings({ shape: 'spike' }).insets('default').build()
+```
+
+- `nutsbnStroke()` / `nutsbnStrokeWidth()` apply again, `patternFill` is visible on proportional-symbol maps, and level-0 proportional-symbol maps with a pattern no longer throw.
+
+Example
+
+```javascript
+map.patternFill([{ pattern: 'hatching', regionIds: ['EE'], legendBackground: '#dcdcdc' }])
+```
+
+- Sankey flows end flat unless arrows are on, and a partial `bundleSettings` object no longer breaks bundled routes.
+
+Example
+
+```javascript
+map.flowSettings({ edgeBundling: true, bundleSettings: { chargeStrength: 20 } })
+```
+
+- A TypeScript error for consumers without `skipLibCheck` (`zoomButtons` declared twice in `InsetConfig`) is fixed.
+
+Example
+
+```ts
+const inset: InsetConfig = { geo: 'MT', zoomButtons: true }
+```
+
+### Behaviour changes to check
+
+No API was removed, but these can change how an existing page looks or behaves:
+
+- Narrow containers switch to the compact layout, whatever the window width. Use `layout('desktop')` to keep the old one.
+- Maps and their buttons add tab stops to the page. `keyboardNavigation(false)` removes the map's.
+- Some legends move slightly where parts used to touch or overlap; very short swatches grow to fit their labels.
+- TypeScript: sub-legend settings are now typed `Config | false`, so code that reads them needs to handle `false`.
+
+Example
+
+```ts
+const sizeLegend = legend.sizeLegend || undefined
+```
+
 ## 4.15.0
 
 ### New
