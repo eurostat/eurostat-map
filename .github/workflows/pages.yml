@@ -1,0 +1,79 @@
+name: Publish site
+
+# GitHub Pages: the repository as it is (examples, docs), rendered by Jekyll as the "publish a branch" setting did,
+# plus the bundles built from it. build/ is not committed, so this is what gives the live examples their library.
+on:
+    push:
+        branches:
+            - master
+    # the API docs are committed by a workflow, and such commits do not trigger `push`
+    workflow_run:
+        workflows: ['Regenerate API docs']
+        types: [completed]
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+# one deployment at a time; a newer push waits for the running one and then replaces it
+concurrency:
+    group: pages
+    cancel-in-progress: false
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+              with:
+                  ref: master
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v7
+              with:
+                  node-version: '24'
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build the bundles
+              run: npm run build
+
+            # Jekyll would copy them into the site
+            - name: Remove the dependencies
+              run: rm -rf node_modules
+
+            - name: Configure Pages
+              uses: actions/configure-pages@v6
+
+            - name: Render the site
+              uses: actions/jekyll-build-pages@v1
+              with:
+                  source: ./
+                  destination: ./_site
+
+            - name: Check that the examples will find the library
+              run: test -s _site/build/eurostatmap.min.js && test -s _site/build/eurostatmap.js && test -s _site/examples/index.html
+
+            - name: Upload the site
+              uses: actions/upload-pages-artifact@v5
+              with:
+                  path: ./_site
+
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
+
+        steps:
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v5
