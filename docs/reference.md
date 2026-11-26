@@ -68,6 +68,8 @@ This document is the narrative usage guide. For generated, signature-accurate AP
     - [Insets](#insets)
     - [Minimap](#minimap)
     - [Buttons](#buttons)
+    - [Accessibility](#accessibility)
+    - [Errors](#errors)
     - [Export](#export)
     - [Miscellaneous](#miscellaneous)
     - [Build and update](#build-and-update)
@@ -2433,6 +2435,45 @@ You can add zoom buttons with `map.zoomButtons(true)` and an inset toggle with `
 | _map_.**legendButtonPosition**([*value*])       | Array ([x,y]) | auto          | Position adjustment of the legend button.                                                                                     |
 | _map_.**legendVisibilityBreakpoint**([*value*]) | number        | _480_         | Container width (px) at or below which the legend starts hidden when `legendButton` is enabled.                                |
 
+## Accessibility
+
+A built map is a named group for screen readers, its buttons work from the keyboard, and its regions can be explored with
+the keyboard: one tab stop on the map, then the arrow keys move from region to region (in the order of their codes), Page
+Up and Page Down change country, Home and End go to the first and last region, and Escape leaves. Each move shows the
+region's tooltip and highlight, and the tooltip's text is announced. Flow maps have no keyboard navigation. Readers who
+ask their system for reduced motion get no transitions, unless `transitionDuration()` is set.
+
+| Method                                  | Type    | Default value              | Description |
+| --------------------------------------- | ------- | -------------------------- | ----------- |
+| _map_.**ariaLabel**([*value*])          | String  | the title and subtitle     | The accessible name of the map. A `role` or `aria-label` you put on the SVG element yourself is left alone. |
+| _map_.**ariaDescription**([*value*])    | String  | _undefined_                | A longer description (what the map shows, the main finding), written as the SVG's `<desc>`. |
+| _map_.**keyboardNavigation**([*value*]) | Boolean | _true_                     | Set to false to leave the map regions out of the tab order. |
+
+```javascript
+eurostatmap
+    .map('choropleth')
+    .title('Population density in 2024')
+    .ariaDescription('Density is highest in the Benelux countries and lowest in the north of Scandinavia.')
+    .build()
+```
+
+A description of the main finding is the part only you can write: colour maps are otherwise silent to a screen reader.
+
+## Errors
+
+| Method                       | Type     | Default value | Description |
+| ---------------------------- | -------- | ------------- | ----------- |
+| _map_.**onError**([*value*]) | Function | _undefined_   | Called as `function(error, map)` when part of the map fails. `error.type` is `'geometry'` (boundary data could not be loaded; the map also shows a message), `'data'` (statistics could not be loaded; `error.statKey` names the dataset) or `'render'`. `error.message` can be shown to the reader. `onBuild` is not called for a map whose data failed. |
+
+```javascript
+map.onError((error) => {
+    document.querySelector('#status').textContent = error.message
+})
+```
+
+The console also warns about an unknown classification method (the map then uses `quantile`) and about legend options
+that look misspelt.
+
 ## Export
 
 Export the map as a PNG image or a SVG file.
@@ -2450,7 +2491,7 @@ Export the map as a PNG image or a SVG file.
 | ---------------------------------------------- | ------------ | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**noDataText**([*value*])                | String       | _"Data unavailable"_ | The text to show for regions where no data is available.                                                                                                                                                                                                                                                                                                         |
 | _map_.**language**([*value*])                  | String       | _"en"_               | The language code, for multilingual maps.                                                                                                                                                                                                                                                                                                                        |
-| _map_.**transitionDuration**([*value*])        | int          | _500_                | When updating statistical figures, the map style changes progressively. This parameter sets the duration of this transition, in ms.                                                                                                                                                                                                                              |
+| _map_.**transitionDuration**([*value*])        | int          | _500_                | When updating statistical figures, the map style changes progressively. This parameter sets the duration of this transition, in ms. 0 for readers who ask for reduced motion, unless set.                                                                                                                                                                                                                              |
 | _map_.**filtersDefinitionFunction**([*value*]) | Function     | _function() {}_      | A function defining SVG filter elements. To be used to defined fill patterns.                                                                                                                                                                                                                                                                                    |
 | _map_.**onBuild**([*value*])                   | Function     | _undefined_          | A function to execute after the map build is complete.                                                                                                                                                                                                                                                                                                           |
 | _map_.**svg**([*value*])                       | d3 selection | -                    | Returns the D3 selection of the map SVG element.                                                                                                                                                                                                                                                                                                                 |
@@ -2477,7 +2518,7 @@ After changing some parameters, one of the following methods need to be executed
 | _map_.**updateLocations**()      | _this_ | Redraw the custom point location markers.                                                                                               |
 | _map_.**updateBackgroundMap**()  | _this_ | Show or hide the background map on an already-built map to match the current `backgroundMap()` value, without a full rebuild.           |
 
-Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new) !
+Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat-map/issues/new) !
 
 ## Version migration
 

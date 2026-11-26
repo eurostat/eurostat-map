@@ -1,6 +1,7 @@
 const EUROSTAT_TOAST_ID = 'em-eurostat-error-toast-container'
 let lastEurostatToastAt = 0
 
+/** A short message in the corner of the page for something that could not be loaded. */
 export const showEurostatApiErrorToast = function (message) {
     if (typeof document === 'undefined') return
 
@@ -25,6 +26,7 @@ export const showEurostatApiErrorToast = function (message) {
     }
 
     const toast = document.createElement('div')
+    toast.setAttribute('role', 'alert')
     toast.textContent = message || 'Eurostat API request failed.'
     toast.style.background = 'rgba(186, 42, 42, 0.96)'
     toast.style.color = '#fff'

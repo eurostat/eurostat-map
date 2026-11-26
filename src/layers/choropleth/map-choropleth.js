@@ -1,4 +1,5 @@
 //map-choropleth.js
+import { warnUnknownClassification } from '../../core/option-check'
 import { select } from 'd3-selection'
 import { min, max } from 'd3-array'
 import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
@@ -336,6 +337,12 @@ export const decorateChoroplethLayer = function (layer, config) {
                         const domain = nClasses > 0 ? ckmeans(dataArrayNumeric, nClasses).map((cluster) => cluster.pop()).slice(0, -1) : []
                         layer.classifier(scaleThreshold().domain(domain).range(range))
                         break
+                    }
+                    default: {
+                        // a continuous scheme needs no method, and a classifier the caller set stays
+                        if (layer.colorSchemeType_ === 'continuous') break
+                        warnUnknownClassification(layer.classificationMethod_, ['quantile', 'equinter', 'equal-interval', 'threshold', 'jenks', 'ckmeans'])
+                        if (!layer.classifier_) layer.classifier(scaleQuantile().domain(dataArrayNumeric).range(range))
                     }
                 }
 

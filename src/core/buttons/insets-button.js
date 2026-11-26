@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import { BOX_CORNER_RADIUS } from './corner-radius'
 import { getButtonPadding, getButtonSize, getMapDrawingExtent } from './button-utils'
+import { makeButtonAccessible } from '../accessibility'
 
 export const appendInsetsButton = (map) => {
     const svg = select('#' + map.svgId())
@@ -49,6 +50,8 @@ export const appendInsetsButton = (map) => {
             container.style('display', 'none')
         }
     })
+
+    makeButtonAccessible(insetButton, 'Show or hide the inset maps')
 }
 
 export function updateInsetsButtonPosition(map) {

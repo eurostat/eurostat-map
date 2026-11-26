@@ -139,7 +139,7 @@ For detailed documentation on what eurostat-map can do, see the **[documentation
 
 For generated, signature-accurate API docs from TypeScript/JSDoc, see [the API docs](https://eurostat.github.io/eurostat-map/docs/api/index.html).
 
-Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat.js/issues/new)!
+Anything unclear or missing? Feel free to [ask](https://github.com/eurostat/eurostat-map/issues/new)!
 
 ## Made with eurostat-map
 
@@ -164,11 +164,11 @@ eurostat-map is an open-source JavaScript library for building interactive, publ
 | _contributors_ | [<img src="https://github.com/jgaffuri.png" height="40" />](https://github.com/jgaffuri) [<img src="https://github.com/JoeWDavies.png" height="40" />](https://github.com/JoeWDavies) |
 | _version_      | See [npm](https://www.npmjs.com/package/eurostat-map?activeTab=versions)                                                                                                              |
 | _status_       | Since 2018                                                                                                                                                                            |
-| _license_      | [EUPL 1.2](https://github.com/eurostat/Nuts2json/blob/master/LICENSE)                                                                                                                 |
+| _license_      | [EUPL 1.2](LICENSE)                                                                                                                 |
 
 ## Contribute
 
-Feel free to [ask for assistance](https://github.com/eurostat/eurostat.js/issues/new), fork the project or simply star it (it's always a pleasure).
+Feel free to [ask for assistance](https://github.com/eurostat/eurostat-map/issues/new), fork the project or simply star it (it's always a pleasure).
 
 ## Copyright
 

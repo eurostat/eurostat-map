@@ -3,6 +3,7 @@ import { scaleQuantile, scaleQuantize, scaleThreshold } from 'd3-scale'
 import { getResponsiveSymbolSize } from '../../core/responsive.js'
 import { min, max } from 'd3-array'
 import { getCentroidsGroup } from '../../core/geo/centroids.js'
+import { warnUnknownClassification } from '../../core/option-check.js'
 
 /**
  * @description defines classifier functions (layer.classifierColor and layer.classifierSize) for both symbol size and color
@@ -61,6 +62,9 @@ function defineColorClassifier(layer) {
         layer.psClasses_ = layer.psThresholds_.length + 1
         const range = getA(layer.psClasses_)
         layer.classifierColor(scaleThreshold().domain(layer.psThresholds_).range(range))
+    } else {
+        warnUnknownClassification(layer.psClassificationMethod_, ['quantile', 'equinter', 'threshold'])
+        if (!layer.classifierColor_) layer.classifierColor(scaleQuantile().domain(getColorData(layer).getArray()).range(getA(layer.psClasses_)))
     }
 }
 

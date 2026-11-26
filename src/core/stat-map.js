@@ -10,6 +10,9 @@ import { createMapInstance, updateGeoMapTemplate } from './map-instance'
 import { refreshCentroids } from './geo/centroids'
 import { exportMapToPNG, exportMapToSVG } from './export'
 import { buildGridCartogramBase } from './cartograms'
+import { reportMapError } from './errors'
+import { warnMisspelledOptions } from './option-check'
+import { prefersReducedMotion, setupKeyboardNavigation } from './accessibility'
 import { createLayer, makeMapSelfLayer, forwardFieldsToActiveLayer, forwardChainableMethod } from './layer'
 import { getRole, isLayerTypeRegistered, getLayerType } from './layer-registry'
 
@@ -439,10 +442,10 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      * Duration in milliseconds for D3 transitions when the map updates.
      * Set to 0 to disable transitions.
      * @type {number}
-     * @default 500
+     * @default 500, or 0 when the reader asks the system for reduced motion
      * @example map.transitionDuration(0)
      */
-    out.transitionDuration_ = 500
+    out.transitionDuration_ = prefersReducedMotion() ? 0 : 500
     //specific tooltip text function
     out.tooltip_.textFunction = undefined
     /**
@@ -460,6 +463,14 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
      * map.onBuild(m => console.log('Map ready', m))
      */
     out.onBuild_ = undefined
+    /**
+     * Called when part of the map fails: boundary data or statistics that cannot be loaded, or an error while drawing.
+     * onBuild is not called for a map whose data failed.
+     * @type {function(error: {type: string, message: string, statKey?: string, cause?: *}, map: object): void | undefined}
+     * @example
+     * map.onError((error) => showMessage(error.message))
+     */
+    out.onError_ = undefined
     /**
      * Legend configuration object. Passed to the legend constructor.
      * The available properties depend on the map type's legend.
@@ -545,6 +556,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         'transitionDuration_',
         'filtersDefinitionFunction_',
         'onBuild_',
+        'onError_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -575,6 +587,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         }
         //set new legend config
         out.legend_ = v
+        warnMisspelledOptions(v)
         //update if existing legend
         if (out.legendObj_) out.updateLegend()
         return out
@@ -727,6 +740,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         const isFacade = layer === out
         const legendConfig = isFacade ? out.legend() : layer.legend_
         if (!legendConfig) return out
+        warnMisspelledOptions(legendConfig)
 
         const constructor = isFacade ? out.getLegendConstructor() : layer.getLegendConstructor()
         if (!layer.legendObj_) {
@@ -901,12 +915,14 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
                 // Other map types keep historical behavior (country-level fallback).
                 if (nl === 'mixed' && out._mapType !== 'spark') nl = 0
 
-                statData.retrieveFromRemote(nl, out.language(), () => {
+                statData.retrieveFromRemote(nl, out.language(), (error) => {
                     // bookkeeping MUST always run
                     if (isRemote) {
                         out._loadingStatCount_ = Math.max(0, out._loadingStatCount_ - 1)
                         out.updateLoader()
                     }
+
+                    if (error) reportMapError(out, { type: 'data', statKey, message: error.userMessage || error.message, cause: error })
 
                     if (!isStatDataReady()) return
 

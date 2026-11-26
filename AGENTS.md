@@ -314,6 +314,21 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
 * Maintain existing formatting standards defined in `.prettierrc`.
 * Do not leave active console logging statements or unfinished debugger codes in production files.
 
+## CI, errors, accessibility
+
+- `.github/workflows/ci.yml` runs `npm ci`, the type check, both builds, a check that the committed `build/` matches `src/`
+  (line endings ignored) and `npm test`. A red "bundles match" step means a bundle was not rebuilt.
+- `npm run check:declarations` compiles `src/types` without `skipLibCheck`, which hides errors in `.d.ts` files.
+- Nothing may touch `window`/`document` while a module loads: the package must import in Node
+  (`test/integration/node-import.test.mjs`).
+- A new legend option has to be in `LEGEND_OPTIONS` (`core/option-check.js`), or a near-identical name is reported as
+  misspelt; a unit test checks the typed ones.
+- Failures reach the caller through `reportMapError` (`core/errors.js`, `map.onError()`); a new thing that can fail
+  should use it. A new clickable SVG control uses `makeButtonAccessible` (`core/accessibility.js`). Region keyboard
+  navigation drives the regions' own `mouseover`/`mouseout` handlers, so it works for any map type that has them.
+- Attributes added to the map DOM change the inset and smoke baselines: first show that only those attributes differ,
+  then recapture.
+
 ## Examples use Eurostat UI components and the shared settings panel
 
 An example's settings (dropdowns, radios, sliders, checkboxes) go in the shared side panel,

@@ -361,7 +361,7 @@ export const statData = function (config) {
                     // Caller's loading counter (which drives the spinner overlay) only decrements
                     // inside this callback - skipping it on an API-reported error left the spinner
                     // spinning forever even though the request itself completed.
-                    if (callback) callback()
+                    if (callback) callback(userFacingError('Eurostat API request failed: ' + label))
                     return
                 }
                 //decode stat data
@@ -406,7 +406,7 @@ export const statData = function (config) {
                 console.error('Error retrieving Eurostat data: ' + message, err)
                 // Same reasoning as the data___.error branch above: a rejected fetch must still
                 // run the callback or the spinner never hides.
-                if (callback) callback()
+                if (callback) callback(userFacingError(message, err))
             })
     }
 
@@ -469,7 +469,7 @@ export const statData = function (config) {
                 const message = err?.message || 'Network or parsing error while retrieving CSV data.'
                 showEurostatApiErrorToast('CSV data request failed: ' + message)
                 console.error('Error retrieving CSV data:', err)
-                if (callback) callback()
+                if (callback) callback(userFacingError('CSV data request failed: ' + message, err))
             })
     }
 

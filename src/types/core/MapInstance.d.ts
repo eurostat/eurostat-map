@@ -1,3 +1,4 @@
+import type { MapError } from './MapError'
 import type { StatConfig } from './stat/StatConfig'
 import type { StatData } from './stat/StatData'
 import type { Layer } from './layer/Layer'
@@ -646,6 +647,26 @@ export interface MapInstance {
      */
     onBuild(): ((map: MapInstance) => void) | undefined
     onBuild(callback: (map: MapInstance) => void): this
+
+    /**
+     * Called when part of the map fails: boundary data or statistics that cannot be loaded, or an error while drawing.
+     * `onBuild` is not called for a map whose data failed.
+     * @example map.onError((error) => showMessage(error.message))
+     */
+    onError(): ((error: MapError, map: MapInstance) => void) | undefined
+    onError(callback: (error: MapError, map: MapInstance) => void): this
+
+    /** Accessible name of the map's svg. Unset: the title and subtitle. */
+    ariaLabel(): string | undefined
+    ariaLabel(label: string): this
+
+    /** A longer description for screen readers, written as the svg's `<desc>`. */
+    ariaDescription(): string | undefined
+    ariaDescription(description: string): this
+
+    /** One tab stop on the map, then the arrow keys move between regions and announce their tooltips. @default true */
+    keyboardNavigation(): boolean
+    keyboardNavigation(enabled: boolean): this
 
     /** Build and update. */
 

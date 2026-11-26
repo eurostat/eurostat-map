@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import { BOX_CORNER_RADIUS } from './corner-radius'
 import { getButtonPadding, getButtonSize, getMapDrawingExtent } from './button-utils'
+import { makeButtonAccessible, prefersReducedMotion } from '../accessibility'
 
 // The two zoom buttons form one stack: only its outer corners are rounded, the + button on top and the - button below.
 const ZOOM_BUTTON_RADIUS = BOX_CORNER_RADIUS
@@ -57,6 +58,9 @@ export const appendZoomButtons = (map) => {
         event.stopPropagation()
         zoomOut(map)
     })
+
+    makeButtonAccessible(zoomInBtn, 'Zoom in')
+    makeButtonAccessible(zoomOutBtn, 'Zoom out')
 }
 
 export function updateZoomButtonsPosition(map) {
@@ -80,9 +84,15 @@ function positionZoomButtons(map, buttonGroup, buttonSize) {
 }
 
 function zoomIn(map) {
-    map.svg_.transition().call(map.__zoomBehavior.scaleBy, 2)
+    zoomBy(map, 2)
 }
 
 function zoomOut(map) {
-    map.svg_.transition().call(map.__zoomBehavior.scaleBy, 0.5)
+    zoomBy(map, 0.5)
+}
+
+function zoomBy(map, factor) {
+    const transition = map.svg_.transition()
+    if (prefersReducedMotion()) transition.duration(0)
+    transition.call(map.__zoomBehavior.scaleBy, factor)
 }

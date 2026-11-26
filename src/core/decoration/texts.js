@@ -1,5 +1,6 @@
 import { getFontSizeFromClass } from '../utils'
 import { isCompact } from '../layout-profile'
+import { applyMapAccessibility } from '../accessibility'
 
 export function addTitle(out) {
     // define default position
@@ -36,6 +37,7 @@ export function addTitle(out) {
         .html(out.title())
 
     wrapTextForMobile(title, out, out.titlePosition()[0])
+    applyMapAccessibility(out) // the title is the map's accessible name
 }
 
 export function addSubtitle(out) {

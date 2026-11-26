@@ -7,7 +7,7 @@
 		exports["eurostatmap"] = factory();
 	else
 		root["eurostatmap"] = factory();
-})(self, () => {
+})(Object(typeof self !== 'undefined' ? self : this), () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
@@ -40,6 +40,85 @@ ___CSS_LOADER_EXPORT___.push([module.id, `/* STYLING OF NUTS REGIONS AND BOUNDAR
 .em-nutsrg,
 #em-user-regions {
     cursor: pointer !important;
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ },
+
+/***/ "./node_modules/css-loader/dist/cjs.js!./src/css/accessibility.css"
+/*!*************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js!./src/css/accessibility.css ***!
+  \*************************************************************************/
+(module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/noSourceMaps.js */ "./node_modules/css-loader/dist/runtime/noSourceMaps.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `/* Keyboard focus (see core/accessibility.js). :focus-visible: a mouse click draws no ring. */
+.em-button:focus,
+.em-drawing-group:focus {
+    outline: none;
+}
+
+.em-button:focus-visible > path:first-of-type,
+.em-button:focus-visible > rect:first-of-type {
+    stroke: #0e47cb !important;
+    stroke-width: 3px !important;
+}
+
+.em-drawing-group:focus-visible .em-frame {
+    stroke: #0e47cb !important;
+    stroke-width: 4px !important;
+    display: inline !important;
+}
+
+/* the region the arrow keys are on */
+.em-map .em-keyboard-focus,
+.em-map .em-keyboard-focus > * {
+    stroke: #000 !important;
+    stroke-width: 2.5px !important;
+    vector-effect: non-scaling-stroke;
+}
+
+/* read by screen readers, not shown */
+.em-announcer {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* shown where a map's boundaries could not be loaded (see core/errors.js) */
+.em-load-error {
+    font-family: sans-serif;
+    font-size: 14px;
+    fill: #8a1c1c;
+}
+
+.em--dark .em-load-error {
+    fill: #ffb4b4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .em-loading-spinner {
+        animation-duration: 4s !important;
+    }
 }
 `, ""]);
 // Exports
@@ -569,9 +648,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_css_loader_dist_cjs_js_cartogram_css__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./cartogram.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/cartogram.css");
 /* harmony import */ var _node_modules_css_loader_dist_cjs_js_countries_css__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./countries.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/countries.css");
 /* harmony import */ var _node_modules_css_loader_dist_cjs_js_borders_css__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./borders.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/borders.css");
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_responsive_css__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./responsive.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/responsive.css");
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_border_modes_css__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./border-modes.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/border-modes.css");
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_accessibility_css__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./accessibility.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/accessibility.css");
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_responsive_css__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./responsive.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/responsive.css");
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_border_modes_css__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! -!../../node_modules/css-loader/dist/cjs.js!./border-modes.css */ "./node_modules/css-loader/dist/cjs.js!./src/css/border-modes.css");
 // Imports
+
 
 
 
@@ -609,8 +690,9 @@ ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_insets_css__WEBPA
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_cartogram_css__WEBPACK_IMPORTED_MODULE_15__["default"]);
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_countries_css__WEBPACK_IMPORTED_MODULE_16__["default"]);
 ___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_borders_css__WEBPACK_IMPORTED_MODULE_17__["default"]);
-___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_responsive_css__WEBPACK_IMPORTED_MODULE_18__["default"]);
-___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_border_modes_css__WEBPACK_IMPORTED_MODULE_19__["default"]);
+___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_accessibility_css__WEBPACK_IMPORTED_MODULE_18__["default"]);
+___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_responsive_css__WEBPACK_IMPORTED_MODULE_19__["default"]);
+___CSS_LOADER_EXPORT___.i(_node_modules_css_loader_dist_cjs_js_border_modes_css__WEBPACK_IMPORTED_MODULE_20__["default"]);
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `
 `, ""]);
@@ -20503,6 +20585,209 @@ class TricoloreViz {
 
 /***/ },
 
+/***/ "./src/core/accessibility.js"
+/*!***********************************!*\
+  !*** ./src/core/accessibility.js ***!
+  \***********************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   applyMapAccessibility: () => (/* binding */ applyMapAccessibility),
+/* harmony export */   makeButtonAccessible: () => (/* binding */ makeButtonAccessible),
+/* harmony export */   prefersReducedMotion: () => (/* binding */ prefersReducedMotion),
+/* harmony export */   setupKeyboardNavigation: () => (/* binding */ setupKeyboardNavigation)
+/* harmony export */ });
+// What a map offers to people who use a keyboard or a screen reader, or who ask for less motion.
+
+const NAVIGATION_HINT = 'Map regions. Use the arrow keys to move between regions, Page Up and Page Down to change country, and Escape to leave.'
+
+const prefersReducedMotion = () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
+/** Titles may carry markup (<tspan>...): the accessible name is its text. */
+const plainText = (html) => {
+    if (!html) return ''
+    const element = document.createElement('template')
+    element.innerHTML = String(html)
+    return element.content.textContent.replace(/\s+/g, ' ').trim()
+}
+
+/**
+ * Names the map's svg for assistive technology: aria-label (map.ariaLabel(), else the title and subtitle) and a
+ * <desc> from map.ariaDescription(). Attributes the page put on its own svg are left alone.
+ * @param {*} map
+ */
+const applyMapAccessibility = function (map) {
+    if (map.isInset) return
+    const node = map.svg_?.node()
+    if (!node) return
+
+    // data-em-a11y marks the attributes as the library's, so a later build (or another map in the same svg) may update them
+    const ours = node.hasAttribute('data-em-a11y')
+    if (ours || (!node.hasAttribute('role') && !node.hasAttribute('aria-label') && !node.hasAttribute('aria-labelledby'))) {
+        const name = map.ariaLabel_ || [plainText(map.title_), plainText(map.subtitle_)].filter(Boolean).join('. ') || 'Statistical map'
+        node.setAttribute('data-em-a11y', '')
+        node.setAttribute('role', 'group')
+        node.setAttribute('aria-roledescription', 'map')
+        node.setAttribute('aria-label', name)
+    }
+
+    node.querySelector(':scope > desc.em-description')?.remove()
+    if (map.ariaDescription_) {
+        // <desc>, not <title>: browsers show an svg <title> as a tooltip over the whole map
+        const desc = document.createElementNS('http://www.w3.org/2000/svg', 'desc')
+        desc.setAttribute('class', 'em-description')
+        desc.textContent = map.ariaDescription_
+        node.insertBefore(desc, node.firstChild)
+    }
+}
+
+/**
+ * Makes an svg group that handles clicks usable from the keyboard.
+ * @param {*} selection d3 selection of the button group
+ * @param {string} label
+ */
+const makeButtonAccessible = function (selection, label) {
+    selection
+        .attr('role', 'button')
+        .attr('tabindex', 0)
+        .attr('aria-label', label)
+        .on('keydown.em-a11y', function (event) {
+            if (event.key !== 'Enter' && event.key !== ' ') return
+            event.preventDefault()
+            event.stopPropagation()
+            this.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+        })
+}
+
+const hasHoverHandler = (element) => !!element.__on?.some((listener) => listener.type === 'mouseover' && listener.value)
+
+const isShown = (element) => {
+    if (element.checkVisibility && !element.checkVisibility()) return false
+    const box = element.getBoundingClientRect()
+    return box.width > 0 || box.height > 0
+}
+
+/** The elements of the map that show a tooltip for a region, one per region (its symbol rather than its area), in id order. */
+const regionTargets = (drawing) => {
+    const byId = new Map()
+    drawing.querySelectorAll('path, g.em-centroid, .em-grid-cell, .em-grid-shape').forEach((element) => {
+        const id = element.__data__?.properties?.id
+        if (id === undefined || !hasHoverHandler(element) || !isShown(element)) return
+        if (!byId.has(id) || element.tagName.toLowerCase() === 'g') byId.set(id, element)
+    })
+    return [...byId.keys()].sort().map((id) => ({ id: String(id), element: byId.get(id) }))
+}
+
+const mouseEvent = (element, type) => {
+    const box = element.getBoundingClientRect()
+    element.dispatchEvent(
+        new MouseEvent(type, {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: box.left + box.width / 2,
+            clientY: box.top + box.height / 2,
+        })
+    )
+}
+
+const liveRegion = (map) => {
+    const id = 'em-announcer-' + map.svgId_
+    let region = document.getElementById(id)
+    if (region) return region
+    region = document.createElement('div')
+    region.id = id
+    region.className = 'em-announcer'
+    region.setAttribute('aria-live', 'polite')
+    document.body.appendChild(region)
+    return region
+}
+
+const tooltipText = (map) => {
+    const node = document.getElementById(map.tooltip_?.id)
+    if (!node) return ''
+    // the text of each block on its own, so that "France" and "117" are not read as one word
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT)
+    const parts = []
+    while (walker.nextNode()) parts.push(walker.currentNode.textContent.trim())
+    return parts.filter(Boolean).join(' ')
+}
+
+/**
+ * One tab stop per map; the arrow keys then move from region to region. Each move runs the region's own mouse
+ * handlers, so every map type shows its usual tooltip and highlight, and the tooltip's text is announced.
+ * Turned off with map.keyboardNavigation(false). Flow maps have no region tooltips.
+ * @param {*} map
+ */
+const setupKeyboardNavigation = function (map) {
+    if (map.isInset) return
+    const drawing = map.svg_?.select('#em-drawing-' + map.svgId_)
+    if (!drawing || drawing.empty()) return
+
+    drawing.on('.em-keyboard', null).attr('tabindex', null).attr('role', null).attr('aria-label', null)
+    if (map.keyboardNavigation_ === false || map._mapType === 'flow') return
+
+    let targets = []
+    let current = null
+
+    const leave = () => {
+        if (!current) return
+        current.element.classList.remove('em-keyboard-focus')
+        mouseEvent(current.element, 'mouseout')
+        current = null
+    }
+
+    const show = (target) => {
+        leave()
+        current = target
+        target.element.classList.add('em-keyboard-focus')
+        mouseEvent(target.element, 'mouseover')
+        mouseEvent(target.element, 'mousemove')
+        liveRegion(map).textContent = tooltipText(map) || target.element.__data__.properties.na || target.id
+    }
+
+    /** The first region of the next (or previous) country. NUTS ids start with the country code. */
+    const otherCountry = (index, step) => {
+        const country = (i) => targets[i].id.slice(0, 2)
+        let i = index
+        do i = (i + step + targets.length) % targets.length
+        while (i !== index && country(i) === country(index))
+        while (i > 0 && country(i - 1) === country(i)) i--
+        return i
+    }
+
+    drawing
+        .attr('tabindex', 0)
+        .attr('role', 'application')
+        .attr('aria-label', NAVIGATION_HINT)
+        .on('blur.em-keyboard', leave)
+        .on('keydown.em-keyboard', (event) => {
+            if (event.key === 'Escape') return leave()
+            const keys = ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'Home', 'End', 'PageDown', 'PageUp']
+            if (!keys.includes(event.key) || event.altKey || event.ctrlKey || event.metaKey) return
+
+            // read again at every key: a zoom, a data change or a NUTS level change moves and replaces regions
+            targets = regionTargets(drawing.node())
+            if (!targets.length) return
+            event.preventDefault()
+            event.stopPropagation()
+
+            const index = current ? targets.findIndex((t) => t.id === current.id) : -1
+            let next
+            if (event.key === 'Home') next = 0
+            else if (event.key === 'End') next = targets.length - 1
+            else if (index < 0) next = 0
+            else if (event.key === 'PageDown') next = otherCountry(index, 1)
+            else if (event.key === 'PageUp') next = otherCountry(index, -1)
+            else next = (index + (event.key === 'ArrowRight' || event.key === 'ArrowDown' ? 1 : -1) + targets.length) % targets.length
+            show(targets[next])
+        })
+}
+
+
+/***/ },
+
 /***/ "./src/core/buttons/button-utils.js"
 /*!******************************************!*\
   !*** ./src/core/buttons/button-utils.js ***!
@@ -20586,6 +20871,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var _corner_radius__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./corner-radius */ "./src/core/buttons/corner-radius.js");
 /* harmony import */ var _button_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./button-utils */ "./src/core/buttons/button-utils.js");
+/* harmony import */ var _accessibility__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../accessibility */ "./src/core/accessibility.js");
+
 
 
 
@@ -20637,6 +20924,8 @@ const appendInsetsButton = (map) => {
             container.style('display', 'none')
         }
     })
+
+    ;(0,_accessibility__WEBPACK_IMPORTED_MODULE_3__.makeButtonAccessible)(insetButton, 'Show or hide the inset maps')
 }
 
 function updateInsetsButtonPosition(map) {
@@ -20682,6 +20971,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var _corner_radius__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./corner-radius */ "./src/core/buttons/corner-radius.js");
 /* harmony import */ var _button_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./button-utils */ "./src/core/buttons/button-utils.js");
+/* harmony import */ var _accessibility__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../accessibility */ "./src/core/accessibility.js");
+
 
 
 
@@ -20757,6 +21048,8 @@ const appendLegendButton = (map) => {
         const isHidden = legendSvg.style('display') === 'none'
         legendSvg.style('display', isHidden ? null : 'none')
     })
+
+    ;(0,_accessibility__WEBPACK_IMPORTED_MODULE_3__.makeButtonAccessible)(legendButton, 'Show or hide the legend')
 }
 
 const updateLegendButtonPosition = (map) => {
@@ -20811,6 +21104,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
 /* harmony import */ var _corner_radius__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./corner-radius */ "./src/core/buttons/corner-radius.js");
 /* harmony import */ var _button_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./button-utils */ "./src/core/buttons/button-utils.js");
+/* harmony import */ var _accessibility__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../accessibility */ "./src/core/accessibility.js");
+
 
 
 
@@ -20870,6 +21165,9 @@ const appendZoomButtons = (map) => {
         event.stopPropagation()
         zoomOut(map)
     })
+
+    ;(0,_accessibility__WEBPACK_IMPORTED_MODULE_3__.makeButtonAccessible)(zoomInBtn, 'Zoom in')
+    ;(0,_accessibility__WEBPACK_IMPORTED_MODULE_3__.makeButtonAccessible)(zoomOutBtn, 'Zoom out')
 }
 
 function updateZoomButtonsPosition(map) {
@@ -20893,11 +21191,17 @@ function positionZoomButtons(map, buttonGroup, buttonSize) {
 }
 
 function zoomIn(map) {
-    map.svg_.transition().call(map.__zoomBehavior.scaleBy, 2)
+    zoomBy(map, 2)
 }
 
 function zoomOut(map) {
-    map.svg_.transition().call(map.__zoomBehavior.scaleBy, 0.5)
+    zoomBy(map, 0.5)
+}
+
+function zoomBy(map, factor) {
+    const transition = map.svg_.transition()
+    if ((0,_accessibility__WEBPACK_IMPORTED_MODULE_3__.prefersReducedMotion)()) transition.duration(0)
+    transition.call(map.__zoomBehavior.scaleBy, factor)
 }
 
 
@@ -23497,12 +23801,14 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const PLACENAMESURL = window.location.hostname.includes('ec.europa.eu')
-    ? 'https://ec.europa.eu/eurostat/cache/GISCO/pub/euronym/v3/UTF_LATIN/50/EUR.csv'
-    : 'https://raw.githubusercontent.com/eurostat/euronym/main/pub/v3/UTF_LATIN/50/EUR.csv'
+// resolved when used: nothing may touch `window` while the module loads (the package is importable in Node)
+const defaultPlacenamesURL = () =>
+    window.location.hostname.includes('ec.europa.eu')
+        ? 'https://ec.europa.eu/eurostat/cache/GISCO/pub/euronym/v3/UTF_LATIN/50/EUR.csv'
+        : 'https://raw.githubusercontent.com/eurostat/euronym/main/pub/v3/UTF_LATIN/50/EUR.csv'
 
 // Load once and store all labels
-async function loadPlacenames(out, url = PLACENAMESURL) {
+async function loadPlacenames(out, url = defaultPlacenamesURL()) {
     const raw = await (0,d3_fetch__WEBPACK_IMPORTED_MODULE_0__.csv)(url)
     let filtered = raw
     if (out.placenamesFilter_) filtered = out.placenamesFilter_(raw)
@@ -24927,6 +25233,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/core/utils.js");
 /* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../layout-profile */ "./src/core/layout-profile.js");
+/* harmony import */ var _accessibility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../accessibility */ "./src/core/accessibility.js");
+
 
 
 
@@ -24965,6 +25273,7 @@ function addTitle(out) {
         .html(out.title())
 
     wrapTextForMobile(title, out, out.titlePosition()[0])
+    ;(0,_accessibility__WEBPACK_IMPORTED_MODULE_2__.applyMapAccessibility)(out) // the title is the map's accessible name
 }
 
 function addSubtitle(out) {
@@ -25967,6 +26276,75 @@ function dorlingWorker(flag) {
 function dorlingWorkerD3URL(url) {
     this.dorlingSettings(Object.assign({}, this.dorlingSettings(), { workerD3URL: url }))
     return this
+}
+
+
+/***/ },
+
+/***/ "./src/core/errors.js"
+/*!****************************!*\
+  !*** ./src/core/errors.js ***!
+  \****************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   GEO_ERROR_MESSAGE: () => (/* binding */ GEO_ERROR_MESSAGE),
+/* harmony export */   reportMapError: () => (/* binding */ reportMapError),
+/* harmony export */   showMapErrorMessage: () => (/* binding */ showMapErrorMessage)
+/* harmony export */ });
+/** What the reader sees on a map whose boundaries could not be loaded. */
+const GEO_ERROR_MESSAGE = 'The map could not be loaded: the boundary data is unavailable.'
+
+/**
+ * Tells the caller that part of a map failed, through map.onError(). A callback that throws is logged, so that it
+ * cannot stop the map's own bookkeeping (loading counters, spinner).
+ * @param {*} map The main map (not an inset)
+ * @param {import('../types/core/MapError').MapError} error
+ */
+const reportMapError = function (map, error) {
+    const callback = map?.onError_
+    if (typeof callback !== 'function') return
+    try {
+        callback(error, map)
+    } catch (e) {
+        console.error('[eurostat-map] The onError callback failed:', e)
+    }
+}
+
+/**
+ * Writes a message where the map should be. It lives in the zoom group, which the next successful build empties.
+ * @param {*} map
+ * @param {string} message
+ */
+const showMapErrorMessage = function (map, message = GEO_ERROR_MESSAGE) {
+    const zoomGroup = map.svg_?.select('#em-zoom-group-' + map.svgId_)
+    if (!zoomGroup || zoomGroup.empty()) return
+    zoomGroup.select('.em-load-error').remove()
+
+    const width = map.width_ || 400
+    const text = zoomGroup
+        .append('text')
+        .attr('class', 'em-load-error')
+        .attr('role', 'alert')
+        .attr('text-anchor', 'middle')
+        .attr('x', width / 2)
+        .attr('y', (map.height_ || 300) / 2)
+
+    // wrapped by character count (about 7px each): SVG text does not wrap, and a map can be phone sized
+    const lineLength = Math.max(20, Math.floor((width - 20) / 7))
+    const lines = []
+    message.split(' ').forEach((word) => {
+        const last = lines.length - 1
+        if (last >= 0 && lines[last].length + word.length + 1 <= lineLength) lines[last] += ' ' + word
+        else lines.push(word)
+    })
+    lines.forEach((line, i) => {
+        text.append('tspan')
+            .attr('x', width / 2)
+            .attr('dy', i ? '1.3em' : 0)
+            .text(line)
+    })
 }
 
 
@@ -30911,11 +31289,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _decoration_texts_js__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./decoration/texts.js */ "./src/core/decoration/texts.js");
 /* harmony import */ var _decoration_scalebar_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./decoration/scalebar.js */ "./src/core/decoration/scalebar.js");
 /* harmony import */ var _locations_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./locations.js */ "./src/core/locations.js");
-/* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./layout */ "./src/core/layout.js");
-/* harmony import */ var _geo_projection__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./geo/projection */ "./src/core/geo/projection.js");
-/* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
-/* harmony import */ var _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./buttons/corner-radius */ "./src/core/buttons/corner-radius.js");
-/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
+/* harmony import */ var _accessibility_js__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./accessibility.js */ "./src/core/accessibility.js");
+/* harmony import */ var _errors_js__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./errors.js */ "./src/core/errors.js");
+/* harmony import */ var _toast_js__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./toast.js */ "./src/core/toast.js");
+/* harmony import */ var _layout__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./layout */ "./src/core/layout.js");
+/* harmony import */ var _geo_projection__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./geo/projection */ "./src/core/geo/projection.js");
+/* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./buttons/corner-radius */ "./src/core/buttons/corner-radius.js");
+/* harmony import */ var _layout_profile__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./layout-profile */ "./src/core/layout-profile.js");
+
+
+
 
 
 
@@ -30958,7 +31342,7 @@ __webpack_require__.r(__webpack_exports__);
  * contents poke out of the rounded frame. Attributes, not CSS, so SVG/PNG/HTML export keep them.
  */
 const roundInsetCorners = (out) => (sel) => {
-    if (out.isInset) sel.attr('rx', _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_24__.BOX_CORNER_RADIUS).attr('ry', _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_24__.BOX_CORNER_RADIUS)
+    if (out.isInset) sel.attr('rx', _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_27__.BOX_CORNER_RADIUS).attr('ry', _buttons_corner_radius__WEBPACK_IMPORTED_MODULE_27__.BOX_CORNER_RADIUS)
 }
 
 /** Widest a map gets by default (px), when its container offers more. */
@@ -30980,6 +31364,10 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     out.height_ = 0
     out.containerId_ = undefined
     out.responsive_ = true // scale the svg down to fit its container (viewBox)
+    // accessibility (see accessibility.js)
+    out.ariaLabel_ = undefined // accessible name of the map; the title and subtitle when unset
+    out.ariaDescription_ = undefined // longer description for screen readers, written as the svg's <desc>
+    out.keyboardNavigation_ = true // arrow keys move between regions
     // How the layout adapts to the room the map has (see layout-profile.js): 'auto' follows the width of the
     // map's container (a small iframe is as compact as a phone), 'desktop' and 'compact' fix the profile.
     out.layout_ = 'auto'
@@ -30997,7 +31385,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     // Divides the exact bbox-fit pixel size when z is not set explicitly, so the default
     // view is zoomed in a bit tighter than an exact fit (which tends to look too zoomed out).
     // Higher = more zoomed in by default; 1 = exact fit.
-    out.defaultFitZoom_ = _geo_projection__WEBPACK_IMPORTED_MODULE_22__.DEFAULT_FIT_ZOOM
+    out.defaultFitZoom_ = _geo_projection__WEBPACK_IMPORTED_MODULE_25__.DEFAULT_FIT_ZOOM
     out.scale_ = '20M' //TODO choose automatically?
     out.position_ = { x: undefined, y: undefined, z: undefined } // initial map view
     out.placenames_ = false // load placenames from placenames.js
@@ -31220,6 +31608,19 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
 
     out.isInset = config?.isInset || false
 
+    // accessibility settings also apply to an already-built map
+    ;['ariaLabel', 'ariaDescription', 'keyboardNavigation'].forEach(function (name) {
+        out[name] = function (v) {
+            if (!arguments.length) return out[name + '_']
+            out[name + '_'] = v
+            if (out.svg_) {
+                (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.applyMapAccessibility)(out)
+                if (name === 'keyboardNavigation') (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.setupKeyboardNavigation)(out)
+            }
+            return out
+        }
+    })
+
     // warn existing users of functions that have been banished to the shadow realm.
     ;(0,_deprecated__WEBPACK_IMPORTED_MODULE_4__.defineDeprecatedFunctions)(out)
 
@@ -31233,7 +31634,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
     out.responsive = function (v) {
         if (!arguments.length) return out.responsive_
         out.responsive_ = !!v
-        ;(0,_layout__WEBPACK_IMPORTED_MODULE_21__.updateResponsiveMap)(out)
+        ;(0,_layout__WEBPACK_IMPORTED_MODULE_24__.updateResponsiveMap)(out)
         return out
     }
 
@@ -31274,7 +31675,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             if (!arguments.length) return out[att]
             out[att] = !!v
             if (out.insetTemplates_) (0,_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(out.insetTemplates_, out.svgId_, (inset) => inset[name](out[att]))
-            ;(0,_layout__WEBPACK_IMPORTED_MODULE_21__.applyBorderModeClasses)(out, true)
+            ;(0,_layout__WEBPACK_IMPORTED_MODULE_24__.applyBorderModeClasses)(out, true)
             return out
         }
     })
@@ -31523,12 +31924,12 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
      * Build a map object, including container, frame, map svg, insets and d3 zoom
      */
     out.buildMapTemplateBase = function () {
-        const svg = (0,_layout__WEBPACK_IMPORTED_MODULE_21__.createMapSVG)(out)
+        const svg = (0,_layout__WEBPACK_IMPORTED_MODULE_24__.createMapSVG)(out)
         out.svg_ = svg
 
         // Wrap SVG so HTML overlays (spinner, tooltip) can sit above it
         if (!out.isInset) {
-            out._wrapper_ = (0,_layout__WEBPACK_IMPORTED_MODULE_21__.wrapMapSvg)(svg)
+            out._wrapper_ = (0,_layout__WEBPACK_IMPORTED_MODULE_24__.wrapMapSvg)(svg)
         }
 
         //set container for cases where container contains various maps
@@ -31543,10 +31944,10 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
 
         // how much room the container offers decides the layout profile, and the width unless it was set
         if (!out.isInset) {
-            const containerWidth = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.resolveContainerWidth)(out)
+            const containerWidth = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_28__.resolveContainerWidth)(out)
             if (containerWidth && !out._widthExplicit_) out.width_ = Math.min(DEFAULT_MAX_WIDTH, containerWidth)
         }
-        svg.classed('em--compact', (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.isCompact)(out))
+        svg.classed('em--compact', (0,_layout_profile__WEBPACK_IMPORTED_MODULE_28__.isCompact)(out))
 
         //set SVG dimensions
         const requestedHeight = out._heightFn_ ? +out._heightFn_(out) : NaN
@@ -31560,7 +31961,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             const maxTotalHeight = 0.99 * availableHeight
 
             // Estimate header/footer/padding overhead to find maximum allowed map height
-            const mobile = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.isCompact)(out)
+            const mobile = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_28__.isCompact)(out)
             const overhead = mobile ? (out.header_ ? 60 : 0) + (out.footnote_ ? 20 : 0) + 5 : (out.header_ ? 80 : 0) + (out.footnote_ ? 40 : 0) + 15
             const maxMapHeight = Math.max(150, maxTotalHeight - overhead)
             // the shape of the map follows its width, not the height of the screen: a compact map filling the window left bands of empty space
@@ -31578,7 +31979,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             out.proj_ = 54030
         }
         svg.attr('width', out.width()).attr('height', out.height())
-        ;(0,_layout__WEBPACK_IMPORTED_MODULE_21__.updateResponsiveMap)(out)
+        ;(0,_layout__WEBPACK_IMPORTED_MODULE_24__.updateResponsiveMap)(out)
 
         // define clipPath relative to the drawing group (map area)
         const defs = svg.append('defs').attr('class', 'em-defs')
@@ -31652,6 +32053,8 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             (0,_decoration_stamps__WEBPACK_IMPORTED_MODULE_7__.appendStamp)(out.stamp_, out)
         }
 
+        (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.applyMapAccessibility)(out)
+
         return out
     }
 
@@ -31674,13 +32077,13 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
 
             // position
             if (!out.position_.x || !out.position_.y) {
-                (0,_geo_projection__WEBPACK_IMPORTED_MODULE_22__.defineDefaultPosition)(out)
+                (0,_geo_projection__WEBPACK_IMPORTED_MODULE_25__.defineDefaultPosition)(out)
             }
-            out.position_.z = out.position_.z || (0,_geo_projection__WEBPACK_IMPORTED_MODULE_22__.getDefaultZ)(out)
+            out.position_.z = out.position_.z || (0,_geo_projection__WEBPACK_IMPORTED_MODULE_25__.getDefaultZ)(out)
 
             // d3 projection/path functions
-            ;(0,_geo_projection__WEBPACK_IMPORTED_MODULE_22__.defineProjection)(out)
-            ;(0,_geo_projection__WEBPACK_IMPORTED_MODULE_22__.definePathFunction)(out)
+            ;(0,_geo_projection__WEBPACK_IMPORTED_MODULE_25__.defineProjection)(out)
+            ;(0,_geo_projection__WEBPACK_IMPORTED_MODULE_25__.definePathFunction)(out)
 
             if (out.backgroundMap_) {
                 drawBackgroundMap(out)
@@ -31704,7 +32107,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         // prepare group for proportional symbols, with centroids
         // IMPORTANT: Skip for grid cartograms - they use grid cells as anchors instead
         if (withCenterPoints && !out.gridCartogram_) {
-            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_23__.addCentroidsToMap)(out)
+            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_26__.addCentroidsToMap)(out)
         }
 
         // add user locations (points)
@@ -31781,7 +32184,7 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
         // auto-show the toggle button whenever insets exist and the user hasn't explicitly
         // configured insetsButton themselves - otherwise there would be no way to reveal them.
         {
-            const isMobileForInsetsButton = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_25__.isCompact)(out, out.insetsVisibilityBreakpoint_)
+            const isMobileForInsetsButton = (0,_layout_profile__WEBPACK_IMPORTED_MODULE_28__.isCompact)(out, out.insetsVisibilityBreakpoint_)
             const hasInsets = Array.isArray(out.insets_) ? out.insets_.length > 0 : !!out.insets_
             if (out.insetsButton_ || (!out._insetsButtonExplicit_ && isMobileForInsetsButton && hasInsets)) {
                 (0,_buttons_insets_button__WEBPACK_IMPORTED_MODULE_12__.appendInsetsButton)(out)
@@ -31798,8 +32201,11 @@ const createMapInstance = function (config, withCenterPoints, mapType) {
             (0,_decoration_coastal_margin_js__WEBPACK_IMPORTED_MODULE_17__.appendCoastalMargin)(out)
         }
 
+        (0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.applyMapAccessibility)(out)
+        ;(0,_accessibility_js__WEBPACK_IMPORTED_MODULE_21__.setupKeyboardNavigation)(out)
+
         //header/footer
-        setTimeout(() => (0,_layout__WEBPACK_IMPORTED_MODULE_21__.recalculateLayout)(out), 20)
+        setTimeout(() => (0,_layout__WEBPACK_IMPORTED_MODULE_24__.recalculateLayout)(out), 20)
         return out
     }
 
@@ -31874,7 +32280,7 @@ const drawBackgroundMap = function (out) {
 /**
  * Requests geographic data and then builds the map template
  */
-const updateGeoMapTemplate = function (callback, map) {
+const updateGeoMapTemplate = function (callback, map, root = map) {
     if (!callback) console.warn('⚠️ map.updateGeoMapTemplate called without callback function!')
     // Erase previous data
     map.Geometries.defaultGeoData = null
@@ -31890,8 +32296,10 @@ const updateGeoMapTemplate = function (callback, map) {
         if (callback) callback()
     } else {
         // use default
+        let loaded = false // tells a failed download from an error while drawing
         map.Geometries.getDefaultGeoData(map.geo_, map.filterGeometriesFunction_, map.nutsLevel_)
             .then(() => {
+                loaded = true
                 map.buildMapTemplate()
 
                 // Execute callback if defined
@@ -31903,13 +32311,22 @@ const updateGeoMapTemplate = function (callback, map) {
                 // decrements for this target and the spinner spins forever, even though every
                 // other map/inset loaded fine. This map/inset just won't have geometry to draw.
                 console.error(`[eurostat-map] Failed to load geo data for "${map.svgId_ || map.geo_}":`, err)
+                if (loaded) {
+                    (0,_errors_js__WEBPACK_IMPORTED_MODULE_22__.reportMapError)(root, { type: 'render', message: err?.message || String(err), cause: err })
+                } else {
+                    if (map === root) {
+                        (0,_errors_js__WEBPACK_IMPORTED_MODULE_22__.showMapErrorMessage)(map)
+                        ;(0,_toast_js__WEBPACK_IMPORTED_MODULE_23__.showEurostatApiErrorToast)(_errors_js__WEBPACK_IMPORTED_MODULE_22__.GEO_ERROR_MESSAGE)
+                    }
+                    (0,_errors_js__WEBPACK_IMPORTED_MODULE_22__.reportMapError)(root, { type: 'geometry', message: _errors_js__WEBPACK_IMPORTED_MODULE_22__.GEO_ERROR_MESSAGE, geo: map.geo_, cause: err })
+                }
                 if (callback) callback()
             })
     }
 
     // Use executeForAllInsets for recursive inset updates
     (0,_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(map.insetTemplates_, map.svgId_, (inset) => {
-        updateGeoMapTemplate(callback, inset)
+        updateGeoMapTemplate(callback, inset, root)
     })
 
     return map
@@ -32182,6 +32599,273 @@ function debounce(func, wait) {
         clearTimeout(timeout)
         timeout = setTimeout(() => func(...args), wait)
     }
+}
+
+
+/***/ },
+
+/***/ "./src/core/option-check.js"
+/*!**********************************!*\
+  !*** ./src/core/option-check.js ***!
+  \**********************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   LEGEND_OPTIONS: () => (/* binding */ LEGEND_OPTIONS),
+/* harmony export */   isOneEditAway: () => (/* binding */ isOneEditAway),
+/* harmony export */   suggestOption: () => (/* binding */ suggestOption),
+/* harmony export */   warnMisspelledOptions: () => (/* binding */ warnMisspelledOptions),
+/* harmony export */   warnUnknownClassification: () => (/* binding */ warnUnknownClassification)
+/* harmony export */ });
+// Spelling checks for options the library would otherwise ignore without a word.
+
+/** Every option a legend() config accepts, whatever the map type. test/unit/core/option-check.test.mjs keeps it in step with src/types/legend. */
+const LEGEND_OPTIONS = [
+    'addSubtitle',
+    'addTitle',
+    'annotationLineEndOffsets',
+    'annotationLineLength',
+    'annotationOffsets',
+    'annotations',
+    'appendCategoryLegend',
+    'appendNoDataLegend',
+    'applyPosition',
+    'arrowHeight',
+    'arrowPadding',
+    'arrowWidth',
+    'ascending',
+    'axisArrows',
+    'axisArrowsBidirectional',
+    'axisExtremes',
+    'axisTitleFontSize',
+    'barHeight',
+    'bottom',
+    'bottomLeft',
+    'bottomRight',
+    'boxOpacity',
+    'boxPadding',
+    'breaks1',
+    'breaks2',
+    'build',
+    'cellNb',
+    'cellPadding',
+    'centerAnnotationOffsets',
+    'centerLabel',
+    'color',
+    'colorLegend',
+    'colorTarget',
+    'curveX',
+    'curveY',
+    'decimals',
+    'decorate',
+    'divergingArrowLength',
+    'divergingLineLength',
+    'divergingLinePadding',
+    'exampleData',
+    'flowColorLegend',
+    'flowWidthLegend',
+    'gap',
+    'getBaseX',
+    'getBaseY',
+    'getClassToFillStyle',
+    'getColorClassifier',
+    'getColorStats',
+    'getHighlightFunction',
+    'getLabelFormatter',
+    'getNumberOfClasses',
+    'getSizeStats',
+    'getUnHighlightFunction',
+    'gridBreaks',
+    'gridSize',
+    'height',
+    'high',
+    'highLabel',
+    'highlightTolerance',
+    'histogram',
+    'itemGap',
+    'items',
+    'key',
+    'label',
+    'label1',
+    'label2',
+    'labelDecNb',
+    'labelDy',
+    'labelFontSize',
+    'labelFormatter',
+    'labelOffset',
+    'labelOffsetX',
+    'labelOffsets',
+    'labelPosition',
+    'labelRotation',
+    'labelType',
+    'labelX',
+    'labelY',
+    'labels',
+    'labelsV1',
+    'labelsV2',
+    'layer',
+    'left',
+    'legendBackground',
+    'legendLabel',
+    'lgg',
+    'lineOpacity',
+    'lineStrokeWidth',
+    'low',
+    'lowLabel',
+    'makeBackgroundBox',
+    'map',
+    'margin',
+    'marginTop',
+    'maxDepth',
+    'maxMin',
+    'maxMinLabels',
+    'maxMinRegionLabels',
+    'maxMinTickLength',
+    'mergeArrays',
+    'minorSubdivisions',
+    'noData',
+    'noDataLegend',
+    'noDataPadding',
+    'noDataShapeHeight',
+    'noDataShapeWidth',
+    'noDataText',
+    'noDataYOffset',
+    'nodeSizeLegend',
+    'offsetX',
+    'onlyApplyOpacityWhileZoomed',
+    'order',
+    'orientation',
+    'pad',
+    'padding',
+    'pattern',
+    'patternId',
+    'pointOfDivergence',
+    'pointOfDivergenceLabel',
+    'pointOfDivergenceLabelsAtExtremes',
+    'pointOfDivergenceLabelsStacked',
+    'pointOfDivergencePadding',
+    'position',
+    'radius',
+    'regionColorLegend',
+    'right',
+    'ringLabel',
+    'rotation',
+    'rowClass',
+    'scaleLegend',
+    'segments',
+    'sepLineLength',
+    'sepLineStroke',
+    'sepLineStrokeWidth',
+    'setBoxDimension',
+    'shapeFill',
+    'shapeHeight',
+    'shapeOffsets',
+    'shapePadding',
+    'shapeStroke',
+    'shapeStrokeWidth',
+    'shapeWidth',
+    'show',
+    'showAxisExtremes',
+    'showCenter',
+    'showCounts',
+    'showData',
+    'showDivergingLine',
+    'showExampleChart',
+    'showLines',
+    'showMaxRegion',
+    'showPercentages',
+    'showXAxis',
+    'sizeLegend',
+    'squareSize',
+    'startY',
+    'strokeOpacity',
+    'subtitle',
+    'svg',
+    'svgId',
+    'swatchHeight',
+    'swatchWidth',
+    'text',
+    'tickCount',
+    'tickFormat',
+    'tickLabels',
+    'tickLength',
+    'tickValues',
+    'ticks',
+    'timeLegend',
+    'title',
+    'titleFontSize',
+    'titlePadding',
+    'top',
+    'topLeft',
+    'topRight',
+    'type',
+    'update',
+    'updateBackgroundBoxOpacity',
+    'updateConfig',
+    'updateContainer',
+    'values',
+    'valuesV1',
+    'valuesV2',
+    'vennRadius',
+    'width',
+    'widthLegend',
+    'x',
+    'xAxisLabelsOffset',
+    'xAxisRotation',
+    'xAxisTickStep',
+    'xAxisTitleOffset',
+    'y',
+    'yAxisLabelsOffset',
+    'yAxisTitleOffset',
+]
+
+/** True when `a` becomes `b` by one insertion, deletion, substitution or swap of neighbouring letters. */
+const isOneEditAway = function (a, b) {
+    if (a === b || Math.abs(a.length - b.length) > 1) return false
+    let i = 0
+    while (i < a.length && a[i] === b[i]) i++
+    if (a.length === b.length) {
+        const swapped = a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2)
+        return swapped || a.slice(i + 1) === b.slice(i + 1)
+    }
+    const [long, short] = a.length > b.length ? [a, b] : [b, a]
+    return long.slice(i + 1) === short.slice(i)
+}
+
+/** The known option a name is most likely a misspelling of, or undefined. Short names are too alike to judge. */
+const suggestOption = function (name, known) {
+    if (name.length < 5 || known.includes(name)) return undefined
+    const lower = name.toLowerCase()
+    return known.find((option) => option.toLowerCase() === lower) || known.find((option) => isOneEditAway(lower, option.toLowerCase()))
+}
+
+const warned = new Set()
+
+/**
+ * Warns once about each option of a config (and of its sub-objects, e.g. sizeLegend) that looks misspelt.
+ * @param {object} config
+ * @param {string[]} known
+ * @param {string} context e.g. 'legend'
+ */
+const warnMisspelledOptions = function (config, known = LEGEND_OPTIONS, context = 'legend') {
+    if (!config || typeof config !== 'object') return
+    Object.keys(config).forEach((key) => {
+        const value = config[key]
+        const suggestion = suggestOption(key, known)
+        const path = context + '.' + key
+        if (suggestion) {
+            if (!warned.has(path)) console.warn(`[eurostat-map] Unknown option "${path}": did you mean "${suggestion}"?`)
+            warned.add(path)
+        } else if (/Legend$/.test(key) && Object.prototype.toString.call(value) === '[object Object]') {
+            warnMisspelledOptions(value, known, path)
+        }
+    })
+}
+
+/** @param {string} method @param {string[]} valid */
+const warnUnknownClassification = function (method, valid) {
+    console.warn(`[eurostat-map] Unknown classification method "${method}": using "quantile". Valid methods: ${valid.join(', ')}.`)
 }
 
 
@@ -32749,7 +33433,7 @@ const statData = function (config) {
                     // Caller's loading counter (which drives the spinner overlay) only decrements
                     // inside this callback - skipping it on an API-reported error left the spinner
                     // spinning forever even though the request itself completed.
-                    if (callback) callback()
+                    if (callback) callback(userFacingError('Eurostat API request failed: ' + label))
                     return
                 }
                 //decode stat data
@@ -32794,7 +33478,7 @@ const statData = function (config) {
                 console.error('Error retrieving Eurostat data: ' + message, err)
                 // Same reasoning as the data___.error branch above: a rejected fetch must still
                 // run the callback or the spinner never hides.
-                if (callback) callback()
+                if (callback) callback(userFacingError(message, err))
             })
     }
 
@@ -32857,7 +33541,7 @@ const statData = function (config) {
                 const message = err?.message || 'Network or parsing error while retrieving CSV data.'
                 ;(0,_toast__WEBPACK_IMPORTED_MODULE_3__.showEurostatApiErrorToast)('CSV data request failed: ' + message)
                 console.error('Error retrieving CSV data:', err)
-                if (callback) callback()
+                if (callback) callback(userFacingError('CSV data request failed: ' + message, err))
             })
     }
 
@@ -32909,8 +33593,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
 /* harmony import */ var _export__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./export */ "./src/core/export.js");
 /* harmony import */ var _cartograms__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./cartograms */ "./src/core/cartograms.js");
-/* harmony import */ var _layer__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./layer */ "./src/core/layer.js");
-/* harmony import */ var _layer_registry__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./layer-registry */ "./src/core/layer-registry.js");
+/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./errors */ "./src/core/errors.js");
+/* harmony import */ var _option_check__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./option-check */ "./src/core/option-check.js");
+/* harmony import */ var _accessibility__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./accessibility */ "./src/core/accessibility.js");
+/* harmony import */ var _layer__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./layer */ "./src/core/layer.js");
+/* harmony import */ var _layer_registry__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./layer-registry */ "./src/core/layer-registry.js");
+
+
+
 
 
 
@@ -33150,7 +33840,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
     // ── Layer 0 facade + thematic API ─────────────────────────────────────────────
     // The map is its own layer 0 until its type is migrated to a real Layer (Phase 3+).
     // makeMapSelfLayer installs the (relocated) encoding API onto the map.
-    ;(0,_layer__WEBPACK_IMPORTED_MODULE_12__.makeMapSelfLayer)(out)
+    ;(0,_layer__WEBPACK_IMPORTED_MODULE_15__.makeMapSelfLayer)(out)
 
     // ── Layer stack ───────────────────────────────────────────────────────────────
     out.layers_ = mapType ? [out] : [] // facade: the map is its own layer 0 if type specified, empty stack if not
@@ -33172,7 +33862,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
 
     out.addLayer = function (typeOrConfig, config) {
         const cfg = typeof typeOrConfig === 'string' ? { type: typeOrConfig, ...(config || {}) } : { ...typeOrConfig }
-        const role = cfg.role || (0,_layer_registry__WEBPACK_IMPORTED_MODULE_13__.getRole)(cfg.type)
+        const role = cfg.role || (0,_layer_registry__WEBPACK_IMPORTED_MODULE_16__.getRole)(cfg.type)
         const addingBase = role === 'base'
         const onlyFacade = out.layers_.length === 1 && out.layers_[0] === out
 
@@ -33186,7 +33876,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         }
 
         // Real Layer path is only available for REGISTERED types (Phase 3+).
-        if (!(0,_layer_registry__WEBPACK_IMPORTED_MODULE_13__.isLayerTypeRegistered)(cfg.type)) {
+        if (!(0,_layer_registry__WEBPACK_IMPORTED_MODULE_16__.isLayerTypeRegistered)(cfg.type)) {
             console.error(
                 `[eurostat-map] Layer type "${cfg.type}" is not yet available as a layer. ` +
                     `Use eurostatmap.map('${cfg.type}') for a standalone single-type map for now.`
@@ -33194,8 +33884,8 @@ const createStatMap = function (config, withCenterPoints, mapType) {
             return out.activeLayer()
         }
 
-        const layer = (0,_layer__WEBPACK_IMPORTED_MODULE_12__.createLayer)(out, cfg)
-        ;(0,_layer_registry__WEBPACK_IMPORTED_MODULE_13__.getLayerType)(cfg.type).decorate(layer, cfg)
+        const layer = (0,_layer__WEBPACK_IMPORTED_MODULE_15__.createLayer)(out, cfg)
+        ;(0,_layer_registry__WEBPACK_IMPORTED_MODULE_16__.getLayerType)(cfg.type).decorate(layer, cfg)
 
         if (addingBase) out.layers_.unshift(layer)
         else out.layers_.push(layer)
@@ -33352,10 +34042,10 @@ const createStatMap = function (config, withCenterPoints, mapType) {
      * Duration in milliseconds for D3 transitions when the map updates.
      * Set to 0 to disable transitions.
      * @type {number}
-     * @default 500
+     * @default 500, or 0 when the reader asks the system for reduced motion
      * @example map.transitionDuration(0)
      */
-    out.transitionDuration_ = 500
+    out.transitionDuration_ = (0,_accessibility__WEBPACK_IMPORTED_MODULE_14__.prefersReducedMotion)() ? 0 : 500
     //specific tooltip text function
     out.tooltip_.textFunction = undefined
     /**
@@ -33373,6 +34063,14 @@ const createStatMap = function (config, withCenterPoints, mapType) {
      * map.onBuild(m => console.log('Map ready', m))
      */
     out.onBuild_ = undefined
+    /**
+     * Called when part of the map fails: boundary data or statistics that cannot be loaded, or an error while drawing.
+     * onBuild is not called for a map whose data failed.
+     * @type {function(error: {type: string, message: string, statKey?: string, cause?: *}, map: object): void | undefined}
+     * @example
+     * map.onError((error) => showMessage(error.message))
+     */
+    out.onError_ = undefined
     /**
      * Legend configuration object. Passed to the legend constructor.
      * The available properties depend on the map type's legend.
@@ -33458,6 +34156,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         'transitionDuration_',
         'filtersDefinitionFunction_',
         'onBuild_',
+        'onError_',
     ].forEach(function (att) {
         out[att.substring(0, att.length - 1)] = function (v) {
             if (!arguments.length) return out[att]
@@ -33488,6 +34187,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         }
         //set new legend config
         out.legend_ = v
+        ;(0,_option_check__WEBPACK_IMPORTED_MODULE_13__.warnMisspelledOptions)(v)
         //update if existing legend
         if (out.legendObj_) out.updateLegend()
         return out
@@ -33640,6 +34340,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         const isFacade = layer === out
         const legendConfig = isFacade ? out.legend() : layer.legend_
         if (!legendConfig) return out
+        ;(0,_option_check__WEBPACK_IMPORTED_MODULE_13__.warnMisspelledOptions)(legendConfig)
 
         const constructor = isFacade ? out.getLegendConstructor() : layer.getLegendConstructor()
         if (!layer.legendObj_) {
@@ -33814,12 +34515,14 @@ const createStatMap = function (config, withCenterPoints, mapType) {
                 // Other map types keep historical behavior (country-level fallback).
                 if (nl === 'mixed' && out._mapType !== 'spark') nl = 0
 
-                statData.retrieveFromRemote(nl, out.language(), () => {
+                statData.retrieveFromRemote(nl, out.language(), (error) => {
                     // bookkeeping MUST always run
                     if (isRemote) {
                         out._loadingStatCount_ = Math.max(0, out._loadingStatCount_ - 1)
                         out.updateLoader()
                     }
+
+                    if (error) (0,_errors__WEBPACK_IMPORTED_MODULE_12__.reportMapError)(out, { type: 'data', statKey, message: error.userMessage || error.message, cause: error })
 
                     if (!isStatDataReady()) return
 
@@ -33996,7 +34699,7 @@ const getURLParameters = function () {
  * @returns {MapInstance}
  */
 const buildSingleLayerMap = function (type, config) {
-    const role = (0,_layer_registry__WEBPACK_IMPORTED_MODULE_13__.getRole)(type)
+    const role = (0,_layer_registry__WEBPACK_IMPORTED_MODULE_16__.getRole)(type)
     const withCenterPoints = role === 'overlay' || type === 'bar' || type === 'barComposition'
     const CANONICAL_MAP_TYPES = {
         choropleth: 'ch',
@@ -34173,11 +34876,11 @@ const buildSingleLayerMap = function (type, config) {
     typeFields = [...new Set(typeFields)]
     typeMethods = [...new Set(typeMethods)]
 
-    ;(0,_layer__WEBPACK_IMPORTED_MODULE_12__.forwardFieldsToActiveLayer)(out, [...baseFields, ...typeFields])
+    ;(0,_layer__WEBPACK_IMPORTED_MODULE_15__.forwardFieldsToActiveLayer)(out, [...baseFields, ...typeFields])
 
     const allMethods = [...baseMethods, ...typeMethods]
     for (const method of allMethods) {
-        ;(0,_layer__WEBPACK_IMPORTED_MODULE_12__.forwardChainableMethod)(out, method)
+        ;(0,_layer__WEBPACK_IMPORTED_MODULE_15__.forwardChainableMethod)(out, method)
     }
 
     return out
@@ -34199,6 +34902,7 @@ __webpack_require__.r(__webpack_exports__);
 const EUROSTAT_TOAST_ID = 'em-eurostat-error-toast-container'
 let lastEurostatToastAt = 0
 
+/** A short message in the corner of the page for something that could not be loaded. */
 const showEurostatApiErrorToast = function (message) {
     if (typeof document === 'undefined') return
 
@@ -34223,6 +34927,7 @@ const showEurostatApiErrorToast = function (message) {
     }
 
     const toast = document.createElement('div')
+    toast.setAttribute('role', 'alert')
     toast.textContent = message || 'Eurostat API request failed.'
     toast.style.background = 'rgba(186, 42, 42, 0.96)'
     toast.style.color = '#fff'
@@ -36658,26 +37363,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getFillPatternLegend: () => (/* binding */ getFillPatternLegend),
 /* harmony export */   map: () => (/* binding */ map)
 /* harmony export */ });
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/max.js");
-/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/min.js");
-/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/quantile.js");
-/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/quantize.js");
-/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/threshold.js");
-/* harmony import */ var d3_scale_chromatic__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! d3-scale-chromatic */ "./node_modules/d3-scale-chromatic/src/sequential-multi/YlGnBu.js");
-/* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/lab.js");
-/* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/piecewise.js");
-/* harmony import */ var _core_color_palettes__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../core/color-palettes */ "./src/core/color-palettes.js");
-/* harmony import */ var _core_color_stretch__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../core/color-stretch */ "./src/core/color-stretch.js");
-/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../core/stat-map */ "./src/core/stat-map.js");
-/* harmony import */ var _core_layer_registry__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../core/layer-registry */ "./src/core/layer-registry.js");
-/* harmony import */ var _legend_choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../legend/choropleth/legend-choropleth */ "./src/legend/choropleth/legend-choropleth.js");
-/* harmony import */ var _core_decoration_ranked_bar_chart__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../core/decoration/ranked-bar-chart */ "./src/core/decoration/ranked-bar-chart.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
-/* harmony import */ var simple_statistics__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! simple-statistics */ "./node_modules/simple-statistics/dist/simple-statistics.mjs");
-/* harmony import */ var _core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../../core/decoration/pattern-fill */ "./src/core/decoration/pattern-fill.js");
-/* harmony import */ var _legend_legend_utils__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../../legend/legend-utils */ "./src/legend/legend-utils.js");
+/* harmony import */ var _core_option_check__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/option-check */ "./src/core/option-check.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/max.js");
+/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/min.js");
+/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/quantile.js");
+/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/quantize.js");
+/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/threshold.js");
+/* harmony import */ var d3_scale_chromatic__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! d3-scale-chromatic */ "./node_modules/d3-scale-chromatic/src/sequential-multi/YlGnBu.js");
+/* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/lab.js");
+/* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/piecewise.js");
+/* harmony import */ var _core_color_palettes__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../core/color-palettes */ "./src/core/color-palettes.js");
+/* harmony import */ var _core_color_stretch__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../core/color-stretch */ "./src/core/color-stretch.js");
+/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../core/stat-map */ "./src/core/stat-map.js");
+/* harmony import */ var _core_layer_registry__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../core/layer-registry */ "./src/core/layer-registry.js");
+/* harmony import */ var _legend_choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../legend/choropleth/legend-choropleth */ "./src/legend/choropleth/legend-choropleth.js");
+/* harmony import */ var _core_decoration_ranked_bar_chart__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../core/decoration/ranked-bar-chart */ "./src/core/decoration/ranked-bar-chart.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var simple_statistics__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! simple-statistics */ "./node_modules/simple-statistics/dist/simple-statistics.mjs");
+/* harmony import */ var _core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../../core/decoration/pattern-fill */ "./src/core/decoration/pattern-fill.js");
+/* harmony import */ var _legend_legend_utils__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../../legend/legend-utils */ "./src/legend/legend-utils.js");
 //map-choropleth.js
+
 
 
 
@@ -36705,7 +37412,7 @@ __webpack_require__.r(__webpack_exports__);
  * @returns {ChoroplethMap}
  */
 const map = function (config) {
-    return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_11__.buildSingleLayerMap)('choropleth', config)
+    return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_12__.buildSingleLayerMap)('choropleth', config)
 }
 
 /**
@@ -36726,7 +37433,7 @@ const decorateChoroplethLayer = function (layer, config) {
     layer.makeClassifNice_ = false
     //the color function [0,1] -> color
     const paletteA = ['#D4DAF0', '#C1C9EB', '#A8B4E6', '#93A2DC', '#7C90D6', '#677CD2', '#5169BE', '#3C57B0', '#2644A7', '#15246B']
-    layer.colorFunction_ = (t) => (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_8__["default"])(d3_interpolate__WEBPACK_IMPORTED_MODULE_7__["default"], paletteA)(Math.min(Math.max(0, t), 1)) // default
+    layer.colorFunction_ = (t) => (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_9__["default"])(d3_interpolate__WEBPACK_IMPORTED_MODULE_8__["default"], paletteA)(Math.min(Math.max(0, t), 1)) // default
     //a function returning the color from the class i
     layer.classToFillStyle_ = undefined
     //the classifier: a function which return a class number from a stat value.
@@ -36789,20 +37496,20 @@ const decorateChoroplethLayer = function (layer, config) {
         layer.colorsName_ = typeof v === 'string' ? v : null
         layer.divergingScheme_ = false
         if (layer.colorsName_) {
-            if ((0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.isDivergingName)(layer.colorsName_)) {
+            if ((0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.isDivergingName)(layer.colorsName_)) {
                 layer.divergingScheme_ = true
-                layer.colorFunction_ = (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingInterpolator)(layer.colorsName_)
-            } else if ((0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.isSingleHueName)(layer.colorsName_)) {
-                const ramp = (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_8__["default"])(d3_interpolate__WEBPACK_IMPORTED_MODULE_7__["default"], (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.singleHuePalette)(layer.colorsName_, 9))
+                layer.colorFunction_ = (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.divergingInterpolator)(layer.colorsName_)
+            } else if ((0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.isSingleHueName)(layer.colorsName_)) {
+                const ramp = (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_9__["default"])(d3_interpolate__WEBPACK_IMPORTED_MODULE_8__["default"], (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.singleHuePalette)(layer.colorsName_, 9))
                 layer.colorFunction_ = (t) => ramp(Math.min(Math.max(0, t), 1))
             } else {
                 throw new Error(
                     'Unknown colour palette: ' +
                         layer.colorsName_ +
                         '. Available: ' +
-                        Object.keys(_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.EUROSTAT_SINGLE_HUES).join(', ') +
+                        Object.keys(_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.EUROSTAT_SINGLE_HUES).join(', ') +
                         ', or a diverging pair such as ' +
-                        _core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.EUROSTAT_DIVERGING_SCHEMES.slice(0, 3).join(', ')
+                        _core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.EUROSTAT_DIVERGING_SCHEMES.slice(0, 3).join(', ')
                 )
             }
         }
@@ -36815,7 +37522,7 @@ const decorateChoroplethLayer = function (layer, config) {
         if (!name) return layer.colors_
         if (layer.colorSchemeType_ === 'continuous') return (layer.colors_ = null) // the colour function drives continuous schemes
         if (!layer.divergingScheme_) {
-            layer.colors_ = (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.singleHuePalette)(name, layer.numberOfClasses_)
+            layer.colors_ = (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.singleHuePalette)(name, layer.numberOfClasses_)
         } else {
             layer.colors_ = divergingColorsForClasses(name)
         }
@@ -36826,18 +37533,18 @@ const decorateChoroplethLayer = function (layer, config) {
         const n = layer.numberOfClasses_
         const classifier = layer.classifier_
         const extent = layer.dataExtent_
-        if (!classifier || !extent || typeof classifier.invertExtent !== 'function') return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingPalette)(name, n)
+        if (!classifier || !extent || typeof classifier.invertExtent !== 'function') return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.divergingPalette)(name, n)
 
         const pivot = layer.pointOfDivergence_ ?? 0
-        if (pivot <= extent[0]) return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingClassColors)(name, 0, false, n) // every class is above it
-        if (pivot >= extent[1]) return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingClassColors)(name, n, false, 0) // every class is below it
+        if (pivot <= extent[0]) return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.divergingClassColors)(name, 0, false, n) // every class is above it
+        if (pivot >= extent[1]) return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.divergingClassColors)(name, n, false, 0) // every class is below it
 
         // upper limit of every class but the last
         const limits = Array.from({ length: n - 1 }, (_, i) => classifier.invertExtent(i)[1])
         const onLimit = limits.findIndex((l) => Math.abs(l - pivot) <= 1e-9 * Math.max(1, Math.abs(pivot)))
-        if (onLimit >= 0) return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingClassColors)(name, onLimit + 1, false, n - onLimit - 1)
+        if (onLimit >= 0) return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.divergingClassColors)(name, onLimit + 1, false, n - onLimit - 1)
         const containing = classifier(pivot)
-        return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_9__.divergingClassColors)(name, containing, true, n - 1 - containing)
+        return (0,_core_color_palettes__WEBPACK_IMPORTED_MODULE_10__.divergingClassColors)(name, containing, true, n - 1 - containing)
     }
 
     //override attribute values with config values
@@ -36883,7 +37590,7 @@ const decorateChoroplethLayer = function (layer, config) {
             const map = layer.map
             // apply classification to all insets that are outside of the main map's SVG
             if (map.insetTemplates_) {
-                (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.executeForAllInsets)(map.insetTemplates_, map.svgId_, applyClassificationToMap)
+                (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.executeForAllInsets)(map.insetTemplates_, map.svgId_, applyClassificationToMap)
             }
 
             // apply to main map
@@ -36916,7 +37623,7 @@ const decorateChoroplethLayer = function (layer, config) {
         const fillData = resolveFillData()
         const dataArray = fillData.getArray()
         const dataArrayNumeric = (dataArray || []).map((v) => +v).filter((v) => Number.isFinite(v))
-        layer.dataExtent_ = dataArrayNumeric.length ? [(0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])(dataArrayNumeric), (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(dataArrayNumeric)] : null // used to place a diverging scheme's neutral
+        layer.dataExtent_ = dataArrayNumeric.length ? [(0,d3_array__WEBPACK_IMPORTED_MODULE_3__["default"])(dataArrayNumeric), (0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])(dataArrayNumeric)] : null // used to place a diverging scheme's neutral
 
         if (dataArray) {
             const setupClassifier = () => {
@@ -36925,8 +37632,8 @@ const decorateChoroplethLayer = function (layer, config) {
                 if (layer.colorSchemeType_ === 'continuous') {
                     if (layer.colorStretch_) {
                         // stretch the distance from the point of divergence, or from the lowest value
-                        const reference = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.checkIfDiverging)(layer) ? (layer.pointOfDivergence_ ?? 0) : (0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])(dataArrayNumeric)
-                        const { transform, untransform } = (0,_core_color_stretch__WEBPACK_IMPORTED_MODULE_10__.colorStretch)(layer.colorStretch_, reference)
+                        const reference = (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.checkIfDiverging)(layer) ? (layer.pointOfDivergence_ ?? 0) : (0,d3_array__WEBPACK_IMPORTED_MODULE_3__["default"])(dataArrayNumeric)
+                        const { transform, untransform } = (0,_core_color_stretch__WEBPACK_IMPORTED_MODULE_11__.colorStretch)(layer.colorStretch_, reference)
                         layer.valueTransform_ = transform
                         layer.valueUntransform_ = untransform
                     }
@@ -36938,9 +37645,9 @@ const decorateChoroplethLayer = function (layer, config) {
                         layer.domain_ = null
                     } else {
                         const transformedValues = dataArrayNumeric.map(valueTransform)
-                        const minVal = (0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])(transformedValues)
-                        const maxVal = (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(transformedValues)
-                        const isDiverging = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.checkIfDiverging)(layer)
+                        const minVal = (0,d3_array__WEBPACK_IMPORTED_MODULE_3__["default"])(transformedValues)
+                        const maxVal = (0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])(transformedValues)
+                        const isDiverging = (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.checkIfDiverging)(layer)
                         const isFullScale = typeof layer.colorFunction_?.domain === 'function'
 
                         if (!isFullScale) {
@@ -36958,21 +37665,21 @@ const decorateChoroplethLayer = function (layer, config) {
 
                 switch (layer.classificationMethod_) {
                     case 'quantile': {
-                        layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_3__["default"])().domain(dataArrayNumeric).range(range))
+                        layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_4__["default"])().domain(dataArrayNumeric).range(range))
                         break
                     }
                     case 'equal-interval':
                     case 'equinter': {
                         layer.classifier(
-                            (0,d3_scale__WEBPACK_IMPORTED_MODULE_4__["default"])()
-                                .domain([(0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])(dataArrayNumeric), (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(dataArrayNumeric)])
+                            (0,d3_scale__WEBPACK_IMPORTED_MODULE_5__["default"])()
+                                .domain([(0,d3_array__WEBPACK_IMPORTED_MODULE_3__["default"])(dataArrayNumeric), (0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])(dataArrayNumeric)])
                                 .range(range)
                         )
                         break
                     }
                     case 'threshold': {
                         layer.numberOfClasses(layer.thresholds_.length + 1)
-                        layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_5__["default"])().domain(layer.thresholds_).range(generateRange(layer.numberOfClasses_)))
+                        layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_6__["default"])().domain(layer.thresholds_).range(generateRange(layer.numberOfClasses_)))
                         break
                     }
                     case 'jenks': {
@@ -36983,9 +37690,9 @@ const decorateChoroplethLayer = function (layer, config) {
                         // alone so the legend still shows its configured number of classes/colors;
                         // any classes beyond what the data supports simply end up unused.
                         const nClasses = Math.min(layer.numberOfClasses_, dataArrayNumeric.length) || 1
-                        const jenksBreaks = (0,simple_statistics__WEBPACK_IMPORTED_MODULE_16__.jenks)(dataArrayNumeric, nClasses) //data, lowerClassLimits, nClasses
+                        const jenksBreaks = (0,simple_statistics__WEBPACK_IMPORTED_MODULE_17__.jenks)(dataArrayNumeric, nClasses) //data, lowerClassLimits, nClasses
                         const domain = jenksBreaks ? jenksBreaks.slice(1, -1) : []
-                        layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_5__["default"])().domain(domain).range(range))
+                        layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_6__["default"])().domain(domain).range(range))
                         break
                     }
                     case 'ckmeans': {
@@ -36993,16 +37700,22 @@ const decorateChoroplethLayer = function (layer, config) {
                         // for more classes than there are data points - guard the zero-data case
                         // explicitly rather than relying on the clamp below to avoid it.
                         const nClasses = Math.min(layer.numberOfClasses_, dataArrayNumeric.length)
-                        const domain = nClasses > 0 ? (0,simple_statistics__WEBPACK_IMPORTED_MODULE_16__.ckmeans)(dataArrayNumeric, nClasses).map((cluster) => cluster.pop()).slice(0, -1) : []
-                        layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_5__["default"])().domain(domain).range(range))
+                        const domain = nClasses > 0 ? (0,simple_statistics__WEBPACK_IMPORTED_MODULE_17__.ckmeans)(dataArrayNumeric, nClasses).map((cluster) => cluster.pop()).slice(0, -1) : []
+                        layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_6__["default"])().domain(domain).range(range))
                         break
+                    }
+                    default: {
+                        // a continuous scheme needs no method, and a classifier the caller set stays
+                        if (layer.colorSchemeType_ === 'continuous') break
+                        ;(0,_core_option_check__WEBPACK_IMPORTED_MODULE_0__.warnUnknownClassification)(layer.classificationMethod_, ['quantile', 'equinter', 'equal-interval', 'threshold', 'jenks', 'ckmeans'])
+                        if (!layer.classifier_) layer.classifier((0,d3_scale__WEBPACK_IMPORTED_MODULE_4__["default"])().domain(dataArrayNumeric).range(range))
                     }
                 }
 
                 // For quantile, keep exact quantile thresholds so class counts stay balanced.
                 if (layer.makeClassifNice_) {
                     const rawThresholds = layer.classifier_.domain()
-                    const niceThresholds = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.applyNiceNumbers)(rawThresholds, dataArrayNumeric)
+                    const niceThresholds = (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.applyNiceNumbers)(rawThresholds, dataArrayNumeric)
                     layer.classifier_.domain(niceThresholds)
                 }
             }
@@ -37014,7 +37727,7 @@ const decorateChoroplethLayer = function (layer, config) {
                     .attr('ecl', null)
 
                 regions.each(function (rg) {
-                    const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+                    const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
 
                     const regionData = fillData.get(rg.properties.id)
 
@@ -37030,7 +37743,7 @@ const decorateChoroplethLayer = function (layer, config) {
                     // otherwise numeric/discrete classification - takes priority over
                     // both numeric classification and the generic no-data handling below
                     if (layer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(layer.categoryFillStyle_, value)) {
-                        sel.attr('ecl', (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.toCategoryEcl)(value))
+                        sel.attr('ecl', (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.toCategoryEcl)(value))
                         return
                     }
 
@@ -37055,7 +37768,7 @@ const decorateChoroplethLayer = function (layer, config) {
             setupClassifier()
 
             if (map.svg_) {
-                const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getRegionsSelector)(map)
+                const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.getRegionsSelector)(map)
                 classifyRegions(map.svg().selectAll(selector))
 
                 if (map.nutsLevel_ === 'mixed') {
@@ -37072,7 +37785,7 @@ const decorateChoroplethLayer = function (layer, config) {
             const map = layer.map
             // apply style to insets
             if (map.insetTemplates_) {
-                (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.executeForAllInsets)(map.insetTemplates_, map.svgId_, applyStyleToMap)
+                (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.executeForAllInsets)(map.insetTemplates_, map.svgId_, applyStyleToMap)
             }
 
             // apply to main map
@@ -37097,13 +37810,13 @@ const decorateChoroplethLayer = function (layer, config) {
 
         // Apply color and events to regions if SVG exists
         if (map.svg_) {
-            const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getRegionsSelector)(map)
+            const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.getRegionsSelector)(map)
             const regions = map.svg().selectAll(selector)
 
             const finalizeRegionStyling = () => {
                 // Store the original color for each region
                 regions.each(function () {
-                    const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+                    const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
                     sel.attr('fill___', sel.style('fill'))
                 })
                 // Set up mouse events
@@ -37114,8 +37827,8 @@ const decorateChoroplethLayer = function (layer, config) {
                     map.svg()
                         .selectAll('.em-grid-text')
                         .each(function () {
-                            const cellColor = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this.parentNode).style('fill')
-                            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('fill', (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getTextColorForBackground)(cellColor))
+                            const cellColor = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this.parentNode).style('fill')
+                            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).attr('fill', (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.getTextColorForBackground)(cellColor))
                         })
                 }
             }
@@ -37155,28 +37868,28 @@ const decorateChoroplethLayer = function (layer, config) {
 
             //add hatching if needed
             if (map.patternFill_) {
-                (0,_core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_17__.applyPatternFill)(map, map.patternFill_)
+                (0,_core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_18__.applyPatternFill)(map, map.patternFill_)
             }
         }
     }
 
     //@override
     layer.getLegendConstructor = function () {
-        return _legend_choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_13__.legend
+        return _legend_choropleth_legend_choropleth__WEBPACK_IMPORTED_MODULE_14__.legend
     }
 
     //@override
     layer.getRankedBarChartConstructor = function () {
-        return _core_decoration_ranked_bar_chart__WEBPACK_IMPORTED_MODULE_14__.rankedBarChart
+        return _core_decoration_ranked_bar_chart__WEBPACK_IMPORTED_MODULE_15__.rankedBarChart
     }
 
     // when mixing different NUTS levels (e.g. showing NUTS 1 and NUTS 2 data simultaneously)
     const styleMixedNUTS = function (map) {
         map.svg()
-            .selectAll((0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getRegionsSelector)(map))
+            .selectAll((0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.getRegionsSelector)(map))
             .each(function () {
                 if (this.parentNode.classList.contains('em-cntrg')) return // Skip country regions
-                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
                 const ecl = sel.attr('ecl')
                 const lvl = sel.attr('lvl')
 
@@ -37195,7 +37908,7 @@ const decorateChoroplethLayer = function (layer, config) {
     }
 
     const regionsFillFunction = function (rg) {
-        const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+        const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
         const ecl = sel.attr('ecl') // may be a class index or a raw value
         const isNoInput = sel.attr('ni') === '1'
         const colorSchemeType = layer.colorSchemeType_ || 'discrete'
@@ -37210,7 +37923,7 @@ const decorateChoroplethLayer = function (layer, config) {
         }
 
         // Extra categorical value mixed into this classification
-        const categoryValue = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.fromCategoryEcl)(ecl)
+        const categoryValue = (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.fromCategoryEcl)(ecl)
         if (categoryValue !== undefined) {
             return (layer.categoryFillStyle_ && layer.categoryFillStyle_[categoryValue]) || layer.noDataFillStyle_ || 'gray'
         }
@@ -37246,7 +37959,7 @@ const decorateChoroplethLayer = function (layer, config) {
         regions
             .on('mouseover', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
-                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
                 sel.style('fill', map.hoverColor_) // Apply highlight color
                 if (tooltipHost) tooltipHost.mouseover(layer.tooltip_.textFunction(rg, layer))
                 if (map.onRegionMouseOver_) map.onRegionMouseOver_(e, rg, this, map)
@@ -37258,7 +37971,7 @@ const decorateChoroplethLayer = function (layer, config) {
             })
             .on('mouseout', function (e, rg) {
                 if (shouldOmit(rg.properties.id)) return
-                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
                 sel.style('fill', sel.attr('fill___')) // Revert to original color
                 if (tooltipHost) tooltipHost.mouseout()
                 if (map.onRegionMouseOut_) map.onRegionMouseOut_(e, rg, this, map)
@@ -37270,7 +37983,7 @@ const decorateChoroplethLayer = function (layer, config) {
         const map = layer.map
         if (!map.svg_) return layer
 
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getRegionsSelector)(map)
+        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.getRegionsSelector)(map)
         const region = map
             .svg()
             .selectAll(selector)
@@ -37313,11 +38026,11 @@ const decorateChoroplethLayer = function (layer, config) {
         const map = layer.map
         if (!map.svg_) return layer
 
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.getRegionsSelector)(map)
+        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.getRegionsSelector)(map)
         map.svg()
             .selectAll(selector)
             .each(function () {
-                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
                 const original = sel.attr('fill___')
                 if (original) sel.style('fill', original)
             })
@@ -37334,7 +38047,7 @@ const decorateChoroplethLayer = function (layer, config) {
 
 //build a color legend object
 const getColorFunction = function (colorFunction, colorArray, schemeType = 'discrete') {
-    colorFunction = colorFunction || d3_scale_chromatic__WEBPACK_IMPORTED_MODULE_6__["default"]
+    colorFunction = colorFunction || d3_scale_chromatic__WEBPACK_IMPORTED_MODULE_7__["default"]
 
     if (schemeType === 'continuous') {
         return function (value, domain = [0, 1]) {
@@ -37373,18 +38086,18 @@ const getFillPatternLegend = function () {
  * comments.md's tooltip decimal-truncation item for the reasoning.
  */
 function formatTooltipValue(value, statData, tooltipConfig) {
-    if (typeof value !== 'number' || !Number.isFinite(value)) return (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.spaceAsThousandSeparator)(value)
+    if (typeof value !== 'number' || !Number.isFinite(value)) return (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.spaceAsThousandSeparator)(value)
 
     const decimals =
         typeof tooltipConfig?.decimals === 'number'
             ? tooltipConfig.decimals
-            : (0,_legend_legend_utils__WEBPACK_IMPORTED_MODULE_18__.getMaxDomainPrecision)({ domain: () => [0, (0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])((statData.getArray?.() || []).map((v) => +v).filter(Number.isFinite)) ?? value] })
+            : (0,_legend_legend_utils__WEBPACK_IMPORTED_MODULE_19__.getMaxDomainPrecision)({ domain: () => [0, (0,d3_array__WEBPACK_IMPORTED_MODULE_2__["default"])((statData.getArray?.() || []).map((v) => +v).filter(Number.isFinite)) ?? value] })
 
     // toFixed()'s decimal part is kept as a literal string (spaceAsThousandSeparator/toLocaleString
     // would round-trip through Number and re-drop trailing zeros, e.g. Number("7.0") === 7).
     // Only the integer part goes through the normal thousand-separator formatting.
     const [integerPart, decimalPart] = value.toFixed(decimals).split('.')
-    const formattedInteger = (0,_core_utils__WEBPACK_IMPORTED_MODULE_15__.spaceAsThousandSeparator)(Number(integerPart))
+    const formattedInteger = (0,_core_utils__WEBPACK_IMPORTED_MODULE_16__.spaceAsThousandSeparator)(Number(integerPart))
     return decimalPart ? `${formattedInteger}.${decimalPart}` : formattedInteger
 }
 
@@ -37455,7 +38168,7 @@ const choroplethTooltipFunction = function (region, layer) {
     // Optional status flag
     const statusFlag = sv.status
     if (statusFlag && layer.map.tooltip_.showFlags) {
-        const flagText = layer.map.tooltip_.showFlags === 'short' ? statusFlag : _core_utils__WEBPACK_IMPORTED_MODULE_15__.flags[statusFlag] || statusFlag
+        const flagText = layer.map.tooltip_.showFlags === 'short' ? statusFlag : _core_utils__WEBPACK_IMPORTED_MODULE_16__.flags[statusFlag] || statusFlag
         buf.push(` <span class="status-flag">${flagText}</span>`)
     }
 
@@ -37490,8 +38203,8 @@ function getContinuousColor(value, layer) {
     return colorFn(Math.min(Math.max(t, 0), 1))
 }
 
-(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_12__.registerLayerType)('choropleth', 'base', decorateChoroplethLayer)
-;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_12__.registerLayerType)('ch', 'base', decorateChoroplethLayer)
+(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_13__.registerLayerType)('choropleth', 'base', decorateChoroplethLayer)
+;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_13__.registerLayerType)('ch', 'base', decorateChoroplethLayer)
 
 
 /***/ },
@@ -48270,6 +48983,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/max.js");
 /* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/min.js");
 /* harmony import */ var _core_geo_centroids_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../core/geo/centroids.js */ "./src/core/geo/centroids.js");
+/* harmony import */ var _core_option_check_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../core/option-check.js */ "./src/core/option-check.js");
+
 
 
 
@@ -48333,6 +49048,9 @@ function defineColorClassifier(layer) {
         layer.psClasses_ = layer.psThresholds_.length + 1
         const range = getA(layer.psClasses_)
         layer.classifierColor((0,d3_scale__WEBPACK_IMPORTED_MODULE_3__["default"])().domain(layer.psThresholds_).range(range))
+    } else {
+        (0,_core_option_check_js__WEBPACK_IMPORTED_MODULE_8__.warnUnknownClassification)(layer.psClassificationMethod_, ['quantile', 'equinter', 'threshold'])
+        if (!layer.classifierColor_) layer.classifierColor((0,d3_scale__WEBPACK_IMPORTED_MODULE_1__["default"])().domain(getColorData(layer).getArray()).range(getA(layer.psClasses_)))
     }
 }
 
@@ -79677,7 +80395,7 @@ function applyProjectionDefaults(wkt) {
   \**********************/
 (module) {
 
-module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node --test test/e2e/flow-color-legend.test.mjs test/e2e/flow-legend-overlap.test.mjs test/e2e/legend-overlap.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/legend-layout.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0","typedoc":{"minimatch":"6.2.3"}},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node --test test/e2e/accessibility-errors.test.mjs test/e2e/flow-color-legend.test.mjs test/e2e/flow-legend-overlap.test.mjs test/e2e/legend-overlap.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/legend-layout.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","check:declarations":"tsc --project tsconfig.declarations.json","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && npm run check:declarations && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0","typedoc":{"minimatch":"6.2.3"}},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
 
 /***/ }
 

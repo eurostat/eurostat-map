@@ -19,6 +19,9 @@ import { appendCoastalMargin } from './decoration/coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './decoration/texts.js'
 import { addScalebarToMap, getDefaultScalebarConfig, mergeScalebarConfig, updateScalebar } from './decoration/scalebar.js'
 import { attachLocationsApi, updateLocations } from './locations.js'
+import { applyMapAccessibility, setupKeyboardNavigation } from './accessibility.js'
+import { GEO_ERROR_MESSAGE, reportMapError, showMapErrorMessage } from './errors.js'
+import { showEurostatApiErrorToast } from './toast.js'
 import { applyBorderModeClasses, createMapSVG, recalculateLayout, updateResponsiveMap, wrapMapSvg } from './layout'
 import { DEFAULT_FIT_ZOOM, defineDefaultPosition, definePathFunction, defineProjection, getDefaultZ } from './geo/projection'
 import { addCentroidsToMap } from './geo/centroids'
@@ -62,6 +65,10 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     out.height_ = 0
     out.containerId_ = undefined
     out.responsive_ = true // scale the svg down to fit its container (viewBox)
+    // accessibility (see accessibility.js)
+    out.ariaLabel_ = undefined // accessible name of the map; the title and subtitle when unset
+    out.ariaDescription_ = undefined // longer description for screen readers, written as the svg's <desc>
+    out.keyboardNavigation_ = true // arrow keys move between regions
     // How the layout adapts to the room the map has (see layout-profile.js): 'auto' follows the width of the
     // map's container (a small iframe is as compact as a phone), 'desktop' and 'compact' fix the profile.
     out.layout_ = 'auto'
@@ -301,6 +308,19 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     }
 
     out.isInset = config?.isInset || false
+
+    // accessibility settings also apply to an already-built map
+    ;['ariaLabel', 'ariaDescription', 'keyboardNavigation'].forEach(function (name) {
+        out[name] = function (v) {
+            if (!arguments.length) return out[name + '_']
+            out[name + '_'] = v
+            if (out.svg_) {
+                applyMapAccessibility(out)
+                if (name === 'keyboardNavigation') setupKeyboardNavigation(out)
+            }
+            return out
+        }
+    })
 
     // warn existing users of functions that have been banished to the shadow realm.
     defineDeprecatedFunctions(out)
@@ -734,6 +754,8 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             appendStamp(out.stamp_, out)
         }
 
+        applyMapAccessibility(out)
+
         return out
     }
 
@@ -880,6 +902,9 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             appendCoastalMargin(out)
         }
 
+        applyMapAccessibility(out)
+        setupKeyboardNavigation(out)
+
         //header/footer
         setTimeout(() => recalculateLayout(out), 20)
         return out
@@ -956,7 +981,7 @@ const drawBackgroundMap = function (out) {
 /**
  * Requests geographic data and then builds the map template
  */
-export const updateGeoMapTemplate = function (callback, map) {
+export const updateGeoMapTemplate = function (callback, map, root = map) {
     if (!callback) console.warn('⚠️ map.updateGeoMapTemplate called without callback function!')
     // Erase previous data
     map.Geometries.defaultGeoData = null
@@ -972,8 +997,10 @@ export const updateGeoMapTemplate = function (callback, map) {
         if (callback) callback()
     } else {
         // use default
+        let loaded = false // tells a failed download from an error while drawing
         map.Geometries.getDefaultGeoData(map.geo_, map.filterGeometriesFunction_, map.nutsLevel_)
             .then(() => {
+                loaded = true
                 map.buildMapTemplate()
 
                 // Execute callback if defined
@@ -985,13 +1012,22 @@ export const updateGeoMapTemplate = function (callback, map) {
                 // decrements for this target and the spinner spins forever, even though every
                 // other map/inset loaded fine. This map/inset just won't have geometry to draw.
                 console.error(`[eurostat-map] Failed to load geo data for "${map.svgId_ || map.geo_}":`, err)
+                if (loaded) {
+                    reportMapError(root, { type: 'render', message: err?.message || String(err), cause: err })
+                } else {
+                    if (map === root) {
+                        showMapErrorMessage(map)
+                        showEurostatApiErrorToast(GEO_ERROR_MESSAGE)
+                    }
+                    reportMapError(root, { type: 'geometry', message: GEO_ERROR_MESSAGE, geo: map.geo_, cause: err })
+                }
                 if (callback) callback()
             })
     }
 
     // Use executeForAllInsets for recursive inset updates
     executeForAllInsets(map.insetTemplates_, map.svgId_, (inset) => {
-        updateGeoMapTemplate(callback, inset)
+        updateGeoMapTemplate(callback, inset, root)
     })
 
     return map

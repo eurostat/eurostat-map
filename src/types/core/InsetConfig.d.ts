@@ -45,9 +45,6 @@ export interface InsetConfig {
     /** Show/hide the graticule (coordinate grid lines) for this inset. @default false */
     drawGraticule?: boolean
 
-    /** Show/hide zoom +/- buttons for this inset. @default false */
-    zoomButtons?: boolean
-
     /** D3 zoom scale extent [min, max] for this inset. */
     zoomExtent?: [number, number]
 

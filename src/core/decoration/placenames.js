@@ -1,12 +1,14 @@
 import { csv } from 'd3-fetch'
 import { projectToMap } from '../geo/proj4'
 
-const PLACENAMESURL = window.location.hostname.includes('ec.europa.eu')
-    ? 'https://ec.europa.eu/eurostat/cache/GISCO/pub/euronym/v3/UTF_LATIN/50/EUR.csv'
-    : 'https://raw.githubusercontent.com/eurostat/euronym/main/pub/v3/UTF_LATIN/50/EUR.csv'
+// resolved when used: nothing may touch `window` while the module loads (the package is importable in Node)
+const defaultPlacenamesURL = () =>
+    window.location.hostname.includes('ec.europa.eu')
+        ? 'https://ec.europa.eu/eurostat/cache/GISCO/pub/euronym/v3/UTF_LATIN/50/EUR.csv'
+        : 'https://raw.githubusercontent.com/eurostat/euronym/main/pub/v3/UTF_LATIN/50/EUR.csv'
 
 // Load once and store all labels
-export async function loadPlacenames(out, url = PLACENAMESURL) {
+export async function loadPlacenames(out, url = defaultPlacenamesURL()) {
     const raw = await csv(url)
     let filtered = raw
     if (out.placenamesFilter_) filtered = out.placenamesFilter_(raw)

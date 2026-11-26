@@ -14,6 +14,8 @@ module.exports = {
         path: path.resolve(__dirname, '../build'),
         library: 'eurostatmap',
         libraryTarget: 'umd',
+        // `self` does not exist in Node: importing the package there (server rendering, tests) must not throw
+        globalObject: "typeof self !== 'undefined' ? self : this",
         publicPath: '/build/',
     },
     devtool: false,

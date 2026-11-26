@@ -56,6 +56,7 @@ import type { FlowMap } from './layers/flow/FlowMap'
 export type { MapConfig, MapType, MapInstance }
 export type EurostatMap = MapInstance
 export type { TooltipConfig } from './core/TooltipConfig'
+export type { MapError } from './core/MapError'
 export type { LegendConfig } from './legend/LegendConfig'
 export type { StatConfig } from './core/stat/StatConfig'
 export type { EncodingConfig } from './core/encoding/EncodingConfig'

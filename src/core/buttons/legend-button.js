@@ -1,6 +1,7 @@
 import { select } from 'd3-selection'
 import { BOX_CORNER_RADIUS } from './corner-radius'
 import { getButtonPadding, getButtonSize, getMapDrawingExtent } from './button-utils'
+import { makeButtonAccessible } from '../accessibility'
 
 export const appendLegendButton = (map) => {
     const legendObj = map.legendObj_ || (typeof map.legendObj === 'function' ? map.legendObj() : undefined)
@@ -73,6 +74,8 @@ export const appendLegendButton = (map) => {
         const isHidden = legendSvg.style('display') === 'none'
         legendSvg.style('display', isHidden ? null : 'none')
     })
+
+    makeButtonAccessible(legendButton, 'Show or hide the legend')
 }
 
 export const updateLegendButtonPosition = (map) => {

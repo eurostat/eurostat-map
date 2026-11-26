@@ -12,6 +12,8 @@ const mainConfig = {
         path: path.resolve(__dirname, '../build'), // This moves the output to the parent folder's 'build' directory
         library: 'eurostatmap',
         libraryTarget: 'umd',
+        // `self` does not exist in Node: importing the package there (server rendering, tests) must not throw
+        globalObject: "typeof self !== 'undefined' ? self : this",
         publicPath: '/build/', // Optional: if resources are served from this path
         //clean: true, // Clean the output directory before emit
     },

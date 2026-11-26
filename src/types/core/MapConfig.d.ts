@@ -1,3 +1,4 @@
+import type { MapError } from './MapError'
 import type { StatConfig } from './stat/StatConfig'
 import type { CompositionStatConfig } from '../layers/composition/CompositionStatConfig'
 import type { LegendConfig } from '../legend/LegendConfig'
@@ -117,6 +118,14 @@ export interface MapConfig {
 
     /** Duration in milliseconds for D3 transitions when the map updates. Set to 0 to disable. @default 500 */
     transitionDuration?: number
+    /** Called when boundary data or statistics cannot be loaded, or drawing fails. */
+    onError?: (error: MapError, map: any) => void
+    /** Accessible name of the map's svg. Unset: the title and subtitle. */
+    ariaLabel?: string
+    /** A longer description for screen readers, written as the svg's `<desc>`. */
+    ariaDescription?: string
+    /** Move between regions with the arrow keys. @default true */
+    keyboardNavigation?: boolean
 
     /**
      * Statistical data configuration.

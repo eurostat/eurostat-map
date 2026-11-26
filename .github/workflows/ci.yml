@@ -1,0 +1,45 @@
+name: CI
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        timeout-minutes: 30
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '24'
+                  cache: npm
+
+            # the lockfile is the build toolchain: never `npm install` here (docs/release-flow.md)
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Type check
+              run: npm run type-check
+
+            - name: Build both bundles
+              run: |
+                  npm run build-prod
+                  npx webpack --config webpack/webpack.config.dev.js --no-watch
+
+            # A commit that changes src/ has to include the rebuilt bundles. Line endings differ between Windows and
+            # Linux checkouts, so they are not compared.
+            - name: Check that the committed bundles match the source
+              run: git diff --exit-code --stat --ignore-space-at-eol -- build
+
+            - name: Install the test browser
+              run: npx playwright install --with-deps chromium
+
+            - name: Tests
+              run: npm test

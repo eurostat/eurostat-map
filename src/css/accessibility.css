@@ -1,0 +1,53 @@
+/* Keyboard focus (see core/accessibility.js). :focus-visible: a mouse click draws no ring. */
+.em-button:focus,
+.em-drawing-group:focus {
+    outline: none;
+}
+
+.em-button:focus-visible > path:first-of-type,
+.em-button:focus-visible > rect:first-of-type {
+    stroke: #0e47cb !important;
+    stroke-width: 3px !important;
+}
+
+.em-drawing-group:focus-visible .em-frame {
+    stroke: #0e47cb !important;
+    stroke-width: 4px !important;
+    display: inline !important;
+}
+
+/* the region the arrow keys are on */
+.em-map .em-keyboard-focus,
+.em-map .em-keyboard-focus > * {
+    stroke: #000 !important;
+    stroke-width: 2.5px !important;
+    vector-effect: non-scaling-stroke;
+}
+
+/* read by screen readers, not shown */
+.em-announcer {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* shown where a map's boundaries could not be loaded (see core/errors.js) */
+.em-load-error {
+    font-family: sans-serif;
+    font-size: 14px;
+    fill: #8a1c1c;
+}
+
+.em--dark .em-load-error {
+    fill: #ffb4b4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .em-loading-spinner {
+        animation-duration: 4s !important;
+    }
+}
