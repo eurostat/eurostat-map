@@ -14,8 +14,8 @@ sitting uncommitted in the working tree.
   unrelated in-progress work from elsewhere in the tree — check `git status` first, since
   multiple agents/sessions may be working in this repo concurrently).
 - Build with the locked toolchain (`npm ci` first in a new checkout or worktree).
-- If source under `src/` changed, rebuild the bundle (`npm run build-prod`, and the dev
-  bundle via `npx webpack --config webpack/webpack.config.dev.js --no-watch` if
+- If source under `src/` changed, rebuild the bundles (`npm run build-prod`, which builds the minified and the ES
+  module bundle, and the dev bundle via `npx webpack --config webpack/webpack.config.dev.js --no-watch` if
   `build/eurostatmap.js` is also tracked as changed) and include the updated `build/`
   output in the same commit.
 - Push after committing — don't leave commits local-only.
@@ -333,6 +333,14 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   `test/e2e/accessibility-errors.test.mjs`; the screen reader check is manual (`test/manual/accessibility-screen-reader.md`).
 - Attributes added to the map DOM change the inset and smoke baselines: first show that only those attributes differ,
   then recapture.
+
+## Three bundles
+
+`eurostatmap.min.js` (`main`, unpkg, IMAGE's HTML export), `eurostatmap.mjs` (`module`: what bundlers, IMAGE included,
+use; dependencies are imports, so every package `src/` imports must be in `dependencies`) and `eurostatmap.js` (dev:
+tests and examples; IMAGE's tests read it). Don't rename or drop a file, and don't add an `exports` field without
+allowing `build/types/*` and the bundle paths IMAGE imports. `src/esm.js` gives the module build its default export.
+Deep imports from a dependency need the `.js` extension.
 
 ## Where things live (split in 2026-11)
 

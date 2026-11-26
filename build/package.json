@@ -26,7 +26,7 @@
   },
   "main": "build/eurostatmap.min.js",
   "unpkg": "build/eurostatmap.min.js",
-  "module": "build/eurostatmap.js",
+  "module": "build/eurostatmap.mjs",
   "types": "build/types/index.d.ts",
   "typings": "build/types/index.d.ts",
   "files": [
@@ -45,6 +45,8 @@
   "dependencies": {
     "d3-array": "^3.2.4",
     "d3-axis": "^3.0.0",
+        "d3-color": "3.1.0",
+        "d3-dsv": "^3.0.1",
     "d3-ease": "^3.0.1",
     "d3-fetch": "^3.0.1",
     "d3-force": "^3.0.0",
@@ -57,6 +59,7 @@
     "d3-selection": "^3.0.0",
     "d3-shape": "^3.2.0",
     "d3-svg-annotation": "^2.5.1",
+        "d3-transition": "^3.0.1",
     "d3-zoom": "^3.0.0",
     "idb-keyval": "^6.2.2",
     "jsonstat-toolkit": "^1.0.8",

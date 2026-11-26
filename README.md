@@ -84,6 +84,10 @@ or
 const eurostatmap = require('eurostat-map')
 ```
 
+Bundlers (webpack, Vite, Angular, Rollup) get an ES module build that imports D3 and the other dependencies instead of
+containing them, so an application that already uses D3 includes it once. `require()` and the script tag get a
+self-contained bundle.
+
 or
 
 ```html

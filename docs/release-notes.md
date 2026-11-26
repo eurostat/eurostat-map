@@ -98,6 +98,14 @@ map.annotations([{ x: 300, y: 200, align: 'right', note: { label: 'Constanta', t
 
 ### Improvements
 
+- **A real ES module build for bundlers.** The package's `module` entry (`build/eurostatmap.mjs`) imports D3, proj4 and the other dependencies instead of containing them: in a test application that also uses D3, the bundle is about 13% smaller gzipped than with 4.15.0. `import eurostatmap from 'eurostat-map'` now works in webpack, where it returned `undefined` before. The `build/eurostatmap.js` and `build/eurostatmap.min.js` files are unchanged in kind.
+
+Example
+
+```javascript
+import eurostatmap from 'eurostat-map' // or: import { map } from 'eurostat-map'
+```
+
 - **The layout follows the width the map is drawn at**, not the window. In narrow containers the map is drawn at real size, legends sit under it, buttons are larger and a finger scrolls the page. `height()` accepts a function. Force a profile with `layout()`.
 
 Example
@@ -205,6 +213,7 @@ No API was removed, but these can change how an existing page looks or behaves:
 - Narrow containers switch to the compact layout, whatever the window width. Use `layout('desktop')` to keep the old one.
 - Maps, legends and buttons add tab stops to the page. `keyboardNavigation(false)` removes the map's and the legend's.
 - Some legends move slightly where parts used to touch or overlap; very short swatches grow to fit their labels.
+- Bundlers now resolve `build/eurostatmap.mjs` instead of `build/eurostatmap.js`. A tool that cannot handle `.mjs` files (webpack 4, for example) can import `eurostat-map/build/eurostatmap.min.js`.
 - TypeScript: sub-legend settings are now typed `Config | false`, so code that reads them needs to handle `false`.
 
 Example
