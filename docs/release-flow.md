@@ -46,16 +46,15 @@ If you're iterating (building a feature, then fixing bugs the user spots in revi
 3. Build distributables
 
 - install the locked toolchain first if `node_modules` is missing or stale: `npm ci` (see "Toolchain and lockfile" below; never a bare `npm install`)
-- run production build:
-    - `npm run build-prod` (rebuilds `build/eurostatmap.min.js`, the `main`/`unpkg` target, and `build/eurostatmap.mjs`, the `module` target)
-- **also rebuild the unminified dev bundle** if `src/**` changed:
-    - `npx webpack --config webpack/webpack.config.dev.js --no-watch` (not `npm start`: the dev config sets `watch: true`, so without `--no-watch` it compiles once and then never exits)
-    - this regenerates `build/eurostatmap.js`, used by the tests, the examples and consumers that load it by path, and tracked in git separately. `build-prod` does **not** touch it — skipping this step ships a stale file.
-- verify build artifacts were updated as expected (e.g. `grep` for a distinctive new identifier in both `build/eurostatmap.min.js` and `build/eurostatmap.js`)
+- build everything:
+    - `npm run build` (empties `build/`, then builds the typings, `eurostatmap.min.js` (`main`/`unpkg`),
+      `eurostatmap.mjs` (`module`) and `eurostatmap.js` (dev)). `npm publish` runs it again by itself (`prepack`), so
+      what is published always matches the source; it needs a current `npm ci`.
+- verify build artifacts (e.g. `grep` for a distinctive new identifier in the three bundles)
 
 4. Commit + tag + push
 
-- stage all release changes
+- stage all release changes (`build/` is not committed, except `build/package.json` with the new version)
 - commit with message:
     - `Release X.Y.Z`
 - create tag:
@@ -156,7 +155,7 @@ Snippet conventions:
 
 ## Toolchain and lockfile
 
-`package-lock.json` is committed so the bundles in `build/` are reproducible. Without it every fresh
+`package-lock.json` is committed so that the bundles are reproducible (they are built from the tag, not committed). Without it every fresh
 `npm install` re-resolved the `^` ranges, and a rebuild with no source change rewrote thousands of
 lines of third-party code in `build/eurostatmap.js` (and changed the minified bundle).
 
@@ -180,9 +179,9 @@ Rules:
 
 - Use `npm ci` to install. It never touches the lock and fails if `package.json` and the lock disagree.
 - Bumping a dependency is a deliberate change: `npm install <pkg>@<version>` (updates the lock),
-  rebuild both bundles, and commit `package-lock.json` and the new bundles together. Say in the commit
+  rebuild, and commit `package-lock.json`. Say in the commit
   message which package moved and why.
-- Check what a bump did to the bundle before committing it. Build both bundles from the previous release
+- Check what a bump did to the bundle before committing the lock. Build both bundles from the previous release
   commit with the old lock, again with the new lock, and diff `build/eurostatmap.js`: apart from the bumped
   package's modules there must be no difference. Strip `\r` first (`git` converts line endings on Windows).
 - To get a clean tree after editing `package.json`, use `npm install --package-lock-only` and then `npm ci`,

@@ -13,11 +13,9 @@ sitting uncommitted in the working tree.
 - Stage only the files relevant to the task (avoid broad `git add -A` sweeps that pick up
   unrelated in-progress work from elsewhere in the tree — check `git status` first, since
   multiple agents/sessions may be working in this repo concurrently).
-- Build with the locked toolchain (`npm ci` first in a new checkout or worktree).
-- If source under `src/` changed, rebuild the bundles (`npm run build-prod`, which builds the minified and the ES
-  module bundle, and the dev bundle via `npx webpack --config webpack/webpack.config.dev.js --no-watch` if
-  `build/eurostatmap.js` is also tracked as changed) and include the updated `build/`
-  output in the same commit.
+- Build with the locked toolchain (`npm ci` first in a new checkout or worktree), then `npm run build`.
+- **`build/` is not committed** (only `build/package.json`, a source file). CI, the Publish site workflow and
+  `npm pack`/`publish` (through `prepack`) build it. After changing `src/`, rebuild before testing or opening examples.
 - Push after committing — don't leave commits local-only.
 
 ## Release process: version bumps need sign-off, only the user publishes to npm
@@ -57,7 +55,7 @@ This package is consumed by `image` (the sibling `image` repo, dependency
 Before shipping a change to default layout, legend config names, CSS classes or public API, check how `image/image/src` (sibling
 repo) uses it, and compare the result with the version IMAGE ships (`image/image/node_modules/eurostat-map`): render IMAGE's
 legend configs and CSS with both bundles and diff element positions, and run IMAGE's browser tests against the new build
-(copy `build/` over its `node_modules` copy, clear `image/.angular/cache`, `npm run e2e`, then restore). Fix IMAGE directly
+(`npm run build`; copy `build/` and `package.json` over its `node_modules` copy, clear `image/.angular/cache`, `npm run e2e`, then restore). Fix IMAGE directly
 if it needs to change (read its `AGENTS.md` first).
 
 ## Known bug class: confusing the shared layer with the current map/inset instance
@@ -135,7 +133,7 @@ the regions that end up with a classified/sized value from whatever data was jus
 Never hand-roll a workaround in an example (own SVG patterns, injected rects, manual legend boxes, per-element
 restyling in `onBuild`). Search `src/`, `docs/reference.md` and the bundled d3-annotation options first (e.g.
 `patternFill()` for hatching with its own legend item; `note.bgPadding` for a callout box). If the API is missing or
-misbehaves, fix or extend the library, rebuild the bundles and commit them. Example: `patternFill` overlays were
+misbehaves, fix or extend the library. Example: `patternFill` overlays were
 invisible on proportional-symbol maps because the map type's CSS overrode their `fill` attribute; the fix was in
 `core/decoration/pattern-fill.js` (inline style), not in the example.
 
@@ -265,7 +263,7 @@ Because script execution can be disabled in certain PowerShell environments, alw
   `src/index.js`) cannot be loaded by the unit loader: test it through the bundle, or extract the logic.
 * `test/manual/` holds the browser pages to check by eye (formerly at the top of `test/`); they load the bundle by
   relative path, so moving one means fixing its `../` depth.
-* **Production Build**: `cmd /c npm run build-prod` (copies typings and builds output to `build/`)
+* **Build**: `cmd /c npm run build` (empties `build/`, then typings, minified, ES module and dev bundles)
 * **Local Test Server**: `cmd /c npm run server`
 * **Format Files**: `cmd /c npm run format` (runs Prettier). Don't run it, or `prettier --write` on a
   whole directory, for a small change: many tracked files aren't Prettier-clean (and some are CRLF),
@@ -304,9 +302,7 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   classes after build has to do the same.
 - `ps-background.js` writes id-specific fill rules (`#svgId.em--ps ...`) that beat any class rule,
   so it writes separate light and `.em--dark` variants.
-- `package-lock.json` is committed and is the build toolchain: it reproduces the committed bundles (first the 4.14.1 ones, re-checked on 4.15.0 + later source in 2026-11)
-  (`build/eurostatmap.min.js` and its map byte for byte, third-party code in `build/eurostatmap.js`
-  with zero diff). Install with `npm ci` (never a bare `npm install`, which re-resolves `^` ranges
+- `package-lock.json` is committed and is the build toolchain: it decides what every published bundle contains. Install with `npm ci` (never a bare `npm install`, which re-resolves `^` ranges
   and changes the bundles with no source change). Playwright is locked to the version whose browser
   is installed on the maintainer's machine. Refresh or bump deliberately, see "Toolchain and
   lockfile" in `docs/release-flow.md`.
@@ -318,8 +314,11 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
 
 ## CI, errors, accessibility
 
-- `.github/workflows/ci.yml` runs `npm ci`, the type check, both builds, a check that the committed `build/` matches `src/`
-  (line endings ignored) and `npm test`. A red "bundles match" step means a bundle was not rebuilt.
+- `.github/workflows/ci.yml` runs `npm ci`, the type check, `npm run build` and `npm test`.
+- `.github/workflows/pages.yml` publishes the site (Pages is set to "GitHub Actions"): the repository rendered by Jekyll
+  plus a fresh `build/`, so live examples run the latest `master` a few minutes after a push. It also runs after the API
+  docs workflow, whose commits do not trigger `push`. If the site looks stale or an example finds no library, check that
+  workflow. Never link to `build/` files on raw.githubusercontent.com: they are no longer in the repository.
 - `npm run check:declarations` compiles `src/types` without `skipLibCheck`, which hides errors in `.d.ts` files.
 - Nothing may touch `window`/`document` while a module loads: the package must import in Node
   (`test/integration/node-import.test.mjs`).

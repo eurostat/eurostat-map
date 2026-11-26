@@ -1,5 +1,9 @@
 # Dependency directories
 /node_modules/
+# Build output (npm run build): made by CI, by the Publish site workflow and before npm pack/publish, never committed.
+# build/package.json is a source file that has to sit next to the bundles.
+/build/*
+!/build/package.json
 # Dev version
 .vscode/
 TYPESCRIPT-PLAN.md

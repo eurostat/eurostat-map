@@ -1,7 +1,7 @@
 # eurostat-map: Data-Driven Maps
 
 <div align="center">
-  <img src="https://img.shields.io/github/size/eurostat/eurostat-map/build/eurostatmap.min.js?label=minified%20size" alt="minified size">
+  <img src="https://img.shields.io/bundlephobia/minzip/eurostat-map?label=minified%20%2B%20gzipped" alt="minified and gzipped size">
   <img src="https://img.shields.io/npm/v/eurostat-map" alt="npm">
   <img src="https://img.shields.io/badge/license-EUPL-success" alt="license">
   <a href="http://www.awesomeofficialstatistics.org"><img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome Official Statistics"></a>
