@@ -220,3 +220,61 @@ test('parallel flows use independent directional widths and clear proportional i
         await browser.close()
     }
 })
+
+test('redrawing flows on a built map keeps their layer order, and widths and sub-legends can be updated', async () => {
+    const browser = await chromium.launch()
+    try {
+        const page = await browser.newPage({ viewport: { width: 1200, height: 900 } })
+        const errors = []
+        page.on('pageerror', (error) => errors.push(error.message))
+        await page.route('**/WORLD_4326.json', (route) => route.fulfill({ path: fileURLToPath(world) }))
+        await page.setContent('<svg id="map"></svg>')
+        await page.addScriptTag({ path: fileURLToPath(bundle) })
+        await page.evaluate(() => {
+            window.map = eurostatmap
+                .map('flow')
+                .geo('WORLD')
+                .proj('4326')
+                .worldTopojsonURL('https://map.test/WORLD_4326.json')
+                .width(800)
+                .height(500)
+                .insets(false)
+                .flowGraph({
+                    nodes: [
+                        { id: 'FR', x: 2, y: 45 },
+                        { id: 'DE', x: 10, y: 52 },
+                    ],
+                    links: [{ source: 'FR', target: 'DE', value: 400 }],
+                })
+                .flowSettings({ lineType: 'straight', bidirectional: false, edgeBundling: true, maxWidth: 10, color: () => 'red' })
+                .legend({ flowColorLegend: false })
+            window.map.build()
+        })
+        await page.locator('path.em-flow-link').waitFor({ state: 'attached' })
+        await page.locator('.em-legend-title, .em-legend-label').first().waitFor({ state: 'attached' })
+        const result = await page.evaluate(() => {
+            const container = () => document.getElementById('em-flow-container')
+            const position = () => [...container().parentNode.children].indexOf(container())
+            const path = () => document.querySelector('path.em-flow-link')
+            const before = { position: position(), path: path(), width: +path().getAttribute('stroke-width') }
+            window.map.flowSettings({ maxWidth: 20 }).updateFlowWidths()
+            const keptPath = path() === before.path
+            const width = +path().getAttribute('stroke-width')
+            window.map.updateStyle()
+            window.map.updateStyle()
+            const chains = window.map.updateFlowWidths() === window.map
+            window.map.legend({ flowColorLegend: { title: 'Flight type', items: [{ label: 'Domestic', color: 'red' }] } })
+            return {
+                chains,
+                keptPath,
+                widthRatio: width / before.width,
+                samePosition: position() === before.position,
+                legendShown: document.body.textContent.includes('Flight type'),
+            }
+        })
+        assert.deepEqual(result, { chains: true, keptPath: true, widthRatio: 2, samePosition: true, legendShown: true })
+        assert.deepEqual(errors, [])
+    } finally {
+        await browser.close()
+    }
+})

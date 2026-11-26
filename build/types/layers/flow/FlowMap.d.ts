@@ -8,6 +8,12 @@ export interface FlowMap extends MapInstance {
     flowGraph(): FlowGraph
     flowGraph(v: FlowGraph): this
 
+    /**
+     * Applies a changed `maxWidth`/`minWidth` to a built map and updates its legend. Edge-bundled routes keep their
+     * shape; other layouts are redrawn.
+     */
+    updateFlowWidths(): this
+
     flowSettings(): {
         color: FlowColor
         regionColors: string[]

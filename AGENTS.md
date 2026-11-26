@@ -180,6 +180,9 @@ invisible on proportional-symbol maps because the map type's CSS overrode their 
   `maxMinLabels`) instead of inventing new ones. `test/e2e/legend-overlap.test.mjs` renders every legend type under stress.
   The separation pass compares what is drawn (leaf elements, text without line spacing), not group boxes: IMAGE uses
   tight legends (`titlePadding: -4`) that must not move.
+- To change a built flow map, do not rebuild it: set `flowGraph`/`flowSettings` and call `updateStyle()` (or `legend(cfg)`, which redraws
+  flows then legend), which keeps the base map and zoom; `updateFlowWidths()` restyles bundled routes without restarting the
+  bundling. `updateStyle()` must therefore stay safe to call repeatedly (it once sank the flow layer under the base map).
 - A custom flow `nodeSizeScale` used with a size legend needs a `domain()` method, including when
   the example supplies explicit legend values.
 - Edge bundling must choose its charge distance independently of the node size scale.

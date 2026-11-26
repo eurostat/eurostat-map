@@ -30019,7 +30019,8 @@ const forwardChainableMethod = function (map, name) {
                         isGetter = true
                     }
                 }
-                return isGetter ? r : map
+                // a method that returns its own layer (for chaining) hands back the map, like a setter
+                return isGetter && r !== layer ? r : map
             }
         },
     })
@@ -43874,15 +43875,16 @@ const decorateFlowLayer = function (out, config) {
         // If it doesn't exist, create it
         if (flowContainer.empty()) {
             flowContainer = zoomGroup.append('g').attr('id', 'em-flow-container').attr('class', 'em-flow-container')
+
+            //hacky: move it up one so that it is above the regions but below the labels
+            // (only once: moving it on every redraw would sink it below the regions)
+            const node = flowContainer.node()
+            if (node && node.previousSibling) {
+                node.parentNode?.insertBefore(node, node.previousSibling)
+            }
         } else {
             // If it exists, clear existing contents
             flowContainer.selectAll('*').remove()
-        }
-
-        //hacky: move it up one so that it is above the regions but below the labels
-        const node = flowContainer.node()
-        if (node && node.previousSibling) {
-            node.parentNode?.insertBefore(node, node.previousSibling)
         }
 
         // Show importer/exporter regions by coloring them
@@ -43915,6 +43917,26 @@ const decorateFlowLayer = function (out, config) {
             const zoomGroup = out.svg().select('#em-zoom-group-' + out.svgId_)
             ;(0,_core_decoration_labels__WEBPACK_IMPORTED_MODULE_16__.addFlowValueLabels)(out, zoomGroup)
         }
+    }
+
+    /**
+     * Applies a changed maxWidth/minWidth to a built map, and updates its legend. Edge-bundled routes keep their
+     * shape (only their stroke widths change); other layouts depend on the widths, so their flows are redrawn.
+     */
+    out.updateFlowWidths = function () {
+        const flowContainer = (0,d3_selection__WEBPACK_IMPORTED_MODULE_7__["default"])('#em-zoom-group-' + out.svgId_).select('#em-flow-container')
+        if (flowContainer.empty()) return out // not built yet
+
+        if (out.flowLineType_ === 'straight' && out.flowEdgeBundling_) {
+            defineWidthScale(out)
+            flowContainer.selectAll('path.em-flow-link').attr('stroke-width', function () {
+                return out.strokeWidthScale(this.getAttribute('data-nb'))
+            })
+        } else {
+            out.updateStyle()
+        }
+        out.legendObj_?.update()
+        return out
     }
 
     //@override
@@ -52859,6 +52881,11 @@ const legend = function (map, config) {
         labels: ['Exporter', 'Importer'],
     }
 
+    // default settings of each sub-legend, restored when one that was switched off with false is switched on again
+    const subLegendDefaults = Object.fromEntries(
+        ['flowWidthLegend', 'nodeSizeLegend', 'flowColorLegend', 'regionColorLegend'].map((key) => [key, { ...out[key] }])
+    )
+
     //override attribute values with config values
     if (config)
         for (let key in config) {
@@ -52907,6 +52934,7 @@ const legend = function (map, config) {
                         out[key] = false
                         continue
                     }
+                    if (out[key] === false && m.legend_[key] && subLegendDefaults[key]) out[key] = { ...subLegendDefaults[key] }
                     for (let p in out[key]) {
                         //override each property in size and color legend m.legend_
                         if (m.legend_[key][p] !== undefined) {

@@ -555,12 +555,43 @@
                 return () => cancelAnimationFrame(frame)
             }
 
-            // ---- build / rebuild the map from the current settings ----
+            // ---- build the map once, then update only what a setting changes ----
             let stopAnimation = () => {}
+            let map // the current map
+            let ready = false // whether it has finished building
+            let mapWidth
+            let drawn // the settings currently on screen
+            let flightsByKey = new Map() // the flights currently on screen
+            const tooltip = (link) => flowTooltip(flightsByKey, drawn.merge)(link)
+
+            // overlays go on top of the flow lines, so they are added again after every redraw of the flows
+            function drawOverlays() {
+                const svg = map.svg()
+                if (drawn.voronoi && svg.select('.em-voronoi').empty()) drawVoronoi(svg)
+                if (drawn.animate) {
+                    svg.select('.em-flow-lines').style('opacity', 0) // dots only; hover still works
+                    stopAnimation = startAnimation(svg, flightsByKey)
+                }
+            }
+
+            /** Changes that only restyle the existing lines. Returns false if the flows have to be redrawn. */
+            function restyle(s) {
+                const changed = Object.keys(s).filter((k) => s[k] !== drawn[k])
+                if (changed.some((k) => k !== 'opacity' && k !== 'maxWidth')) return false
+                // without bundling the lines' geometry depends on their width, so they are redrawn
+                if (changed.includes('maxWidth') && !s.bundling) return false
+
+                if (changed.includes('opacity')) {
+                    map.flowSettings({ opacity: s.opacity }) // also restored after hovering a line
+                    const lines = map.svg().selectAll('.em-flow-link')
+                    lines.attr(s.merge ? 'stroke-opacity' : 'opacity', s.opacity)
+                }
+                if (changed.includes('maxWidth')) map.flowSettings({ maxWidth: s.maxWidth }).updateFlowWidths()
+                drawn = s
+                return true
+            }
 
             function render() {
-                stopAnimation()
-                stopAnimation = () => {}
                 updateTopNRange()
                 const s = readSettings()
                 $('bundling').disabled = !$('merge').checked
@@ -570,9 +601,18 @@
                 $('maxWidth-out').textContent = s.maxWidth
                 $('opacity-out').textContent = s.opacity
 
+                if (map && !ready) return // onBuild renders again once the map is there
+                const width = $('flight-map').clientWidth
+                const rebuild = !map || width !== mapWidth
+                if (!rebuild && restyle(s)) return
+
+                stopAnimation()
+                stopAnimation = () => {}
+                drawn = s
+
                 const flights = selectFlights(s)
                 $('summary').textContent = `${fmt(flights.length)} flight${flights.length === 1 ? '' : 's'} shown`
-                const flightsByKey = new Map(flights.map((f) => [f.origin + '|' + f.destination, f]))
+                flightsByKey = new Map(flights.map((f) => [f.origin + '|' + f.destination, f]))
                 const graph = toFlowGraph({
                     airports: data.airports,
                     flights: flights.map((f) => ({ origin: f.origin, destination: f.destination, count: f.value })),
@@ -603,117 +643,126 @@
                           ? (d) => (flightOf(d)?.international ? scopeColours.international : scopeColours.domestic)
                           : '#000'
 
-                // reset the svg (and its zoom state) before drawing the new map into it
+                const label = s.airport ? `Flights from ${nameOf(s.airport)} (${s.airport})` : `Top ${s.topN} flights by ${s.theme.toLowerCase()}`
+
+                const flowSettings = {
+                    lineType: 'straight',
+                    // merged: one line per route. Separate directions: both drawn side by side (not with edge bundling)
+                    bidirectional: !s.merge,
+                    bidirectionalLayout: 'parallel',
+                    edgeBundling: s.bundling,
+                    bundleSettings: {
+                        alphaDecay: 0.1,
+                        chargeStrength: s.strength, // negative: routes are pushed apart instead of bundled
+                        distanceMax: null, // use the default bundling distance
+                        linkStrength: 0.7,
+                        linkIterations: 1,
+                    },
+                    maxWidth: s.maxWidth,
+                    minWidth: 0.6,
+                    internal: false,
+                    arrows: !s.merge && !s.bundling,
+                    outlines: false,
+                    nodes: true,
+                    nodeType: 'circle', // donut or circle
+                    colorGradient: false,
+                    widthGradient: false,
+                    opacityGradient: false,
+                    topLocations: 0, // Top N locations by flow volume
+                    opacity: s.opacity,
+                    color: lineColour, // black, the share of empty seats, or domestic vs international
+                    labelOffsets: { x: 9, y: 0 }, // Offsets for flow labels
+                }
+
+                const legendConfig = {
+                    width: 220,
+                    x: 20,
+                    y: 150,
+                    boxOpacity: 0,
+                    flowWidthLegend: {
+                        title: s.theme === 'Passengers carried' ? 'Passengers (flights)' : 'Empty seats (flights)',
+                        segments: 4,
+                        width: 150,
+                        maxMin: true,
+                        orientation: 'horizontal',
+                    },
+                    nodeSizeLegend: { title: 'Passengers (airports)', values: [60000000, 1000000], labels: ['60M', '1M'] },
+                    flowColorLegend:
+                        s.colourBy === 'scope'
+                            ? {
+                                  title: 'Flight type',
+                                  marginTop: 30,
+                                  items: [
+                                      { label: 'International', color: scopeColours.international },
+                                      { label: 'Domestic', color: scopeColours.domestic },
+                                  ],
+                              }
+                            : false,
+                    regionColorLegend: { title: 'Region colors' },
+                }
+
+                // an existing map only needs its flows and legend redrawn: the base map and zoom stay as they are
+                if (!rebuild) {
+                    map.subtitle(label).flowGraph(graph).flowSettings(flowSettings)
+                    map.legend(legendConfig) // redraws the flows, then the legend
+                    drawOverlays()
+                    return
+                }
+
+                // reset the svg (and its zoom state) before drawing a new map into it
                 const svg = d3.select('#map')
                 svg.selectAll('*').remove()
                 svg.property('__zoom', d3.zoomIdentity)
+                mapWidth = width
+                ready = false
 
-                const label = s.airport ? `Flights from ${nameOf(s.airport)} (${s.airport})` : `Top ${s.topN} flights by ${s.theme.toLowerCase()}`
-
-                eurostatmap
+                map = eurostatmap
                     .map('flow')
-                    .width(document.getElementById('flight-map').clientWidth)
+                    .width(width)
                     .title('Passenger flights, 2024')
                     .subtitle(label)
                     .header(true)
                     .footer(true)
                     .position({ x: 3900000, y: 2900000, z: 6400 })
-
                     .flowGraph(graph)
-
-                    // line type
-                    // merged: one line per route. Separate directions: both drawn side by side (not with edge bundling)
-                    .flowSettings({ lineType: 'straight', bidirectional: !s.merge, bidirectionalLayout: 'parallel', edgeBundling: s.bundling })
-                    .flowSettings({
-                        bundleSettings: {
-                            alphaDecay: 0.1,
-                            chargeStrength: s.strength, // negative: routes are pushed apart instead of bundled
-                            distanceMax: null, // use the default bundling distance
-                            linkStrength: 0.7,
-                            linkIterations: 1,
-                        },
-                    })
-                    .flowSettings({ maxWidth: s.maxWidth, minWidth: 0.6, internal: false })
-
-                    // flow accessories
-                    .flowSettings({ arrows: !s.merge && !s.bundling, outlines: false })
-
-                    //nodes
-                    .flowSettings({ nodes: true })
-                    .flowSettings({ nodeType: 'circle' }) // donut or circle
-
-                    // gradients
-                    .flowSettings({ colorGradient: false, widthGradient: false, opacityGradient: false })
-
-                    // color: black, or the share of empty seats
-                    .flowSettings({ topLocations: 0 }) // Top N locations by flow volume
-                    .flowSettings({
-                        opacity: s.opacity,
-                        color: lineColour,
-                    })
-
-                    .flowSettings({ labelOffsets: { x: 9, y: 0 } }) // Offsets for flow labels
-
-                    .tooltip({ textFunction: flowTooltip(flightsByKey, s.merge), offset: { x: 60, y: 40 } }) // follows the pointer; default offset is 30 x 20
+                    .flowSettings(flowSettings)
+                    .tooltip({ textFunction: tooltip, offset: { x: 60, y: 40 } }) // follows the pointer; default offset is 30 x 20
                     .labels({
                         values: false,
                         backgrounds: true,
                         shadows: true,
                     })
                     .nutsLevel(0)
-                    .legend({
-                        width: 220,
-                        x: 20,
-                        y: 150,
-                        boxOpacity: 0,
-                        flowWidthLegend: {
-                            title: s.theme === 'Passengers carried' ? 'Passengers (flights)' : 'Empty seats (flights)',
-                            segments: 4,
-                            width: 150,
-                            maxMin: true,
-                            orientation: 'horizontal',
-                        },
-                        nodeSizeLegend: { title: 'Passengers (airports)', values: [60000000, 1000000], labels: ['60M', '1M'] },
-                        flowColorLegend:
-                            s.colourBy === 'scope'
-                                ? {
-                                      title: 'Flight type',
-                                      marginTop: 30,
-                                      items: [
-                                          { label: 'International', color: scopeColours.international },
-                                          { label: 'Domestic', color: scopeColours.domestic },
-                                      ],
-                                  }
-                                : false,
-                        regionColorLegend: { title: 'Region colors' },
-                    })
+                    .legend(legendConfig)
                     .drawCoastalMargin(false)
                     .insets(false)
                     .zoomExtent([0.03, 1000])
-                    .onBuild((map) => {
+                    .onBuild((built) => {
+                        if (built !== map || ready) return
+                        ready = true
                         const svg = map.svg()
                         svg.attr('viewBox', `0 0 ${svg.attr('width')} ${svg.attr('height')}`)
-                        if (s.voronoi) drawVoronoi(svg)
-                        if (s.animate) {
-                            svg.select('.em-flow-lines').style('opacity', 0) // dots only; hover still works
-                            stopAnimation = startAnimation(svg, flightsByKey)
-                        }
+                        drawOverlays()
+                        render() // apply anything changed while the map was building
                     })
-                    .build()
+                map.build()
             }
 
             // on narrow screens start with the controls folded away so the map is visible straight away
             if (window.matchMedia('(max-width: 900px)').matches) document.querySelector('.flight-controls').open = false
 
             let timer
-            $('controls').addEventListener('input', () => {
+            $('controls').addEventListener('input', (e) => {
                 clearTimeout(timer)
-                timer = setTimeout(render, 150)
+                // line opacity and (bundled) width are cheap enough to follow the slider as it moves
+                if (e.target.id === 'opacity' || (e.target.id === 'maxWidth' && readSettings().bundling)) render()
+                else timer = setTimeout(render, 150)
             })
             $('reset-controls').addEventListener('click', () => {
                 $('controls').reset()
                 updateTopNRange()
                 $('topN').value = $('topN').defaultValue // reset() clamped it to the previous airport's maximum
+                mapWidth = null // build from scratch, which also resets the zoom
                 render()
             })
             render()

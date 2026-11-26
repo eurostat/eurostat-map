@@ -372,7 +372,8 @@ export const forwardChainableMethod = function (map, name) {
                         isGetter = true
                     }
                 }
-                return isGetter ? r : map
+                // a method that returns its own layer (for chaining) hands back the map, like a setter
+                return isGetter && r !== layer ? r : map
             }
         },
     })

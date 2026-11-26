@@ -57,6 +57,11 @@ export const legend = function (map, config) {
         labels: ['Exporter', 'Importer'],
     }
 
+    // default settings of each sub-legend, restored when one that was switched off with false is switched on again
+    const subLegendDefaults = Object.fromEntries(
+        ['flowWidthLegend', 'nodeSizeLegend', 'flowColorLegend', 'regionColorLegend'].map((key) => [key, { ...out[key] }])
+    )
+
     //override attribute values with config values
     if (config)
         for (let key in config) {
@@ -105,6 +110,7 @@ export const legend = function (map, config) {
                         out[key] = false
                         continue
                     }
+                    if (out[key] === false && m.legend_[key] && subLegendDefaults[key]) out[key] = { ...subLegendDefaults[key] }
                     for (let p in out[key]) {
                         //override each property in size and color legend m.legend_
                         if (m.legend_[key][p] !== undefined) {
