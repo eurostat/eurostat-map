@@ -34,9 +34,9 @@ jobs:
                   npx webpack --config webpack/webpack.config.dev.js --no-watch
 
             # A commit that changes src/ has to include the rebuilt bundles. Line endings differ between Windows and
-            # Linux checkouts, so they are not compared.
+            # Linux checkouts, so they are not compared, nor is the source map (it embeds the sources as checked out).
             - name: Check that the committed bundles match the source
-              run: git diff --exit-code --stat --ignore-space-at-eol -- build
+              run: git diff --exit-code --stat --ignore-space-at-eol -- build ':!build/*.map'
 
             - name: Install the test browser
               run: npx playwright install --with-deps chromium
