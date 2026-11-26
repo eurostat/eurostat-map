@@ -9,6 +9,13 @@ const prod = require('./webpack.config.prod')
 const dependencies = Object.keys(packageJson.dependencies)
 const isDependency = (request) => dependencies.some((name) => request === name || request.startsWith(name + '/'))
 
+// Two exceptions are included. proj4: the few internal modules the library takes from it import each other without file
+// extensions, which Node's ES module loader rejects, and test runners load this file with Node (IMAGE's does).
+// d3-svg-annotation, together with its own old D3 packages: It reads the drag position from
+// d3-selection 1's global `event`, which only works while it and d3-drag 1 share one copy of d3-selection: an
+// application's package manager may well install two (IMAGE's does), and annotations then cannot be dragged.
+const isExternal = (request, context) => !context.includes('node_modules') && !/^(d3-svg-annotation|proj4)($|\/)/.test(request) && isDependency(request)
+
 // the same loaders as the production build
 const mainProd = prod.find((config) => config.name === 'main')
 
@@ -24,7 +31,7 @@ const esmConfig = {
         chunkFormat: 'module',
     },
     externalsType: 'module',
-    externals: [({ request }, callback) => (isDependency(request) ? callback(null, request) : callback())],
+    externals: [({ request, context }, callback) => (isExternal(request, context) ? callback(null, request) : callback())],
     resolve: { extensions: ['.js', '.ts'] },
     devtool: false,
     plugins: [

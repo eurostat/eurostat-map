@@ -46,9 +46,12 @@ test('the package points bundlers at the module build, which leaves its dependen
     assert.equal(pkg.module, 'build/eurostatmap.mjs')
     const source = fs.readFileSync(path.join(ROOT, pkg.module), 'utf8')
     const imported = [...source.matchAll(/^import .* from "([^"]+)";$/gm)].map((m) => m[1])
-    assert.ok(imported.includes('d3-selection') && imported.includes('proj4/lib/core.js'), imported.join(', '))
+    assert.ok(imported.includes('d3-selection'), imported.join(', '))
     const undeclared = imported.filter((name) => !Object.keys(pkg.dependencies).some((d) => name === d || name.startsWith(d + '/')))
     assert.deepEqual(undeclared, [])
+    // included, with its old D3: dragging breaks when an application installs two copies of d3-selection 1
+    assert.ok(!imported.includes('d3-svg-annotation'), 'd3-svg-annotation must stay inside the module build')
+    assert.deepEqual(imported.filter((name) => name.startsWith('proj4')), [])
 })
 
 test('an application bundled against it draws a map', async () => {
@@ -84,6 +87,15 @@ test('an application bundled against it draws a map', async () => {
             }
         }, ORIGIN)
         assert.deepEqual(result, { sameFunction: true, version: 'string', regions: 3, annotations: 1, swatches: true })
+        // annotations can be dragged in edit mode
+        const note = () => page.getAttribute('g.annotation-note', 'transform')
+        const handle = await page.locator('.annotation-note .handle').first().boundingBox()
+        const before = await note()
+        await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2)
+        await page.mouse.down()
+        await page.mouse.move(handle.x + 60, handle.y + 40, { steps: 6 })
+        await page.mouse.up()
+        assert.notEqual(await note(), before, 'the note follows the pointer')
         assert.deepEqual(errors, [])
     } finally {
         await browser.close()

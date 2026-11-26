@@ -342,6 +342,10 @@ use; dependencies are imports, so every package `src/` imports must be in `depen
 tests and examples; IMAGE's tests read it). Don't rename or drop a file, and don't add an `exports` field without
 allowing `build/types/*` and the bundle paths IMAGE imports. `src/esm.js` gives the module build its default export.
 Deep imports from a dependency need the `.js` extension.
+`d3-svg-annotation` stays inside the module build, with its old D3 packages: left as an import, annotation dragging broke
+in IMAGE, whose install has two copies of d3-selection 1. Only IMAGE's own tests showed it, so run them for any change to
+what the module build leaves external. proj4 is included too: its internal files cannot be loaded by Node's ES module
+loader, which IMAGE's unit tests use.
 
 ## Where things live (split in 2026-11)
 
