@@ -121,7 +121,9 @@ const SCENARIOS = {
     ],
     'trivariate, default size': [
         'trivariateChoropleth',
-        base(`.stat('v1', ${st}).stat('v2', ${st2}).stat('v3', { eurostatDatasetCode: 'y', filters: { time: '2021' } }).legend({ title: '${LONG}', titlePadding: 0 })`),
+        base(
+            `.stat('v1', ${st}).stat('v2', ${st2}).stat('v3', { eurostatDatasetCode: 'y', filters: { time: '2021' } }).legend({ title: '${LONG}', titlePadding: 0 })`
+        ),
     ],
     'value by alpha': ['valueByAlpha', base(`.stat('value', ${st}).stat('alpha', ${st2}).legend({ title: '${LONG}', titlePadding: 0 })`)],
 }
@@ -208,3 +210,48 @@ for (const [name, [type, setup]] of Object.entries(SCENARIOS)) {
         }
     })
 }
+
+// IMAGE switches a built map between legend layouts this way: the new config has to win over what the legend was built with
+test('width and orientation applied after build are honoured', async () => {
+    const page = await browser.newPage({ viewport: { width: 1000, height: 900 } })
+    try {
+        await routeFixtures(page, { root: ROOT })
+        await page.goto(ORIGIN + '/')
+        await page.addScriptTag({ url: ORIGIN + '/build/eurostatmap.js' })
+        await page.evaluate((origin) => {
+            const m = window.eurostatmap
+                .map('choropleth')
+                .svgId('map')
+                .width(800)
+                .height(700)
+                .nuts2jsonBaseURL(origin + '/nuts2json/v2')
+            m.nutsLevel(2)
+                .stat({ eurostatDatasetCode: 'demo_r_d3dens', filters: { time: '2021' } })
+                .numberOfClasses(5)
+                .legend({ title: 'T', width: 150, orientation: 'vertical' })
+                .build()
+            window.map = m
+        }, ORIGIN)
+        await page.waitForSelector('#map .em-legend-rect', { timeout: 15000 })
+
+        const horizontal = await page.evaluate(() => {
+            window.map.legend({ title: 'T', orientation: 'horizontal', width: 240 })
+            const swatches = [...document.querySelectorAll('#map .em-discrete-legend-container .em-legend-item > .em-legend-rect')]
+            return swatches.slice(0, 5).reduce((sum, r) => sum + Number(r.getAttribute('width')), 0) // the five classes, not the no-data swatch
+        })
+        assert.equal(Math.round(horizontal), 240)
+
+        const barHeight = await page.evaluate(() => {
+            const m = window.map
+            m.colorSchemeType('continuous')
+                .classificationMethod('quantile')
+                .colorFunction((t) => `rgb(${Math.round(255 * t)},80,120)`)
+            m.updateClassification().updateStyle()
+            m.legend({ title: 'T', orientation: 'vertical', width: 100 })
+            return Number(document.querySelector('#map .em-legend-gradient').getAttribute('height'))
+        })
+        assert.equal(barHeight, 100)
+    } finally {
+        await page.close()
+    }
+})

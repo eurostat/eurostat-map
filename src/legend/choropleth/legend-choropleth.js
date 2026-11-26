@@ -72,19 +72,23 @@ export const legend = function (map, config = {}) {
         }
     }
 
-    // what the caller set, which the compact layout must not override
-    const configuredOrientation = out.orientation
-    const configuredWidth = out.width
-    const orientationIsExplicit = config.orientation != null
-    const widthIsExplicit = config.width != null
+    // What the caller set, which the compact layout must not override. It is kept apart from out.orientation / out.width
+    // because the compact layout overwrites those, and it follows every later map.legend(config).
+    let configuredOrientation = out.orientation
+    let configuredWidth = out.width
 
     //@override
     out.update = function () {
-        out.updateConfig()
+        out.orientation = configuredOrientation
+        out.width = configuredWidth
+        out.updateConfig() // applies the current legend config over them
+        configuredOrientation = out.orientation
+        configuredWidth = out.width
+        const isSet = (key) => config[key] != null || out.layer.legend_?.[key] != null
         // Under the map (compact layout) a legend runs along it, as wide as the map allows; elsewhere it is as configured
         const below = legendsBelowMap(out.map) && !out.histogram
-        out.orientation = below && !orientationIsExplicit ? 'horizontal' : configuredOrientation
-        out.width = below && !widthIsExplicit ? Math.max(120, Math.min(out.map.width() - 2 * (EDGE + out.boxPadding) - 24, 480)) : configuredWidth
+        if (below && !isSet('orientation')) out.orientation = 'horizontal'
+        if (below && !isSet('width')) out.width = Math.max(120, Math.min(out.map.width() - 2 * (EDGE + out.boxPadding) - 24, 480))
         out.updateContainer()
 
         if (out.lgg.node()) {
