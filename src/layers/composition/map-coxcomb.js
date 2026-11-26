@@ -1,21 +1,21 @@
-import { scaleBand } from 'd3-scale'
 import { select } from 'd3-selection'
 import { arc, stack } from 'd3-shape'
-import { max, min } from 'd3-array'
+import { max } from 'd3-array'
 import { buildSingleLayerMap } from '../../core/stat-map'
 import * as StatisticalData from '../../core/stat-data'
 import { registerLayerType } from '../../core/layer-registry'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
-import { executeForAllInsets, getRegionsSelector, spaceAsThousandSeparator } from '../../core/utils'
+import { executeForAllInsets, getRegionsSelector } from '../../core/utils'
 import * as CoxcombLegend from '../../legend/legend-coxcomb.js'
 import { interpolate } from 'd3-interpolate'
 import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/dorling'
 import { adjustGridCartogramTextLabels, getGridCartogramChartOffset } from '../../core/cartograms'
 import { buildGetterSetters, applyConfigValues, buildCompositionCategoryColorFn } from '../composition/composition-map'
-import { createRadialScale } from '../../core/scale.js'
 import { getCentroidsGroup } from '../../core/geo/centroids'
 import { DEFAULT_CATEGORICAL_COLORS } from '../../core/color-palettes'
 import { getResponsiveSymbolSize } from '../../core/responsive'
+import { buildTooltipCache, computeTotals, computeCoxStatusMap, getRegionTotal, defineSizeScales, getCoxcombTopRadius, buildMonthData, getActiveKeys, createAngleScale } from './coxcomb-data'
+import { addMouseEventsToRegionPolygons, addMouseEventsToRegions, addMouseEventsToGridCartogram } from './coxcomb-interactions'
 //types
 /** @typedef {import('../../types/core/MapInstance').MapInstance} MapInstance */
 /** @typedef {import('../../types/layers/composition/coxcomb/CoxcombMapConfig').CoxcombMapConfig} CoxcombMapConfig */
@@ -371,221 +371,10 @@ export const decorateCoxcombLayer = function (out, config) {
             const index = out.statCodes_.indexOf('default')
             if (index > -1) out.statCodes_.splice(index, 1)
         }
-        computeTotals()
-        computeCoxStatusMap()
-        defineSizeScales()
-        buildTooltipCache()
-    }
-
-    function buildTooltipCache() {
-        out._tooltipCache = new Map()
-        const months = out._coxTimes || []
-        const unit = out.statData(out.statCodes_[0])?.unitText() || ''
-
-        const allRegions = new Set()
-        months.forEach((month) => {
-            const stat = out.totalCode_ ? out.statData(`${month}:${out.totalCode_}`) : out.statData(`${month}:${out._coxCategoryCodes[0]}`)
-            if (stat?._data_) Object.keys(stat._data_).forEach((id) => allRegions.add(id))
-        })
-
-        allRegions.forEach((regionId) => {
-            const includeOther =
-                out.totalCode_ &&
-                months.some((month) => {
-                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                    const sumCauses = out._coxCategoryCodes.reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
-                    return totalVal > sumCauses
-                })
-
-            const causes = includeOther ? [...out._coxCategoryCodes, 'other'] : [...out._coxCategoryCodes]
-            const regionYearly = out.yearlyTotals?.[regionId] || 0
-            const monthlyTotals = out.monthlyTotals?.[regionId] || {}
-
-            const headerCells = [`<th class="em-breakdown-label">Month</th>`]
-            causes.forEach((cause) => {
-                const label = out.catLabels_[cause] || cause
-                const color = out.catColors_[cause] || (cause === 'other' ? '#FFCC80' : '#999')
-                headerCells.push(`<th class="em-breakdown-label" style="color:${color}">${label}</th>`)
-            })
-            headerCells.push(`<th class="em-breakdown-label">Total</th>`)
-
-            const rows = months.map((month, i) => {
-                const label = out._coxTimeLabels ? out._coxTimeLabels[i] : month
-                const cells = [`<td class="em-breakdown-label">${label}</td>`]
-                const monthSum = monthlyTotals[month] || 0
-
-                causes.forEach((cause) => {
-                    let rawVal = 0
-                    if (cause === 'other') {
-                        const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                        const sumCauses = causes
-                            .filter((c) => c !== 'other')
-                            .reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
-                        rawVal = Math.max(totalVal - sumCauses, 0)
-                    } else {
-                        rawVal = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
-                    }
-                    cells.push(rawVal > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(rawVal)}</span></td>` : '<td></td>')
-                })
-
-                cells.push(monthSum > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(monthSum)}</span></td>` : '<td></td>')
-                return `<tr>${cells.join('')}</tr>`
-            })
-
-            const yearRow =
-                regionYearly > 0
-                    ? `<tr class="em-total"><td class="em-breakdown-label">Year total</td><td colspan="${causes.length}"></td><td><span class="em-breakdown-value">${spaceAsThousandSeparator(regionYearly)} ${unit}</span></td></tr>`
-                    : ''
-
-            out._tooltipCache.set(
-                regionId,
-                `
-            <div class="em-tooltip-breakdown em-tooltip-cx">
-                <table class="em-tooltip-cx-table">
-                    <tr>${headerCells.join('')}</tr>
-                    ${rows.join('')}
-                    ${yearRow}
-                </table>
-            </div>`
-            )
-        })
-    }
-
-    // ── Totals computation ───────────────────────────────────────────────────
-
-    /**
-     * Pre-compute per-region yearly and monthly totals.
-     * Stored on `out.yearlyTotals` and `out.monthlyTotals` for use during
-     * rendering and tooltip generation.
-     */
-    function computeTotals() {
-        const yearlyTotals = {}
-        const monthlyTotals = {}
-
-        if (out.totalCode_) {
-            // Use the dedicated TOTAL series for each time period
-            out._coxTimes.forEach((month) => {
-                const stat = out.statData(`${month}:${out.totalCode_}`)
-                if (!stat?._data_) return
-
-                for (const region in stat._data_) {
-                    const v = stat._data_[region]?.value || 0
-                    monthlyTotals[region] = monthlyTotals[region] || {}
-                    monthlyTotals[region][month] = v
-                    yearlyTotals[region] = (yearlyTotals[region] || 0) + v
-                }
-            })
-        } else {
-            // Sum all categories per time period per region
-            out._coxTimes.forEach((month) => {
-                const perRegionMonthSum = {}
-
-                out._coxCategoryCodes.forEach((cause) => {
-                    const stat = out.statData(`${month}:${cause}`)
-                    if (!stat?._data_) return
-
-                    for (const region in stat._data_) {
-                        const v = stat._data_[region]?.value || 0
-                        perRegionMonthSum[region] = (perRegionMonthSum[region] || 0) + v
-                    }
-                })
-
-                for (const region in perRegionMonthSum) {
-                    monthlyTotals[region] = monthlyTotals[region] || {}
-                    monthlyTotals[region][month] = perRegionMonthSum[region]
-                    yearlyTotals[region] = (yearlyTotals[region] || 0) + perRegionMonthSum[region]
-                }
-            })
-        }
-
-        out.yearlyTotals = yearlyTotals
-        out.monthlyTotals = monthlyTotals
-    }
-
-    /**
-     * Build a status map: regionId → {value: ':'} (no data), {value: 0} (has data), null (not in dataset).
-     * Used to style region polygons in mixed NUTS mode.
-     */
-    function computeCoxStatusMap() {
-        const months = out._coxTimes || []
-        const cats = out._coxCategoryCodes || []
-        const useTotal = !!out.totalCode_
-        const status = new Map()
-
-        const regionIds = new Set()
-        const addIdsFrom = (key) => {
-            const st = out.statData(key)
-            if (st?._data_) Object.keys(st._data_).forEach((id) => regionIds.add(id))
-        }
-
-        months.forEach((m) => {
-            if (useTotal) addIdsFrom(`${m}:${out.totalCode_}`)
-            else cats.forEach((c) => addIdsFrom(`${m}:${c}`))
-        })
-
-        regionIds.forEach((id) => {
-            let seenAny = false,
-                seenND = false,
-                seenNumeric = false
-
-            months.forEach((m) => {
-                const entries = useTotal ? [out.statData(`${m}:${out.totalCode_}`)?.get(id)] : cats.map((c) => out.statData(`${m}:${c}`)?.get(id))
-
-                entries.forEach((e) => {
-                    if (!e) return
-                    seenAny = true
-                    if (e.value === ':') seenND = true
-                    else if (typeof e.value === 'number') seenNumeric = true
-                })
-            })
-
-            if (seenND) status.set(id, { value: ':' })
-            else if (seenAny || seenNumeric) status.set(id, { value: 0 })
-            else status.set(id, null)
-        })
-
-        out.coxStatus_ = status
-    }
-
-    function getRegionTotal(id) {
-        return out.yearlyTotals[id] !== undefined ? out.yearlyTotals[id] : undefined
-    }
-
-    /**
-     * Define the two size scales used for rendering:
-     *  - `classifierSize_`: maps yearly total → outer circle radius (area ∝ total)
-     *  - `classifierChartSize_`: maps a stacked value → inner/outer arc radius,
-     *    normalised within the region so proportions are preserved
-     */
-    function defineSizeScales() {
-        const minRadius = getResponsiveSymbolSize(out.coxcombMinRadius_ || 0, 0)
-        const maxRadius = getResponsiveSymbolSize(out.coxcombMaxRadius_ || 80, 8)
-
-        const allMonthlyValues = []
-        for (const regionId in out.monthlyTotals) {
-            for (const month in out.monthlyTotals[regionId]) {
-                allMonthlyValues.push(out.monthlyTotals[regionId][month])
-            }
-        }
-
-        // Also check custom size legend values
-        const legendConfig = out.legend()
-        if (legendConfig && legendConfig.sizeLegend && Array.isArray(legendConfig.sizeLegend.values)) {
-            allMonthlyValues.push(...legendConfig.sizeLegend.values)
-        }
-
-        const radialScale = createRadialScale(allMonthlyValues, maxRadius, 0)
-        // minRadius is intentionally 0 here — the minimum chart size is enforced
-        // geometrically via a per-chart scaleFactor in drawCoxcombChart, which
-        // scales the entire chart group uniformly. Applying a floor in the scale
-        // itself corrupts stacked inner radii and distorts category proportions.
-
-        out.classifierChartSize_ = radialScale
-        out._globalMonthlyMax = radialScale.domain()[1]
-        out._globalMonthlyMin = radialScale.domain()[0]
-
-        // stub for API compatibility
-        out.classifierSize_ = radialScale
+        computeTotals(out)
+        computeCoxStatusMap(out)
+        defineSizeScales(out)
+        buildTooltipCache(out)
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
@@ -656,7 +445,7 @@ export const decorateCoxcombLayer = function (out, config) {
             adjustGridCartogramTextLabels({
                 map,
                 getAnchors: getCoxcombAnchors,
-                getRadius: getCoxcombTopRadius,
+                getRadius: (regionId) => getCoxcombTopRadius(out, regionId),
                 margin: 2,
             })
         } else {
@@ -666,11 +455,11 @@ export const decorateCoxcombLayer = function (out, config) {
             const regionFeatures = s
                 .selectAll('g.em-centroid')
                 .data()
-                .filter((rg) => getRegionTotal(rg.properties.id) !== undefined)
+                .filter((rg) => getRegionTotal(out, rg.properties.id) !== undefined)
 
             applyStyleToRegionPolygons(map)
-            addMouseEventsToRegionPolygons(map)
-            addMouseEventsToRegions(map)
+            addMouseEventsToRegionPolygons(out, map)
+            addMouseEventsToRegions(out, map)
             addCoxcombChartsToMap(regionFeatures, map)
         }
 
@@ -769,7 +558,7 @@ export const decorateCoxcombLayer = function (out, config) {
 
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
-            const monthData = buildMonthData(regionId, months, causes)
+            const monthData = buildMonthData(out, regionId, months, causes)
             if (!monthData.length) return
 
             const keys = getActiveKeys(monthData, causes)
@@ -804,7 +593,7 @@ export const decorateCoxcombLayer = function (out, config) {
             return 'cox_' + rg.properties.id
         })
         addCoxcombChartsToGridCartogram(regionIds, map, angle)
-        addMouseEventsToGridCartogram(map)
+        addMouseEventsToGridCartogram(out, map)
     }
 
     function addCoxcombChartsToGridCartogram(regionIds, map, angle) {
@@ -824,7 +613,7 @@ export const decorateCoxcombLayer = function (out, config) {
             const node = out.svg().select('#cox_' + regionId)
             if (node.empty()) return
 
-            const monthData = buildMonthData(regionId, months, causes)
+            const monthData = buildMonthData(out, regionId, months, causes)
             if (!monthData.length) return
 
             const keys = getActiveKeys(monthData, causes)
@@ -846,150 +635,6 @@ export const decorateCoxcombLayer = function (out, config) {
             const shapeEl = node.select('.em-grid-shape, .em-grid-rect, .em-grid-hexagon').node()
             if (shapeEl?.nextSibling) node.node().insertBefore(g.node(), shapeEl.nextSibling)
         })
-    }
-
-    // ── Mouse events ─────────────────────────────────────────────────────────
-
-    /**
-     * Add tooltip mouse events to region polygons (like pie charts do).
-     * This allows users to hover over the region fill, not just the coxcomb chart.
-     */
-    function addMouseEventsToRegionPolygons(map) {
-        const selector = getRegionsSelector(map)
-        const regions = map.svg().selectAll(selector)
-
-        regions
-            .on('mouseenter', function (e, rg) {
-                if (!getRegionTotal(rg.properties.id)) return
-                const sel = select(this)
-                sel.attr('fill___', sel.style('fill'))
-                sel.style('fill', out.hoverColor_)
-                if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-            })
-            // .on('mousemove', function (e) {
-            //     if (out.map._tooltip) out.map._tooltip.mousemove(e)
-            // })
-            .on('mouseleave', function (e, rg) {
-                const sel = select(this)
-                const newFill = sel.attr('fill___')
-                if (newFill) {
-                    sel.style('fill', newFill)
-                    sel.attr('fill___', null)
-                    if (out.map._tooltip) out.map._tooltip.mouseout()
-                }
-            })
-    }
-
-    /**
-     * Coxcomb mouse events are attached to the centroid symbol groups (not region
-     * paths) and include ring/chart stroke highlighting — distinct from the shared
-     * addMouseEventsToRegions which operates on plain region fills.
-     */
-    function addMouseEventsToRegions(map) {
-        const shouldOmit = (id) => map.tooltip_.omitRegions?.includes(id)
-        const symbols = map.svg().selectAll('g.em-centroid')
-
-        // Cache to avoid repeated function calls on mousemove
-        let cachedRegion = null
-        let cachedSelection = null
-
-        symbols
-            .on('mouseenter', function (e, rg) {
-                if (shouldOmit(rg.properties.id) || !getRegionTotal(rg.properties.id)) return
-
-                // Cache for mousemove performance
-                cachedRegion = rg
-                cachedSelection = select(this)
-
-                cachedSelection.attr('fill___', cachedSelection.style('fill'))
-                cachedSelection.style('fill', out.hoverColor_)
-                highlightCoxcombChart(cachedSelection, true)
-                if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-            })
-            // .on('mousemove', function (e, rg) {
-            //     // Use cached data to avoid expensive checks on every mousemove
-            //     if (!cachedRegion) return
-            //     if (out.map._tooltip) out.map._tooltip.mousemove(e)
-            // })
-            .on('mouseleave', function (e, rg) {
-                // Use cached data for consistent behavior
-                if (!cachedRegion || !cachedSelection) return
-
-                cachedSelection.style('fill', cachedSelection.attr('fill___') || '')
-                cachedSelection.attr('fill___', null)
-                highlightCoxcombChart(cachedSelection, false)
-                if (out.map._tooltip) out.map._tooltip.mouseout()
-
-                // Clear cache
-                cachedRegion = null
-                cachedSelection = null
-            })
-    }
-
-    function addMouseEventsToGridCartogram(map) {
-        const shapes = out.svg().selectAll('#em-grid-container .em-grid-cell .em-grid-shape')
-        const charts = out.svg().selectAll('#em-grid-container .em-grid-cell .em-coxcomb')
-
-        const getRegionData = (el) => select(el.closest('.em-grid-cell')).datum()
-
-        // Cache to avoid repeated DOM lookups on mousemove
-        let cachedRegion = null
-        let cachedCell = null
-
-        const handleMouseOver = function (e) {
-            const rg = getRegionData(this)
-            if (!rg || !getRegionTotal(rg.properties.id)) return
-
-            // Cache for mousemove performance
-            cachedRegion = rg
-            cachedCell = select(this.closest('.em-grid-cell'))
-
-            const shape = cachedCell.select('.em-grid-shape')
-            shape.attr('fill___', shape.style('fill')).style('fill', out.hoverColor_)
-            highlightCoxcombChart(cachedCell, true)
-            if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-        }
-
-        const handleMouseMove = function (e) {
-            // Use cached data to avoid expensive DOM lookups on every mousemove
-            if (!cachedRegion) return
-            if (out.map._tooltip) out.map._tooltip.mousemove(e)
-        }
-
-        const handleMouseOut = function (e) {
-            // Use cached data for consistent behavior
-            if (!cachedRegion || !cachedCell) return
-
-            const shape = cachedCell.select('.em-grid-shape')
-            shape.style('fill', shape.attr('fill___') || '').attr('fill___', null)
-            highlightCoxcombChart(cachedCell, false)
-            if (out.map._tooltip) out.map._tooltip.mouseout()
-
-            // Clear cache
-            cachedRegion = null
-            cachedCell = null
-        }
-
-        shapes.on('mouseenter', handleMouseOver).on('mousemove', handleMouseMove).on('mouseleave', handleMouseOut)
-        charts.style('pointer-events', 'all').on('mouseenter', handleMouseOver).on('mousemove', handleMouseMove).on('mouseleave', handleMouseOut)
-    }
-
-    /**
-     * Apply or remove hover highlight on a coxcomb chart.
-     * When rings are shown, the outer circle stroke width is scaled by zoom.
-     * Otherwise, the chart stroke color is changed.
-     *
-     * @param {Object} container - d3 selection containing the chart (centroid group or cell)
-     * @param {boolean} active - true = highlight on, false = highlight off
-     */
-    function highlightCoxcombChart(container, active) {
-        const k = out._lastZoomK || 1
-        if (out.coxcombRings_) {
-            const outline = container.select('circle.em-coxcomb-max-outline').node()
-            if (outline) outline.style.setProperty('stroke-width', `${active ? 2 / k : 0.3 / k}px`, 'important')
-        } else {
-            container.selectAll('g.em-coxcomb-chart').style('stroke', active ? out.hoverColor_ : '#ffffff')
-        }
     }
 
     // ── Region polygon styling ────────────────────────────────────────────────
@@ -1050,86 +695,6 @@ export const decorateCoxcombLayer = function (out, config) {
                 if (map.geo_ !== 'WORLD') sel.style('stroke-width', sel.style('stroke-width') || 1)
             }
         })
-    }
-
-    // ── Data helpers ─────────────────────────────────────────────────────────
-
-    /**
-     * Get the maximum outer radius that appears at either the first or last
-     * time period. Used for grid cartogram text label placement.
-     */
-    function getCoxcombTopRadius(regionId) {
-        const months = out._coxTimes
-        if (!months?.length) return 0
-
-        let maxR = 0
-        ;[months[0], months[months.length - 1]].forEach((month) => {
-            let stackSum = out._coxCategoryCodes.reduce((a, cause) => {
-                return a + (out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0)
-            }, 0)
-
-            if (out.totalCode_) {
-                const total = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                if (total > stackSum) stackSum = total
-            }
-
-            const r = out.classifierChartSize_(stackSum)
-            if (r > maxR) maxR = r
-        })
-
-        return maxR
-    }
-
-    /**
-     * Build the per-time-period row data for a region, ready for d3.stack().
-     * Each row: { month, [category]: value, ..., other?: value }
-     *
-     * 'other' is computed as total − sum(categories) when totalCode is set
-     * and the difference is positive.
-     */
-    function buildMonthData(regionId, months, causes) {
-        const rows = months
-            .map((month) => {
-                const row = { month }
-                let sumCauses = 0
-
-                causes.forEach((cause) => {
-                    const val = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
-                    row[cause] = val
-                    sumCauses += val
-                })
-
-                if (out.totalCode_) {
-                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                    const otherVal = totalVal > sumCauses ? totalVal - sumCauses : 0
-                    if (otherVal > 0) row['other'] = otherVal
-                }
-
-                return Object.values(row).some((v) => v && v > 0) ? row : null
-            })
-            .filter(Boolean)
-
-        const hasOther = rows.some((r) => (r.other || 0) > 0)
-        if (hasOther) {
-            out._anyRegionHasOther_ = true
-        } else {
-            rows.forEach((r) => delete r.other)
-        }
-
-        return rows
-    }
-
-    function getActiveKeys(monthData, causes) {
-        const keys = [...causes]
-        if (monthData.some((d) => (d['other'] || 0) > 0)) keys.push('other')
-        return keys
-    }
-
-    function createAngleScale(months) {
-        return scaleBand()
-            .domain(months)
-            .range([0, 2 * Math.PI])
-            .align(0)
     }
 
     // ── Legend ───────────────────────────────────────────────────────────────

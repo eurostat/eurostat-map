@@ -334,6 +334,16 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
 - Attributes added to the map DOM change the inset and smoke baselines: first show that only those attributes differ,
   then recapture.
 
+## Where things live (split in 2026-11)
+
+- `core/stat-map.js`: map lifecycle (build, updates, legends). `stat()`/`statData()` and category datasets are in
+  `core/stat-api.js`; `buildSingleLayerMap` is in `core/single-layer-map.js`.
+- Coxcomb: numbers in `composition/coxcomb-data.js`, hover in `coxcomb-interactions.js`. Bivariate legend call-outs and
+  highlight: `legend/choropleth/bivariate-annotations.js`, `bivariate-highlight.js`. Default country labels:
+  `core/decoration/default-labels.js`.
+- When moving code out of a closure, check for undefined names (`tsc --allowJs --checkJs`, filter TS2304) and run the
+  snapshot tests: a missed closure variable only fails at run time.
+
 ## Examples use Eurostat UI components and the shared settings panel
 
 An example's settings (dropdowns, radios, sliders, checkboxes) go in the shared side panel,

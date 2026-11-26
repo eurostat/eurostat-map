@@ -22577,6 +22577,249 @@ function getCornerCoords(position, bbox, map, padding, buttonReserve = 0) {
 
 /***/ },
 
+/***/ "./src/core/decoration/default-labels.js"
+/*!***********************************************!*\
+  !*** ./src/core/decoration/default-labels.js ***!
+  \***********************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DEFAULTLABELS: () => (/* binding */ DEFAULTLABELS),
+/* harmony export */   DEFAULTSTATLABELPOSITIONS: () => (/* binding */ DEFAULTSTATLABELPOSITIONS)
+/* harmony export */ });
+/**
+ * Default labels for country / geographical names.
+ * Using centroids would clash with proportional symbols, and are generally not ideal placements, so labels are positioned independently
+ * Labels are provided for all supported languages: "en","fr" and "de" (defined using map.language())
+ */
+const DEFAULTLABELS = {
+    EUR_3035: {
+        cc: [
+            { text: 'AL', x: 5150000, y: 2060000, class: 'cc', size: 7 },
+            { text: 'AT', x: 4670000, y: 2690000, class: 'cc', size: 18 },
+            { text: 'BE', x: 3930000, y: 3010000, class: 'cc', size: 17 },
+            { text: 'BG', x: 5567000, y: 2250000, class: 'cc', size: 22 },
+            { text: 'HR', x: 4840000, y: 2480000, class: 'cc', size: 10 },
+            { text: 'CY', x: 6426000, y: 1480000, class: 'cc', size: 10 },
+            { text: 'CZ', x: 4707000, y: 2920000, class: 'cc', size: 18 },
+            { text: 'DK', x: 4316000, y: 3621000, class: 'cc', size: 20 },
+            { text: 'EE', x: 5220000, y: 3990000, class: 'cc', size: 12 },
+            { text: 'FI', x: 5150000, y: 4424000, class: 'cc', size: 20 },
+            { text: 'FR', x: 3767740, y: 2662817, class: 'cc', size: 22 },
+            { text: 'DE', x: 4347284, y: 3093276, class: 'cc', size: 22 },
+            { text: 'EL', x: 5370000, y: 1750000, class: 'cc', size: 22 },
+            { text: 'HU', x: 5020000, y: 2630000, class: 'cc', size: 17 },
+            { text: 'IS', x: 3040000, y: 4833000, class: 'cc', size: 10 },
+            { text: 'IE', x: 3136000, y: 3394000, class: 'cc', size: 17 },
+            { text: 'IT', x: 4469967, y: 2181963, class: 'cc', size: 22 },
+            { text: 'LV', x: 5290000, y: 3800000, class: 'cc', size: 12 },
+            { text: 'LT', x: 5190000, y: 3630000, class: 'cc', size: 12 },
+            { text: 'LU', x: 4120000, y: 2940000, class: 'cc', size: 12 },
+            { text: 'MT', x: 4820000, y: 1415000, class: 'cc', size: 10 },
+            { text: 'ME', x: 5073000, y: 2185000, class: 'cc', size: 7 },
+            { text: 'GE', x: 6942680, y: 2660000, class: 'cc' },
+            { text: 'UA', x: 5890000, y: 3050000, class: 'cc' },
+            { text: 'BA', x: 4949262, y: 2338688, class: 'cc' },
+            { text: 'MD', x: 5740000, y: 2790000, class: 'cc' },
+
+            { text: 'MK', x: 5300000, y: 2080000, class: 'cc', size: 10 },
+            { text: 'NL', x: 4020000, y: 3208000, class: 'cc', size: 17 },
+            { text: 'NO', x: 4300000, y: 4147000, class: 'cc', size: 20 },
+            { text: 'PL', x: 4964000, y: 3200000, class: 'cc', size: 22 },
+            { text: 'PT', x: 2770000, y: 1990000, class: 'cc', size: 18 },
+            { text: 'RO', x: 5451000, y: 2600000, class: 'cc', size: 22 },
+            { text: 'RS', x: 5200000, y: 2350000, class: 'cc', size: 10 },
+            { text: 'SK', x: 5040000, y: 2860000, class: 'cc', size: 12 },
+            { text: 'SI', x: 4675000, y: 2500000, class: 'cc', size: 10 },
+            { text: 'ES', x: 3160096, y: 1900000, class: 'cc', size: 22 },
+            { text: 'SE', x: 4630000, y: 4000000, class: 'cc', size: 20 },
+            { text: 'CH', x: 4170000, y: 2600000, class: 'cc', size: 16 },
+            { text: 'TR', x: 6510000, y: 2100000, class: 'cc', size: 22 },
+            { text: 'UK', x: 3558000, y: 3250000, class: 'cc', size: 17 },
+            { text: 'BY', x: 5550000, y: 3500000, class: 'cc' },
+            { text: 'RU', x: 6500000, y: 3500000, class: 'cc' },
+        ],
+        en: [
+            { text: 'MEDITERRANEAN SEA', x: 3980000, y: 1600000, class: 'seas', size: 12, letterSpacing: 7 },
+            { text: 'ATLANTIC OCEAN', x: 2820000, y: 2540000, class: 'seas', size: 12, letterSpacing: 2 },
+            { text: 'NORTH SEA', x: 3915000, y: 3700000, class: 'seas', size: 12 },
+            { text: 'BALTIC SEA', x: 4900000, y: 3730000, class: 'seas', size: 10, rotate: -50 },
+            { text: 'NORWEGIAN SEA', x: 3800000, y: 4500000, class: 'seas', size: 12, letterSpacing: 1 },
+            { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'seas', size: 12, letterSpacing: 4 },
+            { text: 'ALBANIA', cc: 'AL', x: 5100000, y: 2030000, class: 'countries', size: 7, rotate: 70 },
+            { text: 'AUSTRIA', cc: 'AT', x: 4670000, y: 2690000, class: 'countries', size: 10 },
+            { text: 'BELGIUM', cc: 'BE', x: 3900000, y: 3030000, class: 'countries', size: 7, rotate: 30 },
+            { text: 'BULGARIA', cc: 'BG', x: 5567000, y: 2256000, class: 'countries', size: 12 },
+            { text: 'CROATIA', cc: 'HR', x: 4876000, y: 2470000, class: 'countries', size: 7 },
+            { text: 'CYPRUS', cc: 'CY', x: 6426000, y: 1480000, class: 'countries', size: 10 },
+            { text: 'CZECHIA', cc: 'CZ', x: 4707000, y: 2920000, class: 'countries', size: 12 },
+            { text: 'DENMARK', cc: 'DK', x: 4316000, y: 3621000, class: 'countries', size: 10 },
+            { text: 'ESTONIA', cc: 'EE', x: 5220000, y: 3990000, class: 'countries', size: 7 },
+            { text: 'FINLAND', cc: 'FI', x: 5150000, y: 4424000, class: 'countries', size: 12 },
+            { text: 'FRANCE', cc: 'FR', x: 3767740, y: 2662817, class: 'countries', size: 12 },
+            { text: 'GERMANY', cc: 'DE', x: 4347284, y: 3093276, class: 'countries', size: 12 },
+            { text: 'GREECE', cc: 'EL', x: 5470000, y: 1860000, class: 'countries', size: 12 },
+            { text: 'HUNGARY', cc: 'HU', x: 5020000, y: 2650000, class: 'countries', size: 10 },
+            { text: 'ICELAND', cc: 'IS', x: 3040000, y: 4833000, class: 'countries', size: 10 },
+            { text: 'IRELAND', cc: 'IE', x: 3136000, y: 3394000, class: 'countries', size: 10 },
+            { text: 'ITALY', cc: 'IT', x: 4500000, y: 2181963, class: 'countries', size: 12 },
+            { text: 'LATVIA', cc: 'LV', x: 5290000, y: 3800000, class: 'countries', size: 7 },
+            { text: 'LITHUANIA', cc: 'LT', x: 5190000, y: 3630000, class: 'countries', size: 7 },
+            { text: 'LUX.', cc: 'LU', x: 4160000, y: 2910000, class: 'countries', size: 7 },
+            { text: 'MALTA', cc: 'MT', x: 4855000, y: 1400000, class: 'countries', size: 7 },
+            { text: 'MONT.', cc: 'ME', x: 5073000, y: 2185000, class: 'countries', size: 7 },
+            { text: 'N. MACEDONIA', cc: 'MK', x: 5400000, y: 2082000, class: 'countries', size: 7 },
+            { text: 'NETHERLANDS', cc: 'NL', x: 3977000, y: 3208000, class: 'countries', size: 7 },
+            { text: 'NORWAY', cc: 'NO', x: 4260000, y: 4147000, class: 'countries', size: 12 },
+            { text: 'POLAND', cc: 'PL', x: 4964000, y: 3269000, class: 'countries', size: 12 },
+            { text: 'PORTUGAL', cc: 'PT', x: 2830000, y: 1990000, class: 'countries', size: 10, rotate: -75 },
+            { text: 'ROMANIA', cc: 'RO', x: 5451000, y: 2600000, class: 'countries', size: 12 },
+            { text: 'SERBIA', cc: 'RS', x: 5200000, y: 2370000, class: 'countries', size: 7 },
+            { text: 'SLOVAKIA', cc: 'SK', x: 5040000, y: 2835000, class: 'countries', size: 7, rotate: -30 },
+            { text: 'SLOVENIA', cc: 'SI', x: 4735000, y: 2522000, class: 'countries', size: 7, rotate: -30 },
+            { text: 'SPAIN', cc: 'ES', x: 3200000, y: 2050000, class: 'countries', size: 12 },
+            { text: 'SWEDEN', cc: 'SE', x: 4630000, y: 4040000, class: 'countries', size: 12 },
+            { text: 'SWITZERLAND', cc: 'CH', x: 4200000, y: 2594000, class: 'countries', size: 7 },
+            { text: 'TÜRKIYE', cc: 'TR', x: 6510000, y: 2100000, class: 'countries', size: 12 },
+            { text: 'U.K.', cc: 'UK', x: 3558000, y: 3250000, class: 'countries', size: 12 },
+            { text: 'UKRAINE', cc: 'UA', x: 5890000, y: 3050000, class: 'countries', size: 12 },
+            { text: 'MOLDOVA', class: 'countries', cc: 'MD', x: 5740000, y: 2790000, size: 12 },
+            { text: 'GEORGIA', class: 'countries', cc: 'GE', x: 6942680, y: 2660000, size: 12 },
+            { text: 'BELARUS', cc: 'BY', x: 5550000, y: 3500000, class: 'countries', size: 12 },
+            { text: 'RUSSIAN FEDERATION', cc: 'RU', x: 6500000, y: 3500000, class: 'countries', size: 12 },
+
+            // split Bosnia label
+            { text: 'BOSNIA', cc: 'BA', x: 4949262, y: 2348688, class: 'countries', size: 7 },
+            { text: '& H.', cc: 'BA', x: 4949262, y: 2280000, class: 'countries', size: 7 },
+        ],
+    },
+    IC_32628: {
+        cc: [{ text: 'ES', x: 420468, y: 3180647, class: 'cc', size: 12 }],
+        en: [{ text: 'Canary Islands', x: 420468, y: 3180647, class: 'countries', size: 12 }],
+    },
+    GP_32620: {
+        cc: [{ text: 'FR', x: 667000, y: 1740000, class: 'cc', size: 12 }],
+        en: [{ text: 'Guadeloupe', x: 700000, y: 1810000, class: 'countries', size: 12 }],
+    },
+    MQ_32620: {
+        cc: [{ text: 'FR', x: 716521, y: 1621322, class: 'cc', size: 12 }],
+        en: [{ text: 'Martinique', x: 716521, y: 1621322, class: 'countries', size: 12 }],
+    },
+    GF_32622: {
+        cc: [{ text: 'FR', x: 266852, y: 444074, class: 'cc', size: 12 }],
+        en: [{ text: 'Guyane', x: 266852, y: 444074, class: 'countries', size: 12 }],
+    },
+    RE_32740: {
+        cc: [{ text: 'FR', x: 348011, y: 7680000, class: 'cc', size: 10 }],
+        en: [{ text: 'Réunion', x: 348011, y: 7680000, class: 'countries', size: 10 }],
+    },
+    YT_32738: {
+        cc: [{ text: 'FR', x: 516549, y: 8593920, class: 'cc', size: 10 }],
+        en: [{ text: 'Mayotte', x: 516549, y: 8593920, class: 'countries', size: 10 }],
+    },
+    MT_3035: {
+        cc: [{ text: 'MT', x: 4719755, y: 1410701, class: 'cc', size: 10 }],
+        en: [{ text: 'Malta', x: 4719755, y: 1410701, class: 'countries', size: 10 }],
+    },
+    PT20_32626: {
+        cc: [{ text: 'PT', x: 397418, y: 4320000, class: 'cc', size: 10 }],
+        en: [{ text: 'Azores', x: 397418, y: 4320000, class: 'countries', size: 10 }],
+    },
+    PT30_32628: {
+        cc: [{ text: 'PT', x: 333586, y: 3624000, class: 'cc', size: 10, rotate: 30 }],
+        en: [{ text: 'Madeira', x: 333586, y: 3624000, class: 'countries', size: 10, rotate: 30 }],
+    },
+    LI_3035: {
+        cc: [{ text: 'LI', x: 4287060, y: 2660000, class: 'cc', size: 12 }],
+        en: [{ text: 'Liechtenstein', x: 4287060, y: 2679000, class: 'countries', size: 7 }],
+    },
+    IS_3035: {
+        cc: [{ text: 'IS', x: 3011804, y: 4960000, class: 'cc', size: 12 }],
+        en: [{ text: 'Iceland', x: 3011804, y: 4960000, class: 'countries', size: 12 }],
+    },
+    SJ_SV_3035: {
+        cc: [{ text: 'NO', x: 4570000, y: 6260000, class: 'cc', size: 10 }],
+        en: [{ text: 'Svalbard', x: 4570000, y: 6260000, class: 'countries', size: 10 }],
+    },
+    SJ_JM_3035: {
+        cc: [{ text: 'NO', x: 3647762, y: 5420300, class: 'cc', size: 10 }],
+        en: [{ text: 'Jan Mayen', x: 3647762, y: 5420300, class: 'countries', size: 7 }],
+    },
+    CARIB_32620: {
+        cc: [
+            { text: 'FR', x: 700000, y: 1810000, class: 'cc', size: 10 },
+            { text: 'FR', x: 640000, y: 1590000, class: 'cc', size: 10 },
+            { text: 'FR', x: 540000, y: 1962000, class: 'cc', size: 7 },
+        ],
+        en: [
+            { text: 'Guadeloupe', x: 700000, y: 1810000, class: 'countries', size: 10 },
+            { text: 'Martinique', x: 570000, y: 1590000, class: 'countries', size: 10 },
+            { text: 'Saint Martin', x: 597000, y: 1962000, class: 'countries', size: 7 },
+        ],
+    },
+    // note: WORLD x/y are in EPSG:4326 then reprojected by d3 to EPSG:54030
+    WORLD_54030: {
+        en: [
+            { text: 'NORTH ATLANTIC', x: -45, y: 25, class: 'seas', size: 10, letterSpacing: 1 },
+            { text: 'SOUTH ATLANTIC', x: -15, y: -25, class: 'seas', size: 10, letterSpacing: 1 },
+            { text: 'SOUTH PACIFIC', x: -126, y: -25, class: 'seas', size: 10, letterSpacing: 1 },
+            { text: 'NORTH', x: -136, y: 25, class: 'seas', size: 10, letterSpacing: 1 },
+            { text: 'PACIFIC', x: -134, y: 20, class: 'seas', size: 10, letterSpacing: 1 },
+            { text: 'INDIAN OCEAN', x: 80, y: -25, class: 'seas', size: 10, letterSpacing: 1 },
+            { text: 'SOUTHERN OCEAN', x: -5, y: -67, class: 'seas', size: 10, letterSpacing: 6 },
+        ],
+    },
+}
+
+const DEFAULTSTATLABELPOSITIONS = {
+    AL: { x: 5150000, y: 2000000 },
+    AT: { x: 4670000, y: 2740000 },
+    BE: { x: 3930000, y: 3060000 },
+    BG: { x: 5567000, y: 2300000 },
+    HR: { x: 4657718, y: 2400243 },
+    CY: { x: 6426000, y: 1570000 },
+    CH: { x: 4170000, y: 2600000 },
+    CZ: { x: 4707000, y: 2950000 },
+    DK: { x: 4316000, y: 3621000 },
+    EE: { x: 5220000, y: 4050000 },
+    FI: { x: 5150000, y: 4424000 },
+    FR: { x: 3767740, y: 2662817 },
+    DE: { x: 4347284, y: 3093276 },
+    EL: { x: 5370000, y: 1750000 },
+    HU: { x: 5020000, y: 2670000 },
+    IS: { x: 3040000, y: 4833000 },
+    IE: { x: 3136000, y: 3394000 },
+    IT: { x: 4500000, y: 2181963 },
+    LV: { x: 5290000, y: 3840000 },
+    LT: { x: 5190000, y: 3670000 },
+    LU: { x: 4120000, y: 2940000 },
+    MT: { x: 4880000, y: 1480000 },
+    GE: { x: 6912680, y: 2696554 },
+    UA: { x: 5865507, y: 3130158 },
+    BA: { x: 4959262, y: 2368688 },
+    MD: { x: 5736016, y: 2835957 },
+    ME: { x: 5073000, y: 2230000 },
+    MK: { x: 5300000, y: 2130000 },
+    NL: { x: 4020000, y: 3208000 },
+    NO: { x: 4300000, y: 4147000 },
+    PL: { x: 4964000, y: 3200000 },
+    PT: { x: 2760000, y: 1990000 },
+    RO: { x: 5451000, y: 2600000 },
+    RS: { x: 5200000, y: 2370000 },
+    SK: { x: 5040000, y: 2890000 },
+    SI: { x: 4660000, y: 2550000 },
+    ES: { x: 3200000, y: 2000000 },
+    SE: { x: 4630000, y: 4000000 },
+    TR: { x: 6510000, y: 2100000 },
+    UK: { x: 3558000, y: 3250000 },
+    BY: { x: 5550000, y: 3500000 },
+    RU: { x: 6842086, y: 3230517 },
+}
+
+
+/***/ },
+
 /***/ "./src/core/decoration/label-layout.js"
 /*!*********************************************!*\
   !*** ./src/core/decoration/label-layout.js ***!
@@ -22691,7 +22934,7 @@ function hideCollidingLabels(map) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   DEFAULTLABELS: () => (/* binding */ DEFAULTLABELS),
+/* harmony export */   DEFAULTLABELS: () => (/* reexport safe */ _default_labels__WEBPACK_IMPORTED_MODULE_8__.DEFAULTLABELS),
 /* harmony export */   addFlowNodeLabels: () => (/* binding */ addFlowNodeLabels),
 /* harmony export */   addFlowValueLabels: () => (/* binding */ addFlowValueLabels),
 /* harmony export */   addLabelsToMap: () => (/* binding */ addLabelsToMap),
@@ -22708,6 +22951,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var d3_force__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! d3-force */ "./node_modules/d3-force/src/y.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../utils */ "./src/core/utils.js");
 /* harmony import */ var _label_layout__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./label-layout */ "./src/core/decoration/label-layout.js");
+/* harmony import */ var _default_labels__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./default-labels */ "./src/core/decoration/default-labels.js");
+
+
+
 
 
 
@@ -22744,8 +22991,8 @@ const geographicLabelColorsByClass = (map) =>
  * @description appends text labels to the map. Labels can be countries, country codes, ocean names or statistical values
  */
 const addLabelsToMap = function (map, zg) {
-    if (!map.labels_.config) map.labels_.config = DEFAULTLABELS
-    if (!map.labels_.statLabelsPositions) map.labels_.statLabelsPositions = DEFAULTSTATLABELPOSITIONS
+    if (!map.labels_.config) map.labels_.config = _default_labels__WEBPACK_IMPORTED_MODULE_8__.DEFAULTLABELS
+    if (!map.labels_.statLabelsPositions) map.labels_.statLabelsPositions = _default_labels__WEBPACK_IMPORTED_MODULE_8__.DEFAULTSTATLABELPOSITIONS
 
     map._statLabelFormatter = map.labels_.valuesFormatter ? map.labels_.valuesFormatter : _utils__WEBPACK_IMPORTED_MODULE_6__.spaceAsThousandSeparator
 
@@ -22754,7 +23001,7 @@ const addLabelsToMap = function (map, zg) {
 
     if (map.labels_?.values && map._mapType !== 'ps') appendStatLabelCentroidsToMap(map, labelsContainer)
 
-    let labelsArray = map.labels_?.labels || DEFAULTLABELS[`${map.geo}_${map.proj_}.cc`]
+    let labelsArray = map.labels_?.labels || _default_labels__WEBPACK_IMPORTED_MODULE_8__.DEFAULTLABELS[`${map.geo}_${map.proj_}.cc`]
 
     if (labelsArray) {
         const halog = (0,_utils__WEBPACK_IMPORTED_MODULE_6__.ensureGroup)(labelsContainer, 'em-label-halos')
@@ -23464,235 +23711,6 @@ const appendStatLabelCentroidsToMap = function (map, labelsContainer) {
 
             .attr('class', 'em-stat-label-halo')
     }
-}
-
-/**
- * Default labels for country / geographical names.
- * Using centroids would clash with proportional symbols, and are generally not ideal placements, so labels are positioned independently
- * Labels are provided for all supported languages: "en","fr" and "de" (defined using map.language())
- */
-const DEFAULTLABELS = {
-    EUR_3035: {
-        cc: [
-            { text: 'AL', x: 5150000, y: 2060000, class: 'cc', size: 7 },
-            { text: 'AT', x: 4670000, y: 2690000, class: 'cc', size: 18 },
-            { text: 'BE', x: 3930000, y: 3010000, class: 'cc', size: 17 },
-            { text: 'BG', x: 5567000, y: 2250000, class: 'cc', size: 22 },
-            { text: 'HR', x: 4840000, y: 2480000, class: 'cc', size: 10 },
-            { text: 'CY', x: 6426000, y: 1480000, class: 'cc', size: 10 },
-            { text: 'CZ', x: 4707000, y: 2920000, class: 'cc', size: 18 },
-            { text: 'DK', x: 4316000, y: 3621000, class: 'cc', size: 20 },
-            { text: 'EE', x: 5220000, y: 3990000, class: 'cc', size: 12 },
-            { text: 'FI', x: 5150000, y: 4424000, class: 'cc', size: 20 },
-            { text: 'FR', x: 3767740, y: 2662817, class: 'cc', size: 22 },
-            { text: 'DE', x: 4347284, y: 3093276, class: 'cc', size: 22 },
-            { text: 'EL', x: 5370000, y: 1750000, class: 'cc', size: 22 },
-            { text: 'HU', x: 5020000, y: 2630000, class: 'cc', size: 17 },
-            { text: 'IS', x: 3040000, y: 4833000, class: 'cc', size: 10 },
-            { text: 'IE', x: 3136000, y: 3394000, class: 'cc', size: 17 },
-            { text: 'IT', x: 4469967, y: 2181963, class: 'cc', size: 22 },
-            { text: 'LV', x: 5290000, y: 3800000, class: 'cc', size: 12 },
-            { text: 'LT', x: 5190000, y: 3630000, class: 'cc', size: 12 },
-            { text: 'LU', x: 4120000, y: 2940000, class: 'cc', size: 12 },
-            { text: 'MT', x: 4820000, y: 1415000, class: 'cc', size: 10 },
-            { text: 'ME', x: 5073000, y: 2185000, class: 'cc', size: 7 },
-            { text: 'GE', x: 6942680, y: 2660000, class: 'cc' },
-            { text: 'UA', x: 5890000, y: 3050000, class: 'cc' },
-            { text: 'BA', x: 4949262, y: 2338688, class: 'cc' },
-            { text: 'MD', x: 5740000, y: 2790000, class: 'cc' },
-
-            { text: 'MK', x: 5300000, y: 2080000, class: 'cc', size: 10 },
-            { text: 'NL', x: 4020000, y: 3208000, class: 'cc', size: 17 },
-            { text: 'NO', x: 4300000, y: 4147000, class: 'cc', size: 20 },
-            { text: 'PL', x: 4964000, y: 3200000, class: 'cc', size: 22 },
-            { text: 'PT', x: 2770000, y: 1990000, class: 'cc', size: 18 },
-            { text: 'RO', x: 5451000, y: 2600000, class: 'cc', size: 22 },
-            { text: 'RS', x: 5200000, y: 2350000, class: 'cc', size: 10 },
-            { text: 'SK', x: 5040000, y: 2860000, class: 'cc', size: 12 },
-            { text: 'SI', x: 4675000, y: 2500000, class: 'cc', size: 10 },
-            { text: 'ES', x: 3160096, y: 1900000, class: 'cc', size: 22 },
-            { text: 'SE', x: 4630000, y: 4000000, class: 'cc', size: 20 },
-            { text: 'CH', x: 4170000, y: 2600000, class: 'cc', size: 16 },
-            { text: 'TR', x: 6510000, y: 2100000, class: 'cc', size: 22 },
-            { text: 'UK', x: 3558000, y: 3250000, class: 'cc', size: 17 },
-            { text: 'BY', x: 5550000, y: 3500000, class: 'cc' },
-            { text: 'RU', x: 6500000, y: 3500000, class: 'cc' },
-        ],
-        en: [
-            { text: 'MEDITERRANEAN SEA', x: 3980000, y: 1600000, class: 'seas', size: 12, letterSpacing: 7 },
-            { text: 'ATLANTIC OCEAN', x: 2820000, y: 2540000, class: 'seas', size: 12, letterSpacing: 2 },
-            { text: 'NORTH SEA', x: 3915000, y: 3700000, class: 'seas', size: 12 },
-            { text: 'BALTIC SEA', x: 4900000, y: 3730000, class: 'seas', size: 10, rotate: -50 },
-            { text: 'NORWEGIAN SEA', x: 3800000, y: 4500000, class: 'seas', size: 12, letterSpacing: 1 },
-            { text: 'BLACK SEA', x: 6300000, y: 2500000, class: 'seas', size: 12, letterSpacing: 4 },
-            { text: 'ALBANIA', cc: 'AL', x: 5100000, y: 2030000, class: 'countries', size: 7, rotate: 70 },
-            { text: 'AUSTRIA', cc: 'AT', x: 4670000, y: 2690000, class: 'countries', size: 10 },
-            { text: 'BELGIUM', cc: 'BE', x: 3900000, y: 3030000, class: 'countries', size: 7, rotate: 30 },
-            { text: 'BULGARIA', cc: 'BG', x: 5567000, y: 2256000, class: 'countries', size: 12 },
-            { text: 'CROATIA', cc: 'HR', x: 4876000, y: 2470000, class: 'countries', size: 7 },
-            { text: 'CYPRUS', cc: 'CY', x: 6426000, y: 1480000, class: 'countries', size: 10 },
-            { text: 'CZECHIA', cc: 'CZ', x: 4707000, y: 2920000, class: 'countries', size: 12 },
-            { text: 'DENMARK', cc: 'DK', x: 4316000, y: 3621000, class: 'countries', size: 10 },
-            { text: 'ESTONIA', cc: 'EE', x: 5220000, y: 3990000, class: 'countries', size: 7 },
-            { text: 'FINLAND', cc: 'FI', x: 5150000, y: 4424000, class: 'countries', size: 12 },
-            { text: 'FRANCE', cc: 'FR', x: 3767740, y: 2662817, class: 'countries', size: 12 },
-            { text: 'GERMANY', cc: 'DE', x: 4347284, y: 3093276, class: 'countries', size: 12 },
-            { text: 'GREECE', cc: 'EL', x: 5470000, y: 1860000, class: 'countries', size: 12 },
-            { text: 'HUNGARY', cc: 'HU', x: 5020000, y: 2650000, class: 'countries', size: 10 },
-            { text: 'ICELAND', cc: 'IS', x: 3040000, y: 4833000, class: 'countries', size: 10 },
-            { text: 'IRELAND', cc: 'IE', x: 3136000, y: 3394000, class: 'countries', size: 10 },
-            { text: 'ITALY', cc: 'IT', x: 4500000, y: 2181963, class: 'countries', size: 12 },
-            { text: 'LATVIA', cc: 'LV', x: 5290000, y: 3800000, class: 'countries', size: 7 },
-            { text: 'LITHUANIA', cc: 'LT', x: 5190000, y: 3630000, class: 'countries', size: 7 },
-            { text: 'LUX.', cc: 'LU', x: 4160000, y: 2910000, class: 'countries', size: 7 },
-            { text: 'MALTA', cc: 'MT', x: 4855000, y: 1400000, class: 'countries', size: 7 },
-            { text: 'MONT.', cc: 'ME', x: 5073000, y: 2185000, class: 'countries', size: 7 },
-            { text: 'N. MACEDONIA', cc: 'MK', x: 5400000, y: 2082000, class: 'countries', size: 7 },
-            { text: 'NETHERLANDS', cc: 'NL', x: 3977000, y: 3208000, class: 'countries', size: 7 },
-            { text: 'NORWAY', cc: 'NO', x: 4260000, y: 4147000, class: 'countries', size: 12 },
-            { text: 'POLAND', cc: 'PL', x: 4964000, y: 3269000, class: 'countries', size: 12 },
-            { text: 'PORTUGAL', cc: 'PT', x: 2830000, y: 1990000, class: 'countries', size: 10, rotate: -75 },
-            { text: 'ROMANIA', cc: 'RO', x: 5451000, y: 2600000, class: 'countries', size: 12 },
-            { text: 'SERBIA', cc: 'RS', x: 5200000, y: 2370000, class: 'countries', size: 7 },
-            { text: 'SLOVAKIA', cc: 'SK', x: 5040000, y: 2835000, class: 'countries', size: 7, rotate: -30 },
-            { text: 'SLOVENIA', cc: 'SI', x: 4735000, y: 2522000, class: 'countries', size: 7, rotate: -30 },
-            { text: 'SPAIN', cc: 'ES', x: 3200000, y: 2050000, class: 'countries', size: 12 },
-            { text: 'SWEDEN', cc: 'SE', x: 4630000, y: 4040000, class: 'countries', size: 12 },
-            { text: 'SWITZERLAND', cc: 'CH', x: 4200000, y: 2594000, class: 'countries', size: 7 },
-            { text: 'TÜRKIYE', cc: 'TR', x: 6510000, y: 2100000, class: 'countries', size: 12 },
-            { text: 'U.K.', cc: 'UK', x: 3558000, y: 3250000, class: 'countries', size: 12 },
-            { text: 'UKRAINE', cc: 'UA', x: 5890000, y: 3050000, class: 'countries', size: 12 },
-            { text: 'MOLDOVA', class: 'countries', cc: 'MD', x: 5740000, y: 2790000, size: 12 },
-            { text: 'GEORGIA', class: 'countries', cc: 'GE', x: 6942680, y: 2660000, size: 12 },
-            { text: 'BELARUS', cc: 'BY', x: 5550000, y: 3500000, class: 'countries', size: 12 },
-            { text: 'RUSSIAN FEDERATION', cc: 'RU', x: 6500000, y: 3500000, class: 'countries', size: 12 },
-
-            // split Bosnia label
-            { text: 'BOSNIA', cc: 'BA', x: 4949262, y: 2348688, class: 'countries', size: 7 },
-            { text: '& H.', cc: 'BA', x: 4949262, y: 2280000, class: 'countries', size: 7 },
-        ],
-    },
-    IC_32628: {
-        cc: [{ text: 'ES', x: 420468, y: 3180647, class: 'cc', size: 12 }],
-        en: [{ text: 'Canary Islands', x: 420468, y: 3180647, class: 'countries', size: 12 }],
-    },
-    GP_32620: {
-        cc: [{ text: 'FR', x: 667000, y: 1740000, class: 'cc', size: 12 }],
-        en: [{ text: 'Guadeloupe', x: 700000, y: 1810000, class: 'countries', size: 12 }],
-    },
-    MQ_32620: {
-        cc: [{ text: 'FR', x: 716521, y: 1621322, class: 'cc', size: 12 }],
-        en: [{ text: 'Martinique', x: 716521, y: 1621322, class: 'countries', size: 12 }],
-    },
-    GF_32622: {
-        cc: [{ text: 'FR', x: 266852, y: 444074, class: 'cc', size: 12 }],
-        en: [{ text: 'Guyane', x: 266852, y: 444074, class: 'countries', size: 12 }],
-    },
-    RE_32740: {
-        cc: [{ text: 'FR', x: 348011, y: 7680000, class: 'cc', size: 10 }],
-        en: [{ text: 'Réunion', x: 348011, y: 7680000, class: 'countries', size: 10 }],
-    },
-    YT_32738: {
-        cc: [{ text: 'FR', x: 516549, y: 8593920, class: 'cc', size: 10 }],
-        en: [{ text: 'Mayotte', x: 516549, y: 8593920, class: 'countries', size: 10 }],
-    },
-    MT_3035: {
-        cc: [{ text: 'MT', x: 4719755, y: 1410701, class: 'cc', size: 10 }],
-        en: [{ text: 'Malta', x: 4719755, y: 1410701, class: 'countries', size: 10 }],
-    },
-    PT20_32626: {
-        cc: [{ text: 'PT', x: 397418, y: 4320000, class: 'cc', size: 10 }],
-        en: [{ text: 'Azores', x: 397418, y: 4320000, class: 'countries', size: 10 }],
-    },
-    PT30_32628: {
-        cc: [{ text: 'PT', x: 333586, y: 3624000, class: 'cc', size: 10, rotate: 30 }],
-        en: [{ text: 'Madeira', x: 333586, y: 3624000, class: 'countries', size: 10, rotate: 30 }],
-    },
-    LI_3035: {
-        cc: [{ text: 'LI', x: 4287060, y: 2660000, class: 'cc', size: 12 }],
-        en: [{ text: 'Liechtenstein', x: 4287060, y: 2679000, class: 'countries', size: 7 }],
-    },
-    IS_3035: {
-        cc: [{ text: 'IS', x: 3011804, y: 4960000, class: 'cc', size: 12 }],
-        en: [{ text: 'Iceland', x: 3011804, y: 4960000, class: 'countries', size: 12 }],
-    },
-    SJ_SV_3035: {
-        cc: [{ text: 'NO', x: 4570000, y: 6260000, class: 'cc', size: 10 }],
-        en: [{ text: 'Svalbard', x: 4570000, y: 6260000, class: 'countries', size: 10 }],
-    },
-    SJ_JM_3035: {
-        cc: [{ text: 'NO', x: 3647762, y: 5420300, class: 'cc', size: 10 }],
-        en: [{ text: 'Jan Mayen', x: 3647762, y: 5420300, class: 'countries', size: 7 }],
-    },
-    CARIB_32620: {
-        cc: [
-            { text: 'FR', x: 700000, y: 1810000, class: 'cc', size: 10 },
-            { text: 'FR', x: 640000, y: 1590000, class: 'cc', size: 10 },
-            { text: 'FR', x: 540000, y: 1962000, class: 'cc', size: 7 },
-        ],
-        en: [
-            { text: 'Guadeloupe', x: 700000, y: 1810000, class: 'countries', size: 10 },
-            { text: 'Martinique', x: 570000, y: 1590000, class: 'countries', size: 10 },
-            { text: 'Saint Martin', x: 597000, y: 1962000, class: 'countries', size: 7 },
-        ],
-    },
-    // note: WORLD x/y are in EPSG:4326 then reprojected by d3 to EPSG:54030
-    WORLD_54030: {
-        en: [
-            { text: 'NORTH ATLANTIC', x: -45, y: 25, class: 'seas', size: 10, letterSpacing: 1 },
-            { text: 'SOUTH ATLANTIC', x: -15, y: -25, class: 'seas', size: 10, letterSpacing: 1 },
-            { text: 'SOUTH PACIFIC', x: -126, y: -25, class: 'seas', size: 10, letterSpacing: 1 },
-            { text: 'NORTH', x: -136, y: 25, class: 'seas', size: 10, letterSpacing: 1 },
-            { text: 'PACIFIC', x: -134, y: 20, class: 'seas', size: 10, letterSpacing: 1 },
-            { text: 'INDIAN OCEAN', x: 80, y: -25, class: 'seas', size: 10, letterSpacing: 1 },
-            { text: 'SOUTHERN OCEAN', x: -5, y: -67, class: 'seas', size: 10, letterSpacing: 6 },
-        ],
-    },
-}
-
-const DEFAULTSTATLABELPOSITIONS = {
-    AL: { x: 5150000, y: 2000000 },
-    AT: { x: 4670000, y: 2740000 },
-    BE: { x: 3930000, y: 3060000 },
-    BG: { x: 5567000, y: 2300000 },
-    HR: { x: 4657718, y: 2400243 },
-    CY: { x: 6426000, y: 1570000 },
-    CH: { x: 4170000, y: 2600000 },
-    CZ: { x: 4707000, y: 2950000 },
-    DK: { x: 4316000, y: 3621000 },
-    EE: { x: 5220000, y: 4050000 },
-    FI: { x: 5150000, y: 4424000 },
-    FR: { x: 3767740, y: 2662817 },
-    DE: { x: 4347284, y: 3093276 },
-    EL: { x: 5370000, y: 1750000 },
-    HU: { x: 5020000, y: 2670000 },
-    IS: { x: 3040000, y: 4833000 },
-    IE: { x: 3136000, y: 3394000 },
-    IT: { x: 4500000, y: 2181963 },
-    LV: { x: 5290000, y: 3840000 },
-    LT: { x: 5190000, y: 3670000 },
-    LU: { x: 4120000, y: 2940000 },
-    MT: { x: 4880000, y: 1480000 },
-    GE: { x: 6912680, y: 2696554 },
-    UA: { x: 5865507, y: 3130158 },
-    BA: { x: 4959262, y: 2368688 },
-    MD: { x: 5736016, y: 2835957 },
-    ME: { x: 5073000, y: 2230000 },
-    MK: { x: 5300000, y: 2130000 },
-    NL: { x: 4020000, y: 3208000 },
-    NO: { x: 4300000, y: 4147000 },
-    PL: { x: 4964000, y: 3200000 },
-    PT: { x: 2760000, y: 1990000 },
-    RO: { x: 5451000, y: 2600000 },
-    RS: { x: 5200000, y: 2370000 },
-    SK: { x: 5040000, y: 2890000 },
-    SI: { x: 4660000, y: 2550000 },
-    ES: { x: 3200000, y: 2000000 },
-    SE: { x: 4630000, y: 4000000 },
-    TR: { x: 6510000, y: 2100000 },
-    UK: { x: 3558000, y: 3250000 },
-    BY: { x: 5550000, y: 3500000 },
-    RU: { x: 6842086, y: 3230517 },
 }
 
 
@@ -33216,6 +33234,528 @@ function createLinearScale(rawData = [], maxSize = 20, minSize = 0) {
 
 /***/ },
 
+/***/ "./src/core/single-layer-map.js"
+/*!**************************************!*\
+  !*** ./src/core/single-layer-map.js ***!
+  \**************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   buildSingleLayerMap: () => (/* binding */ buildSingleLayerMap)
+/* harmony export */ });
+/* harmony import */ var _stat_map__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./stat-map */ "./src/core/stat-map.js");
+/* harmony import */ var _layer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./layer */ "./src/core/layer.js");
+/* harmony import */ var _layer_registry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./layer-registry */ "./src/core/layer-registry.js");
+
+
+
+
+/**
+ * Builds a single-layer map instance for a given type and config.
+ * Handles creating the frame, adding the layer, and forwarding legacy properties.
+ *
+ * @param {string} type
+ * @param {object} config
+ * @returns {MapInstance}
+ */
+const buildSingleLayerMap = function (type, config) {
+    const role = (0,_layer_registry__WEBPACK_IMPORTED_MODULE_2__.getRole)(type)
+    const withCenterPoints = role === 'overlay' || type === 'bar' || type === 'barComposition'
+    const CANONICAL_MAP_TYPES = {
+        choropleth: 'ch',
+        ch: 'ch',
+        categorical: 'ct',
+        ct: 'ct',
+        proportionalSymbol: 'ps',
+        proportionalSymbols: 'ps',
+        ps: 'ps',
+        bivariateChoropleth: 'chbi',
+        chbi: 'chbi',
+        trivariateChoropleth: 'chtri',
+        ternary: 'chtri',
+        chtri: 'chtri',
+        stripeComposition: 'scomp',
+        stripe: 'scomp',
+        scomp: 'scomp',
+        pieChart: 'pie',
+        pie: 'pie',
+        composition: 'pie',
+        sparkline: 'spark',
+        spark: 'spark',
+        sparklines: 'spark',
+        flow: 'flow',
+        flowmap: 'flow',
+        coxcomb: 'coxcomb',
+        polar: 'coxcomb',
+    }
+    const canonicalType = CANONICAL_MAP_TYPES[type] || type
+    const out = (0,_stat_map__WEBPACK_IMPORTED_MODULE_0__.createStatMap)(config, withCenterPoints, canonicalType)
+
+    // Remove the self-facade layer so the real layer becomes layer 0.
+    out.layers_ = []
+
+    const layer = out.addLayer(type, config)
+    out.activeLayerIndex(0)
+
+    if (!layer || layer === out) return out
+
+    // Forwarding accessors for backwards compatibility
+    const baseFields = [
+        'encodings_',
+        'catColors_',
+        'catLabels_',
+        'statCodes_',
+        'legend_',
+        'legendObj_',
+        'rankedBarChart_',
+        'rankedBarChartObj_',
+        'tooltip_',
+    ]
+    const baseMethods = [
+        'encoding',
+        'updateClassification',
+        'updateStyle',
+        'getLegendConstructor',
+        'legend',
+        'getRankedBarChartConstructor',
+        'rankedBarChart',
+    ]
+
+    let typeFields = []
+    let typeMethods = []
+
+    if (type === 'choropleth' || type === 'ch') {
+        typeFields = [
+            'numberOfClasses_',
+            'classificationMethod_',
+            'thresholds_',
+            'makeClassifNice_',
+            'colorFunction_',
+            'classToFillStyle_',
+            'noDataFillStyle_',
+            'categoryFillStyle_',
+            'categoryText_',
+            'classifier_',
+            'colors_',
+            'colorSchemeType_',
+            'valueTransform_',
+            'valueUntransform_',
+            'colorStretch_',
+            'pointOfDivergence_',
+            'skipNormalization_',
+            'filtersDefinitionFunction_',
+            'domain_',
+        ]
+        typeMethods = [
+            'numberOfClasses',
+            'classificationMethod',
+            'thresholds',
+            'makeClassifNice',
+            'colorFunction',
+            'classToFillStyle',
+            'noDataFillStyle',
+            'categoryFillStyle',
+            'categoryText',
+            'classifier',
+            'colors',
+            'colorSchemeType',
+            'valueTransform',
+            'valueUntransform',
+            'colorStretch',
+            'pointOfDivergence',
+            'skipNormalization',
+            'threshold',
+            'filtersDefinitionFunction',
+            'highlightRegion',
+            'clearHighlight',
+        ]
+    } else if (type === 'proportionalSymbol' || type === 'proportionalSymbols' || type === 'ps') {
+        typeFields = [
+            'psMaxSize_',
+            'psMinSize_',
+            'psMaxValue_',
+            'psMinValue_',
+            'psFill_',
+            'psFillOpacity_',
+            'psStrokeOpacity_',
+            'psStroke_',
+            'psStrokeWidth_',
+            'classifierSize_',
+            'classifierColor_',
+            'psShape_',
+            'psCustomShape_',
+            'psBarWidth_',
+            'psClassToFillStyle_',
+            'psColorFun_',
+            'psSizeScale_',
+            'noDataFillStyle_',
+            'psThresholds_',
+            'psColors_',
+            'psCustomSVG_',
+            'psOffset_',
+            'psClassificationMethod_',
+            'psClasses_',
+            'dorling_',
+            'psSpikeWidth_',
+            'psCodeLabels_',
+            'psBrightenFactor_',
+            'dorlingSettings_',
+        ]
+        typeMethods = [
+            'psMaxSize',
+            'psMinSize',
+            'psMaxValue',
+            'psMinValue',
+            'psFill',
+            'psFillOpacity',
+            'psStrokeOpacity',
+            'psStroke',
+            'psStrokeWidth',
+            'classifierSize',
+            'classifierColor',
+            'psShape',
+            'psCustomShape',
+            'psBarWidth',
+            'psClassToFillStyle',
+            'psColorFun',
+            'psSizeScale',
+            'psThresholds',
+            'psColors',
+            'psCustomSVG',
+            'psOffset',
+            'psClassificationMethod',
+            'psClasses',
+            'psSpikeWidth',
+            'psCodeLabels',
+            'psBrightenFactor',
+            'psSettings',
+            'dorling',
+            'dorlingSettings',
+            'dorlingWorker',
+            'dorlingWorkerD3URL',
+        ]
+    }
+
+    // Every registered decorator may add its own fluent API. Discover it here so
+    // standalone maps retain the historical map.foo() facade without maintaining
+    // a second per-type list every time a layer is migrated.
+    // 'stat'/'statData' are skipped: attachThematicApi() already defines them on the
+    // layer as backwards-compat forwarders TO the map (layer.stat calls map.stat).
+    // The map's own 'stat'/'statData' are its real, authoritative implementations -
+    // wrapping them here to forward back to the layer would make map.stat() call
+    // layer.stat() call map.stat() forever.
+    Object.keys(layer).forEach((key) => {
+        if (key === 'map' || key === 'id' || key === 'type' || key === 'role' || key === 'isLayer') return
+        if (key === 'stat' || key === 'statData') return
+        if (key.endsWith('_')) typeFields.push(key)
+        else if (typeof layer[key] === 'function') typeMethods.push(key)
+    })
+
+    typeFields = [...new Set(typeFields)]
+    typeMethods = [...new Set(typeMethods)]
+
+    ;(0,_layer__WEBPACK_IMPORTED_MODULE_1__.forwardFieldsToActiveLayer)(out, [...baseFields, ...typeFields])
+
+    const allMethods = [...baseMethods, ...typeMethods]
+    for (const method of allMethods) {
+        ;(0,_layer__WEBPACK_IMPORTED_MODULE_1__.forwardChainableMethod)(out, method)
+    }
+
+    return out
+}
+
+
+/***/ },
+
+/***/ "./src/core/stat-api.js"
+/*!******************************!*\
+  !*** ./src/core/stat-api.js ***!
+  \******************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   attachStatAccessors: () => (/* binding */ attachStatAccessors),
+/* harmony export */   attachStatChannels: () => (/* binding */ attachStatChannels)
+/* harmony export */ });
+/* harmony import */ var _stat_data__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./stat-data */ "./src/core/stat-data.js");
+
+
+const isCategoricalStatConfig = function (config) {
+    return config && typeof config === 'object' && Array.isArray(config.categoryCodes)
+}
+
+const makeChannelStatKey = function (channel, code, prefix) {
+    if (prefix === '') return code
+    return `${prefix || channel}:${code}`
+}
+
+/**
+ * The statistical data settings of a map: the stat() configs and the registration of multi-category datasets.
+ * @param {*} out the map
+ */
+const attachStatChannels = function (out) {
+    /**
+     * Statistical data configuration dictionary.
+     * Keys are stat dataset names ('default', 'color', 'size', 'v1', 'v2', 'v3', etc.).
+     * The 'default' key is used by single-stat map types (choropleth, ps, etc.).
+     *
+     * As a getter/setter it behaves as follows:
+     *   - `map.stat()` → returns the default stat config
+     *   - `map.stat('color')` → returns the stat config for key 'color'
+     *   - `map.stat({ eurostatDatasetCode: 'demo_r_d3dens', ... })` → sets default stat config
+     *   - `map.stat('color', { eurostatDatasetCode: '...', ... })` → sets stat config for key 'color'
+     *
+     * @example
+     * map.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2024' } })
+     *
+     * @example
+     * // bivariate: set two independent datasets
+     * map.stat('v1', { eurostatDatasetCode: 'dataset_a' })
+     * map.stat('v2', { eurostatDatasetCode: 'dataset_b' })
+     */
+    out.stat_ = { default: undefined }
+    out.statChannels_ = {}
+    out.statMeta_ = out.statChannels_
+    out.encodings_ = {}
+
+    out._registerScalarCustomStat = function (key, config) {
+        const statData = _stat_data__WEBPACK_IMPORTED_MODULE_0__.statData(config)
+        statData.setData(config.customData)
+        out.statData(key, statData)
+        delete out.stat_[key]
+        return out
+    }
+
+    out._registerCategoricalStatChannel = function (channel, config, options = {}) {
+        if (config.stat) {
+            config = { ...config.stat, ...config }
+            delete config.stat
+        }
+
+        const {
+            eurostatDatasetCode,
+            customData,
+            filters,
+            unitText,
+            preprocess,
+            transform,
+            categoryParameter,
+            categoryCodes,
+            categoryLabels,
+            categoryColors,
+            totalCode,
+        } = config
+
+        if (!categoryCodes?.length) {
+            console.error('categoryCodes array is required')
+            return out
+        }
+
+        if (!options.totalCodeKey && channel === 'composition') {
+            const totalCodeKeysByMapType = {
+                pie: 'compositionTotalCode_',
+                waffle: 'waffleTotalCode_',
+                bar: 'barTotalCode_',
+            }
+            options.totalCodeKey = totalCodeKeysByMapType[out._mapType]
+        }
+
+        const isPrimaryCategoricalChannel = channel === 'default' || channel === 'composition' || channel === 'height'
+        const statKeyPrefix = options.statKeyPrefix === undefined ? (isPrimaryCategoricalChannel ? '' : channel) : options.statKeyPrefix
+        const statKeys = {}
+
+        for (let i = 0; i < categoryCodes.length; i++) {
+            const code = categoryCodes[i]
+            const statKey = makeChannelStatKey(channel, code, statKeyPrefix)
+            statKeys[code] = statKey
+
+            if (customData && !eurostatDatasetCode) {
+                const statData = _stat_data__WEBPACK_IMPORTED_MODULE_0__.statData({ code, unitText: unitText || 'Value', preprocess, transform })
+                const regionData = {}
+                for (const regionId in customData) {
+                    const value = customData[regionId]?.[code]
+                    if (value !== undefined) regionData[regionId] = value
+                }
+                if (Object.keys(regionData).length > 0) statData.setData(regionData)
+                out.statData(statKey, statData)
+                delete out.stat_[statKey]
+            } else {
+                if (!eurostatDatasetCode) {
+                    console.error('eurostatDatasetCode is required')
+                    return out
+                }
+                if (!categoryParameter) {
+                    console.error('categoryParameter is required')
+                    return out
+                }
+                const baseFilters = filters ? { ...filters } : {}
+                out.stat_[statKey] = { eurostatDatasetCode, unitText, preprocess, transform, filters: { ...baseFilters, [categoryParameter]: code } }
+            }
+
+            if (categoryColors?.[i]) {
+                out.catColors_ = out.catColors_ || {}
+                out.catColors_[code] = categoryColors[i]
+            }
+            if (categoryLabels?.[i]) {
+                out.catLabels_ = out.catLabels_ || {}
+                out.catLabels_[code] = categoryLabels[i]
+            }
+        }
+
+        out.statChannels_[channel] = {
+            name: channel,
+            categoryCodes,
+            statKeys,
+            categoryLabels,
+            categoryColors,
+            unitText,
+            totalCode,
+        }
+
+        if (options.setStatCodes !== false) out.statCodes_ = categoryCodes
+
+        if (options.totalCodeKey) {
+            if (totalCode) {
+                const totalStatKey = makeChannelStatKey(channel, totalCode, statKeyPrefix)
+                out[options.totalCodeKey] = totalStatKey
+                out.statChannels_[channel].totalStatKey = totalStatKey
+
+                if (customData && !eurostatDatasetCode) {
+                    const statData = _stat_data__WEBPACK_IMPORTED_MODULE_0__.statData({ code: totalCode, unitText: unitText || 'Value', preprocess, transform })
+                    const regionData = {}
+                    for (const regionId in customData) {
+                        let total = customData[regionId]?.[totalCode]
+                        if (total === undefined) {
+                            total = 0
+                            categoryCodes.forEach((c) => {
+                                const v = customData[regionId]?.[c]
+                                if (v !== undefined && !isNaN(v)) total += parseFloat(v)
+                            })
+                        }
+                        if (total > 0) regionData[regionId] = total
+                    }
+                    if (Object.keys(regionData).length > 0) statData.setData(regionData)
+                    out.statData(totalStatKey, statData)
+                    delete out.stat_[totalStatKey]
+                } else {
+                    const baseFilters = filters ? { ...filters } : {}
+                    out.stat_[totalStatKey] = {
+                        eurostatDatasetCode,
+                        unitText,
+                        preprocess,
+                        transform,
+                        filters: { ...baseFilters, [categoryParameter]: totalCode },
+                    }
+                }
+            } else {
+                out[options.totalCodeKey] = undefined
+            }
+        }
+
+        return out
+    }
+}
+
+/**
+ * stat() and statData(). Attached after the layer stack: they override the thematic API a map has as its own layer 0.
+ * @param {*} out the map
+ */
+const attachStatAccessors = function (out) {
+    out.stat = function (k, v) {
+        //no argument: getter - return the default stat
+        if (!arguments.length) return out.stat_['default']
+
+        // Some layer types need to expand the public one-object stat config before it is
+        // registered on the shared map (for example, spark maps register one dataset per date).
+        // Keep stat()/statData() map-owned to avoid map <-> layer forwarding recursion, but let
+        // the active layer explicitly handle this specialized config shape when required.
+        if (arguments.length === 1 && k && typeof k === 'object' && !Array.isArray(k)) {
+            const layer = out.activeLayer?.()
+            const handler =
+                layer && Object.prototype.hasOwnProperty.call(layer, 'handleStatConfig') && typeof layer.handleStatConfig === 'function'
+                    ? layer.handleStatConfig
+                    : null
+            if (handler?.call(layer, k)) return out
+        }
+
+        //legacy multi-argument API for categorical composition stats:
+        // .stat('composition', statConfig, categoryParameter, categoryCodes, categoryLabels, categoryColors, totalCode)
+        if (
+            arguments.length > 2 &&
+            (typeof k === 'string' || k instanceof String) &&
+            v &&
+            typeof v === 'object' &&
+            typeof arguments[2] === 'string'
+        ) {
+            return out._registerCategoricalStatChannel(k, {
+                ...v,
+                categoryParameter: arguments[2],
+                categoryCodes: arguments[3],
+                categoryLabels: arguments[4],
+                categoryColors: arguments[5],
+                totalCode: arguments[6],
+            })
+        }
+
+        //two-or-more arguments: setter - set the config k with value v
+        if (arguments.length >= 2) {
+            if (isCategoricalStatConfig(v)) return out._registerCategoricalStatChannel(k, v)
+            if (v?.customData) return out._registerScalarCustomStat(k, v)
+            out.stat_[k] = v
+            return out
+        }
+        //one string argument: getter - return the config k
+        if (typeof k === 'string' || k instanceof String) return out.stat_[k]
+        //one non-string argument: setter - set the entire dictionnary
+        if (isCategoricalStatConfig(k)) return out._registerCategoricalStatChannel('default', k)
+        if (k?.customData) return out._registerScalarCustomStat('default', k)
+        out.stat_ = k.default ? k : { default: k }
+        return out
+    }
+
+    /**
+     * Retrieved statistical data, keyed by stat dataset name.
+     * Each value is a StatData instance.
+     * Lazily creates a new StatData entry if a key is accessed that doesn't yet exist.
+     *
+     * - `map.statData()` → returns the default StatData instance
+     * - `map.statData('color')` → returns the StatData instance for key 'color'
+     * - `map.statData('color', statDataInstance)` → sets StatData for key 'color'
+     *
+     * Use `.statData().setData({ regionId: value, ... })` to supply custom data
+     * directly without fetching from the Eurostat API.
+     *
+     * @example
+     * map.statData().setData({ DE: 120, FR: 95, IT: 88 })
+     */
+    out.statData_ = {
+        default: _stat_data__WEBPACK_IMPORTED_MODULE_0__.statData(),
+        color: _stat_data__WEBPACK_IMPORTED_MODULE_0__.statData(),
+        size: _stat_data__WEBPACK_IMPORTED_MODULE_0__.statData(),
+        v1: _stat_data__WEBPACK_IMPORTED_MODULE_0__.statData(),
+        v2: _stat_data__WEBPACK_IMPORTED_MODULE_0__.statData(), //bivariate
+        v3: _stat_data__WEBPACK_IMPORTED_MODULE_0__.statData(), //trivariate
+    }
+    out.statData = function (k, v) {
+        if (!arguments.length) return out.statData_['default']
+
+        // lazy create if not exist
+        if (arguments.length === 1) {
+            if (!out.statData_[k]) out.statData_[k] = _stat_data__WEBPACK_IMPORTED_MODULE_0__.statData()
+            return out.statData_[k]
+        }
+
+        // setter
+        out.statData_[k] = v
+        return out
+    }
+}
+
+
+/***/ },
+
 /***/ "./src/core/stat-data.js"
 /*!*******************************!*\
   !*** ./src/core/stat-data.js ***!
@@ -33737,7 +34277,7 @@ const statData = function (config) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   buildSingleLayerMap: () => (/* binding */ buildSingleLayerMap),
+/* harmony export */   buildSingleLayerMap: () => (/* reexport safe */ _single_layer_map__WEBPACK_IMPORTED_MODULE_18__.buildSingleLayerMap),
 /* harmony export */   createStatMap: () => (/* binding */ createStatMap),
 /* harmony export */   getURLParameters: () => (/* binding */ getURLParameters)
 /* harmony export */ });
@@ -33749,15 +34289,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tooltip_tooltip__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../tooltip/tooltip */ "./src/tooltip/tooltip.js");
 /* harmony import */ var _decoration_spinner__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./decoration/spinner */ "./src/core/decoration/spinner.js");
 /* harmony import */ var _decoration_label_layout__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./decoration/label-layout */ "./src/core/decoration/label-layout.js");
-/* harmony import */ var _map_instance__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./map-instance */ "./src/core/map-instance.js");
-/* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
-/* harmony import */ var _export__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./export */ "./src/core/export.js");
-/* harmony import */ var _cartograms__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./cartograms */ "./src/core/cartograms.js");
-/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./errors */ "./src/core/errors.js");
-/* harmony import */ var _option_check__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./option-check */ "./src/core/option-check.js");
-/* harmony import */ var _accessibility__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./accessibility */ "./src/core/accessibility.js");
-/* harmony import */ var _layer__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./layer */ "./src/core/layer.js");
-/* harmony import */ var _layer_registry__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./layer-registry */ "./src/core/layer-registry.js");
+/* harmony import */ var _stat_api__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./stat-api */ "./src/core/stat-api.js");
+/* harmony import */ var _map_instance__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./map-instance */ "./src/core/map-instance.js");
+/* harmony import */ var _geo_centroids__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var _export__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./export */ "./src/core/export.js");
+/* harmony import */ var _cartograms__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./cartograms */ "./src/core/cartograms.js");
+/* harmony import */ var _errors__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./errors */ "./src/core/errors.js");
+/* harmony import */ var _option_check__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./option-check */ "./src/core/option-check.js");
+/* harmony import */ var _accessibility__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./accessibility */ "./src/core/accessibility.js");
+/* harmony import */ var _layer__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./layer */ "./src/core/layer.js");
+/* harmony import */ var _layer_registry__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./layer-registry */ "./src/core/layer-registry.js");
+/* harmony import */ var _single_layer_map__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./single-layer-map */ "./src/core/single-layer-map.js");
+
 
 
 
@@ -33790,7 +34333,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 const createStatMap = function (config, withCenterPoints, mapType) {
     //build stat map from map template
-    const out = (0,_map_instance__WEBPACK_IMPORTED_MODULE_8__.createMapInstance)(config, withCenterPoints, mapType)
+    const out = (0,_map_instance__WEBPACK_IMPORTED_MODULE_9__.createMapInstance)(config, withCenterPoints, mapType)
 
     // build-completion latch
     out._geoDone_ = false
@@ -33827,180 +34370,12 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         return count
     }
 
-    /**
-     * Statistical data configuration dictionary.
-     * Keys are stat dataset names ('default', 'color', 'size', 'v1', 'v2', 'v3', etc.).
-     * The 'default' key is used by single-stat map types (choropleth, ps, etc.).
-     *
-     * As a getter/setter it behaves as follows:
-     *   - `map.stat()` → returns the default stat config
-     *   - `map.stat('color')` → returns the stat config for key 'color'
-     *   - `map.stat({ eurostatDatasetCode: 'demo_r_d3dens', ... })` → sets default stat config
-     *   - `map.stat('color', { eurostatDatasetCode: '...', ... })` → sets stat config for key 'color'
-     *
-     * @example
-     * map.stat({ eurostatDatasetCode: 'demo_r_d3dens', unitText: 'people/km²', filters: { TIME: '2024' } })
-     *
-     * @example
-     * // bivariate: set two independent datasets
-     * map.stat('v1', { eurostatDatasetCode: 'dataset_a' })
-     * map.stat('v2', { eurostatDatasetCode: 'dataset_b' })
-     */
-    out.stat_ = { default: undefined }
-    out.statChannels_ = {}
-    out.statMeta_ = out.statChannels_
-    out.encodings_ = {}
-
-    const isCategoricalStatConfig = function (config) {
-        return config && typeof config === 'object' && Array.isArray(config.categoryCodes)
-    }
-
-    const makeChannelStatKey = function (channel, code, prefix) {
-        if (prefix === '') return code
-        return `${prefix || channel}:${code}`
-    }
-
-    out._registerScalarCustomStat = function (key, config) {
-        const statData = _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(config)
-        statData.setData(config.customData)
-        out.statData(key, statData)
-        delete out.stat_[key]
-        return out
-    }
-
-    out._registerCategoricalStatChannel = function (channel, config, options = {}) {
-        if (config.stat) {
-            config = { ...config.stat, ...config }
-            delete config.stat
-        }
-
-        const {
-            eurostatDatasetCode,
-            customData,
-            filters,
-            unitText,
-            preprocess,
-            transform,
-            categoryParameter,
-            categoryCodes,
-            categoryLabels,
-            categoryColors,
-            totalCode,
-        } = config
-
-        if (!categoryCodes?.length) {
-            console.error('categoryCodes array is required')
-            return out
-        }
-
-        if (!options.totalCodeKey && channel === 'composition') {
-            const totalCodeKeysByMapType = {
-                pie: 'compositionTotalCode_',
-                waffle: 'waffleTotalCode_',
-                bar: 'barTotalCode_',
-            }
-            options.totalCodeKey = totalCodeKeysByMapType[out._mapType]
-        }
-
-        const isPrimaryCategoricalChannel = channel === 'default' || channel === 'composition' || channel === 'height'
-        const statKeyPrefix = options.statKeyPrefix === undefined ? (isPrimaryCategoricalChannel ? '' : channel) : options.statKeyPrefix
-        const statKeys = {}
-
-        for (let i = 0; i < categoryCodes.length; i++) {
-            const code = categoryCodes[i]
-            const statKey = makeChannelStatKey(channel, code, statKeyPrefix)
-            statKeys[code] = statKey
-
-            if (customData && !eurostatDatasetCode) {
-                const statData = _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData({ code, unitText: unitText || 'Value', preprocess, transform })
-                const regionData = {}
-                for (const regionId in customData) {
-                    const value = customData[regionId]?.[code]
-                    if (value !== undefined) regionData[regionId] = value
-                }
-                if (Object.keys(regionData).length > 0) statData.setData(regionData)
-                out.statData(statKey, statData)
-                delete out.stat_[statKey]
-            } else {
-                if (!eurostatDatasetCode) {
-                    console.error('eurostatDatasetCode is required')
-                    return out
-                }
-                if (!categoryParameter) {
-                    console.error('categoryParameter is required')
-                    return out
-                }
-                const baseFilters = filters ? { ...filters } : {}
-                out.stat_[statKey] = { eurostatDatasetCode, unitText, preprocess, transform, filters: { ...baseFilters, [categoryParameter]: code } }
-            }
-
-            if (categoryColors?.[i]) {
-                out.catColors_ = out.catColors_ || {}
-                out.catColors_[code] = categoryColors[i]
-            }
-            if (categoryLabels?.[i]) {
-                out.catLabels_ = out.catLabels_ || {}
-                out.catLabels_[code] = categoryLabels[i]
-            }
-        }
-
-        out.statChannels_[channel] = {
-            name: channel,
-            categoryCodes,
-            statKeys,
-            categoryLabels,
-            categoryColors,
-            unitText,
-            totalCode,
-        }
-
-        if (options.setStatCodes !== false) out.statCodes_ = categoryCodes
-
-        if (options.totalCodeKey) {
-            if (totalCode) {
-                const totalStatKey = makeChannelStatKey(channel, totalCode, statKeyPrefix)
-                out[options.totalCodeKey] = totalStatKey
-                out.statChannels_[channel].totalStatKey = totalStatKey
-
-                if (customData && !eurostatDatasetCode) {
-                    const statData = _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData({ code: totalCode, unitText: unitText || 'Value', preprocess, transform })
-                    const regionData = {}
-                    for (const regionId in customData) {
-                        let total = customData[regionId]?.[totalCode]
-                        if (total === undefined) {
-                            total = 0
-                            categoryCodes.forEach((c) => {
-                                const v = customData[regionId]?.[c]
-                                if (v !== undefined && !isNaN(v)) total += parseFloat(v)
-                            })
-                        }
-                        if (total > 0) regionData[regionId] = total
-                    }
-                    if (Object.keys(regionData).length > 0) statData.setData(regionData)
-                    out.statData(totalStatKey, statData)
-                    delete out.stat_[totalStatKey]
-                } else {
-                    const baseFilters = filters ? { ...filters } : {}
-                    out.stat_[totalStatKey] = {
-                        eurostatDatasetCode,
-                        unitText,
-                        preprocess,
-                        transform,
-                        filters: { ...baseFilters, [categoryParameter]: totalCode },
-                    }
-                }
-            } else {
-                out[options.totalCodeKey] = undefined
-            }
-        }
-
-        return out
-    }
+    ;(0,_stat_api__WEBPACK_IMPORTED_MODULE_8__.attachStatChannels)(out)
 
     // ── Layer 0 facade + thematic API ─────────────────────────────────────────────
     // The map is its own layer 0 until its type is migrated to a real Layer (Phase 3+).
     // makeMapSelfLayer installs the (relocated) encoding API onto the map.
-    ;(0,_layer__WEBPACK_IMPORTED_MODULE_15__.makeMapSelfLayer)(out)
+    ;(0,_layer__WEBPACK_IMPORTED_MODULE_16__.makeMapSelfLayer)(out)
 
     // ── Layer stack ───────────────────────────────────────────────────────────────
     out.layers_ = mapType ? [out] : [] // facade: the map is its own layer 0 if type specified, empty stack if not
@@ -34022,7 +34397,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
 
     out.addLayer = function (typeOrConfig, config) {
         const cfg = typeof typeOrConfig === 'string' ? { type: typeOrConfig, ...(config || {}) } : { ...typeOrConfig }
-        const role = cfg.role || (0,_layer_registry__WEBPACK_IMPORTED_MODULE_16__.getRole)(cfg.type)
+        const role = cfg.role || (0,_layer_registry__WEBPACK_IMPORTED_MODULE_17__.getRole)(cfg.type)
         const addingBase = role === 'base'
         const onlyFacade = out.layers_.length === 1 && out.layers_[0] === out
 
@@ -34036,7 +34411,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         }
 
         // Real Layer path is only available for REGISTERED types (Phase 3+).
-        if (!(0,_layer_registry__WEBPACK_IMPORTED_MODULE_16__.isLayerTypeRegistered)(cfg.type)) {
+        if (!(0,_layer_registry__WEBPACK_IMPORTED_MODULE_17__.isLayerTypeRegistered)(cfg.type)) {
             console.error(
                 `[eurostat-map] Layer type "${cfg.type}" is not yet available as a layer. ` +
                     `Use eurostatmap.map('${cfg.type}') for a standalone single-type map for now.`
@@ -34044,8 +34419,8 @@ const createStatMap = function (config, withCenterPoints, mapType) {
             return out.activeLayer()
         }
 
-        const layer = (0,_layer__WEBPACK_IMPORTED_MODULE_15__.createLayer)(out, cfg)
-        ;(0,_layer_registry__WEBPACK_IMPORTED_MODULE_16__.getLayerType)(cfg.type).decorate(layer, cfg)
+        const layer = (0,_layer__WEBPACK_IMPORTED_MODULE_16__.createLayer)(out, cfg)
+        ;(0,_layer_registry__WEBPACK_IMPORTED_MODULE_17__.getLayerType)(cfg.type).decorate(layer, cfg)
 
         if (addingBase) out.layers_.unshift(layer)
         else out.layers_.push(layer)
@@ -34095,94 +34470,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         return out
     }
 
-    out.stat = function (k, v) {
-        //no argument: getter - return the default stat
-        if (!arguments.length) return out.stat_['default']
-
-        // Some layer types need to expand the public one-object stat config before it is
-        // registered on the shared map (for example, spark maps register one dataset per date).
-        // Keep stat()/statData() map-owned to avoid map <-> layer forwarding recursion, but let
-        // the active layer explicitly handle this specialized config shape when required.
-        if (arguments.length === 1 && k && typeof k === 'object' && !Array.isArray(k)) {
-            const layer = out.activeLayer?.()
-            const handler =
-                layer && Object.prototype.hasOwnProperty.call(layer, 'handleStatConfig') && typeof layer.handleStatConfig === 'function'
-                    ? layer.handleStatConfig
-                    : null
-            if (handler?.call(layer, k)) return out
-        }
-
-        //legacy multi-argument API for categorical composition stats:
-        // .stat('composition', statConfig, categoryParameter, categoryCodes, categoryLabels, categoryColors, totalCode)
-        if (
-            arguments.length > 2 &&
-            (typeof k === 'string' || k instanceof String) &&
-            v &&
-            typeof v === 'object' &&
-            typeof arguments[2] === 'string'
-        ) {
-            return out._registerCategoricalStatChannel(k, {
-                ...v,
-                categoryParameter: arguments[2],
-                categoryCodes: arguments[3],
-                categoryLabels: arguments[4],
-                categoryColors: arguments[5],
-                totalCode: arguments[6],
-            })
-        }
-
-        //two-or-more arguments: setter - set the config k with value v
-        if (arguments.length >= 2) {
-            if (isCategoricalStatConfig(v)) return out._registerCategoricalStatChannel(k, v)
-            if (v?.customData) return out._registerScalarCustomStat(k, v)
-            out.stat_[k] = v
-            return out
-        }
-        //one string argument: getter - return the config k
-        if (typeof k === 'string' || k instanceof String) return out.stat_[k]
-        //one non-string argument: setter - set the entire dictionnary
-        if (isCategoricalStatConfig(k)) return out._registerCategoricalStatChannel('default', k)
-        if (k?.customData) return out._registerScalarCustomStat('default', k)
-        out.stat_ = k.default ? k : { default: k }
-        return out
-    }
-
-    /**
-     * Retrieved statistical data, keyed by stat dataset name.
-     * Each value is a StatData instance.
-     * Lazily creates a new StatData entry if a key is accessed that doesn't yet exist.
-     *
-     * - `map.statData()` → returns the default StatData instance
-     * - `map.statData('color')` → returns the StatData instance for key 'color'
-     * - `map.statData('color', statDataInstance)` → sets StatData for key 'color'
-     *
-     * Use `.statData().setData({ regionId: value, ... })` to supply custom data
-     * directly without fetching from the Eurostat API.
-     *
-     * @example
-     * map.statData().setData({ DE: 120, FR: 95, IT: 88 })
-     */
-    out.statData_ = {
-        default: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(),
-        color: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(),
-        size: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(),
-        v1: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(),
-        v2: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(), //bivariate
-        v3: _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData(), //trivariate
-    }
-    out.statData = function (k, v) {
-        if (!arguments.length) return out.statData_['default']
-
-        // lazy create if not exist
-        if (arguments.length === 1) {
-            if (!out.statData_[k]) out.statData_[k] = _stat_data__WEBPACK_IMPORTED_MODULE_2__.statData()
-            return out.statData_[k]
-        }
-
-        // setter
-        out.statData_[k] = v
-        return out
-    }
+    ;(0,_stat_api__WEBPACK_IMPORTED_MODULE_8__.attachStatAccessors)(out)
 
     /**
      * Text shown in the tooltip and legend for regions with no data.
@@ -34205,7 +34493,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
      * @default 500, or 0 when the reader asks the system for reduced motion
      * @example map.transitionDuration(0)
      */
-    out.transitionDuration_ = (0,_accessibility__WEBPACK_IMPORTED_MODULE_14__.prefersReducedMotion)() ? 0 : 500
+    out.transitionDuration_ = (0,_accessibility__WEBPACK_IMPORTED_MODULE_15__.prefersReducedMotion)() ? 0 : 500
     //specific tooltip text function
     out.tooltip_.textFunction = undefined
     /**
@@ -34347,7 +34635,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         }
         //set new legend config
         out.legend_ = v
-        ;(0,_option_check__WEBPACK_IMPORTED_MODULE_13__.warnMisspelledOptions)(v)
+        ;(0,_option_check__WEBPACK_IMPORTED_MODULE_14__.warnMisspelledOptions)(v)
         //update if existing legend
         if (out.legendObj_) out.updateLegend()
         return out
@@ -34500,7 +34788,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         const isFacade = layer === out
         const legendConfig = isFacade ? out.legend() : layer.legend_
         if (!legendConfig) return out
-        ;(0,_option_check__WEBPACK_IMPORTED_MODULE_13__.warnMisspelledOptions)(legendConfig)
+        ;(0,_option_check__WEBPACK_IMPORTED_MODULE_14__.warnMisspelledOptions)(legendConfig)
 
         const constructor = isFacade ? out.getLegendConstructor() : layer.getLegendConstructor()
         if (!layer.legendObj_) {
@@ -34510,7 +34798,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
             const update = legendObj.update
             legendObj.update = function (...args) {
                 const result = update.apply(this, args)
-                ;(0,_accessibility__WEBPACK_IMPORTED_MODULE_14__.setupLegendNavigation)(legendObj)
+                ;(0,_accessibility__WEBPACK_IMPORTED_MODULE_15__.setupLegendNavigation)(legendObj)
                 return result
             }
         }
@@ -34626,7 +34914,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
         let remaining = targets
         _geoTargetsPending = targets
 
-        ;(0,_map_instance__WEBPACK_IMPORTED_MODULE_8__.updateGeoMapTemplate)(() => {
+        ;(0,_map_instance__WEBPACK_IMPORTED_MODULE_9__.updateGeoMapTemplate)(() => {
             out._loadingGeoCount_ = Math.max(0, out._loadingGeoCount_ - 1)
             out.updateLoader()
 
@@ -34690,7 +34978,7 @@ const createStatMap = function (config, withCenterPoints, mapType) {
                         out.updateLoader()
                     }
 
-                    if (error) (0,_errors__WEBPACK_IMPORTED_MODULE_12__.reportMapError)(out, { type: 'data', statKey, message: error.userMessage || error.message, cause: error })
+                    if (error) (0,_errors__WEBPACK_IMPORTED_MODULE_13__.reportMapError)(out, { type: 'data', statKey, message: error.userMessage || error.message, cause: error })
 
                     if (!isStatDataReady()) return
 
@@ -34730,17 +35018,17 @@ const createStatMap = function (config, withCenterPoints, mapType) {
                 .select('#em-zoom-group-' + out.svgId_)
                 .selectAll('*')
                 .remove()
-            ;(0,_cartograms__WEBPACK_IMPORTED_MODULE_11__.buildGridCartogramBase)(out)
+            ;(0,_cartograms__WEBPACK_IMPORTED_MODULE_12__.buildGridCartogramBase)(out)
         }
 
         // filter out centroids without stat data
         if (withCenterPoints) {
             // insets
             if (out.insetTemplates_) {
-                (0,_utils__WEBPACK_IMPORTED_MODULE_0__.executeForAllInsets)(out.insetTemplates_, out.svgId_, _geo_centroids__WEBPACK_IMPORTED_MODULE_9__.refreshCentroids)
+                (0,_utils__WEBPACK_IMPORTED_MODULE_0__.executeForAllInsets)(out.insetTemplates_, out.svgId_, _geo_centroids__WEBPACK_IMPORTED_MODULE_10__.refreshCentroids)
             }
             //main map
-            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_9__.refreshCentroids)(out)
+            (0,_geo_centroids__WEBPACK_IMPORTED_MODULE_10__.refreshCentroids)(out)
         }
 
         out.updateAllLayers()
@@ -34836,11 +35124,11 @@ const createStatMap = function (config, withCenterPoints, mapType) {
     }
 
     out.exportMapToPNG = function (width, height, filename) {
-        return (0,_export__WEBPACK_IMPORTED_MODULE_10__.exportMapToPNG)(out, width, height, filename)
+        return (0,_export__WEBPACK_IMPORTED_MODULE_11__.exportMapToPNG)(out, width, height, filename)
     }
 
     out.exportMapToSVG = function (filename) {
-        return (0,_export__WEBPACK_IMPORTED_MODULE_10__.exportMapToSVG)(out, filename)
+        return (0,_export__WEBPACK_IMPORTED_MODULE_11__.exportMapToSVG)(out, filename)
     }
 
     return out
@@ -34858,201 +35146,7 @@ const getURLParameters = function () {
     return ps
 }
 
-/**
- * Builds a single-layer map instance for a given type and config.
- * Handles creating the frame, adding the layer, and forwarding legacy properties.
- *
- * @param {string} type
- * @param {object} config
- * @returns {MapInstance}
- */
-const buildSingleLayerMap = function (type, config) {
-    const role = (0,_layer_registry__WEBPACK_IMPORTED_MODULE_16__.getRole)(type)
-    const withCenterPoints = role === 'overlay' || type === 'bar' || type === 'barComposition'
-    const CANONICAL_MAP_TYPES = {
-        choropleth: 'ch',
-        ch: 'ch',
-        categorical: 'ct',
-        ct: 'ct',
-        proportionalSymbol: 'ps',
-        proportionalSymbols: 'ps',
-        ps: 'ps',
-        bivariateChoropleth: 'chbi',
-        chbi: 'chbi',
-        trivariateChoropleth: 'chtri',
-        ternary: 'chtri',
-        chtri: 'chtri',
-        stripeComposition: 'scomp',
-        stripe: 'scomp',
-        scomp: 'scomp',
-        pieChart: 'pie',
-        pie: 'pie',
-        composition: 'pie',
-        sparkline: 'spark',
-        spark: 'spark',
-        sparklines: 'spark',
-        flow: 'flow',
-        flowmap: 'flow',
-        coxcomb: 'coxcomb',
-        polar: 'coxcomb',
-    }
-    const canonicalType = CANONICAL_MAP_TYPES[type] || type
-    const out = createStatMap(config, withCenterPoints, canonicalType)
 
-    // Remove the self-facade layer so the real layer becomes layer 0.
-    out.layers_ = []
-
-    const layer = out.addLayer(type, config)
-    out.activeLayerIndex(0)
-
-    if (!layer || layer === out) return out
-
-    // Forwarding accessors for backwards compatibility
-    const baseFields = ['encodings_', 'catColors_', 'catLabels_', 'statCodes_', 'legend_', 'legendObj_', 'rankedBarChart_', 'rankedBarChartObj_', 'tooltip_']
-    const baseMethods = ['encoding', 'updateClassification', 'updateStyle', 'getLegendConstructor', 'legend', 'getRankedBarChartConstructor', 'rankedBarChart']
-
-    let typeFields = []
-    let typeMethods = []
-
-    if (type === 'choropleth' || type === 'ch') {
-        typeFields = [
-            'numberOfClasses_',
-            'classificationMethod_',
-            'thresholds_',
-            'makeClassifNice_',
-            'colorFunction_',
-            'classToFillStyle_',
-            'noDataFillStyle_',
-            'categoryFillStyle_',
-            'categoryText_',
-            'classifier_',
-            'colors_',
-            'colorSchemeType_',
-            'valueTransform_',
-            'valueUntransform_',
-            'colorStretch_',
-            'pointOfDivergence_',
-            'skipNormalization_',
-            'filtersDefinitionFunction_',
-            'domain_',
-        ]
-        typeMethods = [
-            'numberOfClasses',
-            'classificationMethod',
-            'thresholds',
-            'makeClassifNice',
-            'colorFunction',
-            'classToFillStyle',
-            'noDataFillStyle',
-            'categoryFillStyle',
-            'categoryText',
-            'classifier',
-            'colors',
-            'colorSchemeType',
-            'valueTransform',
-            'valueUntransform',
-            'colorStretch',
-            'pointOfDivergence',
-            'skipNormalization',
-            'threshold',
-            'filtersDefinitionFunction',
-            'highlightRegion',
-            'clearHighlight',
-        ]
-    } else if (type === 'proportionalSymbol' || type === 'proportionalSymbols' || type === 'ps') {
-        typeFields = [
-            'psMaxSize_',
-            'psMinSize_',
-            'psMaxValue_',
-            'psMinValue_',
-            'psFill_',
-            'psFillOpacity_',
-            'psStrokeOpacity_',
-            'psStroke_',
-            'psStrokeWidth_',
-            'classifierSize_',
-            'classifierColor_',
-            'psShape_',
-            'psCustomShape_',
-            'psBarWidth_',
-            'psClassToFillStyle_',
-            'psColorFun_',
-            'psSizeScale_',
-            'noDataFillStyle_',
-            'psThresholds_',
-            'psColors_',
-            'psCustomSVG_',
-            'psOffset_',
-            'psClassificationMethod_',
-            'psClasses_',
-            'dorling_',
-            'psSpikeWidth_',
-            'psCodeLabels_',
-            'psBrightenFactor_',
-            'dorlingSettings_',
-        ]
-        typeMethods = [
-            'psMaxSize',
-            'psMinSize',
-            'psMaxValue',
-            'psMinValue',
-            'psFill',
-            'psFillOpacity',
-            'psStrokeOpacity',
-            'psStroke',
-            'psStrokeWidth',
-            'classifierSize',
-            'classifierColor',
-            'psShape',
-            'psCustomShape',
-            'psBarWidth',
-            'psClassToFillStyle',
-            'psColorFun',
-            'psSizeScale',
-            'psThresholds',
-            'psColors',
-            'psCustomSVG',
-            'psOffset',
-            'psClassificationMethod',
-            'psClasses',
-            'psSpikeWidth',
-            'psCodeLabels',
-            'psBrightenFactor',
-            'psSettings',
-            'dorling',
-            'dorlingSettings',
-            'dorlingWorker',
-            'dorlingWorkerD3URL',
-        ]
-    }
-
-    // Every registered decorator may add its own fluent API. Discover it here so
-    // standalone maps retain the historical map.foo() facade without maintaining
-    // a second per-type list every time a layer is migrated.
-    // 'stat'/'statData' are skipped: attachThematicApi() already defines them on the
-    // layer as backwards-compat forwarders TO the map (layer.stat calls map.stat).
-    // The map's own 'stat'/'statData' are its real, authoritative implementations -
-    // wrapping them here to forward back to the layer would make map.stat() call
-    // layer.stat() call map.stat() forever.
-    Object.keys(layer).forEach((key) => {
-        if (key === 'map' || key === 'id' || key === 'type' || key === 'role' || key === 'isLayer') return
-        if (key === 'stat' || key === 'statData') return
-        if (key.endsWith('_')) typeFields.push(key)
-        else if (typeof layer[key] === 'function') typeMethods.push(key)
-    })
-
-    typeFields = [...new Set(typeFields)]
-    typeMethods = [...new Set(typeMethods)]
-
-    ;(0,_layer__WEBPACK_IMPORTED_MODULE_15__.forwardFieldsToActiveLayer)(out, [...baseFields, ...typeFields])
-
-    const allMethods = [...baseMethods, ...typeMethods]
-    for (const method of allMethods) {
-        ;(0,_layer__WEBPACK_IMPORTED_MODULE_15__.forwardChainableMethod)(out, method)
-    }
-
-    return out
-}
 
 
 /***/ },
@@ -39231,6 +39325,496 @@ const buildTooltipBreakdownHTML = function (regionId, out, getRegionTotalFn, spa
 
 /***/ },
 
+/***/ "./src/layers/composition/coxcomb-data.js"
+/*!************************************************!*\
+  !*** ./src/layers/composition/coxcomb-data.js ***!
+  \************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   buildMonthData: () => (/* binding */ buildMonthData),
+/* harmony export */   buildTooltipCache: () => (/* binding */ buildTooltipCache),
+/* harmony export */   computeCoxStatusMap: () => (/* binding */ computeCoxStatusMap),
+/* harmony export */   computeTotals: () => (/* binding */ computeTotals),
+/* harmony export */   createAngleScale: () => (/* binding */ createAngleScale),
+/* harmony export */   defineSizeScales: () => (/* binding */ defineSizeScales),
+/* harmony export */   getActiveKeys: () => (/* binding */ getActiveKeys),
+/* harmony export */   getCoxcombTopRadius: () => (/* binding */ getCoxcombTopRadius),
+/* harmony export */   getRegionTotal: () => (/* binding */ getRegionTotal)
+/* harmony export */ });
+/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/band.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _core_scale_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/scale.js */ "./src/core/scale.js");
+/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
+// The numbers behind a coxcomb map: totals, scales, per-period rows and tooltip tables. All state is on `out`.
+
+
+
+
+
+function buildTooltipCache(out) {
+    out._tooltipCache = new Map()
+    const months = out._coxTimes || []
+    const unit = out.statData(out.statCodes_[0])?.unitText() || ''
+
+    const allRegions = new Set()
+    months.forEach((month) => {
+        const stat = out.totalCode_ ? out.statData(`${month}:${out.totalCode_}`) : out.statData(`${month}:${out._coxCategoryCodes[0]}`)
+        if (stat?._data_) Object.keys(stat._data_).forEach((id) => allRegions.add(id))
+    })
+
+    allRegions.forEach((regionId) => {
+        const includeOther =
+            out.totalCode_ &&
+            months.some((month) => {
+                const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+                const sumCauses = out._coxCategoryCodes.reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
+                return totalVal > sumCauses
+            })
+
+        const causes = includeOther ? [...out._coxCategoryCodes, 'other'] : [...out._coxCategoryCodes]
+        const regionYearly = out.yearlyTotals?.[regionId] || 0
+        const monthlyTotals = out.monthlyTotals?.[regionId] || {}
+
+        const headerCells = [`<th class="em-breakdown-label">Month</th>`]
+        causes.forEach((cause) => {
+            const label = out.catLabels_[cause] || cause
+            const color = out.catColors_[cause] || (cause === 'other' ? '#FFCC80' : '#999')
+            headerCells.push(`<th class="em-breakdown-label" style="color:${color}">${label}</th>`)
+        })
+        headerCells.push(`<th class="em-breakdown-label">Total</th>`)
+
+        const rows = months.map((month, i) => {
+            const label = out._coxTimeLabels ? out._coxTimeLabels[i] : month
+            const cells = [`<td class="em-breakdown-label">${label}</td>`]
+            const monthSum = monthlyTotals[month] || 0
+
+            causes.forEach((cause) => {
+                let rawVal = 0
+                if (cause === 'other') {
+                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+                    const sumCauses = causes
+                        .filter((c) => c !== 'other')
+                        .reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
+                    rawVal = Math.max(totalVal - sumCauses, 0)
+                } else {
+                    rawVal = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
+                }
+                cells.push(rawVal > 0 ? `<td><span class="em-breakdown-value">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.spaceAsThousandSeparator)(rawVal)}</span></td>` : '<td></td>')
+            })
+
+            cells.push(monthSum > 0 ? `<td><span class="em-breakdown-value">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.spaceAsThousandSeparator)(monthSum)}</span></td>` : '<td></td>')
+            return `<tr>${cells.join('')}</tr>`
+        })
+
+        const yearRow =
+            regionYearly > 0
+                ? `<tr class="em-total"><td class="em-breakdown-label">Year total</td><td colspan="${causes.length}"></td><td><span class="em-breakdown-value">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.spaceAsThousandSeparator)(regionYearly)} ${unit}</span></td></tr>`
+                : ''
+
+        out._tooltipCache.set(
+            regionId,
+            `
+            <div class="em-tooltip-breakdown em-tooltip-cx">
+                <table class="em-tooltip-cx-table">
+                    <tr>${headerCells.join('')}</tr>
+                    ${rows.join('')}
+                    ${yearRow}
+                </table>
+            </div>`
+        )
+    })
+}
+
+// ── Totals computation ───────────────────────────────────────────────────
+
+/**
+ * Pre-compute per-region yearly and monthly totals.
+ * Stored on `out.yearlyTotals` and `out.monthlyTotals` for use during
+ * rendering and tooltip generation.
+ */
+function computeTotals(out) {
+    const yearlyTotals = {}
+    const monthlyTotals = {}
+
+    if (out.totalCode_) {
+        // Use the dedicated TOTAL series for each time period
+        out._coxTimes.forEach((month) => {
+            const stat = out.statData(`${month}:${out.totalCode_}`)
+            if (!stat?._data_) return
+
+            for (const region in stat._data_) {
+                const v = stat._data_[region]?.value || 0
+                monthlyTotals[region] = monthlyTotals[region] || {}
+                monthlyTotals[region][month] = v
+                yearlyTotals[region] = (yearlyTotals[region] || 0) + v
+            }
+        })
+    } else {
+        // Sum all categories per time period per region
+        out._coxTimes.forEach((month) => {
+            const perRegionMonthSum = {}
+
+            out._coxCategoryCodes.forEach((cause) => {
+                const stat = out.statData(`${month}:${cause}`)
+                if (!stat?._data_) return
+
+                for (const region in stat._data_) {
+                    const v = stat._data_[region]?.value || 0
+                    perRegionMonthSum[region] = (perRegionMonthSum[region] || 0) + v
+                }
+            })
+
+            for (const region in perRegionMonthSum) {
+                monthlyTotals[region] = monthlyTotals[region] || {}
+                monthlyTotals[region][month] = perRegionMonthSum[region]
+                yearlyTotals[region] = (yearlyTotals[region] || 0) + perRegionMonthSum[region]
+            }
+        })
+    }
+
+    out.yearlyTotals = yearlyTotals
+    out.monthlyTotals = monthlyTotals
+}
+
+/**
+ * Build a status map: regionId → {value: ':'} (no data), {value: 0} (has data), null (not in dataset).
+ * Used to style region polygons in mixed NUTS mode.
+ */
+function computeCoxStatusMap(out) {
+    const months = out._coxTimes || []
+    const cats = out._coxCategoryCodes || []
+    const useTotal = !!out.totalCode_
+    const status = new Map()
+
+    const regionIds = new Set()
+    const addIdsFrom = (key) => {
+        const st = out.statData(key)
+        if (st?._data_) Object.keys(st._data_).forEach((id) => regionIds.add(id))
+    }
+
+    months.forEach((m) => {
+        if (useTotal) addIdsFrom(`${m}:${out.totalCode_}`)
+        else cats.forEach((c) => addIdsFrom(`${m}:${c}`))
+    })
+
+    regionIds.forEach((id) => {
+        let seenAny = false,
+            seenND = false,
+            seenNumeric = false
+
+        months.forEach((m) => {
+            const entries = useTotal ? [out.statData(`${m}:${out.totalCode_}`)?.get(id)] : cats.map((c) => out.statData(`${m}:${c}`)?.get(id))
+
+            entries.forEach((e) => {
+                if (!e) return
+                seenAny = true
+                if (e.value === ':') seenND = true
+                else if (typeof e.value === 'number') seenNumeric = true
+            })
+        })
+
+        if (seenND) status.set(id, { value: ':' })
+        else if (seenAny || seenNumeric) status.set(id, { value: 0 })
+        else status.set(id, null)
+    })
+
+    out.coxStatus_ = status
+}
+
+function getRegionTotal(out, id) {
+    return out.yearlyTotals[id] !== undefined ? out.yearlyTotals[id] : undefined
+}
+
+/**
+ * Define the two size scales used for rendering:
+ *  - `classifierSize_`: maps yearly total → outer circle radius (area ∝ total)
+ *  - `classifierChartSize_`: maps a stacked value → inner/outer arc radius,
+ *    normalised within the region so proportions are preserved
+ */
+function defineSizeScales(out) {
+    const minRadius = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_3__.getResponsiveSymbolSize)(out.coxcombMinRadius_ || 0, 0)
+    const maxRadius = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_3__.getResponsiveSymbolSize)(out.coxcombMaxRadius_ || 80, 8)
+
+    const allMonthlyValues = []
+    for (const regionId in out.monthlyTotals) {
+        for (const month in out.monthlyTotals[regionId]) {
+            allMonthlyValues.push(out.monthlyTotals[regionId][month])
+        }
+    }
+
+    // Also check custom size legend values
+    const legendConfig = out.legend()
+    if (legendConfig && legendConfig.sizeLegend && Array.isArray(legendConfig.sizeLegend.values)) {
+        allMonthlyValues.push(...legendConfig.sizeLegend.values)
+    }
+
+    const radialScale = (0,_core_scale_js__WEBPACK_IMPORTED_MODULE_2__.createRadialScale)(allMonthlyValues, maxRadius, 0)
+    // minRadius is intentionally 0 here — the minimum chart size is enforced
+    // geometrically via a per-chart scaleFactor in drawCoxcombChart, which
+    // scales the entire chart group uniformly. Applying a floor in the scale
+    // itself corrupts stacked inner radii and distorts category proportions.
+
+    out.classifierChartSize_ = radialScale
+    out._globalMonthlyMax = radialScale.domain()[1]
+    out._globalMonthlyMin = radialScale.domain()[0]
+
+    // stub for API compatibility
+    out.classifierSize_ = radialScale
+}
+
+// ── Data helpers ─────────────────────────────────────────────────────────
+
+/**
+ * Get the maximum outer radius that appears at either the first or last
+ * time period. Used for grid cartogram text label placement.
+ */
+function getCoxcombTopRadius(out, regionId) {
+    const months = out._coxTimes
+    if (!months?.length) return 0
+
+    let maxR = 0
+    ;[months[0], months[months.length - 1]].forEach((month) => {
+        let stackSum = out._coxCategoryCodes.reduce((a, cause) => {
+            return a + (out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0)
+        }, 0)
+
+        if (out.totalCode_) {
+            const total = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+            if (total > stackSum) stackSum = total
+        }
+
+        const r = out.classifierChartSize_(stackSum)
+        if (r > maxR) maxR = r
+    })
+
+    return maxR
+}
+
+/**
+ * Build the per-time-period row data for a region, ready for d3.stack().
+ * Each row: { month, [category]: value, ..., other?: value }
+ *
+ * 'other' is computed as total − sum(categories) when totalCode is set
+ * and the difference is positive.
+ */
+function buildMonthData(out, regionId, months, causes) {
+    const rows = months
+        .map((month) => {
+            const row = { month }
+            let sumCauses = 0
+
+            causes.forEach((cause) => {
+                const val = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
+                row[cause] = val
+                sumCauses += val
+            })
+
+            if (out.totalCode_) {
+                const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+                const otherVal = totalVal > sumCauses ? totalVal - sumCauses : 0
+                if (otherVal > 0) row['other'] = otherVal
+            }
+
+            return Object.values(row).some((v) => v && v > 0) ? row : null
+        })
+        .filter(Boolean)
+
+    const hasOther = rows.some((r) => (r.other || 0) > 0)
+    if (hasOther) {
+        out._anyRegionHasOther_ = true
+    } else {
+        rows.forEach((r) => delete r.other)
+    }
+
+    return rows
+}
+
+function getActiveKeys(monthData, causes) {
+    const keys = [...causes]
+    if (monthData.some((d) => (d['other'] || 0) > 0)) keys.push('other')
+    return keys
+}
+
+function createAngleScale(months) {
+    return (0,d3_scale__WEBPACK_IMPORTED_MODULE_0__["default"])()
+        .domain(months)
+        .range([0, 2 * Math.PI])
+        .align(0)
+}
+
+
+/***/ },
+
+/***/ "./src/layers/composition/coxcomb-interactions.js"
+/*!********************************************************!*\
+  !*** ./src/layers/composition/coxcomb-interactions.js ***!
+  \********************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   addMouseEventsToGridCartogram: () => (/* binding */ addMouseEventsToGridCartogram),
+/* harmony export */   addMouseEventsToRegionPolygons: () => (/* binding */ addMouseEventsToRegionPolygons),
+/* harmony export */   addMouseEventsToRegions: () => (/* binding */ addMouseEventsToRegions),
+/* harmony export */   highlightCoxcombChart: () => (/* binding */ highlightCoxcombChart)
+/* harmony export */ });
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _coxcomb_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./coxcomb-data */ "./src/layers/composition/coxcomb-data.js");
+// Hover behaviour of a coxcomb map.
+
+
+
+
+// ── Mouse events ─────────────────────────────────────────────────────────
+
+/**
+ * Add tooltip mouse events to region polygons (like pie charts do).
+ * This allows users to hover over the region fill, not just the coxcomb chart.
+ */
+function addMouseEventsToRegionPolygons(out, map) {
+    const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getRegionsSelector)(map)
+    const regions = map.svg().selectAll(selector)
+
+    regions
+        .on('mouseenter', function (e, rg) {
+            if (!(0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_2__.getRegionTotal)(out, rg.properties.id)) return
+            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+            sel.attr('fill___', sel.style('fill'))
+            sel.style('fill', out.hoverColor_)
+            if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+        })
+        // .on('mousemove', function (e) {
+        //     if (out.map._tooltip) out.map._tooltip.mousemove(e)
+        // })
+        .on('mouseleave', function (e, rg) {
+            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+            const newFill = sel.attr('fill___')
+            if (newFill) {
+                sel.style('fill', newFill)
+                sel.attr('fill___', null)
+                if (out.map._tooltip) out.map._tooltip.mouseout()
+            }
+        })
+}
+
+/**
+ * Coxcomb mouse events are attached to the centroid symbol groups (not region
+ * paths) and include ring/chart stroke highlighting — distinct from the shared
+ * addMouseEventsToRegions which operates on plain region fills.
+ */
+function addMouseEventsToRegions(out, map) {
+    const shouldOmit = (id) => map.tooltip_.omitRegions?.includes(id)
+    const symbols = map.svg().selectAll('g.em-centroid')
+
+    // Cache to avoid repeated function calls on mousemove
+    let cachedRegion = null
+    let cachedSelection = null
+
+    symbols
+        .on('mouseenter', function (e, rg) {
+            if (shouldOmit(rg.properties.id) || !(0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_2__.getRegionTotal)(out, rg.properties.id)) return
+
+            // Cache for mousemove performance
+            cachedRegion = rg
+            cachedSelection = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+
+            cachedSelection.attr('fill___', cachedSelection.style('fill'))
+            cachedSelection.style('fill', out.hoverColor_)
+            highlightCoxcombChart(out, cachedSelection, true)
+            if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+        })
+        // .on('mousemove', function (e, rg) {
+        //     // Use cached data to avoid expensive checks on every mousemove
+        //     if (!cachedRegion) return
+        //     if (out.map._tooltip) out.map._tooltip.mousemove(e)
+        // })
+        .on('mouseleave', function (e, rg) {
+            // Use cached data for consistent behavior
+            if (!cachedRegion || !cachedSelection) return
+
+            cachedSelection.style('fill', cachedSelection.attr('fill___') || '')
+            cachedSelection.attr('fill___', null)
+            highlightCoxcombChart(out, cachedSelection, false)
+            if (out.map._tooltip) out.map._tooltip.mouseout()
+
+            // Clear cache
+            cachedRegion = null
+            cachedSelection = null
+        })
+}
+
+function addMouseEventsToGridCartogram(out, map) {
+    const shapes = out.svg().selectAll('#em-grid-container .em-grid-cell .em-grid-shape')
+    const charts = out.svg().selectAll('#em-grid-container .em-grid-cell .em-coxcomb')
+
+    const getRegionData = (el) => (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(el.closest('.em-grid-cell')).datum()
+
+    // Cache to avoid repeated DOM lookups on mousemove
+    let cachedRegion = null
+    let cachedCell = null
+
+    const handleMouseOver = function (e) {
+        const rg = getRegionData(this)
+        if (!rg || !(0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_2__.getRegionTotal)(out, rg.properties.id)) return
+
+        // Cache for mousemove performance
+        cachedRegion = rg
+        cachedCell = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this.closest('.em-grid-cell'))
+
+        const shape = cachedCell.select('.em-grid-shape')
+        shape.attr('fill___', shape.style('fill')).style('fill', out.hoverColor_)
+        highlightCoxcombChart(out, cachedCell, true)
+        if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
+    }
+
+    const handleMouseMove = function (e) {
+        // Use cached data to avoid expensive DOM lookups on every mousemove
+        if (!cachedRegion) return
+        if (out.map._tooltip) out.map._tooltip.mousemove(e)
+    }
+
+    const handleMouseOut = function (e) {
+        // Use cached data for consistent behavior
+        if (!cachedRegion || !cachedCell) return
+
+        const shape = cachedCell.select('.em-grid-shape')
+        shape.style('fill', shape.attr('fill___') || '').attr('fill___', null)
+        highlightCoxcombChart(out, cachedCell, false)
+        if (out.map._tooltip) out.map._tooltip.mouseout()
+
+        // Clear cache
+        cachedRegion = null
+        cachedCell = null
+    }
+
+    shapes.on('mouseenter', handleMouseOver).on('mousemove', handleMouseMove).on('mouseleave', handleMouseOut)
+    charts.style('pointer-events', 'all').on('mouseenter', handleMouseOver).on('mousemove', handleMouseMove).on('mouseleave', handleMouseOut)
+}
+
+/**
+ * Apply or remove hover highlight on a coxcomb chart.
+ * When rings are shown, the outer circle stroke width is scaled by zoom.
+ * Otherwise, the chart stroke color is changed.
+ *
+ * @param {Object} container - d3 selection containing the chart (centroid group or cell)
+ * @param {boolean} active - true = highlight on, false = highlight off
+ */
+function highlightCoxcombChart(out, container, active) {
+    const k = out._lastZoomK || 1
+    if (out.coxcombRings_) {
+        const outline = container.select('circle.em-coxcomb-max-outline').node()
+        if (outline) outline.style.setProperty('stroke-width', `${active ? 2 / k : 0.3 / k}px`, 'important')
+    } else {
+        container.selectAll('g.em-coxcomb-chart').style('stroke', active ? out.hoverColor_ : '#ffffff')
+    }
+}
+
+
+/***/ },
+
 /***/ "./src/layers/composition/map-bar.js"
 /*!*******************************************!*\
   !*** ./src/layers/composition/map-bar.js ***!
@@ -40351,24 +40935,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   decorateCoxcombLayer: () => (/* binding */ decorateCoxcombLayer),
 /* harmony export */   map: () => (/* binding */ map)
 /* harmony export */ });
-/* harmony import */ var d3_scale__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-scale */ "./node_modules/d3-scale/src/band.js");
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/arc.js");
-/* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/stack.js");
-/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../core/stat-map */ "./src/core/stat-map.js");
-/* harmony import */ var _core_stat_data__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../core/stat-data */ "./src/core/stat-data.js");
-/* harmony import */ var _core_layer_registry__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../core/layer-registry */ "./src/core/layer-registry.js");
-/* harmony import */ var _core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../core/decoration/pattern-fill */ "./src/core/decoration/pattern-fill.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
-/* harmony import */ var _legend_legend_coxcomb_js__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../legend/legend-coxcomb.js */ "./src/legend/legend-coxcomb.js");
-/* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/value.js");
-/* harmony import */ var _core_dorling_dorling__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../core/dorling/dorling */ "./src/core/dorling/dorling.js");
-/* harmony import */ var _core_cartograms__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../../core/cartograms */ "./src/core/cartograms.js");
-/* harmony import */ var _composition_composition_map__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../composition/composition-map */ "./src/layers/composition/composition-map.js");
-/* harmony import */ var _core_scale_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../core/scale.js */ "./src/core/scale.js");
-/* harmony import */ var _core_geo_centroids__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../core/geo/centroids */ "./src/core/geo/centroids.js");
-/* harmony import */ var _core_color_palettes__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../../core/color-palettes */ "./src/core/color-palettes.js");
-/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/arc.js");
+/* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/stack.js");
+/* harmony import */ var _core_stat_map__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/stat-map */ "./src/core/stat-map.js");
+/* harmony import */ var _core_stat_data__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../core/stat-data */ "./src/core/stat-data.js");
+/* harmony import */ var _core_layer_registry__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../core/layer-registry */ "./src/core/layer-registry.js");
+/* harmony import */ var _core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../core/decoration/pattern-fill */ "./src/core/decoration/pattern-fill.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_legend_coxcomb_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../legend/legend-coxcomb.js */ "./src/legend/legend-coxcomb.js");
+/* harmony import */ var d3_interpolate__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! d3-interpolate */ "./node_modules/d3-interpolate/src/value.js");
+/* harmony import */ var _core_dorling_dorling__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../core/dorling/dorling */ "./src/core/dorling/dorling.js");
+/* harmony import */ var _core_cartograms__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../core/cartograms */ "./src/core/cartograms.js");
+/* harmony import */ var _composition_composition_map__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../composition/composition-map */ "./src/layers/composition/composition-map.js");
+/* harmony import */ var _core_geo_centroids__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../../core/geo/centroids */ "./src/core/geo/centroids.js");
+/* harmony import */ var _core_color_palettes__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../../core/color-palettes */ "./src/core/color-palettes.js");
+/* harmony import */ var _core_responsive__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../../core/responsive */ "./src/core/responsive.js");
+/* harmony import */ var _coxcomb_data__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./coxcomb-data */ "./src/layers/composition/coxcomb-data.js");
+/* harmony import */ var _coxcomb_interactions__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./coxcomb-interactions */ "./src/layers/composition/coxcomb-interactions.js");
 
 
 
@@ -40407,7 +40991,7 @@ __webpack_require__.r(__webpack_exports__);
  * @returns {CoxcombMap}
  */
 const map = function (config) {
-    return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_4__.buildSingleLayerMap)('coxcomb', config)
+    return (0,_core_stat_map__WEBPACK_IMPORTED_MODULE_3__.buildSingleLayerMap)('coxcomb', config)
 }
 
 const decorateCoxcombLayer = function (out, config) {
@@ -40451,7 +41035,7 @@ const decorateCoxcombLayer = function (out, config) {
 
     // ── Getters/setters ──────────────────────────────────────────────────────
 
-    ;(0,_composition_composition_map__WEBPACK_IMPORTED_MODULE_13__.buildGetterSetters)(out, [
+    ;(0,_composition_composition_map__WEBPACK_IMPORTED_MODULE_12__.buildGetterSetters)(out, [
         'catColors_',
         'catLabels_',
         'noDataFillStyle_',
@@ -40507,7 +41091,7 @@ const decorateCoxcombLayer = function (out, config) {
         }
     })
 
-    ;(0,_composition_composition_map__WEBPACK_IMPORTED_MODULE_13__.applyConfigValues)(out, config, [
+    ;(0,_composition_composition_map__WEBPACK_IMPORTED_MODULE_12__.applyConfigValues)(out, config, [
         'coxcombSettings',
         'catColors',
         'catLabels',
@@ -40659,7 +41243,7 @@ const decorateCoxcombLayer = function (out, config) {
 
             const setStatData = (key, regionData) => {
                 if (Object.keys(regionData).length === 0) return
-                const statData = _core_stat_data__WEBPACK_IMPORTED_MODULE_5__.statData({ code: key, unitText: unitText || 'Value' })
+                const statData = _core_stat_data__WEBPACK_IMPORTED_MODULE_4__.statData({ code: key, unitText: unitText || 'Value' })
                 statData.setData(regionData)
                 out.statData(key, statData)
             }
@@ -40728,7 +41312,7 @@ const decorateCoxcombLayer = function (out, config) {
     //@override
     out.updateClassification = function () {
         if (out.insetTemplates_) {
-            (0,_core_utils__WEBPACK_IMPORTED_MODULE_8__.executeForAllInsets)(out.insetTemplates_, out.svgId_, applyClassificationToMap)
+            (0,_core_utils__WEBPACK_IMPORTED_MODULE_7__.executeForAllInsets)(out.insetTemplates_, out.svgId_, applyClassificationToMap)
         }
         applyClassificationToMap()
         return out
@@ -40742,221 +41326,10 @@ const decorateCoxcombLayer = function (out, config) {
             const index = out.statCodes_.indexOf('default')
             if (index > -1) out.statCodes_.splice(index, 1)
         }
-        computeTotals()
-        computeCoxStatusMap()
-        defineSizeScales()
-        buildTooltipCache()
-    }
-
-    function buildTooltipCache() {
-        out._tooltipCache = new Map()
-        const months = out._coxTimes || []
-        const unit = out.statData(out.statCodes_[0])?.unitText() || ''
-
-        const allRegions = new Set()
-        months.forEach((month) => {
-            const stat = out.totalCode_ ? out.statData(`${month}:${out.totalCode_}`) : out.statData(`${month}:${out._coxCategoryCodes[0]}`)
-            if (stat?._data_) Object.keys(stat._data_).forEach((id) => allRegions.add(id))
-        })
-
-        allRegions.forEach((regionId) => {
-            const includeOther =
-                out.totalCode_ &&
-                months.some((month) => {
-                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                    const sumCauses = out._coxCategoryCodes.reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
-                    return totalVal > sumCauses
-                })
-
-            const causes = includeOther ? [...out._coxCategoryCodes, 'other'] : [...out._coxCategoryCodes]
-            const regionYearly = out.yearlyTotals?.[regionId] || 0
-            const monthlyTotals = out.monthlyTotals?.[regionId] || {}
-
-            const headerCells = [`<th class="em-breakdown-label">Month</th>`]
-            causes.forEach((cause) => {
-                const label = out.catLabels_[cause] || cause
-                const color = out.catColors_[cause] || (cause === 'other' ? '#FFCC80' : '#999')
-                headerCells.push(`<th class="em-breakdown-label" style="color:${color}">${label}</th>`)
-            })
-            headerCells.push(`<th class="em-breakdown-label">Total</th>`)
-
-            const rows = months.map((month, i) => {
-                const label = out._coxTimeLabels ? out._coxTimeLabels[i] : month
-                const cells = [`<td class="em-breakdown-label">${label}</td>`]
-                const monthSum = monthlyTotals[month] || 0
-
-                causes.forEach((cause) => {
-                    let rawVal = 0
-                    if (cause === 'other') {
-                        const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                        const sumCauses = causes
-                            .filter((c) => c !== 'other')
-                            .reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
-                        rawVal = Math.max(totalVal - sumCauses, 0)
-                    } else {
-                        rawVal = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
-                    }
-                    cells.push(rawVal > 0 ? `<td><span class="em-breakdown-value">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_8__.spaceAsThousandSeparator)(rawVal)}</span></td>` : '<td></td>')
-                })
-
-                cells.push(monthSum > 0 ? `<td><span class="em-breakdown-value">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_8__.spaceAsThousandSeparator)(monthSum)}</span></td>` : '<td></td>')
-                return `<tr>${cells.join('')}</tr>`
-            })
-
-            const yearRow =
-                regionYearly > 0
-                    ? `<tr class="em-total"><td class="em-breakdown-label">Year total</td><td colspan="${causes.length}"></td><td><span class="em-breakdown-value">${(0,_core_utils__WEBPACK_IMPORTED_MODULE_8__.spaceAsThousandSeparator)(regionYearly)} ${unit}</span></td></tr>`
-                    : ''
-
-            out._tooltipCache.set(
-                regionId,
-                `
-            <div class="em-tooltip-breakdown em-tooltip-cx">
-                <table class="em-tooltip-cx-table">
-                    <tr>${headerCells.join('')}</tr>
-                    ${rows.join('')}
-                    ${yearRow}
-                </table>
-            </div>`
-            )
-        })
-    }
-
-    // ── Totals computation ───────────────────────────────────────────────────
-
-    /**
-     * Pre-compute per-region yearly and monthly totals.
-     * Stored on `out.yearlyTotals` and `out.monthlyTotals` for use during
-     * rendering and tooltip generation.
-     */
-    function computeTotals() {
-        const yearlyTotals = {}
-        const monthlyTotals = {}
-
-        if (out.totalCode_) {
-            // Use the dedicated TOTAL series for each time period
-            out._coxTimes.forEach((month) => {
-                const stat = out.statData(`${month}:${out.totalCode_}`)
-                if (!stat?._data_) return
-
-                for (const region in stat._data_) {
-                    const v = stat._data_[region]?.value || 0
-                    monthlyTotals[region] = monthlyTotals[region] || {}
-                    monthlyTotals[region][month] = v
-                    yearlyTotals[region] = (yearlyTotals[region] || 0) + v
-                }
-            })
-        } else {
-            // Sum all categories per time period per region
-            out._coxTimes.forEach((month) => {
-                const perRegionMonthSum = {}
-
-                out._coxCategoryCodes.forEach((cause) => {
-                    const stat = out.statData(`${month}:${cause}`)
-                    if (!stat?._data_) return
-
-                    for (const region in stat._data_) {
-                        const v = stat._data_[region]?.value || 0
-                        perRegionMonthSum[region] = (perRegionMonthSum[region] || 0) + v
-                    }
-                })
-
-                for (const region in perRegionMonthSum) {
-                    monthlyTotals[region] = monthlyTotals[region] || {}
-                    monthlyTotals[region][month] = perRegionMonthSum[region]
-                    yearlyTotals[region] = (yearlyTotals[region] || 0) + perRegionMonthSum[region]
-                }
-            })
-        }
-
-        out.yearlyTotals = yearlyTotals
-        out.monthlyTotals = monthlyTotals
-    }
-
-    /**
-     * Build a status map: regionId → {value: ':'} (no data), {value: 0} (has data), null (not in dataset).
-     * Used to style region polygons in mixed NUTS mode.
-     */
-    function computeCoxStatusMap() {
-        const months = out._coxTimes || []
-        const cats = out._coxCategoryCodes || []
-        const useTotal = !!out.totalCode_
-        const status = new Map()
-
-        const regionIds = new Set()
-        const addIdsFrom = (key) => {
-            const st = out.statData(key)
-            if (st?._data_) Object.keys(st._data_).forEach((id) => regionIds.add(id))
-        }
-
-        months.forEach((m) => {
-            if (useTotal) addIdsFrom(`${m}:${out.totalCode_}`)
-            else cats.forEach((c) => addIdsFrom(`${m}:${c}`))
-        })
-
-        regionIds.forEach((id) => {
-            let seenAny = false,
-                seenND = false,
-                seenNumeric = false
-
-            months.forEach((m) => {
-                const entries = useTotal ? [out.statData(`${m}:${out.totalCode_}`)?.get(id)] : cats.map((c) => out.statData(`${m}:${c}`)?.get(id))
-
-                entries.forEach((e) => {
-                    if (!e) return
-                    seenAny = true
-                    if (e.value === ':') seenND = true
-                    else if (typeof e.value === 'number') seenNumeric = true
-                })
-            })
-
-            if (seenND) status.set(id, { value: ':' })
-            else if (seenAny || seenNumeric) status.set(id, { value: 0 })
-            else status.set(id, null)
-        })
-
-        out.coxStatus_ = status
-    }
-
-    function getRegionTotal(id) {
-        return out.yearlyTotals[id] !== undefined ? out.yearlyTotals[id] : undefined
-    }
-
-    /**
-     * Define the two size scales used for rendering:
-     *  - `classifierSize_`: maps yearly total → outer circle radius (area ∝ total)
-     *  - `classifierChartSize_`: maps a stacked value → inner/outer arc radius,
-     *    normalised within the region so proportions are preserved
-     */
-    function defineSizeScales() {
-        const minRadius = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_17__.getResponsiveSymbolSize)(out.coxcombMinRadius_ || 0, 0)
-        const maxRadius = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_17__.getResponsiveSymbolSize)(out.coxcombMaxRadius_ || 80, 8)
-
-        const allMonthlyValues = []
-        for (const regionId in out.monthlyTotals) {
-            for (const month in out.monthlyTotals[regionId]) {
-                allMonthlyValues.push(out.monthlyTotals[regionId][month])
-            }
-        }
-
-        // Also check custom size legend values
-        const legendConfig = out.legend()
-        if (legendConfig && legendConfig.sizeLegend && Array.isArray(legendConfig.sizeLegend.values)) {
-            allMonthlyValues.push(...legendConfig.sizeLegend.values)
-        }
-
-        const radialScale = (0,_core_scale_js__WEBPACK_IMPORTED_MODULE_14__.createRadialScale)(allMonthlyValues, maxRadius, 0)
-        // minRadius is intentionally 0 here — the minimum chart size is enforced
-        // geometrically via a per-chart scaleFactor in drawCoxcombChart, which
-        // scales the entire chart group uniformly. Applying a floor in the scale
-        // itself corrupts stacked inner radii and distorts category proportions.
-
-        out.classifierChartSize_ = radialScale
-        out._globalMonthlyMax = radialScale.domain()[1]
-        out._globalMonthlyMin = radialScale.domain()[0]
-
-        // stub for API compatibility
-        out.classifierSize_ = radialScale
+        (0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.computeTotals)(out)
+        ;(0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.computeCoxStatusMap)(out)
+        ;(0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.defineSizeScales)(out)
+        ;(0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.buildTooltipCache)(out)
     }
 
     // ── Styling ──────────────────────────────────────────────────────────────
@@ -40968,13 +41341,13 @@ const decorateCoxcombLayer = function (out, config) {
         if (!out.catColors_) {
             out.catColors({})
             for (let i = 0; i < out.statCodes_.length; i++) {
-                out.catColors_[out.statCodes_[i]] = _core_color_palettes__WEBPACK_IMPORTED_MODULE_16__.DEFAULT_CATEGORICAL_COLORS[i % _core_color_palettes__WEBPACK_IMPORTED_MODULE_16__.DEFAULT_CATEGORICAL_COLORS.length]
+                out.catColors_[out.statCodes_[i]] = _core_color_palettes__WEBPACK_IMPORTED_MODULE_14__.DEFAULT_CATEGORICAL_COLORS[i % _core_color_palettes__WEBPACK_IMPORTED_MODULE_14__.DEFAULT_CATEGORICAL_COLORS.length]
             }
         }
 
         try {
             if (out.insetTemplates_) {
-                (0,_core_utils__WEBPACK_IMPORTED_MODULE_8__.executeForAllInsets)(out.insetTemplates_, out.svgId_, applyStyleToMap)
+                (0,_core_utils__WEBPACK_IMPORTED_MODULE_7__.executeForAllInsets)(out.insetTemplates_, out.svgId_, applyStyleToMap)
             }
             applyStyleToMap(out)
 
@@ -40985,12 +41358,12 @@ const decorateCoxcombLayer = function (out, config) {
             }
 
             if (out.dorling_ && !out.gridCartogram_) {
-                (0,_core_dorling_dorling__WEBPACK_IMPORTED_MODULE_11__.runDorlingSimulation)(
+                (0,_core_dorling_dorling__WEBPACK_IMPORTED_MODULE_10__.runDorlingSimulation)(
                     out,
                     (d) => {
                         const regionalMax = Math.max(...Object.values(out.monthlyTotals[d.properties.id] || { 0: 0 }))
                         const naturalMax = out.classifierChartSize_(regionalMax) || 0
-                        const minRadius = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_17__.getResponsiveSymbolSize)(out.coxcombMinRadius_ || 0, 0)
+                        const minRadius = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_15__.getResponsiveSymbolSize)(out.coxcombMinRadius_ || 0, 0)
                         // Mirror the scaleFactor logic in drawCoxcombChart so the Dorling
                         // simulation reserves the correct amount of space for enlarged charts.
                         const scaleFactor = naturalMax > 0 && naturalMax < minRadius ? minRadius / naturalMax : 1
@@ -40999,7 +41372,7 @@ const decorateCoxcombLayer = function (out, config) {
                     out.dorlingSettings_.padding || 0
                 )
             } else {
-                (0,_core_dorling_dorling__WEBPACK_IMPORTED_MODULE_11__.stopDorlingSimulation)(out)
+                (0,_core_dorling_dorling__WEBPACK_IMPORTED_MODULE_10__.stopDorlingSimulation)(out)
             }
 
             return out
@@ -41014,7 +41387,7 @@ const decorateCoxcombLayer = function (out, config) {
         if (map.gridCartogram_) {
             return map.svg().selectAll('#em-grid-container .em-grid-cell')
         }
-        return (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_15__.getCentroidsGroup)(map).selectAll('g.em-centroid')
+        return (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_13__.getCentroidsGroup)(map).selectAll('g.em-centroid')
     }
 
     function applyStyleToMap(map) {
@@ -41022,31 +41395,31 @@ const decorateCoxcombLayer = function (out, config) {
         if (!out.svg_) return
 
         if (map.gridCartogram_) {
-            const angle = createAngleScale(out._coxTimes)
+            const angle = (0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.createAngleScale)(out._coxTimes)
             applyStyleToGridCartogram(map, angle)
-            ;(0,_core_cartograms__WEBPACK_IMPORTED_MODULE_12__.adjustGridCartogramTextLabels)({
+            ;(0,_core_cartograms__WEBPACK_IMPORTED_MODULE_11__.adjustGridCartogramTextLabels)({
                 map,
                 getAnchors: getCoxcombAnchors,
-                getRadius: getCoxcombTopRadius,
+                getRadius: (regionId) => (0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.getCoxcombTopRadius)(out, regionId),
                 margin: 2,
             })
         } else {
-            const s = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_15__.getCentroidsGroup)(map)
+            const s = (0,_core_geo_centroids__WEBPACK_IMPORTED_MODULE_13__.getCentroidsGroup)(map)
             if (!s) return
 
             const regionFeatures = s
                 .selectAll('g.em-centroid')
                 .data()
-                .filter((rg) => getRegionTotal(rg.properties.id) !== undefined)
+                .filter((rg) => (0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.getRegionTotal)(out, rg.properties.id) !== undefined)
 
             applyStyleToRegionPolygons(map)
-            addMouseEventsToRegionPolygons(map)
-            addMouseEventsToRegions(map)
+            ;(0,_coxcomb_interactions__WEBPACK_IMPORTED_MODULE_17__.addMouseEventsToRegionPolygons)(out, map)
+            ;(0,_coxcomb_interactions__WEBPACK_IMPORTED_MODULE_17__.addMouseEventsToRegions)(out, map)
             addCoxcombChartsToMap(regionFeatures, map)
         }
 
         if (out.patternFill_) {
-            (0,_core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_7__.applyPatternFill)(map, out.patternFill_)
+            (0,_core_decoration_pattern_fill__WEBPACK_IMPORTED_MODULE_6__.applyPatternFill)(map, out.patternFill_)
         }
     }
 
@@ -41069,7 +41442,7 @@ const decorateCoxcombLayer = function (out, config) {
     function drawCoxcombChart(node, regionId, stackedData, keys, angle) {
         const regionMonthlyMax = Math.max(...Object.values(out.monthlyTotals[regionId] || { 0: 0 }))
         const naturalMax = out.classifierChartSize_(regionMonthlyMax)
-        const minRadius = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_17__.getResponsiveSymbolSize)(out.coxcombMinRadius_ || 0, 0)
+        const minRadius = (0,_core_responsive__WEBPACK_IMPORTED_MODULE_15__.getResponsiveSymbolSize)(out.coxcombMinRadius_ || 0, 0)
 
         // If this chart's largest wedge falls below minRadius, scale the entire
         // chart up uniformly so it remains legible. This preserves internal proportions
@@ -41099,7 +41472,7 @@ const decorateCoxcombLayer = function (out, config) {
         }
 
         // Arc generator — inner/outer radii are animated via attrTween
-        const arcGen = (0,d3_shape__WEBPACK_IMPORTED_MODULE_2__["default"])()
+        const arcGen = (0,d3_shape__WEBPACK_IMPORTED_MODULE_1__["default"])()
             .startAngle((d) => angle(d.data.month))
             .endAngle((d) => angle(d.data.month) + angle.bandwidth())
             .padAngle(0.01)
@@ -41126,8 +41499,8 @@ const decorateCoxcombLayer = function (out, config) {
                     // so d[0] correctly returns 0 for the first category and stacking
                     // boundaries are geometrically consistent. Chart enlargement for
                     // legibility is handled entirely by the scaleFactor transform on chartG.
-                    const iInner = (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_10__["default"])(0, out.classifierChartSize_(d[0]))
-                    const iOuter = (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_10__["default"])(0, out.classifierChartSize_(d[1]))
+                    const iInner = (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_9__["default"])(0, out.classifierChartSize_(d[0]))
+                    const iOuter = (0,d3_interpolate__WEBPACK_IMPORTED_MODULE_9__["default"])(0, out.classifierChartSize_(d[1]))
                     return (t) => arcGen.innerRadius(iInner(t)).outerRadius(iOuter(t))(d)
                 })
         })
@@ -41136,15 +41509,15 @@ const decorateCoxcombLayer = function (out, config) {
     function addCoxcombChartsToMap(regionFeatures, map) {
         const months = out._coxTimes
         const causes = out._coxCategoryCodes
-        const angle = createAngleScale(months)
+        const angle = (0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.createAngleScale)(months)
 
         regionFeatures.forEach((region) => {
             const regionId = region.properties.id
-            const monthData = buildMonthData(regionId, months, causes)
+            const monthData = (0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.buildMonthData)(out, regionId, months, causes)
             if (!monthData.length) return
 
-            const keys = getActiveKeys(monthData, causes)
-            const stacked = (0,d3_shape__WEBPACK_IMPORTED_MODULE_3__["default"])().keys(keys)(monthData)
+            const keys = (0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.getActiveKeys)(monthData, causes)
+            const stacked = (0,d3_shape__WEBPACK_IMPORTED_MODULE_2__["default"])().keys(keys)(monthData)
 
             // Create/join the container group at the centroid
             const centroid = map.svg().select('#ps' + regionId)
@@ -41175,14 +41548,14 @@ const decorateCoxcombLayer = function (out, config) {
             return 'cox_' + rg.properties.id
         })
         addCoxcombChartsToGridCartogram(regionIds, map, angle)
-        addMouseEventsToGridCartogram(map)
+        ;(0,_coxcomb_interactions__WEBPACK_IMPORTED_MODULE_17__.addMouseEventsToGridCartogram)(out, map)
     }
 
     function addCoxcombChartsToGridCartogram(regionIds, map, angle) {
         const months = out._coxTimes
         const causes = out._coxCategoryCodes
         const offsets = { ...(out.coxcombOffsets_ || { x: 0, y: 0 }) }
-        const sharedOffset = (0,_core_cartograms__WEBPACK_IMPORTED_MODULE_12__.getGridCartogramChartOffset)(out)
+        const sharedOffset = (0,_core_cartograms__WEBPACK_IMPORTED_MODULE_11__.getGridCartogramChartOffset)(out)
         offsets.x += sharedOffset.x
         offsets.y += sharedOffset.y
 
@@ -41195,11 +41568,11 @@ const decorateCoxcombLayer = function (out, config) {
             const node = out.svg().select('#cox_' + regionId)
             if (node.empty()) return
 
-            const monthData = buildMonthData(regionId, months, causes)
+            const monthData = (0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.buildMonthData)(out, regionId, months, causes)
             if (!monthData.length) return
 
-            const keys = getActiveKeys(monthData, causes)
-            const stacked = (0,d3_shape__WEBPACK_IMPORTED_MODULE_3__["default"])().keys(keys)(monthData)
+            const keys = (0,_coxcomb_data__WEBPACK_IMPORTED_MODULE_16__.getActiveKeys)(monthData, causes)
+            const stacked = (0,d3_shape__WEBPACK_IMPORTED_MODULE_2__["default"])().keys(keys)(monthData)
 
             node.selectAll('.em-coxcomb').remove()
 
@@ -41219,160 +41592,16 @@ const decorateCoxcombLayer = function (out, config) {
         })
     }
 
-    // ── Mouse events ─────────────────────────────────────────────────────────
-
-    /**
-     * Add tooltip mouse events to region polygons (like pie charts do).
-     * This allows users to hover over the region fill, not just the coxcomb chart.
-     */
-    function addMouseEventsToRegionPolygons(map) {
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_8__.getRegionsSelector)(map)
-        const regions = map.svg().selectAll(selector)
-
-        regions
-            .on('mouseenter', function (e, rg) {
-                if (!getRegionTotal(rg.properties.id)) return
-                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
-                sel.attr('fill___', sel.style('fill'))
-                sel.style('fill', out.hoverColor_)
-                if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-            })
-            // .on('mousemove', function (e) {
-            //     if (out.map._tooltip) out.map._tooltip.mousemove(e)
-            // })
-            .on('mouseleave', function (e, rg) {
-                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
-                const newFill = sel.attr('fill___')
-                if (newFill) {
-                    sel.style('fill', newFill)
-                    sel.attr('fill___', null)
-                    if (out.map._tooltip) out.map._tooltip.mouseout()
-                }
-            })
-    }
-
-    /**
-     * Coxcomb mouse events are attached to the centroid symbol groups (not region
-     * paths) and include ring/chart stroke highlighting — distinct from the shared
-     * addMouseEventsToRegions which operates on plain region fills.
-     */
-    function addMouseEventsToRegions(map) {
-        const shouldOmit = (id) => map.tooltip_.omitRegions?.includes(id)
-        const symbols = map.svg().selectAll('g.em-centroid')
-
-        // Cache to avoid repeated function calls on mousemove
-        let cachedRegion = null
-        let cachedSelection = null
-
-        symbols
-            .on('mouseenter', function (e, rg) {
-                if (shouldOmit(rg.properties.id) || !getRegionTotal(rg.properties.id)) return
-
-                // Cache for mousemove performance
-                cachedRegion = rg
-                cachedSelection = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
-
-                cachedSelection.attr('fill___', cachedSelection.style('fill'))
-                cachedSelection.style('fill', out.hoverColor_)
-                highlightCoxcombChart(cachedSelection, true)
-                if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-            })
-            // .on('mousemove', function (e, rg) {
-            //     // Use cached data to avoid expensive checks on every mousemove
-            //     if (!cachedRegion) return
-            //     if (out.map._tooltip) out.map._tooltip.mousemove(e)
-            // })
-            .on('mouseleave', function (e, rg) {
-                // Use cached data for consistent behavior
-                if (!cachedRegion || !cachedSelection) return
-
-                cachedSelection.style('fill', cachedSelection.attr('fill___') || '')
-                cachedSelection.attr('fill___', null)
-                highlightCoxcombChart(cachedSelection, false)
-                if (out.map._tooltip) out.map._tooltip.mouseout()
-
-                // Clear cache
-                cachedRegion = null
-                cachedSelection = null
-            })
-    }
-
-    function addMouseEventsToGridCartogram(map) {
-        const shapes = out.svg().selectAll('#em-grid-container .em-grid-cell .em-grid-shape')
-        const charts = out.svg().selectAll('#em-grid-container .em-grid-cell .em-coxcomb')
-
-        const getRegionData = (el) => (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(el.closest('.em-grid-cell')).datum()
-
-        // Cache to avoid repeated DOM lookups on mousemove
-        let cachedRegion = null
-        let cachedCell = null
-
-        const handleMouseOver = function (e) {
-            const rg = getRegionData(this)
-            if (!rg || !getRegionTotal(rg.properties.id)) return
-
-            // Cache for mousemove performance
-            cachedRegion = rg
-            cachedCell = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this.closest('.em-grid-cell'))
-
-            const shape = cachedCell.select('.em-grid-shape')
-            shape.attr('fill___', shape.style('fill')).style('fill', out.hoverColor_)
-            highlightCoxcombChart(cachedCell, true)
-            if (out.map._tooltip) out.map._tooltip.mouseover(out.tooltip_.textFunction(rg, out))
-        }
-
-        const handleMouseMove = function (e) {
-            // Use cached data to avoid expensive DOM lookups on every mousemove
-            if (!cachedRegion) return
-            if (out.map._tooltip) out.map._tooltip.mousemove(e)
-        }
-
-        const handleMouseOut = function (e) {
-            // Use cached data for consistent behavior
-            if (!cachedRegion || !cachedCell) return
-
-            const shape = cachedCell.select('.em-grid-shape')
-            shape.style('fill', shape.attr('fill___') || '').attr('fill___', null)
-            highlightCoxcombChart(cachedCell, false)
-            if (out.map._tooltip) out.map._tooltip.mouseout()
-
-            // Clear cache
-            cachedRegion = null
-            cachedCell = null
-        }
-
-        shapes.on('mouseenter', handleMouseOver).on('mousemove', handleMouseMove).on('mouseleave', handleMouseOut)
-        charts.style('pointer-events', 'all').on('mouseenter', handleMouseOver).on('mousemove', handleMouseMove).on('mouseleave', handleMouseOut)
-    }
-
-    /**
-     * Apply or remove hover highlight on a coxcomb chart.
-     * When rings are shown, the outer circle stroke width is scaled by zoom.
-     * Otherwise, the chart stroke color is changed.
-     *
-     * @param {Object} container - d3 selection containing the chart (centroid group or cell)
-     * @param {boolean} active - true = highlight on, false = highlight off
-     */
-    function highlightCoxcombChart(container, active) {
-        const k = out._lastZoomK || 1
-        if (out.coxcombRings_) {
-            const outline = container.select('circle.em-coxcomb-max-outline').node()
-            if (outline) outline.style.setProperty('stroke-width', `${active ? 2 / k : 0.3 / k}px`, 'important')
-        } else {
-            container.selectAll('g.em-coxcomb-chart').style('stroke', active ? out.hoverColor_ : '#ffffff')
-        }
-    }
-
     // ── Region polygon styling ────────────────────────────────────────────────
 
     function applyStyleToRegionPolygons(map) {
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_8__.getRegionsSelector)(map)
+        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_7__.getRegionsSelector)(map)
         const regions = map.svg().selectAll(selector)
         const status = out.coxStatus_
         // A region's own default/unnamed stat (independent of coxStatus_, coxcomb's own
         // composition-presence tracker) can hold an extra categorical value - colors the
         // region's polygon, same as ps/pie/bar/waffle - see buildCompositionCategoryColorFn().
-        const getCategoryColor = (0,_composition_composition_map__WEBPACK_IMPORTED_MODULE_13__.buildCompositionCategoryColorFn)(map, out)
+        const getCategoryColor = (0,_composition_composition_map__WEBPACK_IMPORTED_MODULE_12__.buildCompositionCategoryColorFn)(map, out)
 
         // For cntrg regions (RS, EL), we need to apply ecl to ALL paths inside, including Kosovo/XK
         // even though the cntrg container itself is excluded from the main selector
@@ -41405,7 +41634,7 @@ const decorateCoxcombLayer = function (out, config) {
     function styleMixedNUTSRegions(map, status, regions) {
         regions.each(function (rg) {
             if (this.parentNode.classList.contains('em-cntrg')) return
-            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
+            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
             const sv = status.get(rg.properties.id)
 
             if (sv == null) {
@@ -41423,90 +41652,10 @@ const decorateCoxcombLayer = function (out, config) {
         })
     }
 
-    // ── Data helpers ─────────────────────────────────────────────────────────
-
-    /**
-     * Get the maximum outer radius that appears at either the first or last
-     * time period. Used for grid cartogram text label placement.
-     */
-    function getCoxcombTopRadius(regionId) {
-        const months = out._coxTimes
-        if (!months?.length) return 0
-
-        let maxR = 0
-        ;[months[0], months[months.length - 1]].forEach((month) => {
-            let stackSum = out._coxCategoryCodes.reduce((a, cause) => {
-                return a + (out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0)
-            }, 0)
-
-            if (out.totalCode_) {
-                const total = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                if (total > stackSum) stackSum = total
-            }
-
-            const r = out.classifierChartSize_(stackSum)
-            if (r > maxR) maxR = r
-        })
-
-        return maxR
-    }
-
-    /**
-     * Build the per-time-period row data for a region, ready for d3.stack().
-     * Each row: { month, [category]: value, ..., other?: value }
-     *
-     * 'other' is computed as total − sum(categories) when totalCode is set
-     * and the difference is positive.
-     */
-    function buildMonthData(regionId, months, causes) {
-        const rows = months
-            .map((month) => {
-                const row = { month }
-                let sumCauses = 0
-
-                causes.forEach((cause) => {
-                    const val = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
-                    row[cause] = val
-                    sumCauses += val
-                })
-
-                if (out.totalCode_) {
-                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                    const otherVal = totalVal > sumCauses ? totalVal - sumCauses : 0
-                    if (otherVal > 0) row['other'] = otherVal
-                }
-
-                return Object.values(row).some((v) => v && v > 0) ? row : null
-            })
-            .filter(Boolean)
-
-        const hasOther = rows.some((r) => (r.other || 0) > 0)
-        if (hasOther) {
-            out._anyRegionHasOther_ = true
-        } else {
-            rows.forEach((r) => delete r.other)
-        }
-
-        return rows
-    }
-
-    function getActiveKeys(monthData, causes) {
-        const keys = [...causes]
-        if (monthData.some((d) => (d['other'] || 0) > 0)) keys.push('other')
-        return keys
-    }
-
-    function createAngleScale(months) {
-        return (0,d3_scale__WEBPACK_IMPORTED_MODULE_0__["default"])()
-            .domain(months)
-            .range([0, 2 * Math.PI])
-            .align(0)
-    }
-
     // ── Legend ───────────────────────────────────────────────────────────────
 
     out.getLegendConstructor = function () {
-        return _legend_legend_coxcomb_js__WEBPACK_IMPORTED_MODULE_9__.legend
+        return _legend_legend_coxcomb_js__WEBPACK_IMPORTED_MODULE_8__.legend
     }
 
     // ── Tooltip ──────────────────────────────────────────────────────────────
@@ -41521,8 +41670,8 @@ const decorateCoxcombLayer = function (out, config) {
     return out
 }
 
-;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_6__.registerLayerType)('coxcomb', 'overlay', decorateCoxcombLayer)
-;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_6__.registerLayerType)('polar', 'overlay', decorateCoxcombLayer)
+;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_5__.registerLayerType)('coxcomb', 'overlay', decorateCoxcombLayer)
+;(0,_core_layer_registry__WEBPACK_IMPORTED_MODULE_5__.registerLayerType)('polar', 'overlay', decorateCoxcombLayer)
 
 
 /***/ },
@@ -49783,6 +49932,285 @@ function appendSpikesToMap(map, sizeData, out, styleSource) {
 
 /***/ },
 
+/***/ "./src/legend/choropleth/bivariate-annotations.js"
+/*!********************************************************!*\
+  !*** ./src/legend/choropleth/bivariate-annotations.js ***!
+  \********************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   addCornerAnnotations: () => (/* binding */ addCornerAnnotations),
+/* harmony export */   appendMultilineText: () => (/* binding */ appendMultilineText),
+/* harmony export */   clamp: () => (/* binding */ clamp),
+/* harmony export */   getAnnotationLineEndOffset: () => (/* binding */ getAnnotationLineEndOffset),
+/* harmony export */   getAnnotationLineLength: () => (/* binding */ getAnnotationLineLength),
+/* harmony export */   getAnnotationOffset: () => (/* binding */ getAnnotationOffset),
+/* harmony export */   getLineEndpointToAnnotationLabel: () => (/* binding */ getLineEndpointToAnnotationLabel),
+/* harmony export */   splitMultilineText: () => (/* binding */ splitMultilineText)
+/* harmony export */ });
+// The labelled call-outs at the corners of the bivariate legend square, and its multi-line text.
+
+function addCornerAnnotations(out) {
+    if (!out.annotations) return
+
+    const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
+    const numberOfClasses = out.map.numberOfClasses_ || 3
+    const cellSize = out.squareSize / numberOfClasses
+    const corners = {
+        // Anchor each annotation at the center of the corresponding corner class cell.
+        topLeft: [cellSize / 2, cellSize / 2],
+        topRight: [out.squareSize - cellSize / 2, cellSize / 2],
+        bottomLeft: [cellSize / 2, out.squareSize - cellSize / 2],
+        bottomRight: [out.squareSize - cellSize / 2, out.squareSize - cellSize / 2],
+    }
+    const cx = out.squareSize / 2
+    const cy = out.squareSize / 2
+
+    const annotationsGroup = out.lgg
+        .append('g')
+        .attr('class', 'bivariate-corner-annotations')
+        .attr(
+            'transform',
+            `translate(${out.boxPadding + out._horizontalOffset},${xc + out._y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
+        )
+
+    Object.entries(corners).forEach(([cornerName, point]) => {
+        const text = out.annotations?.[cornerName]
+        if (!text || typeof text !== 'string' || !text.trim()) return
+
+        const [x0, y0] = point
+        const vx = x0 - cx
+        const vy = y0 - cy
+        const norm = Math.hypot(vx, vy) || 1
+        const ux = vx / norm
+        const uy = vy / norm
+        const cornerOffset = getAnnotationOffset(out, cornerName, ux, uy)
+        const cornerLineLength = getAnnotationLineLength(out, cornerName, ux, uy, cornerOffset)
+
+        const x1 = x0 + ux * cornerLineLength
+        const y1 = y0 + uy * cornerLineLength
+        const tx = x1 + cornerOffset.x
+        const ty = y1 + cornerOffset.y
+
+        const anchor = ux > 0.2 ? 'start' : ux < -0.2 ? 'end' : 'middle'
+        const lines = splitMultilineText(text)
+
+        const annotationLine = annotationsGroup
+            .append('line')
+            .attr('class', 'em-bivariate-corner-annotation-line')
+            .attr('x1', x0)
+            .attr('y1', y0)
+            .attr('x2', x1)
+            .attr('y2', y1)
+
+        const annotationText = annotationsGroup
+            .append('text')
+            .attr('class', 'em-bivariate-corner-annotation')
+            .attr('x', tx)
+            .attr('y', ty)
+            .attr('text-anchor', anchor)
+            .attr('dominant-baseline', 'middle')
+
+        if (out.rotation === -45) {
+            annotationText.attr('transform', `rotate(45 ${tx} ${ty})`)
+        }
+
+        appendMultilineText(annotationText, lines, tx)
+
+        const lineEndOffset = getAnnotationLineEndOffset(out, cornerName)
+        const lineEnd = getLineEndpointToAnnotationLabel(x0, y0, annotationText, x1, y1, lineEndOffset)
+        annotationLine.attr('x2', lineEnd.x).attr('y2', lineEnd.y)
+    })
+}
+
+function getLineEndpointToAnnotationLabel(x0, y0, annotationText, fallbackX, fallbackY, lineEndOffset = { x: 0, y: 0 }) {
+    const node = annotationText?.node && annotationText.node()
+    if (!node || typeof node.getBBox !== 'function') {
+        return { x: fallbackX + lineEndOffset.x, y: fallbackY + lineEndOffset.y }
+    }
+
+    const bbox = node.getBBox()
+    if (!bbox || !Number.isFinite(bbox.x) || !Number.isFinite(bbox.y)) {
+        return { x: fallbackX + lineEndOffset.x, y: fallbackY + lineEndOffset.y }
+    }
+
+    const closestX = clamp(x0, bbox.x, bbox.x + bbox.width)
+    const closestY = clamp(y0, bbox.y, bbox.y + bbox.height)
+
+    const vx = closestX - x0
+    const vy = closestY - y0
+    const vLen = Math.hypot(vx, vy)
+    if (!vLen) {
+        return { x: fallbackX + lineEndOffset.x, y: fallbackY + lineEndOffset.y }
+    }
+
+    const labelGap = 1.5
+    return {
+        x: closestX - (vx / vLen) * labelGap + lineEndOffset.x,
+        y: closestY - (vy / vLen) * labelGap + lineEndOffset.y,
+    }
+}
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value))
+}
+
+function getAnnotationLineEndOffset(out, cornerName) {
+    const defaultOffset = { x: 0, y: 0 }
+    const offsets = out.annotationLineEndOffsets
+
+    if (!offsets || typeof offsets !== 'object') {
+        return defaultOffset
+    }
+
+    const cornerOffset = offsets[cornerName]
+    if (cornerOffset && typeof cornerOffset === 'object') {
+        return {
+            x: typeof cornerOffset.x === 'number' && Number.isFinite(cornerOffset.x) ? cornerOffset.x : defaultOffset.x,
+            y: typeof cornerOffset.y === 'number' && Number.isFinite(cornerOffset.y) ? cornerOffset.y : defaultOffset.y,
+        }
+    }
+
+    if (typeof offsets.x === 'number' || typeof offsets.y === 'number') {
+        return {
+            x: typeof offsets.x === 'number' && Number.isFinite(offsets.x) ? offsets.x : defaultOffset.x,
+            y: typeof offsets.y === 'number' && Number.isFinite(offsets.y) ? offsets.y : defaultOffset.y,
+        }
+    }
+
+    return defaultOffset
+}
+
+function getAnnotationOffset(out, cornerName, ux, uy) {
+    const defaultOffset = { x: ux * 8, y: uy * 8, isCustom: false }
+    const offsets = out.annotationOffsets
+
+    if (offsets && typeof offsets === 'object') {
+        const cornerOffset = offsets[cornerName]
+        if (cornerOffset && typeof cornerOffset === 'object') {
+            const x = typeof cornerOffset.x === 'number' && Number.isFinite(cornerOffset.x) ? cornerOffset.x : defaultOffset.x
+            const y = typeof cornerOffset.y === 'number' && Number.isFinite(cornerOffset.y) ? cornerOffset.y : defaultOffset.y
+            return { x, y, isCustom: true }
+        }
+
+        const x = typeof offsets.x === 'number' && Number.isFinite(offsets.x) ? offsets.x : defaultOffset.x
+        const y = typeof offsets.y === 'number' && Number.isFinite(offsets.y) ? offsets.y : defaultOffset.y
+        if (typeof offsets.x === 'number' || typeof offsets.y === 'number') {
+            return { x, y, isCustom: true }
+        }
+    }
+
+    return defaultOffset
+}
+
+function getAnnotationLineLength(out, cornerName, ux, uy, cornerOffset) {
+    let baseLineLength = 18
+    const lineLengthConfig = out.annotationLineLength
+
+    if (typeof lineLengthConfig === 'number' && Number.isFinite(lineLengthConfig)) {
+        baseLineLength = lineLengthConfig
+    } else if (lineLengthConfig && typeof lineLengthConfig === 'object') {
+        const value = lineLengthConfig[cornerName]
+        if (typeof value === 'number' && Number.isFinite(value)) {
+            baseLineLength = value
+        }
+    }
+
+    // When per-annotation offsets are used, adapt the line so its end stays close to the moved label.
+    const radialOffset = cornerOffset?.isCustom ? ux * cornerOffset.x + uy * cornerOffset.y : 0
+    return Math.max(2, baseLineLength + radialOffset)
+}
+
+function splitMultilineText(text) {
+    if (typeof text !== 'string') return []
+    const breakPattern = new RegExp('<br\\s*\\/?>(?:\\r?\\n)?|\\r?\\n', 'gi')
+    return text
+        .split(breakPattern)
+        .map((line) => line.trim())
+        .filter(Boolean)
+}
+
+function appendMultilineText(textSelection, lines, x, centered = true) {
+    if (!lines.length) return
+    if (lines.length === 1) {
+        textSelection.text(lines[0])
+        return
+    }
+
+    const lineHeight = 1.15
+    const startDy = centered ? -((lines.length - 1) * lineHeight) / 2 : 0
+
+    lines.forEach((line, index) => {
+        textSelection
+            .append('tspan')
+            .attr('x', x)
+            .attr('dy', `${index === 0 ? startDy : lineHeight}em`)
+            .text(line)
+    })
+}
+
+
+/***/ },
+
+/***/ "./src/legend/choropleth/bivariate-highlight.js"
+/*!******************************************************!*\
+  !*** ./src/legend/choropleth/bivariate-highlight.js ***!
+  \******************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   highlightBivariateRegions: () => (/* binding */ highlightBivariateRegions),
+/* harmony export */   unhighlightBivariateRegions: () => (/* binding */ unhighlightBivariateRegions)
+/* harmony export */ });
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../legend */ "./src/legend/legend.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+
+
+
+
+// Highlight selected regions on mouseover
+function highlightBivariateRegions(map, ecl1, ecl2) {
+    const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getLegendRegionsSelector)(map)
+    const dimmedFill = _legend__WEBPACK_IMPORTED_MODULE_1__.getDimmedFill(map)
+    const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1]')
+
+    map._bivariateLegendHighlightActive = true
+
+    allRegions.each(function () {
+        const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+        if (!sel.attr('data-fill')) sel.attr('data-fill', sel.style('fill'))
+    })
+
+    allRegions.style('fill', dimmedFill)
+
+    allRegions
+        .filter(`[ecl1='${ecl1}']`)
+        .filter(`[ecl2='${ecl2}']`)
+        .filter(':not([nd])')
+        .each(function () {
+            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('fill', (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('data-fill'))
+        })
+}
+
+function unhighlightBivariateRegions(map) {
+    const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getLegendRegionsSelector)(map)
+    map.svg_
+        .selectAll(selector)
+        .selectAll('[ecl1],[ecl2]')
+        .each(function () {
+            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+            const original = sel.attr('data-fill')
+            if (original) sel.style('fill', original)
+        })
+    map._bivariateLegendHighlightActive = false
+}
+
+
+/***/ },
+
 /***/ "./src/legend/choropleth/legend-choropleth-bivariate.js"
 /*!**************************************************************!*\
   !*** ./src/legend/choropleth/legend-choropleth-bivariate.js ***!
@@ -49798,6 +50226,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../legend */ "./src/legend/legend.js");
 /* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/line.js");
 /* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _bivariate_annotations__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./bivariate-annotations */ "./src/legend/choropleth/bivariate-annotations.js");
+/* harmony import */ var _bivariate_highlight__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./bivariate-highlight */ "./src/legend/choropleth/bivariate-highlight.js");
+
+
 
 
 
@@ -50004,7 +50436,7 @@ const legend = function (map, config) {
         if (hasAxisArrow('x') || hasAxisArrow('y')) {
             addAxisArrows()
         }
-        addCornerAnnotations()
+        (0,_bivariate_annotations__WEBPACK_IMPORTED_MODULE_5__.addCornerAnnotations)(out)
 
         // Arrow defs
         const arrowDefs = out.lgg.append('defs')
@@ -50253,16 +50685,16 @@ const legend = function (map, config) {
                     .style('fill', fill)
                     .property('__emName', `${out.label1 || 'First variable'}: class ${ecl1 + 1} of ${numberOfClasses}. ${out.label2 || 'Second variable'}: class ${ecl2 + 1} of ${numberOfClasses}.`)
                     .on('mouseover', function () {
-                        highlightBivariateRegions(out.map, ecl1, ecl2)
+                        ;(0,_bivariate_highlight__WEBPACK_IMPORTED_MODULE_6__.highlightBivariateRegions)(out.map, ecl1, ecl2)
                         if (out.map.insetTemplates_) {
-                            (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, highlightBivariateRegions, ecl1, ecl2)
+                            (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, _bivariate_highlight__WEBPACK_IMPORTED_MODULE_6__.highlightBivariateRegions, ecl1, ecl2)
                         }
                         (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).raise() // raise legend square to avoid stroke issue
                     })
                     .on('mouseout', function () {
-                        unhighlightBivariateRegions(out.map)
+                        (0,_bivariate_highlight__WEBPACK_IMPORTED_MODULE_6__.unhighlightBivariateRegions)(out.map)
                         if (out.map.insetTemplates_) {
-                            (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, unhighlightBivariateRegions, ecl1, ecl2)
+                            (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, _bivariate_highlight__WEBPACK_IMPORTED_MODULE_6__.unhighlightBivariateRegions, ecl1, ecl2)
                         }
                     })
             }
@@ -50378,11 +50810,11 @@ const legend = function (map, config) {
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'hanging')
             .attr('alignment-baseline', 'hanging')
-        appendMultilineText(xAxisTitle, splitMultilineText(out.label1), xAxisTitleX, false)
+        ;(0,_bivariate_annotations__WEBPACK_IMPORTED_MODULE_5__.appendMultilineText)(xAxisTitle, (0,_bivariate_annotations__WEBPACK_IMPORTED_MODULE_5__.splitMultilineText)(out.label1), xAxisTitleX, false)
 
         // Y axis title centered on the Y arrow segment and placed outside arrow + endpoint labels.
         const yAxisTitlePadding = 12
-        const yAxisTitleLines = splitMultilineText(out.label2)
+        const yAxisTitleLines = (0,_bivariate_annotations__WEBPACK_IMPORTED_MODULE_5__.splitMultilineText)(out.label2)
         let yAxisTitleX = out._yAxisArrowX - (hasAxisArrow('y') ? out.arrowHeight + yAxisTitlePadding : 8 + yAxisTitlePadding)
         let yAxisTitleY = (spans.yStart + spans.yEnd) / 2
 
@@ -50408,7 +50840,7 @@ const legend = function (map, config) {
             .attr('y', yAxisTitleY)
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'middle')
-        appendMultilineText(yAxisTitle, yAxisTitleLines, yAxisTitleX)
+        ;(0,_bivariate_annotations__WEBPACK_IMPORTED_MODULE_5__.appendMultilineText)(yAxisTitle, yAxisTitleLines, yAxisTitleX)
 
         const yAxisTitleRotation = out.rotation === -45 ? 90 : -90
         yAxisTitle.attr('transform', `rotate(${yAxisTitleRotation} ${yAxisTitleX} ${yAxisTitleY})`)
@@ -50479,205 +50911,6 @@ const legend = function (map, config) {
                 .attr('text-anchor', 'middle')
                 .attr('dominant-baseline', 'middle')
         }
-    }
-
-    function addCornerAnnotations() {
-        if (!out.annotations) return
-
-        const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
-        const numberOfClasses = out.map.numberOfClasses_ || 3
-        const cellSize = out.squareSize / numberOfClasses
-        const corners = {
-            // Anchor each annotation at the center of the corresponding corner class cell.
-            topLeft: [cellSize / 2, cellSize / 2],
-            topRight: [out.squareSize - cellSize / 2, cellSize / 2],
-            bottomLeft: [cellSize / 2, out.squareSize - cellSize / 2],
-            bottomRight: [out.squareSize - cellSize / 2, out.squareSize - cellSize / 2],
-        }
-        const cx = out.squareSize / 2
-        const cy = out.squareSize / 2
-
-        const annotationsGroup = out.lgg
-            .append('g')
-            .attr('class', 'bivariate-corner-annotations')
-            .attr(
-                'transform',
-                `translate(${out.boxPadding + out._horizontalOffset},${xc + out._y}) rotate(${out.rotation}) translate(${out.boxPadding},0)`
-            )
-
-        Object.entries(corners).forEach(([cornerName, point]) => {
-            const text = out.annotations?.[cornerName]
-            if (!text || typeof text !== 'string' || !text.trim()) return
-
-            const [x0, y0] = point
-            const vx = x0 - cx
-            const vy = y0 - cy
-            const norm = Math.hypot(vx, vy) || 1
-            const ux = vx / norm
-            const uy = vy / norm
-            const cornerOffset = getAnnotationOffset(cornerName, ux, uy)
-            const cornerLineLength = getAnnotationLineLength(cornerName, ux, uy, cornerOffset)
-
-            const x1 = x0 + ux * cornerLineLength
-            const y1 = y0 + uy * cornerLineLength
-            const tx = x1 + cornerOffset.x
-            const ty = y1 + cornerOffset.y
-
-            const anchor = ux > 0.2 ? 'start' : ux < -0.2 ? 'end' : 'middle'
-            const lines = splitMultilineText(text)
-
-            const annotationLine = annotationsGroup
-                .append('line')
-                .attr('class', 'em-bivariate-corner-annotation-line')
-                .attr('x1', x0)
-                .attr('y1', y0)
-                .attr('x2', x1)
-                .attr('y2', y1)
-
-            const annotationText = annotationsGroup
-                .append('text')
-                .attr('class', 'em-bivariate-corner-annotation')
-                .attr('x', tx)
-                .attr('y', ty)
-                .attr('text-anchor', anchor)
-                .attr('dominant-baseline', 'middle')
-
-            if (out.rotation === -45) {
-                annotationText.attr('transform', `rotate(45 ${tx} ${ty})`)
-            }
-
-            appendMultilineText(annotationText, lines, tx)
-
-            const lineEndOffset = getAnnotationLineEndOffset(cornerName)
-            const lineEnd = getLineEndpointToAnnotationLabel(x0, y0, annotationText, x1, y1, lineEndOffset)
-            annotationLine.attr('x2', lineEnd.x).attr('y2', lineEnd.y)
-        })
-    }
-
-    function getLineEndpointToAnnotationLabel(x0, y0, annotationText, fallbackX, fallbackY, lineEndOffset = { x: 0, y: 0 }) {
-        const node = annotationText?.node && annotationText.node()
-        if (!node || typeof node.getBBox !== 'function') {
-            return { x: fallbackX + lineEndOffset.x, y: fallbackY + lineEndOffset.y }
-        }
-
-        const bbox = node.getBBox()
-        if (!bbox || !Number.isFinite(bbox.x) || !Number.isFinite(bbox.y)) {
-            return { x: fallbackX + lineEndOffset.x, y: fallbackY + lineEndOffset.y }
-        }
-
-        const closestX = clamp(x0, bbox.x, bbox.x + bbox.width)
-        const closestY = clamp(y0, bbox.y, bbox.y + bbox.height)
-
-        const vx = closestX - x0
-        const vy = closestY - y0
-        const vLen = Math.hypot(vx, vy)
-        if (!vLen) {
-            return { x: fallbackX + lineEndOffset.x, y: fallbackY + lineEndOffset.y }
-        }
-
-        const labelGap = 1.5
-        return {
-            x: closestX - (vx / vLen) * labelGap + lineEndOffset.x,
-            y: closestY - (vy / vLen) * labelGap + lineEndOffset.y,
-        }
-    }
-
-    function clamp(value, min, max) {
-        return Math.max(min, Math.min(max, value))
-    }
-
-    function getAnnotationLineEndOffset(cornerName) {
-        const defaultOffset = { x: 0, y: 0 }
-        const offsets = out.annotationLineEndOffsets
-
-        if (!offsets || typeof offsets !== 'object') {
-            return defaultOffset
-        }
-
-        const cornerOffset = offsets[cornerName]
-        if (cornerOffset && typeof cornerOffset === 'object') {
-            return {
-                x: typeof cornerOffset.x === 'number' && Number.isFinite(cornerOffset.x) ? cornerOffset.x : defaultOffset.x,
-                y: typeof cornerOffset.y === 'number' && Number.isFinite(cornerOffset.y) ? cornerOffset.y : defaultOffset.y,
-            }
-        }
-
-        if (typeof offsets.x === 'number' || typeof offsets.y === 'number') {
-            return {
-                x: typeof offsets.x === 'number' && Number.isFinite(offsets.x) ? offsets.x : defaultOffset.x,
-                y: typeof offsets.y === 'number' && Number.isFinite(offsets.y) ? offsets.y : defaultOffset.y,
-            }
-        }
-
-        return defaultOffset
-    }
-
-    function getAnnotationOffset(cornerName, ux, uy) {
-        const defaultOffset = { x: ux * 8, y: uy * 8, isCustom: false }
-        const offsets = out.annotationOffsets
-
-        if (offsets && typeof offsets === 'object') {
-            const cornerOffset = offsets[cornerName]
-            if (cornerOffset && typeof cornerOffset === 'object') {
-                const x = typeof cornerOffset.x === 'number' && Number.isFinite(cornerOffset.x) ? cornerOffset.x : defaultOffset.x
-                const y = typeof cornerOffset.y === 'number' && Number.isFinite(cornerOffset.y) ? cornerOffset.y : defaultOffset.y
-                return { x, y, isCustom: true }
-            }
-
-            const x = typeof offsets.x === 'number' && Number.isFinite(offsets.x) ? offsets.x : defaultOffset.x
-            const y = typeof offsets.y === 'number' && Number.isFinite(offsets.y) ? offsets.y : defaultOffset.y
-            if (typeof offsets.x === 'number' || typeof offsets.y === 'number') {
-                return { x, y, isCustom: true }
-            }
-        }
-
-        return defaultOffset
-    }
-
-    function getAnnotationLineLength(cornerName, ux, uy, cornerOffset) {
-        let baseLineLength = 18
-        const lineLengthConfig = out.annotationLineLength
-
-        if (typeof lineLengthConfig === 'number' && Number.isFinite(lineLengthConfig)) {
-            baseLineLength = lineLengthConfig
-        } else if (lineLengthConfig && typeof lineLengthConfig === 'object') {
-            const value = lineLengthConfig[cornerName]
-            if (typeof value === 'number' && Number.isFinite(value)) {
-                baseLineLength = value
-            }
-        }
-
-        // When per-annotation offsets are used, adapt the line so its end stays close to the moved label.
-        const radialOffset = cornerOffset?.isCustom ? ux * cornerOffset.x + uy * cornerOffset.y : 0
-        return Math.max(2, baseLineLength + radialOffset)
-    }
-
-    function splitMultilineText(text) {
-        if (typeof text !== 'string') return []
-        const breakPattern = new RegExp('<br\\s*\\/?>(?:\\r?\\n)?|\\r?\\n', 'gi')
-        return text
-            .split(breakPattern)
-            .map((line) => line.trim())
-            .filter(Boolean)
-    }
-
-    function appendMultilineText(textSelection, lines, x, centered = true) {
-        if (!lines.length) return
-        if (lines.length === 1) {
-            textSelection.text(lines[0])
-            return
-        }
-
-        const lineHeight = 1.15
-        const startDy = centered ? -((lines.length - 1) * lineHeight) / 2 : 0
-
-        lines.forEach((line, index) => {
-            textSelection
-                .append('tspan')
-                .attr('x', x)
-                .attr('dy', `${index === 0 ? startDy : lineHeight}em`)
-                .text(line)
-        })
     }
 
     function addAxisArrows() {
@@ -50789,43 +51022,6 @@ const legend = function (map, config) {
         if (Array.isArray(out.breaks2) && out.breaks2.length) {
             out._yAxisArrowX -= (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getFontSizeFromClass)('em-bivariate-tick-label')
         }
-    }
-
-    // Highlight selected regions on mouseover
-    function highlightBivariateRegions(map, ecl1, ecl2) {
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getLegendRegionsSelector)(map)
-        const dimmedFill = _legend__WEBPACK_IMPORTED_MODULE_2__.getDimmedFill(map)
-        const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1]')
-
-        map._bivariateLegendHighlightActive = true
-
-        allRegions.each(function () {
-            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
-            if (!sel.attr('data-fill')) sel.attr('data-fill', sel.style('fill'))
-        })
-
-        allRegions.style('fill', dimmedFill)
-
-        allRegions
-            .filter(`[ecl1='${ecl1}']`)
-            .filter(`[ecl2='${ecl2}']`)
-            .filter(':not([nd])')
-            .each(function () {
-                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('fill', (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).attr('data-fill'))
-            })
-    }
-
-    function unhighlightBivariateRegions(map) {
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getLegendRegionsSelector)(map)
-        map.svg_
-            .selectAll(selector)
-            .selectAll('[ecl1],[ecl2]')
-            .each(function () {
-                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
-                const original = sel.attr('data-fill')
-                if (original) sel.style('fill', original)
-            })
-        map._bivariateLegendHighlightActive = false
     }
 
     return out
