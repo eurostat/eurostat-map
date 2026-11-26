@@ -12,7 +12,7 @@ import { exportMapToPNG, exportMapToSVG } from './export'
 import { buildGridCartogramBase } from './cartograms'
 import { reportMapError } from './errors'
 import { warnMisspelledOptions } from './option-check'
-import { prefersReducedMotion, setupKeyboardNavigation } from './accessibility'
+import { prefersReducedMotion, setupLegendNavigation } from './accessibility'
 import { createLayer, makeMapSelfLayer, forwardFieldsToActiveLayer, forwardChainableMethod } from './layer'
 import { getRole, isLayerTypeRegistered, getLayerType } from './layer-registry'
 
@@ -745,6 +745,14 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         const constructor = isFacade ? out.getLegendConstructor() : layer.getLegendConstructor()
         if (!layer.legendObj_) {
             layer.legendObj_ = constructor(layer, legendConfig)
+            // every redraw of a legend replaces its items: make them reachable from the keyboard again
+            const legendObj = layer.legendObj_
+            const update = legendObj.update
+            legendObj.update = function (...args) {
+                const result = update.apply(this, args)
+                setupLegendNavigation(legendObj)
+                return result
+            }
         }
         const legend = layer.legendObj_
 

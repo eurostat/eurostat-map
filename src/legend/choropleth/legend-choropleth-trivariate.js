@@ -177,6 +177,8 @@ export const legend = function (map, /** @type {TrivariateLegendConfig} */ confi
                     activeLegendIndex = null
 
                     highlightRegionsByColor(map, color)
+                    // the colour cells carry no text: this is what the keyboard navigation announces
+                    el.node().__emName = describeColourCell(map, color)
 
                     if (map.insetTemplates_) {
                         executeForAllInsets(map.insetTemplates_, map.svgId, highlightRegionsByColor, color)
@@ -248,6 +250,18 @@ function highlightRegionsByColor(map, color) {
         const original = normalizeColor(sel.attr('fill___'))
         sel.style('opacity', original === target ? 1 : 0.15)
     })
+}
+
+function describeColourCell(map, color) {
+    const target = normalizeColor(color)
+    const matching = map.svg_
+        .selectAll(getLegendRegionsSelector(map))
+        .selectAll('[ecl]')
+        .filter(function () {
+            return normalizeColor(select(this).attr('fill___')) === target
+        })
+    const count = matching.size()
+    return `Colour area: ${count || 'no'} region${count === 1 ? '' : 's'} on the map`
 }
 
 function resetRegions(map) {

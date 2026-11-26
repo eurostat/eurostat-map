@@ -14,6 +14,8 @@ export const createMapSVG = function (out) {
     //get svg element. Create it if it does not exists
     let svg = select('#' + out.svgId())
     if (svg.size() == 0) {
+        // allowed (a script may rely on it), but more often a mistyped id: say where the map went
+        if (!out.isInset) console.warn(`[eurostat-map] No element with the id "${out.svgId()}": a new <svg> was added at the end of the page.`)
         svg = select('body').append('svg').attr('id', out.svgId())
     }
     svg.attr('class', 'em-map')

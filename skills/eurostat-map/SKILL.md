@@ -124,7 +124,7 @@ _overlay_ layers (symbols, pies, flows...). See [docs/multi-layer-guide.md](../.
 | Own geometries       | `geometries([{ id, class, statisticalRegions: true, features }])`                                                                                                                   |
 | World map            | `geo('WORLD')`, `proj('54030')` (choropleth only)                                                                                                                                   |
 | Export               | `exportMapToPNG()`, `exportMapToSVG()`                                                                                                                                              |
-| Accessibility        | `ariaDescription('main finding')` (say what the map shows); the name comes from `title`, arrow keys move between regions (`keyboardNavigation(false)` to disable)                   |
+| Accessibility        | `ariaDescription('main finding')` (say what the map shows); the name comes from `title`, arrow keys move between regions, flows and legend items (`keyboardNavigation(false)` to disable)                   |
 | Failures             | `onError((error, map) => ...)`: `error.type` is `geometry`, `data` or `render`; `onBuild` does not run when data fails                                                              |
 | Styling              | CSS classes (`em-*`, see [docs/css.md](../../docs/css.md)); `darkMode(true)`, `lightBorders(true)`                                                                                  |
 

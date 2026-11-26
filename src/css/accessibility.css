@@ -1,6 +1,8 @@
 /* Keyboard focus (see core/accessibility.js). :focus-visible: a mouse click draws no ring. */
 .em-button:focus,
-.em-drawing-group:focus {
+.em-drawing-group:focus,
+.em-legend [tabindex]:focus,
+.em-legend[tabindex]:focus {
     outline: none;
 }
 
@@ -17,11 +19,33 @@
 }
 
 /* the region the arrow keys are on */
-.em-map .em-keyboard-focus,
-.em-map .em-keyboard-focus > * {
+.em-drawing-group .em-keyboard-focus:not(.em-flow-focus),
+.em-drawing-group .em-keyboard-focus:not(.em-flow-focus) > * {
     stroke: #000 !important;
     stroke-width: 2.5px !important;
     vector-effect: non-scaling-stroke;
+}
+
+/* a flow's stroke width is its value: outline it with a shadow instead */
+.em-flow-container .em-flow-focus {
+    filter: drop-shadow(0 0 2px #000) drop-shadow(0 0 2px #fff);
+}
+
+/* the focused legend, and the item the arrow keys are on */
+[tabindex].em-legend:focus-visible,
+.em-legend [tabindex]:focus-visible {
+    outline: 3px solid #0e47cb;
+    outline-offset: 4px;
+}
+
+.em-legend rect.em-keyboard-focus {
+    stroke: #000 !important;
+    stroke-width: 2px !important;
+}
+
+.em-legend text.em-keyboard-focus,
+.em-legend g.em-keyboard-focus text {
+    font-weight: bold;
 }
 
 /* read by screen readers, not shown */

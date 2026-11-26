@@ -2440,14 +2440,21 @@ You can add zoom buttons with `map.zoomButtons(true)` and an inset toggle with `
 A built map is a named group for screen readers, its buttons work from the keyboard, and its regions can be explored with
 the keyboard: one tab stop on the map, then the arrow keys move from region to region (in the order of their codes), Page
 Up and Page Down change country, Home and End go to the first and last region, and Escape leaves. Each move shows the
-region's tooltip and highlight, and the tooltip's text is announced. Flow maps have no keyboard navigation. Readers who
-ask their system for reduced motion get no transitions, unless `transitionDuration()` is set.
+region's tooltip and highlight, and the tooltip's text is announced. On a flow map the arrow keys move through the
+places and then the flows, largest first, and Page Up and Page Down switch between the two.
+
+A legend whose items highlight the map on hover is a tab stop too: the arrow keys run the same highlight item by item
+(eleven points along a continuous colour bar). Readers who ask their system for reduced motion get no transitions,
+unless `transitionDuration()` is set.
+
+The library is checked automatically with the keyboard and with axe-core, which finds only some accessibility problems:
+test your published page with a screen reader (see `test/manual/accessibility-screen-reader.md`).
 
 | Method                                  | Type    | Default value              | Description |
 | --------------------------------------- | ------- | -------------------------- | ----------- |
 | _map_.**ariaLabel**([*value*])          | String  | the title and subtitle     | The accessible name of the map. A `role` or `aria-label` you put on the SVG element yourself is left alone. |
 | _map_.**ariaDescription**([*value*])    | String  | _undefined_                | A longer description (what the map shows, the main finding), written as the SVG's `<desc>`. |
-| _map_.**keyboardNavigation**([*value*]) | Boolean | _true_                     | Set to false to leave the map regions out of the tab order. |
+| _map_.**keyboardNavigation**([*value*]) | Boolean | _true_                     | Set to false to leave the map regions and the legend out of the tab order. |
 
 ```javascript
 eurostatmap
@@ -2471,8 +2478,8 @@ map.onError((error) => {
 })
 ```
 
-The console also warns about an unknown classification method (the map then uses `quantile`) and about legend options
-that look misspelt.
+The console also warns about an unknown classification method (the map then uses `quantile`), about legend options that
+look misspelt, and when no element has the map's `svgId` (a new `<svg>` is then added at the end of the page).
 
 ## Export
 

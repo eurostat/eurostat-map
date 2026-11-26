@@ -4,7 +4,7 @@
 
 ### New
 
-- **Maps work with a keyboard and a screen reader.** A built map is a named group, its zoom, legend and inset buttons are keyboard-operable, and one tab stop on the map lets the arrow keys move between regions, showing and announcing each tooltip (Page Up and Page Down change country, Escape leaves). Turn region navigation off with `keyboardNavigation(false)`. Flow maps have no region navigation.
+- **Maps work with a keyboard and a screen reader.** A built map is a named group, its zoom, legend and inset buttons are keyboard-operable, and one tab stop on the map lets the arrow keys move between regions, showing and announcing each tooltip (Page Up and Page Down change country, Escape leaves). On flow maps they move through places and flows. Legends that highlight the map on hover do the same from the keyboard. `keyboardNavigation(false)` turns this off.
 
 Example
 
@@ -131,7 +131,7 @@ Example
 map.transitionDuration(500) // always animate
 ```
 
-- **Mistakes are reported in the console**: an unknown classification method (the map then uses `quantile`, where it used to crash) and legend options that look misspelt.
+- **Mistakes are reported in the console**: an unknown classification method (the map then uses `quantile`, where it used to crash), legend options that look misspelt, and an `svgId` that matches no element.
 
 Example
 
@@ -203,7 +203,7 @@ const inset: InsetConfig = { geo: 'MT', zoomButtons: true }
 No API was removed, but these can change how an existing page looks or behaves:
 
 - Narrow containers switch to the compact layout, whatever the window width. Use `layout('desktop')` to keep the old one.
-- Maps and their buttons add tab stops to the page. `keyboardNavigation(false)` removes the map's.
+- Maps, legends and buttons add tab stops to the page. `keyboardNavigation(false)` removes the map's and the legend's.
 - Some legends move slightly where parts used to touch or overlap; very short swatches grow to fit their labels.
 - TypeScript: sub-legend settings are now typed `Config | false`, so code that reads them needs to handle `false`.
 

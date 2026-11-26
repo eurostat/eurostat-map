@@ -451,6 +451,7 @@ export const legend = function (map, config) {
                     .attr('width', sz)
                     .attr('height', sz)
                     .style('fill', fill)
+                    .property('__emName', `${out.label1 || 'First variable'}: class ${ecl1 + 1} of ${numberOfClasses}. ${out.label2 || 'Second variable'}: class ${ecl2 + 1} of ${numberOfClasses}.`)
                     .on('mouseover', function () {
                         highlightBivariateRegions(out.map, ecl1, ecl2)
                         if (out.map.insetTemplates_) {

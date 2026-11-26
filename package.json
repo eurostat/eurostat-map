@@ -86,6 +86,7 @@
         "@babel/core": "^7.22.6",
         "@babel/preset-env": "^7.22.6",
         "@babel/runtime": "^7.12.1",
+        "axe-core": "^4.14.1",
         "babel-loader": "^9.1.2",
         "css-loader": "^7.1.2",
         "playwright": "^1.60.0",

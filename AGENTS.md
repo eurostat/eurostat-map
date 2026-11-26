@@ -325,7 +325,10 @@ Every map type that mutes national borders in `src/css/layers/*.css` (and world 
   misspelt; a unit test checks the typed ones.
 - Failures reach the caller through `reportMapError` (`core/errors.js`, `map.onError()`); a new thing that can fail
   should use it. A new clickable SVG control uses `makeButtonAccessible` (`core/accessibility.js`). Region keyboard
-  navigation drives the regions' own `mouseover`/`mouseout` handlers, so it works for any map type that has them.
+  navigation drives the regions' own `mouseover`/`mouseout` handlers, so it works for any map type that has them; flow
+  maps use the handlers inside `.em-flow-container`, and legends any element with `mouseover`, `mouseenter` or
+  `mousemove` handlers (give an item without text an `__emName` property, which is not serialised). axe-core runs in
+  `test/e2e/accessibility-errors.test.mjs`; the screen reader check is manual (`test/manual/accessibility-screen-reader.md`).
 - Attributes added to the map DOM change the inset and smoke baselines: first show that only those attributes differ,
   then recapture.
 

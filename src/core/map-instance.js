@@ -19,7 +19,7 @@ import { appendCoastalMargin } from './decoration/coastal-margin.js'
 import { addFootnote, addSourceLink, addSubtitle, addTitle } from './decoration/texts.js'
 import { addScalebarToMap, getDefaultScalebarConfig, mergeScalebarConfig, updateScalebar } from './decoration/scalebar.js'
 import { attachLocationsApi, updateLocations } from './locations.js'
-import { applyMapAccessibility, setupKeyboardNavigation } from './accessibility.js'
+import { applyMapAccessibility, setupKeyboardNavigation, setupLegendNavigation } from './accessibility.js'
 import { GEO_ERROR_MESSAGE, reportMapError, showMapErrorMessage } from './errors.js'
 import { showEurostatApiErrorToast } from './toast.js'
 import { applyBorderModeClasses, createMapSVG, recalculateLayout, updateResponsiveMap, wrapMapSvg } from './layout'
@@ -316,7 +316,10 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             out[name + '_'] = v
             if (out.svg_) {
                 applyMapAccessibility(out)
-                if (name === 'keyboardNavigation') setupKeyboardNavigation(out)
+                if (name === 'keyboardNavigation') {
+                    setupKeyboardNavigation(out)
+                    out.layers_?.forEach((layer) => layer.legendObj_ && setupLegendNavigation(layer.legendObj_))
+                }
             }
             return out
         }
