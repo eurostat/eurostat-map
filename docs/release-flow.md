@@ -34,7 +34,6 @@ If you're iterating (building a feature, then fixing bugs the user spots in revi
 
 - confirm branch is `master`
 - inspect working tree and include intended changes
-- ensure npm auth is valid (`npm whoami`)
 - ensure target tag does not already exist (`git tag --list "X.Y.Z"`)
 - ensure no `v`-prefixed tag exists for the same version (`git tag --list "vX.Y.Z"` should be empty)
 
@@ -65,14 +64,11 @@ If you're iterating (building a feature, then fixing bugs the user spots in revi
     - `git push origin master`
     - `git push origin X.Y.Z`
 
-5. Publish to npm
+5. Publish to npm (the user does this)
 
-- **stop and get explicit user permission before running `npm publish`**, even though every earlier step in this flow (version bump, build, commit, tag, push) can proceed without asking again. Do not fold the publish into the same autonomous batch of actions as the rest of the flow — report that the tagged commit is built/pushed and ready, state the version, and wait for an explicit go-ahead. This holds even if the user already approved the change itself and the version number; the publish step gets its own separate confirmation. **The ask must be its own standalone question about publishing itself** — a "release now" style option elsewhere whose description merely *mentions* "publish to npm" alongside other steps does not count as having asked; if the user picks such an option, still ask the dedicated publish question before actually running it.
-- **this single confirmation covers both `npm publish` (this step) and creating the GitHub Release (step 8)** — they always happen together for a release, so don't ask twice. Once the user says yes here, proceed through `npm publish` and, after it succeeds, straight into the GitHub Release in step 8 without a second permission prompt.
-- once confirmed, publish from repo root:
-    - `npm publish`
-- if npm asks for browser auth, complete it and continue
-- verify published version:
+- **an agent never runs `npm publish`**: it only works with the user's security key
+- report that the tagged commit is built, pushed and ready, state the version, and ask the user to run `npm publish` from the repo root
+- wait until the user says it is published, then verify:
     - `npm view eurostat-map version`
 
 6. Post-publish verification
@@ -95,7 +91,7 @@ If you're iterating (building a feature, then fixing bugs the user spots in revi
 
 8. Create GitHub Release
 
-- covered by the same confirmation obtained in step 5 (`npm publish` and the GitHub Release are asked about together, once) — no second ask needed here.
+- only after step 5 has verified the published version; the user's publish is the go-ahead, no further ask needed
 - check whether `gh` CLI is available and authenticated (`gh auth status`)
 - if available, follow "GitHub Release (gh CLI available)" below
 - if not available, follow "GitHub Release (No gh CLI)" below
