@@ -143,6 +143,7 @@ export function applyComputedStylesToSVG(svg) {
         'stroke-linejoin',
         'stroke-dasharray',
         'stroke-dashoffset',
+        'paint-order', // without it a text's halo stroke is painted over the text in the export
     ])
 
     const PROPS = [

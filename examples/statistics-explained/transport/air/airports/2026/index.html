@@ -47,10 +47,11 @@
                 filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
             }
 
-            /* Kosovo stays thinner than the national borders */
+            /* Kosovo: as muted as the national borders (grey at half opacity over the land) but thinner. A solid colour and
+               at least 0.7px, so that it stays an unbroken line, also in the PNG export */
             #airport-pairs-map .em-kosovo-bn {
-                stroke: grey !important;
-                stroke-width: 0.1px !important;
+                stroke: #b8b8b8 !important;
+                stroke-width: 0.7px !important;
             }
 
             /* bold dark labels on a thick white halo so they stay readable over the flows and the land */

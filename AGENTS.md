@@ -360,6 +360,8 @@ hand-rolling markup in an example. Not every older example has been converted ye
 
 ## Statistics Explained transport maps
 
+- PNG/SVG export keeps page CSS only for the properties listed in `applyComputedStylesToSVG` (`core/utils.js`). Something that looks right
+  on the page but not in the export usually needs its property added there.
 - Edition folders use the dissemination year. Map titles and data use the reference year
   in the supplied workbook. Keep legacy page URLs working when archiving an edition.
 - Maritime edition roots serve the publication maps and hold their export assets. Update the
