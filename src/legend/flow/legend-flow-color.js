@@ -8,6 +8,7 @@ import {
     swatchBarLayout,
     swatchStackStart,
     thresholdsDecorator,
+    legibleSwatchHeight,
 } from '../legend-swatch'
 
 // explain flow line colors
@@ -52,14 +53,13 @@ export function drawFlowColorLegend(out, x, y) {
     const titleBoxHeight = title.node()?.getBBox()?.height || 0
     const titlePadding = cfg.titlePadding ?? 10
     const shapeWidth = out.shapeWidth || 18
-    const shapeHeight = out.shapeHeight || 18
-    // Contiguous swatches by default, like the discrete choropleth legend (not the 5px categorical gap)
-    const rowGap = cfg.shapePadding ?? 0
+    const rowGap = cfg.shapePadding ?? 0 // contiguous swatches by default, like the discrete choropleth legend
+    const shapeHeight = legibleSwatchHeight((out.shapeHeight || 18) + rowGap, out.labelFontSize) - rowGap
     const labelOffsetX = out.labelOffsets?.x ?? 5
     const titleOffset = swatchStackStart({ titleHeight: titleBoxHeight, titlePadding })
 
     // labels at the boundaries between the classes (a threshold scale), instead of one label per swatch
-    const thresholds = Array.isArray(cfg.thresholds) && cfg.thresholds.length ? cfg.thresholds : null
+    const thresholds = Array.isArray(cfg.labels) && cfg.labels.length ? cfg.labels : null
 
     const swatches =
         cfg.orientation === 'horizontal'
@@ -126,7 +126,7 @@ function drawVerticalColorStack(out, items, { thresholds, shapeWidth, shapeHeigh
 
 /**
  * A horizontal bar of contiguous swatches running low to high. Threshold labels sit under the seams between the
- * swatches, `minLabel` / `maxLabel` under the two ends of the bar (or each swatch's own label, centred under it, when
+ * swatches, the two `maxMinLabels` under the ends of the bar (or each swatch's own label, centred under it, when
  * there are no thresholds). Labels that would touch are moved onto a second row, so they can never overlap.
  */
 function drawHorizontalColorBar(out, items, { thresholds, shapeHeight, top }) {
@@ -166,7 +166,8 @@ function drawHorizontalColorBar(out, items, { thresholds, shapeHeight, top }) {
         const label = appendLegendSwatchLabel(container, { x, y: barBottom + tickLength + 2, dy: '0.9em', anchor, text })
         labelled.push({ label, tick })
     }
-    add(0, 'start', cfg.minLabel)
+    const [minLabel, maxLabel] = cfg.maxMin ? cfg.maxMinLabels || [] : []
+    add(0, 'start', minLabel)
     if (thresholds) thresholds.forEach((text, j) => j < count - 1 && add(bar.seamX(j), 'middle', text))
     else {
         items.forEach((item, j) => {
@@ -181,7 +182,7 @@ function drawHorizontalColorBar(out, items, { thresholds, shapeHeight, top }) {
             labelled.push({ label })
         })
     }
-    add(barWidth, 'end', cfg.maxLabel)
+    add(barWidth, 'end', maxLabel)
 
     // never let two labels touch: those that would, go on a second row. Their tick is lengthened to reach them,
     // unless it would run through a label on a row above.

@@ -67,7 +67,7 @@ export interface WaffleColorLegendConfig {
  */
 export interface WaffleLegendConfig extends LegendConfig {
     /** Configuration for the waffle size legend. */
-    sizeLegend?: Partial<WaffleSizeLegendConfig>
+    sizeLegend?: Partial<WaffleSizeLegendConfig> | false
 
     /** Configuration for the color/category legend. Set to false to hide. */
     colorLegend?: Partial<WaffleColorLegendConfig> | false

@@ -1705,6 +1705,8 @@ For legends of specific map types please refer to their own sections:
 - [Waffle chart legends](#waffle-chart-legends)
 - [Bar chart legends](#bar-chart-legends)
 
+**Rules every legend follows.** Parts of a legend (titles, size and colour legends, no-data and pattern items) never overlap: a part that would is moved below the one before it, so a small `marginTop` or `titlePadding`, a long title or a large symbol cannot make them collide. Swatches are never closer than their label text is tall, and labels that would touch move onto another row. Any sub-legend (`sizeLegend`, `colorLegend`, `flowWidthLegend`, ...) is left out with `false`.
+
 ### Choropleth legends
 
 In addition to [the default legend parameters](#map-legend), choropleth maps have the following specific legend parameters:
@@ -2082,8 +2084,9 @@ In addition to [the default legend parameters](#map-legend), flow maps can show 
 | **ticks**        | Boolean | _false_       | Use the labels as ticks.                                               |
 | **orientation**  | 'vertical' or 'horizontal' | _'vertical'_ | `'horizontal'` draws one bar of contiguous swatches, low to high, like the horizontal choropleth legend. |
 | **width**        | Number  | _the legend width_ | Width of the bar of a horizontal legend, in pixels.                |
-| **thresholds**   | Array   | _null_        | A threshold scale: labels at the boundaries between the classes, one fewer than the `items` (the item labels are then not shown). |
-| **minLabel**, **maxLabel** | String | _null_ | Labels of the lower and upper bound, under the two ends of a horizontal bar. |
+| **labels**       | Array   | _null_        | A threshold scale, as in the choropleth legend: labels at the boundaries between the classes, one fewer than the `items` (the item labels are then not shown). |
+| **maxMin**       | Boolean | _false_       | Show the lower and upper bound under the two ends of a horizontal bar. |
+| **maxMinLabels** | String[] | _null_       | `[lower bound, upper bound]` labels, shown when `maxMin` is true.      |
 
 The legend parts never overlap: the title, the labels and the lines are stacked from measured sizes, and labels that would touch move onto a second row.
 

@@ -64,8 +64,8 @@ export interface MushroomColorLegendConfig {
  */
 export interface MushroomLegendConfig extends LegendConfig {
     /** Configuration for the mushroom size legend. */
-    sizeLegend?: Partial<MushroomSizeLegendConfig>
+    sizeLegend?: Partial<MushroomSizeLegendConfig> | false
 
     /** Configuration for the color/category legend. */
-    colorLegend?: Partial<MushroomColorLegendConfig>
+    colorLegend?: Partial<MushroomColorLegendConfig> | false
 }

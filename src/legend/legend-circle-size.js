@@ -1,3 +1,4 @@
+import { select } from 'd3-selection'
 import { max } from 'd3-array'
 import { getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'
 import { formatSizeLabel } from './legend-utils'
@@ -11,7 +12,8 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
     //draw size legend title
     if (title) {
         const sizeLegendTitleFontSize = getFontSizeFromClass('em-size-legend-title')
-        titlePadding += sizeLegendTitleFontSize // add title font size to padding
+        // the label of the largest circle reaches half its height above the circle: keep it clear of the title
+        titlePadding = Math.max(titlePadding, Math.ceil((getFontSizeFromClass('em-legend-label') || 12) * 0.55)) + sizeLegendTitleFontSize
         // append title to the legend
         container
             .append('text')
@@ -114,6 +116,8 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
             return y
         })
 
+    spreadSizeLabels(itemContainer, sizeScale, maxRadius)
+
     if (ringWidth) {
         const ringRadius = maxRadius + ringWidth / 2
         const sample = circleLegend.append('g').attr('class', 'em-ring-legend-sample').attr('transform', `translate(0,${-maxRadius})`)
@@ -138,4 +142,32 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
     }
 
     return out
+}
+
+/**
+ * Circles of similar size have their tops, and so their labels, closer together than the text is tall. Move such labels
+ * down just enough, and bend their leader line to follow. Labels that are already clear are not touched.
+ */
+function spreadSizeLabels(itemContainer, sizeScale, maxRadius) {
+    const spacing = Math.round((getFontSizeFromClass('em-legend-label') || 12) * 0.9) // closer than this, the letters touch
+    const items = []
+    itemContainer.each(function (d) {
+        items.push({ node: this, top: -1 - 2 * sizeScale(d) })
+    })
+    let previous = -Infinity
+    items
+        .sort((a, b) => a.top - b.top) // largest circle (highest top) first
+        .forEach(({ node, top }) => {
+            const y = Math.max(top, previous + spacing)
+            previous = y
+            if (y === top) return
+            const item = select(node)
+            item.select('text.em-legend-label').attr('y', y)
+            item.select('line')
+                .attr('x2', maxRadius - 6)
+                .clone()
+                .attr('x1', maxRadius - 6)
+                .attr('x2', maxRadius + 3)
+                .attr('y2', y)
+        })
 }

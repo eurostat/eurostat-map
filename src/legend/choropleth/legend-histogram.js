@@ -199,9 +199,9 @@ export const createHistogramLegend = (out, baseX, baseY, classPrefix = 'em-legen
             axisGroup
                 .selectAll('text')
                 .attr('class', `${classPrefix}-label em-tick-label`)
-                .attr('text-anchor', 'end')
-                .attr('dy', '0em')
-                .attr('dx', '-0.45em')
+                .attr('text-anchor', labelRotation ? 'end' : 'middle')
+                .attr('dy', labelRotation ? '0.35em' : '0.71em') // below the axis, clear of the bars
+                .attr('dx', labelRotation ? '-0.45em' : null)
                 .attr('transform', `rotate(-${labelRotation})`)
         } else if (out.labelType === 'ranges') {
             axisGroup.call(

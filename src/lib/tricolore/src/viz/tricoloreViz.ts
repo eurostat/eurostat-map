@@ -822,6 +822,84 @@ export class TricoloreViz {
             .attr('y', ty - 6)
             .attr('class', 'em-ternary-center-annotation-label')
             .text(text)
+
+        this.separateCenterLabels(`M ${cx},${cy} Q ${mx},${my}`)
+    }
+
+    /**
+     * In a small triangle the percentages of the centre lines crowd around the centre point, and the annotation of
+     * the centre can land on an axis title. Move what collides until it is clear: each percentage outwards along its
+     * own direction from the centre, the annotation up or to the right (its guide line follows).
+     */
+    private separateCenterLabels(guideStart: string): void {
+        const root = this.svg.node() as SVGSVGElement
+        const centre = root.querySelector('.em-ternary-center-point')
+        if (!root.getBoundingClientRect().width) return // not rendered: nothing can be measured
+
+        // the area of the letters: a text box also reserves room above and below them
+        const ink = (el: Element) => {
+            const r = el.getBoundingClientRect()
+            const pad = r.height * 0.15
+            return { left: r.left, right: r.right, top: r.top + pad, bottom: r.bottom - pad }
+        }
+        const collides = (el: Element, others: Element[]) => {
+            const a = ink(el)
+            return others.some((other) => {
+                const b = ink(other)
+                return other !== el && a.left < b.right - 0.5 && b.left < a.right - 0.5 && a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5
+            })
+        }
+        const texts = () => Array.from(root.querySelectorAll('text'))
+
+        // the percentages are rotated, which makes their bounding boxes far larger than the letters: between
+        // themselves, compare the distance of their middles
+        const percentages = Array.from(root.querySelectorAll<SVGTextElement>('.em-ternary-center-line-label'))
+        const middles = percentages.map((el) => {
+            const r = el.getBoundingClientRect()
+            return [(r.left + r.right) / 2, (r.top + r.bottom) / 2]
+        })
+        const crowded = middles.some(([x1, y1], i) => middles.some(([x2, y2], j) => i < j && Math.hypot(x2 - x1, y2 - y1) < 17))
+        const guides = root.querySelectorAll('.em-ternary-center-line')
+        if (centre && crowded && guides.length === percentages.length) {
+            // no room inside: write each percentage upright, just outside the edge its guide line ends on
+            const cx = Number(centre.getAttribute('cx'))
+            const cy = Number(centre.getAttribute('cy'))
+            percentages.forEach((label, i) => {
+                const x = Number(guides[i].getAttribute('x1'))
+                const y = Number(guides[i].getAttribute('y1'))
+                const length = Math.hypot(x - cx, y - cy) || 1
+                label.setAttribute('x', String(x + ((x - cx) / length) * 13))
+                label.setAttribute('y', String(y + ((y - cy) / length) * 10))
+                label.removeAttribute('transform')
+                label.style.fill = '#333'
+            })
+        }
+
+        const note = root.querySelector('.em-ternary-center-annotation-label')
+        const guide = root.querySelector('.em-ternary-annotation-line')
+        if (!note || !guide) return
+        const x = Number(note.getAttribute('x'))
+        const y = Number(note.getAttribute('y'))
+        const others = texts().filter((t) => t !== note)
+        const bounds = root.getBoundingClientRect()
+        const clear = () => {
+            const box = note.getBoundingClientRect()
+            return !collides(note, others) && box.top >= bounds.top && box.right <= bounds.right
+        }
+        if (!collides(note, others)) return
+        // try ever further positions above and to either side, nearest first
+        for (let distance = 4; distance <= 120; distance += 4) {
+            for (const [dx, dy] of [[0, -distance], [distance, -distance], [-distance, -distance], [distance, 0]]) {
+                note.setAttribute('x', String(x + dx))
+                note.setAttribute('y', String(y + dy))
+                if (clear()) {
+                    guide.setAttribute('d', `${guideStart} ${x + dx},${y + dy + 6}`)
+                    return
+                }
+            }
+        }
+        note.setAttribute('x', String(x))
+        note.setAttribute('y', String(y))
     }
 
     /**

@@ -1,3 +1,4 @@
+import { legibleSwatchHeight, titleClearance } from './legend-swatch'
 import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets } from '../core/utils'
@@ -43,6 +44,10 @@ export const legend = function (map, config) {
     if (config) {
         for (let key in config) {
             if (key === 'colorLegend' || key === 'sizeLegend' || key === 'timeLegend') {
+                if (config[key] === false) {
+                    out[key] = false
+                    continue
+                }
                 for (let p in out[key]) {
                     if (config[key][p] !== undefined) out[key][p] = config[key][p]
                 }
@@ -69,17 +74,10 @@ export const legend = function (map, config) {
         const baseX = out.getBaseX()
 
         // Wedge size legend replaces circle size legend
-        if (map.classifierChartSize_) {
+        if (map.classifierChartSize_ && out.sizeLegend) {
             const container = lgg.append('g').attr('class', 'em-coxcomb-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
             out._sizeLegendContainer = container
-            drawWedgeSizeLegend(
-                out,
-                container,
-                out.sizeLegend.values,
-                map.classifierChartSize_,
-                out.sizeLegend.title,
-                out.sizeLegend.titlePadding
-            )
+            drawWedgeSizeLegend(out, container, out.sizeLegend.values, map.classifierChartSize_, out.sizeLegend.title, out.sizeLegend.titlePadding)
         }
 
         buildColorLegend(out, baseX, baseY)
@@ -175,6 +173,8 @@ export const legend = function (map, config) {
     function buildColorLegend(out, baseX, baseY) {
         const map = out.map
         const config = out.colorLegend
+        if (!config) return
+        config.shapeHeight = legibleSwatchHeight(config.shapeHeight, out.labelFontSize)
         out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-coxcomb-color-legend')
 
         let sizeLegendHeight = 0
@@ -198,7 +198,10 @@ export const legend = function (map, config) {
         let i = 0
         const scs = map.catColors_
         for (let code in scs) {
-            const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
+            const titleSpace = config.title
+                ? out.titleFontSize + titleClearance(out.colorLegend.titlePadding, out.titleFontSize)
+                : out.colorLegend.titlePadding
+            const y = titleSpace + i * (config.shapeHeight + config.shapePadding)
             const col = map.catColors()[code] || 'lightgray'
 
             out._colorLegendContainer
@@ -251,6 +254,7 @@ export const legend = function (map, config) {
      * Labels each segment (e.g., Jan, Feb) around the circle.
      */
     function buildCoxcombTimeLegend(out, baseX, baseY) {
+        if (!out.timeLegend) return
         const times = map._coxTimes || []
         const radius = out.timeLegend.radius || 40
 
@@ -264,7 +268,7 @@ export const legend = function (map, config) {
         }
         if (out._colorLegendContainer) {
             y += out._colorLegendContainer.node().getBBox().height
-            y += out.colorLegend.marginTop || 0
+            y += out.colorLegend?.marginTop || 0
         }
 
         y += out.timeLegend?.marginTop || 0

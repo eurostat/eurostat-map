@@ -63,6 +63,10 @@ export const legend = function (map, config) {
     if (config) {
         for (let key in config) {
             if (key === 'scaleLegend') {
+                if (config.scaleLegend === false) {
+                    out.scaleLegend.show = false
+                    continue
+                }
                 for (let p in out.scaleLegend) {
                     if (config.scaleLegend[p] !== undefined) {
                         out.scaleLegend[p] = config.scaleLegend[p]
@@ -134,7 +138,8 @@ export const legend = function (map, config) {
                 .attr('class', 'em-spark-scale-legend em-grid-cell')
                 .attr('transform', `translate(${baseX}, ${baseY})`)
 
-            drawScaleLegend(out, out._scaleLegendContainer)
+            out._scaleLegendHeight = 0
+            if (out.scaleLegend.show !== false) drawScaleLegend(out, out._scaleLegendContainer)
 
             if ((out.colorLegend.show || out.colorLegend.items?.length) && out.colorLegend.items?.length) {
                 drawColorLegend(out, out._scaleLegendContainer, out._scaleLegendHeight + out.colorLegend.marginTop)

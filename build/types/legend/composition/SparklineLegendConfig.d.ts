@@ -84,7 +84,7 @@ export interface SparklineNoDataLegendConfig {
  */
 export interface SparklineLegendConfig extends LegendConfig {
     /** Configuration for the scale legend showing Y-axis range. */
-    scaleLegend?: Partial<SparklineScaleLegendConfig>
+    scaleLegend?: Partial<SparklineScaleLegendConfig> | false
 
     /** Optional categorical color legend for spark colors. */
     colorLegend?: Partial<SparklineColorLegendConfig> | false

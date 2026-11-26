@@ -252,9 +252,9 @@
                             orientation: 'horizontal',
                             width: 200,
                             items: COLOURS.map((color) => ({ color })),
-                            thresholds: THRESHOLDS.map((t) => t + '%'), // a threshold scale: the class limits
-                            minLabel: bounds[0],
-                            maxLabel: bounds[1],
+                            labels: THRESHOLDS.map((t) => t + '%'), // a threshold scale: the class limits
+                            maxMin: true,
+                            maxMinLabels: bounds,
                         },
                         regionColorLegend: false,
                     })

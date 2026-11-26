@@ -1,3 +1,4 @@
+import { titleClearance } from '../legend-swatch'
 import { select } from 'd3-selection'
 import { format } from 'd3-format'
 import * as Legend from '../legend'
@@ -98,7 +99,7 @@ export const legend = function (map, config) {
         const baseX = out.getBaseX()
 
         // Size legend — branches on barType
-        if (map.classifierSize_) {
+        if (map.classifierSize_ && out.sizeLegend) {
             out._sizeLegendContainer = lgg.append('g').attr('class', 'em-bar-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
 
             if (map.barSettings_.type === 'grouped') {
@@ -410,7 +411,8 @@ export const legend = function (map, config) {
         let i = 0
 
         for (const code in scs) {
-            const y = cfg.titlePadding + (cfg.title ? out.titleFontSize : 0) + i * (cfg.shapeHeight + cfg.shapePadding)
+            const titleSpace = cfg.title ? out.titleFontSize + titleClearance(cfg.titlePadding, out.titleFontSize) : cfg.titlePadding
+            const y = titleSpace + i * (cfg.shapeHeight + cfg.shapePadding)
 
             out._colorLegendContainer
                 .append('rect')

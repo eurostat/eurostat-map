@@ -1,3 +1,4 @@
+import { separateStackedParts } from '../legend-swatch'
 import { select, selectAll } from 'd3-selection'
 import * as Legend from '../legend'
 import { line } from 'd3-shape'
@@ -236,10 +237,18 @@ export const legend = function (map, config) {
             .attr('d', `M ${out.arrowWidth} 0 L 0 ${out.arrowHeight / 2} L ${out.arrowWidth} ${out.arrowHeight}`)
             .attr('markerUnits', 'userSpaceOnUse')
 
+        // The square with its labels and arrows is one part of the legend: group it, so that the titles above it and
+        // the 'no data' box below it can be kept clear of it
+        const graphic = out.lgg.append('g').attr('class', 'em-bivariate-graphic').node()
+        for (const child of [...out.lgg.node().children]) {
+            if (child.tagName === 'g' && child !== graphic && child.id !== 'em-legend-titles') graphic.appendChild(child)
+        }
+
         // 'No data' legend box
         if (out.noData) {
             addNoDataElement()
         }
+        separateStackedParts(out.lgg.node())
 
         // Set legend box dimensions
         setBivariateLegendBoxDimension()

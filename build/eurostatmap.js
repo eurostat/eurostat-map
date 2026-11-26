@@ -20408,6 +20408,82 @@ class TricoloreViz {
             .attr('y', ty - 6)
             .attr('class', 'em-ternary-center-annotation-label')
             .text(text);
+        this.separateCenterLabels(`M ${cx},${cy} Q ${mx},${my}`);
+    }
+    /**
+     * In a small triangle the percentages of the centre lines crowd around the centre point, and the annotation of
+     * the centre can land on an axis title. Move what collides until it is clear: each percentage outwards along its
+     * own direction from the centre, the annotation up or to the right (its guide line follows).
+     */
+    separateCenterLabels(guideStart) {
+        const root = this.svg.node();
+        const centre = root.querySelector('.em-ternary-center-point');
+        if (!root.getBoundingClientRect().width)
+            return; // not rendered: nothing can be measured
+        // the area of the letters: a text box also reserves room above and below them
+        const ink = (el) => {
+            const r = el.getBoundingClientRect();
+            const pad = r.height * 0.15;
+            return { left: r.left, right: r.right, top: r.top + pad, bottom: r.bottom - pad };
+        };
+        const collides = (el, others) => {
+            const a = ink(el);
+            return others.some((other) => {
+                const b = ink(other);
+                return other !== el && a.left < b.right - 0.5 && b.left < a.right - 0.5 && a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5;
+            });
+        };
+        const texts = () => Array.from(root.querySelectorAll('text'));
+        // the percentages are rotated, which makes their bounding boxes far larger than the letters: between
+        // themselves, compare the distance of their middles
+        const percentages = Array.from(root.querySelectorAll('.em-ternary-center-line-label'));
+        const middles = percentages.map((el) => {
+            const r = el.getBoundingClientRect();
+            return [(r.left + r.right) / 2, (r.top + r.bottom) / 2];
+        });
+        const crowded = middles.some(([x1, y1], i) => middles.some(([x2, y2], j) => i < j && Math.hypot(x2 - x1, y2 - y1) < 17));
+        const guides = root.querySelectorAll('.em-ternary-center-line');
+        if (centre && crowded && guides.length === percentages.length) {
+            // no room inside: write each percentage upright, just outside the edge its guide line ends on
+            const cx = Number(centre.getAttribute('cx'));
+            const cy = Number(centre.getAttribute('cy'));
+            percentages.forEach((label, i) => {
+                const x = Number(guides[i].getAttribute('x1'));
+                const y = Number(guides[i].getAttribute('y1'));
+                const length = Math.hypot(x - cx, y - cy) || 1;
+                label.setAttribute('x', String(x + ((x - cx) / length) * 13));
+                label.setAttribute('y', String(y + ((y - cy) / length) * 10));
+                label.removeAttribute('transform');
+                label.style.fill = '#333';
+            });
+        }
+        const note = root.querySelector('.em-ternary-center-annotation-label');
+        const guide = root.querySelector('.em-ternary-annotation-line');
+        if (!note || !guide)
+            return;
+        const x = Number(note.getAttribute('x'));
+        const y = Number(note.getAttribute('y'));
+        const others = texts().filter((t) => t !== note);
+        const bounds = root.getBoundingClientRect();
+        const clear = () => {
+            const box = note.getBoundingClientRect();
+            return !collides(note, others) && box.top >= bounds.top && box.right <= bounds.right;
+        };
+        if (!collides(note, others))
+            return;
+        // try ever further positions above and to either side, nearest first
+        for (let distance = 4; distance <= 120; distance += 4) {
+            for (const [dx, dy] of [[0, -distance], [distance, -distance], [-distance, -distance], [distance, 0]]) {
+                note.setAttribute('x', String(x + dx));
+                note.setAttribute('y', String(y + dy));
+                if (clear()) {
+                    guide.setAttribute('d', `${guideStart} ${x + dx},${y + dy + 6}`);
+                    return;
+                }
+            }
+        }
+        note.setAttribute('x', String(x));
+        note.setAttribute('y', String(y));
     }
     /**
      * Convert ternary coordinates to SVG coordinates
@@ -48796,10 +48872,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   legend: () => (/* binding */ legend)
 /* harmony export */ });
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../legend */ "./src/legend/legend.js");
-/* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/line.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../legend-swatch */ "./src/legend/legend-swatch.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../legend */ "./src/legend/legend.js");
+/* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/line.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+
 
 
 
@@ -48814,7 +48892,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 const legend = function (map, config) {
     //build generic legend object for the map
-    const out = _legend__WEBPACK_IMPORTED_MODULE_1__.legend(map)
+    const out = _legend__WEBPACK_IMPORTED_MODULE_2__.legend(map)
 
     const defaultAnnotationOffsetsByRotation = {
         0: {
@@ -48904,7 +48982,7 @@ const legend = function (map, config) {
     out.noDataYOffset = defaultNoDataYOffsetByRotation[0]
 
     //get the font size of the texts
-    out.axisTitleFontSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getFontSizeFromClass)('em-bivariate-axis-title')
+    out.axisTitleFontSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getFontSizeFromClass)('em-bivariate-axis-title')
 
     //breaks
     out.breaks1 = undefined
@@ -49038,10 +49116,18 @@ const legend = function (map, config) {
             .attr('d', `M ${out.arrowWidth} 0 L 0 ${out.arrowHeight / 2} L ${out.arrowWidth} ${out.arrowHeight}`)
             .attr('markerUnits', 'userSpaceOnUse')
 
+        // The square with its labels and arrows is one part of the legend: group it, so that the titles above it and
+        // the 'no data' box below it can be kept clear of it
+        const graphic = out.lgg.append('g').attr('class', 'em-bivariate-graphic').node()
+        for (const child of [...out.lgg.node().children]) {
+            if (child.tagName === 'g' && child !== graphic && child.id !== 'em-legend-titles') graphic.appendChild(child)
+        }
+
         // 'No data' legend box
         if (out.noData) {
             addNoDataElement()
         }
+        (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.separateStackedParts)(out.lgg.node())
 
         // Set legend box dimensions
         setBivariateLegendBoxDimension()
@@ -49186,26 +49272,26 @@ const legend = function (map, config) {
             .attr('transform', `translate(${out.boxPadding}, ${noDataY + (out.rotation == 0 ? 0 : -10)})`)
 
         const highlightNd = (map) => {
-            const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getLegendRegionsSelector)(map)
-            const dimmedFill = _legend__WEBPACK_IMPORTED_MODULE_1__.getDimmedFill(map)
+            const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getLegendRegionsSelector)(map)
+            const dimmedFill = _legend__WEBPACK_IMPORTED_MODULE_2__.getDimmedFill(map)
             const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1]')
             allRegions.each(function () {
-                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
                 if (!sel.attr('data-fill')) sel.attr('data-fill', sel.style('fill'))
             })
             allRegions.style('fill', dimmedFill)
             allRegions.filter("[nd='nd']").each(function () {
-                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('fill', (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('data-fill'))
+                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('fill', (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).attr('data-fill'))
             })
         }
 
         const unhighlightNd = (map) => {
-            const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getLegendRegionsSelector)(map)
+            const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getLegendRegionsSelector)(map)
             map.svg_
                 .selectAll(selector)
                 .selectAll('[ecl1]')
                 .each(function () {
-                    const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+                    const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
                     const original = sel.attr('data-fill')
                     if (original) sel.style('fill', original)
                 })
@@ -49247,14 +49333,14 @@ const legend = function (map, config) {
                     .on('mouseover', function () {
                         highlightBivariateRegions(out.map, ecl1, ecl2)
                         if (out.map.insetTemplates_) {
-                            (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, highlightBivariateRegions, ecl1, ecl2)
+                            (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, highlightBivariateRegions, ecl1, ecl2)
                         }
-                        (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).raise() // raise legend square to avoid stroke issue
+                        (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).raise() // raise legend square to avoid stroke issue
                     })
                     .on('mouseout', function () {
                         unhighlightBivariateRegions(out.map)
                         if (out.map.insetTemplates_) {
-                            (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, unhighlightBivariateRegions, ecl1, ecl2)
+                            (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, unhighlightBivariateRegions, ecl1, ecl2)
                         }
                     })
             }
@@ -49288,7 +49374,7 @@ const legend = function (map, config) {
         if (out.breaks1) {
             for (let i = 0; i < out.breaks1.length; i++) {
                 const x = initialX + sz * (i + 1)
-                const y = out.squareSize + out.tickLength + (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getFontSizeFromClass)('em-bivariate-tick-label')
+                const y = out.squareSize + out.tickLength + (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getFontSizeFromClass)('em-bivariate-tick-label')
 
                 breakLabels
                     .append('text')
@@ -49420,12 +49506,12 @@ const legend = function (map, config) {
 
         let xAxisLineY = out.squareSize + out.tickLength
         if (Array.isArray(out.breaks1) && out.breaks1.length) {
-            xAxisLineY += (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getFontSizeFromClass)('em-bivariate-tick-label') / 1.5
+            xAxisLineY += (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getFontSizeFromClass)('em-bivariate-tick-label') / 1.5
         }
 
         let yAxisLineX = -out.tickLength
         if (Array.isArray(out.breaks2) && out.breaks2.length) {
-            yAxisLineX -= (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getFontSizeFromClass)('em-bivariate-tick-label') / 1.5
+            yAxisLineX -= (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getFontSizeFromClass)('em-bivariate-tick-label') / 1.5
         }
 
         const xLabelY = hasAxisArrow('x') ? out._xAxisArrowY : xAxisLineY + 8
@@ -49692,7 +49778,7 @@ const legend = function (map, config) {
                 .attr('class', 'em-bivariate-axis-arrow em-bivariate-axis-arrow-x')
                 .attr(
                     'd',
-                    (0,d3_shape__WEBPACK_IMPORTED_MODULE_2__["default"])()([
+                    (0,d3_shape__WEBPACK_IMPORTED_MODULE_3__["default"])()([
                         [spans.xStart, out._xAxisArrowY],
                         [spans.xEnd, out._xAxisArrowY],
                     ])
@@ -49708,7 +49794,7 @@ const legend = function (map, config) {
                 .attr('class', 'em-bivariate-axis-arrow em-bivariate-axis-arrow-y')
                 .attr(
                     'd',
-                    (0,d3_shape__WEBPACK_IMPORTED_MODULE_2__["default"])()([
+                    (0,d3_shape__WEBPACK_IMPORTED_MODULE_3__["default"])()([
                         [out._yAxisArrowX, spans.yStart],
                         [out._yAxisArrowX, spans.yEnd],
                     ])
@@ -49771,7 +49857,7 @@ const legend = function (map, config) {
     function computeAxisArrowAnchors() {
         out._xAxisArrowY = out.squareSize + out.tickLength + out.arrowPadding
         if (Array.isArray(out.breaks1) && out.breaks1.length) {
-            out._xAxisArrowY += (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getFontSizeFromClass)('em-bivariate-tick-label')
+            out._xAxisArrowY += (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getFontSizeFromClass)('em-bivariate-tick-label')
         }
         if (out.rotation === -45) {
             out._xAxisArrowY -= 6
@@ -49779,20 +49865,20 @@ const legend = function (map, config) {
 
         out._yAxisArrowX = -out.tickLength - out.arrowPadding
         if (Array.isArray(out.breaks2) && out.breaks2.length) {
-            out._yAxisArrowX -= (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getFontSizeFromClass)('em-bivariate-tick-label')
+            out._yAxisArrowX -= (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getFontSizeFromClass)('em-bivariate-tick-label')
         }
     }
 
     // Highlight selected regions on mouseover
     function highlightBivariateRegions(map, ecl1, ecl2) {
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getLegendRegionsSelector)(map)
-        const dimmedFill = _legend__WEBPACK_IMPORTED_MODULE_1__.getDimmedFill(map)
+        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getLegendRegionsSelector)(map)
+        const dimmedFill = _legend__WEBPACK_IMPORTED_MODULE_2__.getDimmedFill(map)
         const allRegions = map.svg_.selectAll(selector).selectAll('[ecl1]')
 
         map._bivariateLegendHighlightActive = true
 
         allRegions.each(function () {
-            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
             if (!sel.attr('data-fill')) sel.attr('data-fill', sel.style('fill'))
         })
 
@@ -49803,17 +49889,17 @@ const legend = function (map, config) {
             .filter(`[ecl2='${ecl2}']`)
             .filter(':not([nd])')
             .each(function () {
-                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('fill', (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('data-fill'))
+                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('fill', (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).attr('data-fill'))
             })
     }
 
     function unhighlightBivariateRegions(map) {
-        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.getLegendRegionsSelector)(map)
+        const selector = (0,_core_utils__WEBPACK_IMPORTED_MODULE_4__.getLegendRegionsSelector)(map)
         map.svg_
             .selectAll(selector)
             .selectAll('[ecl1],[ecl2]')
             .each(function () {
-                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+                const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
                 const original = sel.attr('data-fill')
                 if (original) sel.style('fill', original)
             })
@@ -50581,9 +50667,9 @@ const createHistogramLegend = (out, baseX, baseY, classPrefix = 'em-legend') => 
             axisGroup
                 .selectAll('text')
                 .attr('class', `${classPrefix}-label em-tick-label`)
-                .attr('text-anchor', 'end')
-                .attr('dy', '0em')
-                .attr('dx', '-0.45em')
+                .attr('text-anchor', labelRotation ? 'end' : 'middle')
+                .attr('dy', labelRotation ? '0.35em' : '0.71em') // below the axis, clear of the bars
+                .attr('dx', labelRotation ? '-0.45em' : null)
                 .attr('transform', `rotate(-${labelRotation})`)
         } else if (out.labelType === 'ranges') {
             axisGroup.call(
@@ -50845,10 +50931,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   legend: () => (/* binding */ legend)
 /* harmony export */ });
-/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../legend */ "./src/legend/legend.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
-/* harmony import */ var _legend_pattern_fill__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../legend-pattern-fill */ "./src/legend/legend-pattern-fill.js");
-/* harmony import */ var _legend_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../legend-utils */ "./src/legend/legend-utils.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../legend-swatch */ "./src/legend/legend-swatch.js");
+/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../legend */ "./src/legend/legend.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_pattern_fill__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../legend-pattern-fill */ "./src/legend/legend-pattern-fill.js");
+/* harmony import */ var _legend_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../legend-utils */ "./src/legend/legend-utils.js");
+
 
 
 
@@ -50875,7 +50963,7 @@ __webpack_require__.r(__webpack_exports__);
  * @param {Object} config - Legend configuration overrides
  */
 const legend = function (map, config) {
-    const out = _legend__WEBPACK_IMPORTED_MODULE_0__.legend(map)
+    const out = _legend__WEBPACK_IMPORTED_MODULE_1__.legend(map)
 
     // ── Size legend config ───────────────────────────────────────────────────
     out.sizeLegend = {
@@ -50949,7 +51037,7 @@ const legend = function (map, config) {
         const baseX = out.getBaseX()
 
         // Size legend — branches on barType
-        if (map.classifierSize_) {
+        if (map.classifierSize_ && out.sizeLegend) {
             out._sizeLegendContainer = lgg.append('g').attr('class', 'em-bar-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
 
             if (map.barSettings_.type === 'grouped') {
@@ -51002,7 +51090,7 @@ const legend = function (map, config) {
                 .append('g')
                 .attr('class', 'pattern-fill-legend')
                 .attr('transform', `translate(${baseX}, ${legendHeight + 15})`)
-            ;(0,_legend_pattern_fill__WEBPACK_IMPORTED_MODULE_2__.appendPatternFillLegend)(out, patternContainer)
+            ;(0,_legend_pattern_fill__WEBPACK_IMPORTED_MODULE_3__.appendPatternFillLegend)(out, patternContainer)
         }
 
         out.setBoxDimension()
@@ -51019,7 +51107,7 @@ const legend = function (map, config) {
         const maxDomain = domain?.[1] ?? 1
         const legendValues = values || [maxDomain, Math.round(maxDomain / 2), Math.max(1, Math.round(maxDomain * 0.1))]
         const sortedValues = [...legendValues].sort((a, b) => b - a)
-        const dec = typeof legend.widthLegend?.labelFormatter === 'function' ? undefined : (0,_legend_utils__WEBPACK_IMPORTED_MODULE_3__.getMaxDomainPrecision)(classifierWidth)
+        const dec = typeof legend.widthLegend?.labelFormatter === 'function' ? undefined : (0,_legend_utils__WEBPACK_IMPORTED_MODULE_4__.getMaxDomainPrecision)(classifierWidth)
 
         const h = barHeight ?? 8
         const x0 = offsetX ?? 0
@@ -51052,7 +51140,7 @@ const legend = function (map, config) {
                 .attr('x', x0 + maxBarWidth + 8)
                 .attr('y', y + h / 2)
                 .attr('dominant-baseline', 'middle')
-                .text((0,_legend_utils__WEBPACK_IMPORTED_MODULE_3__.formatSizeLabel)(val, legend.widthLegend?.labelFormatter ?? dec))
+                .text((0,_legend_utils__WEBPACK_IMPORTED_MODULE_4__.formatSizeLabel)(val, legend.widthLegend?.labelFormatter ?? dec))
 
             y += h + rowPadding
         }
@@ -51078,7 +51166,7 @@ const legend = function (map, config) {
         const domain = classifierSize.domain()
         const legendValues = values || [domain[0], Math.round((domain[0] + domain[1]) / 2), domain[1]]
         const sortedValues = [...legendValues].sort((a, b) => b - a) // largest first
-        const dec = typeof legend.sizeLegend?.labelFormatter === 'function' ? undefined : (0,_legend_utils__WEBPACK_IMPORTED_MODULE_3__.getMaxDomainPrecision)(classifierSize)
+        const dec = typeof legend.sizeLegend?.labelFormatter === 'function' ? undefined : (0,_legend_utils__WEBPACK_IMPORTED_MODULE_4__.getMaxDomainPrecision)(classifierSize)
         const offsetX = legend.sizeLegend?.offsetX ?? 0
 
         let y = 0
@@ -51118,7 +51206,7 @@ const legend = function (map, config) {
                 .attr('x', offsetX + maxBarWidth + 8)
                 .attr('y', y + h / 2)
                 .attr('dominant-baseline', 'middle')
-                .text((0,_legend_utils__WEBPACK_IMPORTED_MODULE_3__.formatSizeLabel)(val, legend.sizeLegend?.labelFormatter ?? dec))
+                .text((0,_legend_utils__WEBPACK_IMPORTED_MODULE_4__.formatSizeLabel)(val, legend.sizeLegend?.labelFormatter ?? dec))
 
             y += h + padding
         }
@@ -51159,7 +51247,7 @@ const legend = function (map, config) {
                 : [domain[1], Math.round((domain[0] + domain[1]) / 2), Math.max(domain[0], domain[1] * 0.1)]
         const legendValues = values || autoValues
         const sortedValues = [...legendValues].sort((a, b) => b - a) // largest first
-        const dec = typeof legend.sizeLegend?.labelFormatter === 'function' ? undefined : (0,_legend_utils__WEBPACK_IMPORTED_MODULE_3__.getMaxDomainPrecision)(classifierSize)
+        const dec = typeof legend.sizeLegend?.labelFormatter === 'function' ? undefined : (0,_legend_utils__WEBPACK_IMPORTED_MODULE_4__.getMaxDomainPrecision)(classifierSize)
         const offsetX = legend.sizeLegend?.offsetX ?? 0
 
         const bw = barGroupWidth ?? 16
@@ -51191,7 +51279,7 @@ const legend = function (map, config) {
         // Labels are only staggered onto multiple rows to dodge overlap - if the bar spacing
         // already gives each label enough horizontal room (estimated from character count, same
         // ~6.5px/char heuristic used for the map's own bar-badge labels), keep them all on one row.
-        const formattedLabels = sortedValues.map((val) => (0,_legend_utils__WEBPACK_IMPORTED_MODULE_3__.formatSizeLabel)(val, legend.sizeLegend?.labelFormatter ?? dec))
+        const formattedLabels = sortedValues.map((val) => (0,_legend_utils__WEBPACK_IMPORTED_MODULE_4__.formatSizeLabel)(val, legend.sizeLegend?.labelFormatter ?? dec))
         const maxLabelWidth = Math.max(...formattedLabels.map((t) => String(t).length * 6.5))
         const labelSpacing = 14
         const needsStagger = bw + gap < maxLabelWidth + 6
@@ -51261,7 +51349,8 @@ const legend = function (map, config) {
         let i = 0
 
         for (const code in scs) {
-            const y = cfg.titlePadding + (cfg.title ? out.titleFontSize : 0) + i * (cfg.shapeHeight + cfg.shapePadding)
+            const titleSpace = cfg.title ? out.titleFontSize + (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.titleClearance)(cfg.titlePadding, out.titleFontSize) : cfg.titlePadding
+            const y = titleSpace + i * (cfg.shapeHeight + cfg.shapePadding)
 
             out._colorLegendContainer
                 .append('rect')
@@ -51275,11 +51364,11 @@ const legend = function (map, config) {
                 .style('fill', scs[code])
                 .on('mouseover', function () {
                     highlightRegions(map, code)
-                    if (map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(map.insetTemplates_, map.svgId, highlightRegions, code)
+                    if (map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.executeForAllInsets)(map.insetTemplates_, map.svgId, highlightRegions, code)
                 })
                 .on('mouseout', function () {
                     unhighlightRegions(map)
-                    if (map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.executeForAllInsets)(map.insetTemplates_, map.svgId, unhighlightRegions, code)
+                    if (map.insetTemplates_) (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.executeForAllInsets)(map.insetTemplates_, map.svgId, unhighlightRegions, code)
                 })
 
             out._colorLegendContainer
@@ -51835,15 +51924,11 @@ function createHorizontalLegend(out, config) {
         }
     }
 
-    // Range labels are wide ('98.9 − < 133.9'): when neighbours would touch, alternate them onto a second row
+    // Range labels are wide ('98.9 − < 133.9'): neighbours that would touch go onto further rows
     if (ranges) {
-        const rowEnds = [-Infinity, -Infinity]
-        container.selectAll('.em-legend-item > text.em-legend-label').each(function () {
-            const box = this.getBBox()
-            let row = rowEnds[0] + 3 < box.x ? 0 : rowEnds[1] + 3 < box.x ? 1 : 0
-            if (row === 1) (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('y', barBottom + 4 + labelFontSize + 2)
-            rowEnds[row] = box.x + box.width
-        })
+        const nodes = container.selectAll('.em-legend-item > text.em-legend-label').nodes()
+        const { rows } = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.assignLabelRows)(nodes)
+        nodes.forEach((node, k) => (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(node).attr('y', barBottom + 4 + rows[k] * (labelFontSize + 2)))
     }
 
     // Max / min bounds: a tick and label at each end of the bar, from the stat data extent
@@ -51896,24 +51981,25 @@ function drawHorizontalMaxMin(out, config, c) {
     if (mm.showMin) items.push(add(false, 0, mm.minLabel, mm.highlightMin))
     if (mm.showMax) items.push(add(true, barWidth, mm.maxLabel, mm.highlightMax))
 
-    // if an end label runs into a neighbouring threshold label, drop it onto a second row
-    const others = container
+    // if an end label runs into a threshold label, or into the other end label, move it down until it is clear
+    const placed = container
         .selectAll('.em-legend-label')
-        .filter(function () {
-            return !this.classList.contains('em-legend-label-max') && !this.classList.contains('em-legend-label-min')
-        })
         .nodes()
+        .filter((node) => !items.some(({ label }) => label.node() === node))
     items.forEach(({ tick, label }) => {
-        const box = label.node().getBBox()
-        const clash = others.some((o) => {
-            const ob = o.getBBox()
-            return ob.x < box.x + box.width + 2 && ob.x + ob.width + 2 > box.x
-        })
-        if (clash) {
-            const rowY = labelY + labelFontSize + 4
+        const clashes = () => {
+            const box = label.node().getBBox()
+            return placed.some((o) => {
+                const ob = o.getBBox()
+                return ob.x < box.x + box.width + 2 && ob.x + ob.width + 2 > box.x && ob.y < box.y + box.height && ob.y + ob.height > box.y
+            })
+        }
+        for (let row = 1; row <= placed.length && clashes(); row++) {
+            const rowY = labelY + row * (labelFontSize + 4)
             label.attr('y', rowY)
             tick.attr('y2', rowY)
         }
+        placed.push(label.node())
     })
 }
 
@@ -52335,14 +52421,13 @@ function drawFlowColorLegend(out, x, y) {
     const titleBoxHeight = title.node()?.getBBox()?.height || 0
     const titlePadding = cfg.titlePadding ?? 10
     const shapeWidth = out.shapeWidth || 18
-    const shapeHeight = out.shapeHeight || 18
-    // Contiguous swatches by default, like the discrete choropleth legend (not the 5px categorical gap)
-    const rowGap = cfg.shapePadding ?? 0
+    const rowGap = cfg.shapePadding ?? 0 // contiguous swatches by default, like the discrete choropleth legend
+    const shapeHeight = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.legibleSwatchHeight)((out.shapeHeight || 18) + rowGap, out.labelFontSize) - rowGap
     const labelOffsetX = out.labelOffsets?.x ?? 5
     const titleOffset = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.swatchStackStart)({ titleHeight: titleBoxHeight, titlePadding })
 
     // labels at the boundaries between the classes (a threshold scale), instead of one label per swatch
-    const thresholds = Array.isArray(cfg.thresholds) && cfg.thresholds.length ? cfg.thresholds : null
+    const thresholds = Array.isArray(cfg.labels) && cfg.labels.length ? cfg.labels : null
 
     const swatches =
         cfg.orientation === 'horizontal'
@@ -52409,7 +52494,7 @@ function drawVerticalColorStack(out, items, { thresholds, shapeWidth, shapeHeigh
 
 /**
  * A horizontal bar of contiguous swatches running low to high. Threshold labels sit under the seams between the
- * swatches, `minLabel` / `maxLabel` under the two ends of the bar (or each swatch's own label, centred under it, when
+ * swatches, the two `maxMinLabels` under the ends of the bar (or each swatch's own label, centred under it, when
  * there are no thresholds). Labels that would touch are moved onto a second row, so they can never overlap.
  */
 function drawHorizontalColorBar(out, items, { thresholds, shapeHeight, top }) {
@@ -52449,7 +52534,8 @@ function drawHorizontalColorBar(out, items, { thresholds, shapeHeight, top }) {
         const label = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchLabel)(container, { x, y: barBottom + tickLength + 2, dy: '0.9em', anchor, text })
         labelled.push({ label, tick })
     }
-    add(0, 'start', cfg.minLabel)
+    const [minLabel, maxLabel] = cfg.maxMin ? cfg.maxMinLabels || [] : []
+    add(0, 'start', minLabel)
     if (thresholds) thresholds.forEach((text, j) => j < count - 1 && add(bar.seamX(j), 'middle', text))
     else {
         items.forEach((item, j) => {
@@ -52464,7 +52550,7 @@ function drawHorizontalColorBar(out, items, { thresholds, shapeHeight, top }) {
             labelled.push({ label })
         })
     }
-    add(barWidth, 'end', cfg.maxLabel)
+    add(barWidth, 'end', maxLabel)
 
     // never let two labels touch: those that would, go on a second row. Their tick is lengthened to reach them,
     // unless it would run through a label on a row above.
@@ -52761,9 +52847,9 @@ const legend = function (map, config) {
         ticks: false, // use labels as ticks
         orientation: 'vertical', // 'vertical' | 'horizontal'
         width: null, // width of the bar of a horizontal legend (default: the legend width)
-        thresholds: null, // labels at the boundaries between the classes (one fewer than the items): a threshold scale
-        minLabel: null, // label at the start of a horizontal bar (the lower bound)
-        maxLabel: null, // label at the end of a horizontal bar (the upper bound)
+        labels: null, // labels at the boundaries between the classes (one fewer than the items): a threshold scale, as in the choropleth legend
+        maxMin: false, // show the bounds of a horizontal bar
+        maxMinLabels: null, // [lower bound, upper bound] labels, shown when maxMin is true
     }
 
     out.regionColorLegend = {
@@ -52931,7 +53017,8 @@ const legend = function (map, config) {
         }
         // Draw the legend items
         let x = 0
-        let y = out.regionColorLegend.titlePadding
+        const titleBox = title.node().getBBox()
+        let y = Math.max(out.regionColorLegend.titlePadding, titleBox.y + titleBox.height + 2) // clear of the title
         Object.entries(items).forEach(([label, color], i) => {
             out._regionColorContainer
                 .append('rect')
@@ -52978,8 +53065,6 @@ __webpack_require__.r(__webpack_exports__);
 
 //types
 /** @typedef {import('../types/core/MapInstance').MapInstance} MapInstance */
-
-
 
 /**
  * A legend for categorical maps
@@ -53068,7 +53153,7 @@ const legend = function (map, config) {
         })
         ;(0,_legend_swatch__WEBPACK_IMPORTED_MODULE_3__.appendLegendSwatchRows)(container, items, {
             shapeWidth: out.shapeWidth,
-            shapeHeight: out.shapeHeight,
+            shapeHeight: (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_3__.legibleSwatchHeight)(out.shapeHeight + out.shapePadding, out.labelFontSize) - out.shapePadding,
             startY: (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_3__.swatchStackStart)({ titlePadding: out.titlePadding }),
             gap: out.shapePadding,
             labelX: out.shapeWidth + out.labelOffsets.x,
@@ -53092,10 +53177,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   drawCircleSizeLegend: () => (/* binding */ drawCircleSizeLegend)
 /* harmony export */ });
-/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/max.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
-/* harmony import */ var _legend_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./legend-utils */ "./src/legend/legend-utils.js");
-/* harmony import */ var _layers_proportional_symbol_symbols_circle_ring__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../layers/proportional-symbol/symbols/circle-ring */ "./src/layers/proportional-symbol/symbols/circle-ring.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var d3_array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-array */ "./node_modules/d3-array/src/max.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./legend-utils */ "./src/legend/legend-utils.js");
+/* harmony import */ var _layers_proportional_symbol_symbols_circle_ring__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../layers/proportional-symbol/symbols/circle-ring */ "./src/layers/proportional-symbol/symbols/circle-ring.js");
+
 
 
 
@@ -53108,8 +53195,9 @@ __webpack_require__.r(__webpack_exports__);
 function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePadding = 16, ringStyle) {
     //draw size legend title
     if (title) {
-        const sizeLegendTitleFontSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-size-legend-title')
-        titlePadding += sizeLegendTitleFontSize // add title font size to padding
+        const sizeLegendTitleFontSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-size-legend-title')
+        // the label of the largest circle reaches half its height above the circle: keep it clear of the title
+        titlePadding = Math.max(titlePadding, Math.ceil(((0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-legend-label') || 12) * 0.55)) + sizeLegendTitleFontSize
         // append title to the legend
         container
             .append('text')
@@ -53122,8 +53210,8 @@ function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePad
 
     // subtitle
     if (out.sizeLegend?.subtitle) {
-        const subtitleFontSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-legend-subtitle')
-        const titleH = title ? (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-size-legend-title') : 0
+        const subtitleFontSize = (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-legend-subtitle')
+        const titleH = title ? (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-size-legend-title') : 0
         container
             .append('text')
             .attr('class', 'em-legend-subtitle')
@@ -53147,7 +53235,7 @@ function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePad
         values = [max, min]
     }
 
-    let maxRadius = sizeScale((0,d3_array__WEBPACK_IMPORTED_MODULE_0__["default"])(values)) //maximum circle radius to be shown in legend
+    let maxRadius = sizeScale((0,d3_array__WEBPACK_IMPORTED_MODULE_1__["default"])(values)) //maximum circle radius to be shown in legend
     const ringWidth = maxRadius > 0 ? ringStyle?.psRingWidth_ || 0 : 0
     let x = maxRadius + ringWidth
     let y = maxRadius * 2 + titlePadding + ringWidth // y position of the first circle
@@ -53176,7 +53264,7 @@ function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePad
         .attr('r', sizeScale)
 
     //labels
-    let labelFormatter = out.sizeLegend?.labelFormatter || _legend_utils__WEBPACK_IMPORTED_MODULE_2__.formatSizeLabel
+    let labelFormatter = out.sizeLegend?.labelFormatter || _legend_utils__WEBPACK_IMPORTED_MODULE_3__.formatSizeLabel
     if (out.nodeSizeLegend?.labelFormatter) {
         labelFormatter = out.nodeSizeLegend.labelFormatter
     }
@@ -53212,10 +53300,12 @@ function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePad
             return y
         })
 
+    spreadSizeLabels(itemContainer, sizeScale, maxRadius)
+
     if (ringWidth) {
         const ringRadius = maxRadius + ringWidth / 2
         const sample = circleLegend.append('g').attr('class', 'em-ring-legend-sample').attr('transform', `translate(0,${-maxRadius})`)
-        ;(0,_layers_proportional_symbol_symbols_circle_ring__WEBPACK_IMPORTED_MODULE_3__.appendCircleRing)(sample, 50, ringStyle, 90).selectAll('circle').attr('r', ringRadius)
+        ;(0,_layers_proportional_symbol_symbols_circle_ring__WEBPACK_IMPORTED_MODULE_4__.appendCircleRing)(sample, 50, ringStyle, 90).selectAll('circle').attr('r', ringRadius)
 
         const labelTop = ringWidth + 8
         circleLegend
@@ -53231,11 +53321,39 @@ function drawCircleSizeLegend(out, container, values, sizeScale, title, titlePad
             .attr('class', 'em-legend-label em-ring-legend-label')
             .attr('text-anchor', 'start')
             .attr('x', -x)
-            .attr('y', labelTop + (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-legend-label'))
+            .attr('y', labelTop + (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-legend-label'))
             .text(out.sizeLegend.ringLabel)
     }
 
     return out
+}
+
+/**
+ * Circles of similar size have their tops, and so their labels, closer together than the text is tall. Move such labels
+ * down just enough, and bend their leader line to follow. Labels that are already clear are not touched.
+ */
+function spreadSizeLabels(itemContainer, sizeScale, maxRadius) {
+    const spacing = Math.round(((0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-legend-label') || 12) * 0.9) // closer than this, the letters touch
+    const items = []
+    itemContainer.each(function (d) {
+        items.push({ node: this, top: -1 - 2 * sizeScale(d) })
+    })
+    let previous = -Infinity
+    items
+        .sort((a, b) => a.top - b.top) // largest circle (highest top) first
+        .forEach(({ node, top }) => {
+            const y = Math.max(top, previous + spacing)
+            previous = y
+            if (y === top) return
+            const item = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(node)
+            item.select('text.em-legend-label').attr('y', y)
+            item.select('line')
+                .attr('x2', maxRadius - 6)
+                .clone()
+                .attr('x1', maxRadius - 6)
+                .attr('x2', maxRadius + 3)
+                .attr('y2', y)
+        })
 }
 
 
@@ -53769,10 +53887,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   legend: () => (/* binding */ legend)
 /* harmony export */ });
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./legend */ "./src/legend/legend.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
-/* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/arc.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./legend-swatch */ "./src/legend/legend-swatch.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./legend */ "./src/legend/legend.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
+/* harmony import */ var d3_shape__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! d3-shape */ "./node_modules/d3-shape/src/arc.js");
+
 
 
 
@@ -53784,7 +53904,7 @@ __webpack_require__.r(__webpack_exports__);
  * @param {*} map
  */
 const legend = function (map, config) {
-    const out = _legend__WEBPACK_IMPORTED_MODULE_1__.legend(map)
+    const out = _legend__WEBPACK_IMPORTED_MODULE_2__.legend(map)
 
     out.sizeLegend = {
         title: null,
@@ -53818,6 +53938,10 @@ const legend = function (map, config) {
     if (config) {
         for (let key in config) {
             if (key === 'colorLegend' || key === 'sizeLegend' || key === 'timeLegend') {
+                if (config[key] === false) {
+                    out[key] = false
+                    continue
+                }
                 for (let p in out[key]) {
                     if (config[key][p] !== undefined) out[key][p] = config[key][p]
                 }
@@ -53844,17 +53968,10 @@ const legend = function (map, config) {
         const baseX = out.getBaseX()
 
         // Wedge size legend replaces circle size legend
-        if (map.classifierChartSize_) {
+        if (map.classifierChartSize_ && out.sizeLegend) {
             const container = lgg.append('g').attr('class', 'em-coxcomb-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
             out._sizeLegendContainer = container
-            drawWedgeSizeLegend(
-                out,
-                container,
-                out.sizeLegend.values,
-                map.classifierChartSize_,
-                out.sizeLegend.title,
-                out.sizeLegend.titlePadding
-            )
+            drawWedgeSizeLegend(out, container, out.sizeLegend.values, map.classifierChartSize_, out.sizeLegend.title, out.sizeLegend.titlePadding)
         }
 
         buildColorLegend(out, baseX, baseY)
@@ -53892,7 +54009,7 @@ const legend = function (map, config) {
         const startAngle = -wedgeHalfAngle
         const endAngle = wedgeHalfAngle
 
-        const arcGen = (0,d3_shape__WEBPACK_IMPORTED_MODULE_3__["default"])().innerRadius(0).startAngle(startAngle).endAngle(endAngle)
+        const arcGen = (0,d3_shape__WEBPACK_IMPORTED_MODULE_4__["default"])().innerRadius(0).startAngle(startAngle).endAngle(endAngle)
 
         const maxR = sizeScale(Math.max(...values))
         // Center horizontally: wedge points up, labels extend to the right
@@ -53950,6 +54067,8 @@ const legend = function (map, config) {
     function buildColorLegend(out, baseX, baseY) {
         const map = out.map
         const config = out.colorLegend
+        if (!config) return
+        config.shapeHeight = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.legibleSwatchHeight)(config.shapeHeight, out.labelFontSize)
         out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-coxcomb-color-legend')
 
         let sizeLegendHeight = 0
@@ -53973,7 +54092,10 @@ const legend = function (map, config) {
         let i = 0
         const scs = map.catColors_
         for (let code in scs) {
-            const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
+            const titleSpace = config.title
+                ? out.titleFontSize + (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.titleClearance)(out.colorLegend.titlePadding, out.titleFontSize)
+                : out.colorLegend.titlePadding
+            const y = titleSpace + i * (config.shapeHeight + config.shapePadding)
             const col = map.catColors()[code] || 'lightgray'
 
             out._colorLegendContainer
@@ -53987,13 +54109,13 @@ const legend = function (map, config) {
                 .on('mouseover', function () {
                     highlightCoxcombWedges(out.map, code)
                     if (out.map.insetTemplates_) {
-                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, highlightCoxcombWedges, code)
+                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, highlightCoxcombWedges, code)
                     }
                 })
                 .on('mouseout', function () {
                     unhighlightCoxcombWedges(out.map)
                     if (out.map.insetTemplates_) {
-                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, unhighlightCoxcombWedges, code)
+                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, unhighlightCoxcombWedges, code)
                     }
                 })
 
@@ -54026,6 +54148,7 @@ const legend = function (map, config) {
      * Labels each segment (e.g., Jan, Feb) around the circle.
      */
     function buildCoxcombTimeLegend(out, baseX, baseY) {
+        if (!out.timeLegend) return
         const times = map._coxTimes || []
         const radius = out.timeLegend.radius || 40
 
@@ -54039,7 +54162,7 @@ const legend = function (map, config) {
         }
         if (out._colorLegendContainer) {
             y += out._colorLegendContainer.node().getBBox().height
-            y += out.colorLegend.marginTop || 0
+            y += out.colorLegend?.marginTop || 0
         }
 
         y += out.timeLegend?.marginTop || 0
@@ -54068,7 +54191,7 @@ const legend = function (map, config) {
             .attr('class', 'em-coxcomb-time-legend')
             .attr('transform', `translate(${centerX}, ${y + radius})`)
 
-        const arcGen = (0,d3_shape__WEBPACK_IMPORTED_MODULE_3__["default"])()
+        const arcGen = (0,d3_shape__WEBPACK_IMPORTED_MODULE_4__["default"])()
             .innerRadius(0)
             .outerRadius(radius)
             .startAngle((d, i) => i * angleStep)
@@ -54137,10 +54260,10 @@ const legend = function (map, config) {
                 lastActive.forEach((el) => el.classList.add('em-time-active'))
 
                 container.selectAll('path').style('opacity', 0.3).style('stroke', 'white').style('stroke-width', 0.5)
-                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('stroke', '#333').style('stroke-width', 2).style('opacity', 1)
+                ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('stroke', '#333').style('stroke-width', 2).style('opacity', 1)
             })
             .on('mouseout', function () {
-                (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
+                (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('stroke', 'white').style('stroke-width', 0.5).style('opacity', 1)
             })
     }
 
@@ -54149,7 +54272,7 @@ const legend = function (map, config) {
 
         // Store original colors before changing them
         allSegments.each(function () {
-            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
             if (!sel.attr('fill___')) {
                 sel.attr('fill___', sel.style('fill'))
             }
@@ -54158,14 +54281,14 @@ const legend = function (map, config) {
         allSegments.style('fill', 'white')
         const selected = allSegments.filter("path[code='" + code + "']")
         selected.each(function () {
-            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('fill', (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).attr('fill___'))
+            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('fill', (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).attr('fill___'))
         })
     }
 
     function unhighlightCoxcombWedges(map) {
         const allSegments = map.svg_.selectAll('.em-coxcomb-chart').selectAll('path[code]')
         allSegments.each(function () {
-            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+            const sel = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
             const originalColor = sel.attr('fill___')
 
             if (originalColor && originalColor !== 'null' && originalColor !== 'undefined') {
@@ -54203,13 +54326,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   drawDiscreteLegend: () => (/* binding */ drawDiscreteLegend),
 /* harmony export */   resolveDecimals: () => (/* binding */ resolveDecimals)
 /* harmony export */ });
-/* harmony import */ var d3_format__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-format */ "./node_modules/d3-format/src/defaultLocale.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
-/* harmony import */ var _discrete_shared__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./discrete/shared */ "./src/legend/discrete/shared.js");
-/* harmony import */ var _discrete_extras__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./discrete/extras */ "./src/legend/discrete/extras.js");
-/* harmony import */ var _discrete_vertical__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./discrete/vertical */ "./src/legend/discrete/vertical.js");
-/* harmony import */ var _discrete_horizontal__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./discrete/horizontal */ "./src/legend/discrete/horizontal.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./legend-swatch */ "./src/legend/legend-swatch.js");
+/* harmony import */ var d3_format__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-format */ "./node_modules/d3-format/src/defaultLocale.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _discrete_shared__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./discrete/shared */ "./src/legend/discrete/shared.js");
+/* harmony import */ var _discrete_extras__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./discrete/extras */ "./src/legend/discrete/extras.js");
+/* harmony import */ var _discrete_vertical__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./discrete/vertical */ "./src/legend/discrete/vertical.js");
+/* harmony import */ var _discrete_horizontal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./discrete/horizontal */ "./src/legend/discrete/horizontal.js");
 // legends for discrete color scales
+
 
 
 
@@ -54240,7 +54365,7 @@ function buildDiscreteLabelFormatter(out, getThresholdsFn, statData, labelType, 
     }
 
     const decimals = resolveDecimals(out, statData)
-    const decimalFormatter = (0,d3_format__WEBPACK_IMPORTED_MODULE_0__.format)(`,.${decimals}f`)
+    const decimalFormatter = (0,d3_format__WEBPACK_IMPORTED_MODULE_1__.format)(`,.${decimals}f`)
     const fmt = (value) => normalizeMinus(decimalFormatter(value))
 
     if (labelType === 'ranges') {
@@ -54310,7 +54435,7 @@ function drawDiscreteLegend(out, x, y) {
 
     // subtitle
     if (out.colorLegend?.subtitle) {
-        const titleH = out.colorLegend.title ? (0,_core_utils__WEBPACK_IMPORTED_MODULE_1__.getFontSizeFromClass)('em-color-legend-title') + 2 : 0
+        const titleH = out.colorLegend.title ? (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-color-legend-title') + 2 : 0
         out._discreteLegendContainer.append('text').attr('class', 'em-legend-subtitle').attr('x', 0).attr('y', titleH).html(out.colorLegend.subtitle)
     }
 
@@ -54318,26 +54443,28 @@ function drawDiscreteLegend(out, x, y) {
     const config = out.map._mapType == 'ps' ? out.colorLegend : out // Use out.colorLegend for proportional symbols, out for choropleth
 
     const horizontal = config.orientation === 'horizontal'
+    // rows closer together than the label text is tall would print the labels over each other
+    if (!horizontal) config.shapeHeight = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.legibleSwatchHeight)(config.shapeHeight, (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.getFontSizeFromClass)('em-legend-label'))
 
     // thresholds vs ranges
     if (horizontal) {
-        (0,_discrete_horizontal__WEBPACK_IMPORTED_MODULE_5__.createHorizontalLegend)(out, config)
+        (0,_discrete_horizontal__WEBPACK_IMPORTED_MODULE_6__.createHorizontalLegend)(out, config)
     } else if (out.labelType === 'ranges' || out.colorLegend?.labelType === 'ranges') {
-        (0,_discrete_vertical__WEBPACK_IMPORTED_MODULE_4__.createRangesLegend)(out, config)
+        (0,_discrete_vertical__WEBPACK_IMPORTED_MODULE_5__.createRangesLegend)(out, config)
     } else {
-        (0,_discrete_vertical__WEBPACK_IMPORTED_MODULE_4__.createThresholdsLegend)(out, config)
+        (0,_discrete_vertical__WEBPACK_IMPORTED_MODULE_5__.createThresholdsLegend)(out, config)
     }
 
     if (horizontal) {
-        (0,_discrete_horizontal__WEBPACK_IMPORTED_MODULE_5__.appendHorizontalExtraItems)(out, config)
+        (0,_discrete_horizontal__WEBPACK_IMPORTED_MODULE_6__.appendHorizontalExtraItems)(out, config)
         return
     }
 
     // The no-data box and any extra categorical classes (e.g. a "no railway lines" class alongside numeric
     // electrification-rate classes) stack below the classes, as rows of the same swatch stack.
-    let extrasY = (0,_discrete_shared__WEBPACK_IMPORTED_MODULE_2__.classStackBottom)(out, config) + 3 // 3px padding
+    let extrasY = (0,_discrete_shared__WEBPACK_IMPORTED_MODULE_3__.classStackBottom)(out, config) + 3 // 3px padding
     if (config.pointOfDivergence && config.pointOfDivergencePadding) extrasY += config.pointOfDivergencePadding // shift down after point of divergence
-    ;(0,_discrete_extras__WEBPACK_IMPORTED_MODULE_3__.appendExtraSwatchStack)(out, (0,_discrete_extras__WEBPACK_IMPORTED_MODULE_3__.extraSwatchRows)(out, config), extrasY)
+    ;(0,_discrete_extras__WEBPACK_IMPORTED_MODULE_4__.appendExtraSwatchStack)(out, (0,_discrete_extras__WEBPACK_IMPORTED_MODULE_4__.extraSwatchRows)(out, config), extrasY)
 }
 
 /**
@@ -54349,7 +54476,7 @@ function drawDiscreteLegend(out, x, y) {
  * No-ops if there are no categories configured.
  */
 function appendCategoryLegendItems(out, startY) {
-    (0,_discrete_extras__WEBPACK_IMPORTED_MODULE_3__.appendExtraSwatchStack)(out, (0,_discrete_extras__WEBPACK_IMPORTED_MODULE_3__.extraSwatchRows)(out, {}, { includeNoData: false }), startY)
+    (0,_discrete_extras__WEBPACK_IMPORTED_MODULE_4__.appendExtraSwatchStack)(out, (0,_discrete_extras__WEBPACK_IMPORTED_MODULE_4__.extraSwatchRows)(out, {}, { includeNoData: false }), startY)
 }
 
 
@@ -54404,11 +54531,9 @@ const legend = function (map, config) {
     }
 
     // override via config
-    if (config?.sizeLegend) {
-        Object.assign(out.sizeLegend, config.sizeLegend)
-    }
-    if (config?.colorLegend) {
-        Object.assign(out.colorLegend, config.colorLegend)
+    for (const key of ['sizeLegend', 'colorLegend']) {
+        if (config?.[key] === false) out[key] = false
+        else if (config?.[key]) Object.assign(out[key], config[key])
     }
 
     // -------------------------------
@@ -54429,10 +54554,10 @@ const legend = function (map, config) {
         if (out.subtitle) out.addSubtitle()
 
         const baseX = out.getBaseX()
-        let cursorY = out.getBaseY() + out.sizeLegend.marginTop
+        let cursorY = out.getBaseY() + (out.sizeLegend?.marginTop || 0)
         const legendSpacing = 8
 
-        if (out.sizeLegend.title) {
+        if (out.sizeLegend?.title) {
             const sizeTitle = out.lgg
                 .append('text')
                 .attr('class', 'em-size-legend-title')
@@ -54449,7 +54574,9 @@ const legend = function (map, config) {
         // -----------------------------
         const hasIndependentScales = out.map.mushroomSizeScaleFunctionV1_ && out.map.mushroomSizeScaleFunctionV2_
 
-        if (hasIndependentScales) {
+        if (!out.sizeLegend) {
+            // switched off: the colour key starts at the top
+        } else if (hasIndependentScales) {
             // --- v1 legend ---
             const v1Box = drawMushroomSizeLegend(out, baseX, cursorY, 'v1')
 
@@ -54471,8 +54598,8 @@ const legend = function (map, config) {
         // -----------------------------
         // COLOR KEY (only for shared scale)
         // -----------------------------
-        if (!hasIndependentScales) {
-            drawColorKey(out, baseX, cursorY + out.colorLegend.marginTop)
+        if (!hasIndependentScales && out.colorLegend) {
+            drawColorKey(out, baseX, cursorY + Math.max(out.colorLegend.marginTop, 5)) // the key's title clears the size legend
         }
 
         out.setBoxDimension()
@@ -54877,11 +55004,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   legend: () => (/* binding */ legend)
 /* harmony export */ });
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./legend */ "./src/legend/legend.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
-/* harmony import */ var _legend_circle_size__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./legend-circle-size */ "./src/legend/legend-circle-size.js");
-/* harmony import */ var _legend_pattern_fill__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./legend-pattern-fill */ "./src/legend/legend-pattern-fill.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./legend-swatch */ "./src/legend/legend-swatch.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./legend */ "./src/legend/legend.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_circle_size__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./legend-circle-size */ "./src/legend/legend-circle-size.js");
+/* harmony import */ var _legend_pattern_fill__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./legend-pattern-fill */ "./src/legend/legend-pattern-fill.js");
+
 
 
 
@@ -54895,7 +55024,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 const legend = function (map, config) {
     //build generic legend object for the map
-    const out = _legend__WEBPACK_IMPORTED_MODULE_1__.legend(map)
+    const out = _legend__WEBPACK_IMPORTED_MODULE_2__.legend(map)
 
     //size legend config (legend illustrating the values of different pie sizes)
     out.sizeLegend = {
@@ -54971,7 +55100,7 @@ const legend = function (map, config) {
         if (layer.classifierSize_ && out.sizeLegend) {
             //circle size legend
             out._sizeLegendContainer = lgg.append('g').attr('class', 'em-pie-size-legend').attr('transform', `translate(${baseX}, ${baseY})`)
-            ;(0,_legend_circle_size__WEBPACK_IMPORTED_MODULE_3__.drawCircleSizeLegend)(
+            ;(0,_legend_circle_size__WEBPACK_IMPORTED_MODULE_4__.drawCircleSizeLegend)(
                 out,
                 out._sizeLegendContainer,
                 out.sizeLegend.values,
@@ -54990,7 +55119,7 @@ const legend = function (map, config) {
                 .append('g')
                 .attr('class', 'pattern-fill-legend')
                 .attr('transform', `translate(${baseX}, ${legendHeight + 15})`)
-            ;(0,_legend_pattern_fill__WEBPACK_IMPORTED_MODULE_4__.appendPatternFillLegend)(out, patternContainer)
+            ;(0,_legend_pattern_fill__WEBPACK_IMPORTED_MODULE_5__.appendPatternFillLegend)(out, patternContainer)
         }
 
         //set legend box dimensions
@@ -55004,6 +55133,8 @@ const legend = function (map, config) {
     function buildColorLegend(out, baseX, baseY) {
         const layer = out.layer
         const config = out.colorLegend
+        if (!config) return
+        config.shapeHeight = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.legibleSwatchHeight)(config.shapeHeight, out.labelFontSize)
         //container
         out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-pie-color-legend')
 
@@ -55033,7 +55164,10 @@ const legend = function (map, config) {
         const labels = layer.catLabels()
         for (let code in scs) {
             //the vertical position of the legend element
-            const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
+            const titleSpace = config.title
+                ? out.titleFontSize + (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.titleClearance)(out.colorLegend.titlePadding, out.titleFontSize)
+                : out.colorLegend.titlePadding
+            const y = titleSpace + i * (config.shapeHeight + config.shapePadding)
             //rectangle
             out._colorLegendContainer
                 .append('rect')
@@ -55047,13 +55181,13 @@ const legend = function (map, config) {
                 .on('mouseover', function () {
                     highlightSlices(out.map, code)
                     if (out.map.insetTemplates_) {
-                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, highlightSlices, code)
+                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, highlightSlices, code)
                     }
                 })
                 .on('mouseout', function () {
                     unhighlightSlices(out.map)
                     if (out.map.insetTemplates_) {
-                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, unhighlightSlices, code)
+                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, unhighlightSlices, code)
                     }
                 })
 
@@ -55097,7 +55231,7 @@ const legend = function (map, config) {
         // Highlight only the selected segments by restoring their original color
         const selectedSegments = allSegments.filter("path[code='" + code + "']")
         selectedSegments.each(function () {
-            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('opacity', 1) // Restore original color for selected segments
+            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('opacity', 1) // Restore original color for selected segments
         })
     }
 
@@ -55107,7 +55241,7 @@ const legend = function (map, config) {
 
         // Restore each segments's original color from the fill___ attribute
         allSegments.each(function () {
-            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('opacity', 1)
+            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('opacity', 1)
         })
     }
 
@@ -55200,6 +55334,10 @@ const legend = function (map, config) {
     if (config) {
         for (let key in config) {
             if (key === 'scaleLegend') {
+                if (config.scaleLegend === false) {
+                    out.scaleLegend.show = false
+                    continue
+                }
                 for (let p in out.scaleLegend) {
                     if (config.scaleLegend[p] !== undefined) {
                         out.scaleLegend[p] = config.scaleLegend[p]
@@ -55271,7 +55409,8 @@ const legend = function (map, config) {
                 .attr('class', 'em-spark-scale-legend em-grid-cell')
                 .attr('transform', `translate(${baseX}, ${baseY})`)
 
-            drawScaleLegend(out, out._scaleLegendContainer)
+            out._scaleLegendHeight = 0
+            if (out.scaleLegend.show !== false) drawScaleLegend(out, out._scaleLegendContainer)
 
             if ((out.colorLegend.show || out.colorLegend.items?.length) && out.colorLegend.items?.length) {
                 drawColorLegend(out, out._scaleLegendContainer, out._scaleLegendHeight + out.colorLegend.marginTop)
@@ -55589,9 +55728,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   legend: () => (/* binding */ legend)
 /* harmony export */ });
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./legend */ "./src/legend/legend.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./legend-swatch */ "./src/legend/legend-swatch.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./legend */ "./src/legend/legend.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
+
 
 
 
@@ -55603,7 +55744,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 const legend = function (map, config) {
     //build generic legend object for the map
-    const out = _legend__WEBPACK_IMPORTED_MODULE_1__.legend(map)
+    const out = _legend__WEBPACK_IMPORTED_MODULE_2__.legend(map)
 
     //colour legend config (aligned with pie chart color legend)
     out.colorLegend = {
@@ -55690,7 +55831,8 @@ const legend = function (map, config) {
         let i = 0
         const scs = map.catColors()
         for (let code in scs) {
-            const y = legendTitlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
+            const titleSpace = config.title ? out.titleFontSize + (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.titleClearance)(legendTitlePadding, out.titleFontSize) : legendTitlePadding
+            const y = titleSpace + i * (config.shapeHeight + config.shapePadding)
 
             out._colorLegendContainer
                 .append('rect')
@@ -55703,13 +55845,13 @@ const legend = function (map, config) {
                 .on('mouseover', function () {
                     highlightRegions(out.map, code)
                     if (out.map.insetTemplates_) {
-                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, highlightRegions, code)
+                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, highlightRegions, code)
                     }
                 })
                 .on('mouseout', function () {
                     unhighlightRegions(out.map)
                     if (out.map.insetTemplates_) {
-                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, unhighlightRegions)
+                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId_, unhighlightRegions)
                     }
                 })
 
@@ -55737,7 +55879,7 @@ const legend = function (map, config) {
 
         // Save original colors if not already stored
         allRegions.each(function () {
-            const el = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+            const el = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
             if (!el.attr('data-original-fill')) {
                 el.attr('data-original-fill', el.style('fill'))
             }
@@ -55747,7 +55889,7 @@ const legend = function (map, config) {
         // Highlight only the selected regions by restoring their original color
         const selectedRegions = map.svg_.selectAll('pattern').selectAll("rect[code='" + code + "']")
         selectedRegions.each(function () {
-            const el = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+            const el = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
             el.style('fill', el.attr('data-original-fill')) // Restore original fill
         })
     }
@@ -55757,7 +55899,7 @@ const legend = function (map, config) {
 
         // Restore each region's original color from the stored attribute
         allRegions.each(function () {
-            const el = (0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this)
+            const el = (0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this)
             const originalFill = el.attr('data-original-fill')
             if (originalFill) {
                 el.style('fill', originalFill)
@@ -55784,12 +55926,101 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   appendLegendSwatchLabel: () => (/* binding */ appendLegendSwatchLabel),
 /* harmony export */   appendLegendSwatchRows: () => (/* binding */ appendLegendSwatchRows),
 /* harmony export */   assignLabelRows: () => (/* binding */ assignLabelRows),
+/* harmony export */   legibleSwatchHeight: () => (/* binding */ legibleSwatchHeight),
 /* harmony export */   rangesDecorator: () => (/* binding */ rangesDecorator),
+/* harmony export */   separateStackedParts: () => (/* binding */ separateStackedParts),
 /* harmony export */   swatchBarLayout: () => (/* binding */ swatchBarLayout),
 /* harmony export */   swatchStackLayout: () => (/* binding */ swatchStackLayout),
 /* harmony export */   swatchStackStart: () => (/* binding */ swatchStackStart),
-/* harmony export */   thresholdsDecorator: () => (/* binding */ thresholdsDecorator)
+/* harmony export */   thresholdsDecorator: () => (/* binding */ thresholdsDecorator),
+/* harmony export */   titleClearance: () => (/* binding */ titleClearance)
 /* harmony export */ });
+/** Smallest space, in screen pixels, left between two parts of a legend that would otherwise overlap. */
+const PART_GAP = 4
+
+/**
+ * Make sure that no part of a legend is drawn over another. The parts are the groups directly inside the legend
+ * (titles, size legend, colour legend, no-data and pattern items...), in drawing order. A part that draws over an
+ * earlier one is moved down below it; parts side by side, or already clear of each other, are not touched. This runs
+ * for every legend, so that a small `marginTop`, a long title or a large symbol can never make two parts collide.
+ *
+ * What the parts really draw is compared, element by element: the empty corners of a group's bounding box (around a
+ * rotated square, say) do not count, nor does the room a text box reserves above and below its letters, so a legend
+ * with deliberately tight spacing (a negative `titlePadding`) stays as it is.
+ *
+ * @param {SVGGElement} legend the legend's root group
+ */
+function separateStackedParts(legend) {
+    const matrix = legend.getScreenCTM?.()
+    if (!matrix || !matrix.d) return // not rendered (hidden, or no layout engine): nothing can be measured
+    const placed = [] // what the earlier parts draw
+    for (const part of legend.children) {
+        if (part.tagName === 'text') placed.push(...drawnRects(part, matrix.d)) // a title written straight into the legend
+        if (part.tagName !== 'g') continue
+        const drawn = drawnRects(part, matrix.d)
+        if (!drawn.length) continue
+        let shift = 0
+        // moving below one element can run into another: repeat until clear of all of them
+        for (let pass = 0; pass <= placed.length; pass++) {
+            let next = shift
+            for (const box of drawn) {
+                for (const other of placed) {
+                    const hit = box.left < other.right - 1 && other.left < box.right - 1 && box.top + shift < other.bottom - 0.5 && other.top < box.bottom + shift - 0.5
+                    if (hit) next = Math.max(next, other.bottom + PART_GAP - box.top)
+                }
+            }
+            if (next === shift) break
+            shift = next
+        }
+        if (shift) part.setAttribute('transform', `translate(0,${shift / matrix.d}) ${part.getAttribute('transform') || ''}`.trim())
+        drawn.forEach(({ left, right, top, bottom }) => placed.push({ left, right, top: top + shift, bottom: bottom + shift }))
+    }
+}
+
+/** The screen rectangles of what a legend part draws: letters without their line spacing, thick lines with their stroke. */
+function drawnRects(part, scale) {
+    const rects = []
+    const selector = 'text, rect, circle, ellipse, path, polygon, line'
+    for (const element of part.matches(selector) ? [part] : part.querySelectorAll(selector)) {
+        if (element.closest('defs, clipPath, marker')) continue
+        let { left, right, top, bottom, width, height } = element.getBoundingClientRect()
+        if (!width && !height) continue
+        if (element.tagName === 'text') {
+            top += height * 0.12
+            bottom -= height * 0.12
+        } else if (element.tagName === 'line') {
+            const half = (parseFloat(getComputedStyle(element).strokeWidth) || 0) * Math.abs(scale) * 0.5
+            top -= half
+            bottom += half
+        }
+        rects.push({ left, right, top, bottom })
+    }
+    return rects
+}
+
+/**
+ * The smallest height of the swatches of a vertical stack: rows closer together than the label text is tall would
+ * print their labels over each other.
+ *
+ * @param {number} height the configured swatch height
+ * @param {number} fontSize the label font size
+ * @returns {number}
+ */
+function legibleSwatchHeight(height, fontSize) {
+    return Math.max(height, Math.round((fontSize || 12) * 0.85)) // the figures of a label are about 0.75em tall
+}
+
+/**
+ * The gap between a title and the content below it: at least the room the descenders of the title need.
+ *
+ * @param {number} padding the configured titlePadding
+ * @param {number} fontSize the title font size
+ * @returns {number}
+ */
+function titleClearance(padding, fontSize) {
+    return Math.max(padding, Math.ceil((fontSize || 14) * 0.35))
+}
+
 /** Draw an SVG colour swatch at the position chosen by the legend layout. */
 function appendLegendSwatch(row, { x, y, width, height, color, onEnter, onLeave }) {
     return row
@@ -56081,11 +56312,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   legend: () => (/* binding */ legend)
 /* harmony export */ });
-/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
-/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./legend */ "./src/legend/legend.js");
-/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
-/* harmony import */ var _legend_pattern_fill__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./legend-pattern-fill */ "./src/legend/legend-pattern-fill.js");
-/* harmony import */ var _legend_utils__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./legend-utils */ "./src/legend/legend-utils.js");
+/* harmony import */ var _legend_swatch__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./legend-swatch */ "./src/legend/legend-swatch.js");
+/* harmony import */ var d3_selection__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3-selection */ "./node_modules/d3-selection/src/select.js");
+/* harmony import */ var _legend__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./legend */ "./src/legend/legend.js");
+/* harmony import */ var _core_utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../core/utils */ "./src/core/utils.js");
+/* harmony import */ var _legend_pattern_fill__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./legend-pattern-fill */ "./src/legend/legend-pattern-fill.js");
+/* harmony import */ var _legend_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./legend-utils */ "./src/legend/legend-utils.js");
+
 
 
 
@@ -56102,7 +56335,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 const legend = function (map, config) {
     //build generic legend object for the map
-    const out = _legend__WEBPACK_IMPORTED_MODULE_1__.legend(map)
+    const out = _legend__WEBPACK_IMPORTED_MODULE_2__.legend(map)
 
     //size legend config (legend illustrating the values of different waffle sizes)
     out.sizeLegend = {
@@ -56135,6 +56368,10 @@ const legend = function (map, config) {
     if (config)
         for (let key in config) {
             if (key == 'colorLegend' || key == 'sizeLegend') {
+                if (config[key] === false) {
+                    out[key] = false
+                    continue
+                }
                 for (let p in out[key]) {
                     //override each property in size and color legend configs
                     if (config[key][p] !== undefined) {
@@ -56194,7 +56431,7 @@ const legend = function (map, config) {
                 .append('g')
                 .attr('class', 'pattern-fill-legend')
                 .attr('transform', `translate(${baseX}, ${legendHeight + 15})`)
-            ;(0,_legend_pattern_fill__WEBPACK_IMPORTED_MODULE_3__.appendPatternFillLegend)(out, patternContainer)
+            ;(0,_legend_pattern_fill__WEBPACK_IMPORTED_MODULE_4__.appendPatternFillLegend)(out, patternContainer)
         }
 
         //set legend box dimensions
@@ -56207,6 +56444,8 @@ const legend = function (map, config) {
     function buildColorLegend(out, baseX, baseY) {
         const map = out.map
         const config = out.colorLegend
+        if (!config) return
+        config.shapeHeight = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.legibleSwatchHeight)(config.shapeHeight, out.labelFontSize)
 
         //container
         out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-waffle-color-legend')
@@ -56241,7 +56480,10 @@ const legend = function (map, config) {
         if (codes.includes('other')) orderedCodes.push('other')
 
         orderedCodes.forEach((code) => {
-            const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
+            const titleSpace = config.title
+                ? out.titleFontSize + (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_0__.titleClearance)(out.colorLegend.titlePadding, out.titleFontSize)
+                : out.colorLegend.titlePadding
+            const y = titleSpace + i * (config.shapeHeight + config.shapePadding)
 
             // rectangle
             out._colorLegendContainer
@@ -56257,13 +56499,13 @@ const legend = function (map, config) {
                 .on('mouseover', function () {
                     highlightRegions(out.map, code)
                     if (out.map.insetTemplates_) {
-                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
+                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, highlightRegions, code)
                     }
                 })
                 .on('mouseout', function () {
                     unhighlightRegions(out.map)
                     if (out.map.insetTemplates_) {
-                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_2__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, code)
+                        (0,_core_utils__WEBPACK_IMPORTED_MODULE_3__.executeForAllInsets)(out.map.insetTemplates_, out.map.svgId, unhighlightRegions, code)
                     }
                 })
 
@@ -56307,7 +56549,7 @@ const legend = function (map, config) {
         // Highlight only the selected cells by restoring their original opacity
         const selectedCells = allCells.filter("rect[code='" + code + "']")
         selectedCells.each(function () {
-            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('opacity', 1)
+            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('opacity', 1)
         })
     }
 
@@ -56317,7 +56559,7 @@ const legend = function (map, config) {
 
         // Restore each cell's original opacity
         allCells.each(function () {
-            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_0__["default"])(this).style('opacity', 1)
+            ;(0,d3_selection__WEBPACK_IMPORTED_MODULE_1__["default"])(this).style('opacity', 1)
         })
     }
 
@@ -56386,7 +56628,7 @@ const legend = function (map, config) {
                 .attr('x', labelX)
                 .attr('y', y + labelY)
                 .attr('dominant-baseline', 'middle')
-                .text((0,_legend_utils__WEBPACK_IMPORTED_MODULE_4__.formatSizeLabel)(val, legend.sizeLegend?.labelFormatter))
+                .text((0,_legend_utils__WEBPACK_IMPORTED_MODULE_5__.formatSizeLabel)(val, legend.sizeLegend?.labelFormatter))
 
             y += waffleSize + 8
         }
@@ -56700,7 +56942,12 @@ const legend = function (map) {
 
     /** Draw legend background box */
     out.makeBackgroundBox = function () {
-        out.lgg.append('rect').attr('id', 'em-legend-background').attr('class', 'em-legend-background').attr('rx', _core_buttons_corner_radius__WEBPACK_IMPORTED_MODULE_4__.BOX_CORNER_RADIUS).attr('ry', _core_buttons_corner_radius__WEBPACK_IMPORTED_MODULE_4__.BOX_CORNER_RADIUS)
+        out.lgg
+            .append('rect')
+            .attr('id', 'em-legend-background')
+            .attr('class', 'em-legend-background')
+            .attr('rx', _core_buttons_corner_radius__WEBPACK_IMPORTED_MODULE_4__.BOX_CORNER_RADIUS)
+            .attr('ry', _core_buttons_corner_radius__WEBPACK_IMPORTED_MODULE_4__.BOX_CORNER_RADIUS)
         out.updateBackgroundBoxOpacity()
     }
 
@@ -56754,6 +57001,7 @@ const legend = function (map) {
     /** Set legend box dimensions, ensuring it has suitable dimensions to fit to all legend graphic elements */
     out.setBoxDimension = function () {
         if (out.lgg.node()) {
+            (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.separateStackedParts)(out.lgg.node())
             //get legend elements bounding box
             const bb = out.lgg.node().getBBox({ stroke: true })
             //apply to legend box dimensions
@@ -56780,28 +57028,27 @@ const legend = function (map) {
         const onLeave = () => interact(unhighlightFunction)
 
         // a single row of the swatch stack, padded from the top of its container
-        const [{ label }] = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchRows)(
-            container,
-            [{ color, label: text, onEnter, onLeave }],
-            {
-                shapeWidth: out.noDataShapeWidth,
-                shapeHeight: out.noDataShapeHeight,
-                startY: out.noDataPadding,
-                labelX: out.noDataShapeWidth + 5,
-                labelDy: '0.35em',
-            }
-        )
-        label
-            .attr('class', labelClass)
-            .style('pointer-events', 'all')
-            .style('cursor', 'pointer')
-            .on('mouseover', onEnter)
-            .on('mouseout', onLeave)
+        const [{ label }] = (0,_legend_swatch__WEBPACK_IMPORTED_MODULE_2__.appendLegendSwatchRows)(container, [{ color, label: text, onEnter, onLeave }], {
+            shapeWidth: out.noDataShapeWidth,
+            shapeHeight: out.noDataShapeHeight,
+            startY: out.noDataPadding,
+            labelX: out.noDataShapeWidth + 5,
+            labelDy: '0.35em',
+        })
+        label.attr('class', labelClass).style('pointer-events', 'all').style('cursor', 'pointer').on('mouseover', onEnter).on('mouseout', onLeave)
     }
 
     //'no data' legend box
     out.appendNoDataLegend = function (container, noDataText, highlightFunction, unhighlightFunction) {
-        appendExtraSwatch(container, 'nd', out.map.noDataFillStyle(), noDataText, 'em-legend-label em-legend-label-no-data', highlightFunction, unhighlightFunction)
+        appendExtraSwatch(
+            container,
+            'nd',
+            out.map.noDataFillStyle(),
+            noDataText,
+            'em-legend-label em-legend-label-no-data',
+            highlightFunction,
+            unhighlightFunction
+        )
     }
 
     //legend box for an extra categorical value mixed into an otherwise numeric/discrete
@@ -57214,13 +57461,16 @@ const legend = function (map, config) {
 
         for (let key in config) {
             if (key == 'colorLegend' || key == 'sizeLegend') {
+                if (config[key] === false) {
+                    out[key] = false
+                    continue
+                }
                 for (let p in out[key]) {
                     //override each property in size and color legend configs
                     if (config[key][p] !== undefined) {
                         out[key][p] = config[key][p]
                     }
                 }
-                if (config.colorLegend == false) out.colorLegend = false
             } else {
                 out[key] = config[key]
             }
@@ -57252,7 +57502,7 @@ const legend = function (map, config) {
             const baseX = out.getBaseX()
 
             // legend for size
-            if (map.classifierSize_) {
+            if (map.classifierSize_ && out.sizeLegend) {
                 (0,_legend_symbol_size__WEBPACK_IMPORTED_MODULE_3__.drawSizeLegend)(out, baseX, baseY)
             }
             if (map.classifierColor_ && out.colorLegend) {
@@ -57278,7 +57528,10 @@ const legend = function (map, config) {
                 if (out._sizeLegendContainer) {
                     y += out._sizeLegendContainer.node().getBBox().height + out.colorLegend.marginTop
                 }
-                out._discreteLegendContainer = out.lgg.append('g').attr('class', 'em-discrete-legend-container').attr('transform', `translate(${x},${y})`)
+                out._discreteLegendContainer = out.lgg
+                    .append('g')
+                    .attr('class', 'em-discrete-legend-container')
+                    .attr('transform', `translate(${x},${y})`)
                 ;(0,_legend_discrete__WEBPACK_IMPORTED_MODULE_4__.appendCategoryLegendItems)(out, 0)
             }
 
@@ -79379,7 +79632,7 @@ function applyProjectionDefaults(wkt) {
   \**********************/
 (module) {
 
-module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node --test test/e2e/flow-color-legend.test.mjs test/e2e/flow-legend-overlap.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/legend-layout.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0","typedoc":{"minimatch":"6.2.3"}},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"eurostat-map","version":"4.15.0","description":"Reusable library to quickly create and customise web maps showing Eurostat data directly retrieved from Eurostat database.","keywords":["cartography","data visualization","dataviz","maps","d3","europe","eurostat","statistics","SVG","NUTS","thematic-mapping","eurostat-map"],"homepage":"https://github.com/eurostat/eurostat-map","author":"","license":"EUPL-1.2","repository":{"type":"git","url":"https://github.com/eurostat/eurostat-map.git"},"main":"build/eurostatmap.min.js","unpkg":"build/eurostatmap.min.js","module":"build/eurostatmap.js","types":"build/types/index.d.ts","typings":"build/types/index.d.ts","files":["build"],"scripts":{"start":"webpack --config webpack/webpack.config.dev.js","server":"webpack-dev-server --open --watch","build-prod":"npm run copy-types && webpack --config webpack/webpack.config.prod.js","build-prod-debug":"webpack --config webpack/webpack.config.debug-size.js","test":"npm run test:unit && npm run test:integration && npm run test:e2e","test:unit":"node --import ./test/helpers/register-src.mjs --test \\"test/unit/**/*.test.mjs\\"","test:integration":"node --test \\"test/integration/**/*.test.mjs\\"","test:e2e":"node --test test/e2e/flow-color-legend.test.mjs test/e2e/flow-legend-overlap.test.mjs test/e2e/legend-overlap.test.mjs test/e2e/responsive-map.test.mjs && node test/e2e/legend-layout.test.mjs && node test/e2e/kosovo-border.test.mjs && node test/e2e/inset-regression.test.mjs","format":"prettier --write .","copy-types":"node scripts/copy-types.js","check:types:legend-config-sync":"node scripts/check-legend-config-sync.js","check:docs-sync":"node scripts/check-docs-sync.js","type-check":"npm run check:types:legend-config-sync && npm run check:docs-sync && tsc --noEmit --skipLibCheck && tsc --noEmit --skipLibCheck test/types/typescript-test.ts","update-all":"npm run update-types && npm run update-docs && npm run update-examples","update-types":"node scripts/update-types.js","update-docs":"typedoc --options typedoc.json","update-previews":"node examples/scripts/generate-previews.js","update-examples":"npm run update-examples-manifest && npm run generate-previews","update-examples-manifest":"node examples/scripts/update-examples-manifest.js","generate-previews":"node examples/scripts/generate-previews.js"},"dependencies":{"d3-array":"^3.2.4","d3-axis":"^3.0.0","d3-ease":"^3.0.1","d3-fetch":"^3.0.1","d3-force":"^3.0.0","d3-format":"^3.1.0","d3-geo":"^3.1.1","d3-geo-projection":"^3.0.0","d3-interpolate":"^3.0.1","d3-scale":"^4.0.2","d3-scale-chromatic":"^3.1.0","d3-selection":"^3.0.0","d3-shape":"^3.2.0","d3-svg-annotation":"^2.5.1","d3-zoom":"^3.0.0","idb-keyval":"^6.2.2","jsonstat-toolkit":"^1.0.8","proj4":"^2.17.0","simple-statistics":"^7.8.8","topojson-client":"^3.1.0"},"overrides":{"d3-color":"3.1.0","typedoc":{"minimatch":"6.2.3"}},"devDependencies":{"@babel/core":"^7.22.6","@babel/preset-env":"^7.22.6","@babel/runtime":"^7.12.1","babel-loader":"^9.1.2","css-loader":"^7.1.2","playwright":"^1.60.0","prettier":"^3.4.1","style-loader":"^4.0.0","terser-webpack-plugin":"^5.6.1","ts-loader":"^9.5.4","typedoc":"^0.28.12","typedoc-plugin-missing-exports":"^4.0.0","typescript":"^5.9.3","webpack":"^5.88.1","webpack-bundle-analyzer":"^4.10.2","webpack-cli":"^5.0.0","webpack-dev-server":"^6.1.0","webpack-livereload-plugin":"^3.0.2"}}');
 
 /***/ }
 

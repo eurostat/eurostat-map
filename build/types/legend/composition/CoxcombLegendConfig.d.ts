@@ -75,11 +75,11 @@ export interface CoxcombTimeLegendConfig {
  */
 export interface CoxcombLegendConfig extends LegendConfig {
     /** Configuration for the wedge size legend. */
-    sizeLegend?: Partial<CoxcombSizeLegendConfig>
+    sizeLegend?: Partial<CoxcombSizeLegendConfig> | false
 
     /** Configuration for the color/category legend. */
-    colorLegend?: Partial<CoxcombColorLegendConfig>
+    colorLegend?: Partial<CoxcombColorLegendConfig> | false
 
     /** Configuration for the time period legend. */
-    timeLegend?: Partial<CoxcombTimeLegendConfig>
+    timeLegend?: Partial<CoxcombTimeLegendConfig> | false
 }

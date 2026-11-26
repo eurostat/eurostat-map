@@ -201,6 +201,11 @@ function maskRandomIds(htmlString) {
         });
 }
 
+/** Numbers to 3 decimals: measured positions differ in the last float digits from run to run. */
+function roundNumbers(markup) {
+    return markup.replace(/\r\n/g, '\n').replace(/-?\d+\.\d{4,}/g, (n) => String(Math.round(Number(n) * 1000) / 1000));
+}
+
 // ── Main Execution ────────────────────────────────────────────────────────────
 async function run() {
     const isCapture = process.argv.includes('--capture');
@@ -451,17 +456,18 @@ async function run() {
                     throw new Error(`Baseline file not found: ${baselinePath}`);
                 }
                 const baselineContent = fs.readFileSync(baselinePath, 'utf8');
-                if (masked !== baselineContent) {
+                const [current, expected] = [roundNumbers(masked), roundNumbers(baselineContent)];
+                if (current !== expected) {
                     let diffIndex = -1;
-                    for (let i = 0; i < Math.max(masked.length, baselineContent.length); i++) {
-                        if (masked[i] !== baselineContent[i]) {
+                    for (let i = 0; i < Math.max(current.length, expected.length); i++) {
+                        if (current[i] !== expected[i]) {
                             diffIndex = i;
                             break;
                         }
                     }
                     console.error(`      Mismatch at char index: ${diffIndex}`);
-                    console.error(`      Masked (new):  ...${(masked || '').substring(Math.max(0, diffIndex - 50), diffIndex + 50)}...`);
-                    console.error(`      Base (old):    ...${(baselineContent || '').substring(Math.max(0, diffIndex - 50), diffIndex + 50)}...`);
+                    console.error(`      Masked (new):  ...${(current || '').substring(Math.max(0, diffIndex - 50), diffIndex + 50)}...`);
+                    console.error(`      Base (old):    ...${(expected || '').substring(Math.max(0, diffIndex - 50), diffIndex + 50)}...`);
                     throw new Error(`DOM structure mismatch against baseline.`);
                 }
                 passed++;

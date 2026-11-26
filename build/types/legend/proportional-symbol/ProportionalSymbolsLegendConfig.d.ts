@@ -154,7 +154,7 @@ export interface ProportionalSymbolColorLegendConfig {
  */
 export interface ProportionalSymbolsLegendConfig extends LegendConfig {
     /** Configuration for the symbol size legend. */
-    sizeLegend?: Partial<ProportionalSymbolSizeLegendConfig>
+    sizeLegend?: Partial<ProportionalSymbolSizeLegendConfig> | false
 
     /** Configuration for the color classification legend. Set to false to hide. */
     colorLegend?: Partial<ProportionalSymbolColorLegendConfig> | false

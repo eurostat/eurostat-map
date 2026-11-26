@@ -1,3 +1,89 @@
+/** Smallest space, in screen pixels, left between two parts of a legend that would otherwise overlap. */
+const PART_GAP = 4
+
+/**
+ * Make sure that no part of a legend is drawn over another. The parts are the groups directly inside the legend
+ * (titles, size legend, colour legend, no-data and pattern items...), in drawing order. A part that draws over an
+ * earlier one is moved down below it; parts side by side, or already clear of each other, are not touched. This runs
+ * for every legend, so that a small `marginTop`, a long title or a large symbol can never make two parts collide.
+ *
+ * What the parts really draw is compared, element by element: the empty corners of a group's bounding box (around a
+ * rotated square, say) do not count, nor does the room a text box reserves above and below its letters, so a legend
+ * with deliberately tight spacing (a negative `titlePadding`) stays as it is.
+ *
+ * @param {SVGGElement} legend the legend's root group
+ */
+export function separateStackedParts(legend) {
+    const matrix = legend.getScreenCTM?.()
+    if (!matrix || !matrix.d) return // not rendered (hidden, or no layout engine): nothing can be measured
+    const placed = [] // what the earlier parts draw
+    for (const part of legend.children) {
+        if (part.tagName === 'text') placed.push(...drawnRects(part, matrix.d)) // a title written straight into the legend
+        if (part.tagName !== 'g') continue
+        const drawn = drawnRects(part, matrix.d)
+        if (!drawn.length) continue
+        let shift = 0
+        // moving below one element can run into another: repeat until clear of all of them
+        for (let pass = 0; pass <= placed.length; pass++) {
+            let next = shift
+            for (const box of drawn) {
+                for (const other of placed) {
+                    const hit = box.left < other.right - 1 && other.left < box.right - 1 && box.top + shift < other.bottom - 0.5 && other.top < box.bottom + shift - 0.5
+                    if (hit) next = Math.max(next, other.bottom + PART_GAP - box.top)
+                }
+            }
+            if (next === shift) break
+            shift = next
+        }
+        if (shift) part.setAttribute('transform', `translate(0,${shift / matrix.d}) ${part.getAttribute('transform') || ''}`.trim())
+        drawn.forEach(({ left, right, top, bottom }) => placed.push({ left, right, top: top + shift, bottom: bottom + shift }))
+    }
+}
+
+/** The screen rectangles of what a legend part draws: letters without their line spacing, thick lines with their stroke. */
+function drawnRects(part, scale) {
+    const rects = []
+    const selector = 'text, rect, circle, ellipse, path, polygon, line'
+    for (const element of part.matches(selector) ? [part] : part.querySelectorAll(selector)) {
+        if (element.closest('defs, clipPath, marker')) continue
+        let { left, right, top, bottom, width, height } = element.getBoundingClientRect()
+        if (!width && !height) continue
+        if (element.tagName === 'text') {
+            top += height * 0.12
+            bottom -= height * 0.12
+        } else if (element.tagName === 'line') {
+            const half = (parseFloat(getComputedStyle(element).strokeWidth) || 0) * Math.abs(scale) * 0.5
+            top -= half
+            bottom += half
+        }
+        rects.push({ left, right, top, bottom })
+    }
+    return rects
+}
+
+/**
+ * The smallest height of the swatches of a vertical stack: rows closer together than the label text is tall would
+ * print their labels over each other.
+ *
+ * @param {number} height the configured swatch height
+ * @param {number} fontSize the label font size
+ * @returns {number}
+ */
+export function legibleSwatchHeight(height, fontSize) {
+    return Math.max(height, Math.round((fontSize || 12) * 0.85)) // the figures of a label are about 0.75em tall
+}
+
+/**
+ * The gap between a title and the content below it: at least the room the descenders of the title need.
+ *
+ * @param {number} padding the configured titlePadding
+ * @param {number} fontSize the title font size
+ * @returns {number}
+ */
+export function titleClearance(padding, fontSize) {
+    return Math.max(padding, Math.ceil((fontSize || 14) * 0.35))
+}
+
 /** Draw an SVG colour swatch at the position chosen by the legend layout. */
 export function appendLegendSwatch(row, { x, y, width, height, color, onEnter, onLeave }) {
     return row

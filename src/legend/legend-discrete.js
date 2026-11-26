@@ -1,4 +1,5 @@
 // legends for discrete color scales
+import { legibleSwatchHeight } from './legend-swatch'
 import { format } from 'd3-format'
 import { getFontSizeFromClass } from '../core/utils'
 import { classStackBottom } from './discrete/shared'
@@ -107,6 +108,8 @@ export function drawDiscreteLegend(out, x, y) {
     const config = out.map._mapType == 'ps' ? out.colorLegend : out // Use out.colorLegend for proportional symbols, out for choropleth
 
     const horizontal = config.orientation === 'horizontal'
+    // rows closer together than the label text is tall would print the labels over each other
+    if (!horizontal) config.shapeHeight = legibleSwatchHeight(config.shapeHeight, getFontSizeFromClass('em-legend-label'))
 
     // thresholds vs ranges
     if (horizontal) {

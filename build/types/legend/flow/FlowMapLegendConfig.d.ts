@@ -89,14 +89,17 @@ export interface FlowColorLegendConfig {
     /** Width of the bar of a horizontal legend in pixels. @default the legend width */
     width?: number | null
 
-    /** A threshold scale: labels at the boundaries between the classes (one fewer than `items`). The item labels are then not shown. */
-    thresholds?: Array<string | number> | null
+    /**
+     * A threshold scale: labels at the boundaries between the classes (one fewer than `items`), as in the choropleth legend.
+     * The item labels are then not shown.
+     */
+    labels?: Array<string | number> | null
 
-    /** Label of the lower bound, under the start of a horizontal bar. */
-    minLabel?: string | null
+    /** Show the lower and upper bound under the ends of a horizontal bar. @default false */
+    maxMin?: boolean
 
-    /** Label of the upper bound, under the end of a horizontal bar. */
-    maxLabel?: string | null
+    /** `[lower bound, upper bound]` labels of a horizontal bar, shown when `maxMin` is true. */
+    maxMinLabels?: [string, string] | null
 }
 
 /**
@@ -122,14 +125,14 @@ export interface RegionColorLegendConfig {
  */
 export interface FlowMapLegendConfig extends LegendConfig {
     /** Configuration for the flow width legend. */
-    flowWidthLegend?: Partial<FlowWidthLegendConfig>
+    flowWidthLegend?: Partial<FlowWidthLegendConfig> | false
 
     /** Configuration for the node size legend. */
-    nodeSizeLegend?: Partial<NodeSizeLegendConfig>
+    nodeSizeLegend?: Partial<NodeSizeLegendConfig> | false
 
     /** Configuration for the flow color legend. */
-    flowColorLegend?: Partial<FlowColorLegendConfig>
+    flowColorLegend?: Partial<FlowColorLegendConfig> | false
 
     /** Configuration for the region color legend. */
-    regionColorLegend?: Partial<RegionColorLegendConfig>
+    regionColorLegend?: Partial<RegionColorLegendConfig> | false
 }

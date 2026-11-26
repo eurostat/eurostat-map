@@ -1,3 +1,4 @@
+import { legibleSwatchHeight, titleClearance } from './legend-swatch'
 import { format } from 'd3-format'
 import { select } from 'd3-selection'
 import * as Legend from './legend'
@@ -47,6 +48,10 @@ export const legend = function (map, config) {
     if (config)
         for (let key in config) {
             if (key == 'colorLegend' || key == 'sizeLegend') {
+                if (config[key] === false) {
+                    out[key] = false
+                    continue
+                }
                 for (let p in out[key]) {
                     //override each property in size and color legend configs
                     if (config[key][p] !== undefined) {
@@ -119,6 +124,8 @@ export const legend = function (map, config) {
     function buildColorLegend(out, baseX, baseY) {
         const map = out.map
         const config = out.colorLegend
+        if (!config) return
+        config.shapeHeight = legibleSwatchHeight(config.shapeHeight, out.labelFontSize)
 
         //container
         out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-waffle-color-legend')
@@ -153,7 +160,10 @@ export const legend = function (map, config) {
         if (codes.includes('other')) orderedCodes.push('other')
 
         orderedCodes.forEach((code) => {
-            const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
+            const titleSpace = config.title
+                ? out.titleFontSize + titleClearance(out.colorLegend.titlePadding, out.titleFontSize)
+                : out.colorLegend.titlePadding
+            const y = titleSpace + i * (config.shapeHeight + config.shapePadding)
 
             // rectangle
             out._colorLegendContainer

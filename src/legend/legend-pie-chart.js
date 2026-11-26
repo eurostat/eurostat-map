@@ -1,3 +1,4 @@
+import { legibleSwatchHeight, titleClearance } from './legend-swatch'
 import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets } from '../core/utils'
@@ -120,6 +121,8 @@ export const legend = function (map, config) {
     function buildColorLegend(out, baseX, baseY) {
         const layer = out.layer
         const config = out.colorLegend
+        if (!config) return
+        config.shapeHeight = legibleSwatchHeight(config.shapeHeight, out.labelFontSize)
         //container
         out._colorLegendContainer = out.lgg.append('g').attr('class', 'em-pie-color-legend')
 
@@ -149,7 +152,10 @@ export const legend = function (map, config) {
         const labels = layer.catLabels()
         for (let code in scs) {
             //the vertical position of the legend element
-            const y = out.colorLegend.titlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
+            const titleSpace = config.title
+                ? out.titleFontSize + titleClearance(out.colorLegend.titlePadding, out.titleFontSize)
+                : out.colorLegend.titlePadding
+            const y = titleSpace + i * (config.shapeHeight + config.shapePadding)
             //rectangle
             out._colorLegendContainer
                 .append('rect')

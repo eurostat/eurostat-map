@@ -34,11 +34,9 @@ export const legend = function (map, config) {
     }
 
     // override via config
-    if (config?.sizeLegend) {
-        Object.assign(out.sizeLegend, config.sizeLegend)
-    }
-    if (config?.colorLegend) {
-        Object.assign(out.colorLegend, config.colorLegend)
+    for (const key of ['sizeLegend', 'colorLegend']) {
+        if (config?.[key] === false) out[key] = false
+        else if (config?.[key]) Object.assign(out[key], config[key])
     }
 
     // -------------------------------
@@ -59,10 +57,10 @@ export const legend = function (map, config) {
         if (out.subtitle) out.addSubtitle()
 
         const baseX = out.getBaseX()
-        let cursorY = out.getBaseY() + out.sizeLegend.marginTop
+        let cursorY = out.getBaseY() + (out.sizeLegend?.marginTop || 0)
         const legendSpacing = 8
 
-        if (out.sizeLegend.title) {
+        if (out.sizeLegend?.title) {
             const sizeTitle = out.lgg
                 .append('text')
                 .attr('class', 'em-size-legend-title')
@@ -79,7 +77,9 @@ export const legend = function (map, config) {
         // -----------------------------
         const hasIndependentScales = out.map.mushroomSizeScaleFunctionV1_ && out.map.mushroomSizeScaleFunctionV2_
 
-        if (hasIndependentScales) {
+        if (!out.sizeLegend) {
+            // switched off: the colour key starts at the top
+        } else if (hasIndependentScales) {
             // --- v1 legend ---
             const v1Box = drawMushroomSizeLegend(out, baseX, cursorY, 'v1')
 
@@ -101,8 +101,8 @@ export const legend = function (map, config) {
         // -----------------------------
         // COLOR KEY (only for shared scale)
         // -----------------------------
-        if (!hasIndependentScales) {
-            drawColorKey(out, baseX, cursorY + out.colorLegend.marginTop)
+        if (!hasIndependentScales && out.colorLegend) {
+            drawColorKey(out, baseX, cursorY + Math.max(out.colorLegend.marginTop, 5)) // the key's title clears the size legend
         }
 
         out.setBoxDimension()

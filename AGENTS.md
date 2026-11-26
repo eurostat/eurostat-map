@@ -52,6 +52,14 @@ This package is consumed by `image` (the sibling `image` repo, dependency
   (`yarn add eurostat-map@<version>` from `image/`, **not** `npm install` - see that repo's
   `AGENTS.md`) and verify image still builds before considering the change fully landed.
 
+## Never let a library change harm IMAGE
+
+Before shipping a change to default layout, legend config names, CSS classes or public API, check how `image/image/src` (sibling
+repo) uses it, and compare the result with the version IMAGE ships (`image/image/node_modules/eurostat-map`): render IMAGE's
+legend configs and CSS with both bundles and diff element positions, and run IMAGE's browser tests against the new build
+(copy `build/` over its `node_modules` copy, clear `image/.angular/cache`, `npm run e2e`, then restore). Fix IMAGE directly
+if it needs to change (read its `AGENTS.md` first).
+
 ## Known bug class: confusing the shared layer with the current map/inset instance
 
 Several real bugs here (fixed 2026-07-29: image-repo issues #379 and #380) came from the same
@@ -165,6 +173,13 @@ invisible on proportional-symbol maps because the map type's CSS overrode their 
 - Flow legends are stacked from measured sizes (title, then label rows, then the lines), never from fixed offsets, and labels that would touch
   are moved onto another row (`assignLabelRows` in `legend/legend-swatch.js`). Keep it that way for any new legend: a fixed offset is how
   the width legend's title once ended up over its labels. `test/e2e/flow-legend-overlap.test.mjs` checks that no two pieces overlap.
+- Rules for every legend, flow or not: `setBoxDimension` runs `separateStackedParts` (legend-swatch.js), which moves an overlapping
+  top-level group below the earlier ones, so make each sub-legend its own `<g>` child of `lgg` (a graphic made of several interlocking
+  groups, like the bivariate square, goes inside one wrapper group). Use `legibleSwatchHeight` and `titleClearance` for stacks and
+  titles, accept `false` for every sub-legend, and reuse the choropleth option names (`orientation`, `width`, `labels`, `maxMin`,
+  `maxMinLabels`) instead of inventing new ones. `test/e2e/legend-overlap.test.mjs` renders every legend type under stress.
+  The separation pass compares what is drawn (leaf elements, text without line spacing), not group boxes: IMAGE uses
+  tight legends (`titlePadding: -4`) that must not move.
 - A custom flow `nodeSizeScale` used with a size legend needs a `domain()` method, including when
   the example supplies explicit legend values.
 - Edge bundling must choose its charge distance independently of the node size scale.

@@ -88,13 +88,16 @@ export const legend = function (map, config) {
 
         for (let key in config) {
             if (key == 'colorLegend' || key == 'sizeLegend') {
+                if (config[key] === false) {
+                    out[key] = false
+                    continue
+                }
                 for (let p in out[key]) {
                     //override each property in size and color legend configs
                     if (config[key][p] !== undefined) {
                         out[key][p] = config[key][p]
                     }
                 }
-                if (config.colorLegend == false) out.colorLegend = false
             } else {
                 out[key] = config[key]
             }
@@ -126,7 +129,7 @@ export const legend = function (map, config) {
             const baseX = out.getBaseX()
 
             // legend for size
-            if (map.classifierSize_) {
+            if (map.classifierSize_ && out.sizeLegend) {
                 drawSizeLegend(out, baseX, baseY)
             }
             if (map.classifierColor_ && out.colorLegend) {
@@ -152,7 +155,10 @@ export const legend = function (map, config) {
                 if (out._sizeLegendContainer) {
                     y += out._sizeLegendContainer.node().getBBox().height + out.colorLegend.marginTop
                 }
-                out._discreteLegendContainer = out.lgg.append('g').attr('class', 'em-discrete-legend-container').attr('transform', `translate(${x},${y})`)
+                out._discreteLegendContainer = out.lgg
+                    .append('g')
+                    .attr('class', 'em-discrete-legend-container')
+                    .attr('transform', `translate(${x},${y})`)
                 appendCategoryLegendItems(out, 0)
             }
 

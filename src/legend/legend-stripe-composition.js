@@ -1,3 +1,4 @@
+import { titleClearance } from './legend-swatch'
 import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets } from '../core/utils'
@@ -96,7 +97,8 @@ export const legend = function (map, config) {
         let i = 0
         const scs = map.catColors()
         for (let code in scs) {
-            const y = legendTitlePadding + (config.title ? out.titleFontSize : 0) + i * (config.shapeHeight + config.shapePadding)
+            const titleSpace = config.title ? out.titleFontSize + titleClearance(legendTitlePadding, out.titleFontSize) : legendTitlePadding
+            const y = titleSpace + i * (config.shapeHeight + config.shapePadding)
 
             out._colorLegendContainer
                 .append('rect')

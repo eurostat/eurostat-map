@@ -1,7 +1,7 @@
 // Horizontal variant of the discrete colour legend
 import { select } from 'd3-selection'
 import { getFontSizeFromClass } from '../../core/utils'
-import { appendLegendSwatch, appendLegendSwatchLabel, swatchBarLayout } from '../legend-swatch'
+import { appendLegendSwatch, appendLegendSwatchLabel, swatchBarLayout, assignLabelRows } from '../legend-swatch'
 import { highlightClass, getTitlePadding } from './shared'
 import { appendExtraSwatchRow, extraSwatchRows } from './extras'
 import { drawHorizontalDivergence } from './divergence'
@@ -103,15 +103,11 @@ export function createHorizontalLegend(out, config) {
         }
     }
 
-    // Range labels are wide ('98.9 − < 133.9'): when neighbours would touch, alternate them onto a second row
+    // Range labels are wide ('98.9 − < 133.9'): neighbours that would touch go onto further rows
     if (ranges) {
-        const rowEnds = [-Infinity, -Infinity]
-        container.selectAll('.em-legend-item > text.em-legend-label').each(function () {
-            const box = this.getBBox()
-            let row = rowEnds[0] + 3 < box.x ? 0 : rowEnds[1] + 3 < box.x ? 1 : 0
-            if (row === 1) select(this).attr('y', barBottom + 4 + labelFontSize + 2)
-            rowEnds[row] = box.x + box.width
-        })
+        const nodes = container.selectAll('.em-legend-item > text.em-legend-label').nodes()
+        const { rows } = assignLabelRows(nodes)
+        nodes.forEach((node, k) => select(node).attr('y', barBottom + 4 + rows[k] * (labelFontSize + 2)))
     }
 
     // Max / min bounds: a tick and label at each end of the bar, from the stat data extent
@@ -164,24 +160,25 @@ function drawHorizontalMaxMin(out, config, c) {
     if (mm.showMin) items.push(add(false, 0, mm.minLabel, mm.highlightMin))
     if (mm.showMax) items.push(add(true, barWidth, mm.maxLabel, mm.highlightMax))
 
-    // if an end label runs into a neighbouring threshold label, drop it onto a second row
-    const others = container
+    // if an end label runs into a threshold label, or into the other end label, move it down until it is clear
+    const placed = container
         .selectAll('.em-legend-label')
-        .filter(function () {
-            return !this.classList.contains('em-legend-label-max') && !this.classList.contains('em-legend-label-min')
-        })
         .nodes()
+        .filter((node) => !items.some(({ label }) => label.node() === node))
     items.forEach(({ tick, label }) => {
-        const box = label.node().getBBox()
-        const clash = others.some((o) => {
-            const ob = o.getBBox()
-            return ob.x < box.x + box.width + 2 && ob.x + ob.width + 2 > box.x
-        })
-        if (clash) {
-            const rowY = labelY + labelFontSize + 4
+        const clashes = () => {
+            const box = label.node().getBBox()
+            return placed.some((o) => {
+                const ob = o.getBBox()
+                return ob.x < box.x + box.width + 2 && ob.x + ob.width + 2 > box.x && ob.y < box.y + box.height && ob.y + ob.height > box.y
+            })
+        }
+        for (let row = 1; row <= placed.length && clashes(); row++) {
+            const rowY = labelY + row * (labelFontSize + 4)
             label.attr('y', rowY)
             tick.attr('y2', rowY)
         }
+        placed.push(label.node())
     })
 }
 

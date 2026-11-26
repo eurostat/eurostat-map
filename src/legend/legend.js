@@ -1,6 +1,6 @@
 import { select } from 'd3-selection'
 import { formatDefaultLocale } from 'd3-format'
-import { appendLegendSwatchRows } from './legend-swatch'
+import { appendLegendSwatchRows, separateStackedParts } from './legend-swatch'
 import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } from '../core/utils'
 import { BOX_CORNER_RADIUS } from '../core/buttons/corner-radius'
 import { legendsBelowMap, placeLegendsBelow } from '../core/legend-below'
@@ -276,7 +276,12 @@ export const legend = function (map) {
 
     /** Draw legend background box */
     out.makeBackgroundBox = function () {
-        out.lgg.append('rect').attr('id', 'em-legend-background').attr('class', 'em-legend-background').attr('rx', BOX_CORNER_RADIUS).attr('ry', BOX_CORNER_RADIUS)
+        out.lgg
+            .append('rect')
+            .attr('id', 'em-legend-background')
+            .attr('class', 'em-legend-background')
+            .attr('rx', BOX_CORNER_RADIUS)
+            .attr('ry', BOX_CORNER_RADIUS)
         out.updateBackgroundBoxOpacity()
     }
 
@@ -330,6 +335,7 @@ export const legend = function (map) {
     /** Set legend box dimensions, ensuring it has suitable dimensions to fit to all legend graphic elements */
     out.setBoxDimension = function () {
         if (out.lgg.node()) {
+            separateStackedParts(out.lgg.node())
             //get legend elements bounding box
             const bb = out.lgg.node().getBBox({ stroke: true })
             //apply to legend box dimensions
@@ -356,28 +362,27 @@ export const legend = function (map) {
         const onLeave = () => interact(unhighlightFunction)
 
         // a single row of the swatch stack, padded from the top of its container
-        const [{ label }] = appendLegendSwatchRows(
-            container,
-            [{ color, label: text, onEnter, onLeave }],
-            {
-                shapeWidth: out.noDataShapeWidth,
-                shapeHeight: out.noDataShapeHeight,
-                startY: out.noDataPadding,
-                labelX: out.noDataShapeWidth + 5,
-                labelDy: '0.35em',
-            }
-        )
-        label
-            .attr('class', labelClass)
-            .style('pointer-events', 'all')
-            .style('cursor', 'pointer')
-            .on('mouseover', onEnter)
-            .on('mouseout', onLeave)
+        const [{ label }] = appendLegendSwatchRows(container, [{ color, label: text, onEnter, onLeave }], {
+            shapeWidth: out.noDataShapeWidth,
+            shapeHeight: out.noDataShapeHeight,
+            startY: out.noDataPadding,
+            labelX: out.noDataShapeWidth + 5,
+            labelDy: '0.35em',
+        })
+        label.attr('class', labelClass).style('pointer-events', 'all').style('cursor', 'pointer').on('mouseover', onEnter).on('mouseout', onLeave)
     }
 
     //'no data' legend box
     out.appendNoDataLegend = function (container, noDataText, highlightFunction, unhighlightFunction) {
-        appendExtraSwatch(container, 'nd', out.map.noDataFillStyle(), noDataText, 'em-legend-label em-legend-label-no-data', highlightFunction, unhighlightFunction)
+        appendExtraSwatch(
+            container,
+            'nd',
+            out.map.noDataFillStyle(),
+            noDataText,
+            'em-legend-label em-legend-label-no-data',
+            highlightFunction,
+            unhighlightFunction
+        )
     }
 
     //legend box for an extra categorical value mixed into an otherwise numeric/discrete

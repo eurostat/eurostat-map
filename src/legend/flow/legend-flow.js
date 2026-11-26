@@ -45,9 +45,9 @@ export const legend = function (map, config) {
         ticks: false, // use labels as ticks
         orientation: 'vertical', // 'vertical' | 'horizontal'
         width: null, // width of the bar of a horizontal legend (default: the legend width)
-        thresholds: null, // labels at the boundaries between the classes (one fewer than the items): a threshold scale
-        minLabel: null, // label at the start of a horizontal bar (the lower bound)
-        maxLabel: null, // label at the end of a horizontal bar (the upper bound)
+        labels: null, // labels at the boundaries between the classes (one fewer than the items): a threshold scale, as in the choropleth legend
+        maxMin: false, // show the bounds of a horizontal bar
+        maxMinLabels: null, // [lower bound, upper bound] labels, shown when maxMin is true
     }
 
     out.regionColorLegend = {
@@ -215,7 +215,8 @@ export const legend = function (map, config) {
         }
         // Draw the legend items
         let x = 0
-        let y = out.regionColorLegend.titlePadding
+        const titleBox = title.node().getBBox()
+        let y = Math.max(out.regionColorLegend.titlePadding, titleBox.y + titleBox.height + 2) // clear of the title
         Object.entries(items).forEach(([label, color], i) => {
             out._regionColorContainer
                 .append('rect')

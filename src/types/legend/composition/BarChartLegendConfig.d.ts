@@ -93,7 +93,7 @@ export interface BarChartLegendConfig extends LegendConfig {
     sizeLegend?: Partial<BarChartSizeLegendConfig> | false
 
     /** Configuration for the grouped-mode bar width legend (data-driven bar width). */
-    widthLegend?: Partial<BarChartWidthLegendConfig>
+    widthLegend?: Partial<BarChartWidthLegendConfig> | false
 
     /** Configuration for the color/category legend. Set to false to hide. */
     colorLegend?: Partial<BarChartColorLegendConfig> | false
