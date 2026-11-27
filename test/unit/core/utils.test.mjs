@@ -78,6 +78,14 @@ describe('getEstatDataURL', () => {
     })
 })
 
+// the parts of a jsonstat-toolkit dataset that the indexing reads
+const dataset = (dimensions, values) => ({
+    id: Object.keys(dimensions),
+    size: Object.values(dimensions).map((codes) => codes.length),
+    Dimension: (id) => ({ id: dimensions[id] }),
+    Data: (i) => values[i],
+})
+
 describe('stat indexing', () => {
     it('csvToIndex converts numeric strings, keeps text and marks empty cells as no data', () => {
         const rows = [
@@ -97,11 +105,33 @@ describe('stat indexing', () => {
     })
 
     it('jsonstatToIndex indexes the dataset by geo code', () => {
-        const jsonstat = {
-            Dimension: (id) => (id === 'geo' ? { id: ['FR', 'DE'] } : undefined),
-            Data: (i) => [{ value: 1, status: 'p' }, { value: 2 }][i],
-        }
+        const jsonstat = dataset({ geo: ['FR', 'DE'] }, [{ value: 1, status: 'p' }, { value: 2 }])
         assert.deepEqual(jsonstatToIndex(jsonstat), { FR: { value: 1, status: 'p' }, DE: { value: 2 } })
+    })
+
+    it('jsonstatToIndex reports nothing when each region has one value', () => {
+        const choices = []
+        jsonstatToIndex(dataset({ sex: ['T'], geo: ['FR', 'DE'], time: ['2022'] }, [1, 2]), (c) => choices.push(c))
+        assert.deepEqual(choices, [])
+    })
+
+    it('jsonstatToIndex takes the latest time and keeps every region its own value', () => {
+        // FR: 2021, 2022; DE: 2021, 2022
+        let choices
+        const index = jsonstatToIndex(dataset({ geo: ['FR', 'DE'], time: ['2021', '2022'] }, [1, 2, 3, 4]), (c) => (choices = c))
+        assert.deepEqual(index, { FR: 2, DE: 4 })
+        assert.deepEqual(choices, [{ dimension: 'time', used: '2022', count: 2 }])
+    })
+
+    it('jsonstatToIndex takes the first category of other dimensions, before and after geo', () => {
+        // sex M: FR (a, b), DE (a, b); sex F: FR (a, b), DE (a, b)
+        let choices
+        const jsonstat = dataset({ sex: ['M', 'F'], geo: ['FR', 'DE'], unit: ['a', 'b'] }, [1, 2, 3, 4, 5, 6, 7, 8])
+        assert.deepEqual(jsonstatToIndex(jsonstat, (c) => (choices = c)), { FR: 1, DE: 3 })
+        assert.deepEqual(
+            choices.map((c) => c.dimension + '=' + c.used),
+            ['sex=M', 'unit=a']
+        )
     })
 })
 

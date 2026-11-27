@@ -252,12 +252,37 @@ export const getBBOXAsGeoJSON = function (bb) {
  * Index JSONStat stat values by 'geo' code.
  * Return a structure like: {geo:{value:0,status:""}}
  *
+ * A map shows one value per region. If the data has several (more than one category in a dimension other than
+ * 'geo'), the latest time period is used, or the first category of any other dimension, and reported through onChoice.
+ *
  * @param {*} jsData The JSONStat data to index
+ * @param {function(Array<{dimension: string, used: string, count: number}>): void=} onChoice
  */
-export const jsonstatToIndex = function (jsData) {
+export const jsonstatToIndex = function (jsData, onChoice) {
     const ind = {}
     const geos = jsData.Dimension('geo').id
-    for (let i = 0; i < geos.length; i++) ind[geos[i]] = jsData.Data(i)
+
+    // The values are one flat array in row-major order of the dimensions. 'offset' is where the chosen category of
+    // every other dimension starts, and 'geoStride' the distance between two consecutive regions.
+    let offset = 0
+    let stride = 1
+    let geoStride = 1
+    const choices = []
+    for (let k = jsData.id.length - 1; k >= 0; k--) {
+        const dimension = jsData.id[k]
+        if (dimension === 'geo') geoStride = stride
+        else if (jsData.size[k] > 1) {
+            const codes = jsData.Dimension(dimension).id
+            // time codes ('2022', '2022-Q1', '2022-03') sort in time order
+            const used = dimension === 'time' ? codes.reduce((a, b) => (b > a ? b : a)) : codes[0]
+            offset += codes.indexOf(used) * stride
+            choices.unshift({ dimension, used, count: codes.length })
+        }
+        stride *= jsData.size[k]
+    }
+    if (choices.length && onChoice) onChoice(choices)
+
+    for (let i = 0; i < geos.length; i++) ind[geos[i]] = jsData.Data(offset + i * geoStride)
     return ind
 }
 

@@ -39,7 +39,10 @@ export function getBBOXAsGeoJSON(bb: [number, number, number, number]): any
 /**
  * Converts a JSON-stat object to an index keyed by geographic codes.
  */
-export function jsonstatToIndex(jsData: any): Record<string, any>
+export function jsonstatToIndex(
+    jsData: any,
+    onChoice?: (choices: Array<{ dimension: string; used: string; count: number }>) => void
+): Record<string, any>
 
 /**
  * Converts CSV data to an index keyed by geographic codes.

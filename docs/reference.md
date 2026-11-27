@@ -278,6 +278,8 @@ map.stat( {
 | **filters**             | Object | _{ lastTimePeriod : 1 }_ | The Eurostat dimension codes to filter/select the chosen statistical variable. See [here](https://ec.europa.eu/eurostat/data/database) or [here](https://ec.europa.eu/eurostat/web/query-builder) to find them. |
 | **precision**           | int    | _2_                      | The precision of the statistical variable to retrieve (number of decimal places).                                                                                                                                                                             |
 
+A map shows one value per region, so give a filter for every dimension except `geo`. If the response has several values per region, the map uses the latest time period, or the first category of any other dimension, and a console warning names each choice.
+
 #### CSV
 
 Specify statistical data to be retrieved from CSV data.

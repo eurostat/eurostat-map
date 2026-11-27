@@ -70,7 +70,8 @@ Rules that cause most mistakes:
 - **Filters should pin every dimension except `geo`.** The default is `{ lastTimePeriod: 1 }`, and
   the geographic level is added from `nutsLevel` for you. Give a value for each other dimension of
   the dataset (age, sex, unit, time...); every example does. Find the codes with the Eurostat query
-  builder (https://ec.europa.eu/eurostat/web/query-builder). An API error (unknown dataset, invalid
+  builder (https://ec.europa.eu/eurostat/web/query-builder). With several values per region, the latest
+  time or the first category is used and a console warning says which. An API error (unknown dataset, invalid
   filter) is logged to the browser console as `Error retrieving Eurostat data: ...`: read it first.
 - **Region ids are NUTS codes**, which differ from ISO codes in places (Greece is `EL`, not `GR`).
   A custom value or CSV row only shows up if its id matches a region of the chosen `nutsLevel` and

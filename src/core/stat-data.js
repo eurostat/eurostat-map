@@ -378,7 +378,14 @@ export const statData = function (config) {
                 out.metadata.time = jsd.Dimension('time').id[0]
 
                 //index
-                out._data_ = jsonstatToIndex(jsd)
+                out._data_ = jsonstatToIndex(jsd, (choices) => {
+                    const time = choices.find((c) => c.dimension === 'time')
+                    if (time) out.metadata.time = time.used
+                    const list = choices.map((c) => `"${c.dimension}" has ${c.count} values, using "${c.used}"`).join('; ')
+                    console.warn(
+                        `[eurostat-map] ${out.eurostatDatasetCode_}: more than one value per region (${list}). Set these in the stat() filters to choose.`
+                    )
+                })
                 //TODO: use maybe https://github.com/badosa/JSON-stat/blob/master/utils/fromtable.md to build directly an index ?
 
                 //handle null values
@@ -422,7 +429,8 @@ export const statData = function (config) {
      */
     out.getTime = function () {
         const t = out.filters_.time
-        if (t) return t
+        // several requested periods: the map shows one of them, recorded in the metadata
+        if (t && !Array.isArray(t)) return t
         if (!out._data_) return
         return out.metadata.time
     }

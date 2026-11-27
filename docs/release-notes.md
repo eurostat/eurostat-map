@@ -174,6 +174,14 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
+- Asking Eurostat for several time periods no longer puts values on the wrong regions. With more than one value per region, the latest time period (or the first category of another dimension) is used, and a console warning says so.
+
+Example
+
+```javascript
+map.stat({ eurostatDatasetCode: 'demo_r_d3dens', filters: { time: ['2021', '2022'] } }) // shows 2022, with a warning
+```
+
 - Insets keep their configured height, and bar, spike, shape and custom proportional symbols are now drawn in insets.
 
 Example
