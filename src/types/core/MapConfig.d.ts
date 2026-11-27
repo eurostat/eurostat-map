@@ -104,6 +104,9 @@ export interface MapConfig {
     /** Footnote text shown below the map. Defaults to Credits. */
     footnote?: string
 
+    /** Notice written below exported images: the boundary copyright by default, your own text, or `false`. */
+    exportAttribution?: string | false
+
     /** Tooltip text for the footnote. The default Credits also shows boundary attribution. */
     footnoteTooltipText?: string | false
 

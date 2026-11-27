@@ -174,6 +174,14 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
+- Exported PNG and SVG images carry the boundary copyright ("Administrative boundaries: ©EuroGeographics ©OpenStreetMap") in a line below the map, in place of "Credits". `exportAttribution()` rewords it or turns it off.
+
+Example
+
+```javascript
+map.exportAttribution('Boundaries: ©EuroGeographics').exportMapToPNG()
+```
+
 - TypeScript accepts the documented examples: legend options of every map type, sparkline `stat()` configs and the methods of an added choropleth or proportional symbol layer. A check keeps the documentation and the typings in step.
 
 Example

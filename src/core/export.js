@@ -1,5 +1,51 @@
 import { applyComputedStylesToSVG, ensureSvgSize, getDownloadURL } from './utils'
 
+/** The copyright notice of the boundaries the library loads. */
+export const BOUNDARY_ATTRIBUTION = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap'
+
+/** The notice to write on an exported image of a map, or null for none. */
+const exportAttribution = function (out) {
+    if (out.exportAttribution_ === false) return null
+    if (typeof out.exportAttribution_ === 'string') return out.exportAttribution_ || null
+    // boundaries the caller supplied carry their own terms
+    return out.Geometries?.userGeometries ? null : BOUNDARY_ATTRIBUTION
+}
+
+/**
+ * On screen the notice shows on hover over "Credits", which an image cannot do: it is written in a line added below
+ * the map, in place of "Credits". A map that already names EuroGeographics in its own text is left as it is.
+ * @param {SVGSVGElement} svg a clone prepared for export: sized, with a viewBox
+ * @param {string|null} notice
+ */
+const addAttributionLine = function (svg, notice) {
+    if (!notice) return
+    svg.querySelectorAll('.em-credits').forEach((node) => node.remove())
+    const written = Array.from(svg.querySelectorAll('text')).some((node) => node.textContent.includes('EuroGeographics'))
+    if (written && notice === BOUNDARY_ATTRIBUTION) return
+
+    const [x, y, width, height] = svg.getAttribute('viewBox').trim().split(/[\s,]+/).map(Number)
+    // two lines on a map too narrow for one (about 6px a character at this size)
+    const split = notice.length * 6 > width - 10 ? notice.lastIndexOf(' ', Math.ceil(notice.length / 2) + 6) : -1
+    const lines = split > 0 ? [notice.slice(0, split), notice.slice(split + 1)] : [notice]
+    const lineHeight = 14
+    const band = lines.length * lineHeight + 4
+
+    lines.forEach((line, i) => {
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+        text.setAttribute('class', 'em-export-attribution')
+        text.setAttribute('x', String(x + 5))
+        text.setAttribute('y', String(y + height + (i + 1) * lineHeight - 2))
+        text.setAttribute('style', 'font: 11px Arial, sans-serif; fill: #555555; stroke: none')
+        text.textContent = line
+        svg.appendChild(text)
+    })
+    svg.setAttribute('viewBox', `${x} ${y} ${width} ${height + band}`)
+    const shown = Number(svg.getAttribute('height'))
+    svg.setAttribute('height', String(Math.round((shown * (height + band)) / height)))
+    svg.style.removeProperty('height')
+    svg.style.removeProperty('max-height')
+}
+
 /**
  * Exports the fully rendered map (with computed CSS styles inlined) as an SVG file
  * and triggers a browser download.
@@ -23,6 +69,7 @@ export const exportMapToSVG = function (out, filename) {
     applyComputedStylesToSVG(svgNodeClone)
     //set explicit width / height / viewBox for reliable export
     ensureSvgSize(svgNodeClone)
+    addAttributionLine(svgNodeClone, exportAttribution(out))
 
     // Remove the cloned SVG from the document after applying styles
     document.body.removeChild(svgNodeClone)
@@ -50,7 +97,7 @@ export const exportMapToSVG = function (out, filename) {
  * @returns {Promise<object>} Resolves to the map instance.
  */
 export const exportMapToPNG = async function (out, width, height, filename) {
-    await exportSvgToPNG(out.svg_.node(), { width, height, filename })
+    await exportSvgToPNG(out.svg_.node(), { width, height, filename, attribution: exportAttribution(out) })
     return out
 }
 
@@ -71,6 +118,7 @@ const HD_WIDTH = 1920 // smallest default width of an exported PNG, in pixels
  * twice the SVG's size, and at least 1920 px wide.
  * @param {string} [options.filename='eurostat-map'] - File name, without extension.
  * @param {string} [options.background='#ffffff'] - Background colour behind the SVG (PNG is otherwise transparent).
+ * @param {string} [options.attribution] - A notice to write in a line below the picture.
  * @returns {Promise<Blob>} Resolves to the PNG once the download has started.
  */
 export const exportSvgToPNG = async function (svgNode, options = {}) {
@@ -98,6 +146,7 @@ export const exportSvgToPNG = async function (svgNode, options = {}) {
     // Inline computed styles and set explicit size/viewBox (must run while clone is in DOM)
     applyComputedStylesToSVG(svgNodeClone)
     ensureSvgSize(svgNodeClone)
+    addAttributionLine(svgNodeClone, options.attribution)
 
     // Insert a background rect as first child if none present
     const svgWidth =

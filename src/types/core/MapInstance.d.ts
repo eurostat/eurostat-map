@@ -194,6 +194,13 @@ export interface MapInstance {
     footnote(): string | false
     footnote(text: string | false): this
 
+    /**
+     * The notice written below exported PNG and SVG images. By default the boundary copyright (not with geometries you
+     * supply). A string replaces it, `false` leaves it out.
+     */
+    exportAttribution(): string | false | undefined
+    exportAttribution(text: string | false): this
+
     /** Tooltip text for the footnote. The default Credits also shows boundary attribution. */
     footnoteTooltipText(): string | false
     footnoteTooltipText(text: string | false): this

@@ -202,6 +202,8 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
 
     //dataset source link
     out.showSourceLink_ = true
+    // notice written on exported images: undefined for the boundary copyright, a string of your own, or false
+    out.exportAttribution_ = undefined
 
     // Default credits label and disclaimer text
     out.defaultFootnote_ = 'Credits'

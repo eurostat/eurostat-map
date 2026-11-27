@@ -1,3 +1,4 @@
+import { BOUNDARY_ATTRIBUTION } from '../export.js'
 import { getFontSizeFromClass } from '../utils'
 import { isCompact } from '../layout-profile'
 import { applyMapAccessibility } from '../accessibility'
@@ -236,7 +237,7 @@ export const addFootnote = function (out) {
     // last line
     appendLine(line)
 
-    const attribution = 'Administrative boundaries: \u00A9EuroGeographics \u00A9OpenStreetMap'
+    const attribution = BOUNDARY_ATTRIBUTION
 
     if (isCredits) {
         foot.classed('em-credits', true).attr('tabindex', 0).attr('aria-label', `Credits. ${attribution}`)
