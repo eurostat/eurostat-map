@@ -948,7 +948,15 @@ function ignoreLegendBackgroundSize(line) {
     return line.replace(/ (x|y|width|height)="[^"]*"/g, ' $1="*"')
 }
 
-const normaliseLine = (line) => ignoreLegendBackgroundSize(ignoreHiddenTooltipPlacement(line))
+
+// A legend placed in a corner starts where its measured box says, which also differs by a pixel between platforms' fonts:
+// only the side of the map it is on (and its height there) is compared.
+function ignoreLegendSubpixelPlacement(line) {
+    if (!line.includes('class="em-legend"')) return line
+    return line.replace(/transform="translate\(([\d.]+),/, (match, x) => `transform="translate(${Number(x) < 100 ? 'left' : 'right'},`)
+}
+
+const normaliseLine = (line) => ignoreLegendSubpixelPlacement(ignoreLegendBackgroundSize(ignoreHiddenTooltipPlacement(line)))
 
 function compare(name, base, cur) {
     const diffs = []
