@@ -9,6 +9,8 @@ import { buildD3SymbolItem } from './legend-d3-shape'
 import { symbolsLibrary } from '../../layers/proportional-symbol/symbols/d3-symbols'
 import { getCircleRingStatData } from '../../layers/proportional-symbol/symbols/circle-ring'
 import { getCentroidsGroup } from '../../core/geo/centroids'
+import { getSignStyle, OUTLINE_STROKE_WIDTH } from '../../layers/proportional-symbol/ps-sign'
+import { getSizeLegendFill } from './legend-size-fill'
 
 /**
  * Builds a legend which illustrates the statistical values of different symbol sizes
@@ -110,8 +112,44 @@ export function drawSizeLegend(out, baseX, baseY) {
         }
     }
 
+    if (map._psSigned && out.sizeLegend.signKey !== false) addSignKey(out)
+
     // append No Data after all size-legend content is in the container
     if (out.sizeLegend.noData) addNoDataLegend(out)
+}
+
+// two swatches telling how positive and negative values look
+function addSignKey(out) {
+    const layer = out.layer
+    const box = out._sizeLegendContainer.node().getBBox()
+    const radius = 6
+    const rowHeight = 2 * radius + 6
+    const neutral = layer.classifierColor_ ? '#555555' : undefined
+    const container = out._sizeLegendContainer
+        .append('g')
+        .attr('class', 'em-sign-legend')
+        .attr('transform', `translate(0,${box.y + box.height + 12})`)
+
+    const rows = [
+        [false, out.sizeLegend.positiveText],
+        [true, out.sizeLegend.negativeText],
+    ]
+    rows.forEach(([negative, text], i) => {
+        const style = getSignStyle(layer, negative, neutral)
+        const row = container.append('g').attr('class', 'em-legend-item').attr('transform', `translate(0,${i * rowHeight + radius})`)
+        row.append('circle')
+            .attr('class', 'em-sign-legend-swatch')
+            .attr('cx', radius)
+            .attr('r', style.outline ? radius - OUTLINE_STROKE_WIDTH / 2 : radius)
+            .style('fill', style.fill)
+            .style('stroke', style.outline || 'none')
+            .style('stroke-width', style.outline ? OUTLINE_STROKE_WIDTH + 'px' : null)
+        row.append('text')
+            .attr('class', 'em-legend-label')
+            .attr('x', 2 * radius + 6)
+            .attr('dy', '0.35em')
+            .text(text)
+    })
 }
 
 function addNoDataLegend(out) {
@@ -160,7 +198,7 @@ function buildCustomSVGItem(out, value, symbolSize, index, labelFormatter) {
     const symbolGroup = itemContainer
         .append('g')
         .attr('class', 'em-size-legend-symbol')
-        .style('fill', map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_)
+        .style('fill', getSizeLegendFill(out))
         .style('fill-opacity', map.psSettings().fillOpacity)
         .style('stroke', out.sizeLegend.shapeStroke || map.psSettings().stroke)
         .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psSettings().strokeWidth)
@@ -212,7 +250,7 @@ function buildBarsItem(out, value, symbolSize, index, labelFormatter) {
     // draw bar
     itemContainer
         .append('g')
-        .style('fill', map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_)
+        .style('fill', getSizeLegendFill(out))
         .style('fill-opacity', map.psSettings().fillOpacity)
         .style('stroke', out.sizeLegend.shapeStroke ? out.sizeLegend.shapeStroke : map.psSettings().stroke)
         .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psSettings().strokeWidth)

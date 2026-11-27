@@ -10,6 +10,7 @@ import { runDorlingSimulation, stopDorlingSimulation } from '../../core/dorling/
 import { applyClassificationToMap, defineClassifiers } from './ps-classification.js'
 import { updateBackgroundColor } from './ps-background.js'
 import { addMouseEvents } from './ps-interactions.js'
+import { getSignStyle, hasNegativeValues, usesNeutralBackground, OUTLINE_STROKE_WIDTH } from './ps-sign.js'
 import { appendSpikesToMap } from './symbols/spikes.js'
 import { appendCirclesToMap } from './symbols/circles.js'
 import { getCircleRingStatData, parseCircleRingValue } from './symbols/circle-ring.js'
@@ -59,7 +60,21 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
     layer.psSizeScale_ = undefined // 'sqrt' or 'linear'
 
     //colour
-    layer.psFill_ = '#009569'
+    // an accessor, so that a colour set by any route (setter, config, inset copy) counts as the author's choice
+    let psFill = '#009569'
+    layer._psFillChosen = false
+    Object.defineProperty(layer, 'psFill_', {
+        enumerable: true,
+        configurable: true,
+        get: () => psFill,
+        set: (v) => {
+            psFill = v
+            layer._psFillChosen = v !== undefined && v !== null
+        },
+    })
+    // colours used when the size values include negative ones (see ps-sign.js)
+    layer.psPositiveFill_ = undefined
+    layer.psNegativeFill_ = undefined
     layer.psFillOpacity_ = 1
     layer.psStroke_ = '#ffffff'
     layer.psStrokeWidth_ = 0.2
@@ -105,6 +120,8 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             minValue: layer.psMinValue_,
             maxValue: layer.psMaxValue_,
             fill: layer.psFill_,
+            positiveFill: layer.psPositiveFill_,
+            negativeFill: layer.psNegativeFill_,
             fillOpacity: layer.psFillOpacity_,
             stroke: layer.psStroke_,
             strokeWidth: layer.psStrokeWidth_,
@@ -139,6 +156,8 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         if (v.minValue !== undefined) layer.psMinValue_ = v.minValue
         if (v.maxValue !== undefined) layer.psMaxValue_ = v.maxValue
         if (v.fill !== undefined) layer.psFill_ = v.fill
+        if (v.positiveFill !== undefined) layer.psPositiveFill_ = v.positiveFill
+        if (v.negativeFill !== undefined) layer.psNegativeFill_ = v.negativeFill
         if (v.fillOpacity !== undefined) layer.psFillOpacity_ = v.fillOpacity
         if (v.stroke !== undefined) layer.psStroke_ = v.stroke
         if (v.strokeWidth !== undefined) layer.psStrokeWidth_ = v.strokeWidth
@@ -282,23 +301,24 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         //define style per class
         if (!layer.psClassToFillStyle_) layer.psClassToFillStyle_ = getColorLegend(layer.psColorFun_, layer.psColors_)
 
+        // if size dataset not defined then use default
+        // Always source size data from the owning PS layer. Inset map objects
+        // may not carry populated stat datasets, especially with external inset SVGs.
+        const sizeData = getSizeStatData(layer)
+        layer._psSigned = hasNegativeValues(sizeData)
+
         // Gate background color: skip if a base layer (e.g. choropleth) is present below us!
         const hasBaseLayer = map.layers_ && map.layers_.some((l) => l.role === 'base' && l !== layer)
         if (!hasBaseLayer) {
             // update region color according to symbol color
             const backgroundSymbolFill = layer.classifierColor_ ? layer.psClassToFillStyle_(layer.psClasses_ - 1, layer.psClasses_) : layer.psFill_
-            updateBackgroundColor(map, backgroundSymbolFill)
+            updateBackgroundColor(map, usesNeutralBackground(layer) ? '#000000' : backgroundSymbolFill)
         }
 
         // Render symbols against the main layer group on the main map, but against
         // the inset map container when styling an inset. Otherwise inset symbols
         // can be cleared/appended in the main map group instead of the inset.
         const symbolTarget = map === layer.map ? layer : map
-
-        // if size dataset not defined then use default
-        // Always source size data from the owning PS layer. Inset map objects
-        // may not carry populated stat datasets, especially with external inset SVGs.
-        const sizeData = getSizeStatData(layer)
 
         if (map.svg_) {
             // Ensure centroid anchors exist for the target context (main map or inset).
@@ -331,7 +351,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             }
 
             setRegionStyles(map, sizeData)
-            setSymbolStyles(symb)
+            setSymbolStyles(symb, sizeData)
             appendLabelsToSymbols(map, sizeData, layer)
 
             const transitionDuration = map.transitionDuration_ || 0
@@ -442,33 +462,41 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
     /**
      * @description sets color/stroke/opacity styles of all symbols
      * @param {d3.selection} symb symbols d3 selection
+     * @param {*} sizeData the size dataset, which gives the sign of each value
      */
-    function setSymbolStyles(symb) {
+    function setSymbolStyles(symb, sizeData) {
+        const styleOf = function (node) {
+            let classColor
+            if (layer.classifierColor_) {
+                //for ps, ecl attribute belongs to the parent g.em-centroid node created in map-template
+                const ecl = select(node.parentNode).attr('ecl')
+                classColor = !ecl || ecl === 'nd' ? layer.noDataFillStyle_ || 'gray' : layer.psClassToFillStyle_(ecl, layer.psClasses_)
+            }
+            if (!layer._psSigned) return { fill: layer.classifierColor_ ? classColor : layer.psFill_ }
+            const value = sizeData.get(node.__data__?.properties?.id)?.value
+            return getSignStyle(layer, Number(value) < 0, classColor)
+        }
+        const fillOf = function () {
+            return styleOf(this).fill
+        }
         symb.attr('fill-opacity', layer.psFillOpacity_)
             .attr('stroke-opacity', layer.psStrokeOpacity_)
             .attr('stroke', layer.psStroke_)
             .attr('stroke-width', layer.psStrokeWidth_)
-            .style('fill', function () {
-                const ecl = select(this.parentNode).attr('ecl')
-                if (layer.classifierColor_) {
-                    //for ps, ecl attribute belongs to the parent g.em-centroid node created in map-template
-                    if (!ecl || ecl === 'nd') return layer.noDataFillStyle_ || 'gray'
-                    let color = layer.psClassToFillStyle_(ecl, layer.psClasses_)
-                    return color
-                } else {
-                    return layer.psFill_
+            .style('fill', fillOf)
+            // Set fill___ to the same value as fill (don't read back style, as it may not be applied yet during transitions)
+            .attr('fill___', fillOf)
+
+        if (layer._psSigned) {
+            symb.each(function () {
+                const { outline } = styleOf(this)
+                if (outline) {
+                    select(this)
+                        .style('stroke', outline)
+                        .style('stroke-width', Math.max(OUTLINE_STROKE_WIDTH, layer.psStrokeWidth_) + 'px')
                 }
             })
-            .attr('fill___', function () {
-                const ecl = select(this.parentNode).attr('ecl')
-                // Set fill___ to the same value as fill (don't read back style, as it may not be applied yet during transitions)
-                if (layer.classifierColor_) {
-                    if (!ecl || ecl === 'nd') return layer.noDataFillStyle_ || 'gray'
-                    return layer.psClassToFillStyle_(ecl, layer.psClasses_)
-                } else {
-                    return layer.psFill_
-                }
-            })
+        }
     }
 
     /**
@@ -508,7 +536,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         // z-order, not which regions end up with a visible circle.
         const valueOf = (f) => {
             const v = sizeData.get?.(f.properties.id)?.value
-            return v != null && v !== ':' && !isNaN(+v) ? +v : -Infinity
+            return v != null && v !== ':' && !isNaN(+v) ? Math.abs(+v) : -Infinity
         }
         const sorted = centroidFeatures.slice().sort((a, b) => valueOf(b) - valueOf(a))
 

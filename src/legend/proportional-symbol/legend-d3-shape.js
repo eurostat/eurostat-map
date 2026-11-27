@@ -1,3 +1,4 @@
+import { getSizeLegendFill } from './legend-size-fill'
 import { symbolsLibrary } from '../../layers/proportional-symbol/symbols/d3-symbols.js'
 import { symbol } from 'd3-shape'
 
@@ -56,7 +57,7 @@ export function buildD3SymbolItem(out, value, symbolSize, index, labelFormatter)
 
     const symbolGroup = itemContainer
         .append('g')
-        .style('fill', map.classifierColor_ ? out.sizeLegend.shapeFill : map.psFill_)
+        .style('fill', getSizeLegendFill(out))
         .style('fill-opacity', map.psSettings().fillOpacity)
         .style('stroke', out.sizeLegend.shapeStroke || map.psSettings().stroke)
         .style('stroke-width', out.sizeLegend.shapeStrokeWidth || map.psSettings().strokeWidth)

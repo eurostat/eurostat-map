@@ -1,3 +1,4 @@
+import { getSizeLegendFill } from './legend-size-fill'
 import { getFontSizeFromClass, spaceAsThousandSeparator } from '../../core/utils'
 
 export function buildSpikeLegend(out) {
@@ -68,7 +69,7 @@ export function buildSpikeLegend(out) {
     items
         .append('path')
         .attr('d', (d) => spike(map.classifierSize_(d)))
-        .attr('fill', map.psFill_)
+        .attr('fill', getSizeLegendFill(out))
         .attr('fill-opacity', map.psFillOpacity_)
         .attr('stroke', map.psStroke_)
         .attr('stroke-width', map.psStrokeWidth_)

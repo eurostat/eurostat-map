@@ -49,6 +49,15 @@ export interface ProportionalSymbolSizeLegendConfig {
     /** Callout label for the half-filled percentage ring on the largest circle. Set to false to hide the sample. @default 'Share (%)' */
     ringLabel?: string | false
 
+    /** Whether to explain the two signs when the data has negative values. @default true */
+    signKey?: boolean
+
+    /** Label of positive values in that key. @default 'Positive' */
+    positiveText?: string
+
+    /** Label of negative values in that key. @default 'Negative' */
+    negativeText?: string
+
     /** Whether to show a "no data" item. @default false */
     noData?: boolean
 

@@ -435,6 +435,22 @@ map.nutsLevel(0)
 
 The size legend shows a half-filled ring on the largest circle. Set `sizeLegend.ringLabel` to describe the share, for example `map.legend({ sizeLegend: { ringLabel: 'Share of the population aged 65 and over' } })`.
 
+#### Negative values
+
+Proportional symbols suit totals. When a total can be negative (net migration, a trade balance), the size shows the amount whatever its sign, on one scale, and the size legend adds a key for the two signs. Zero has no symbol. Data without negative values is drawn as usual.
+
+| Your settings                      | Positive values                | Negative values                  |
+| ---------------------------------- | ------------------------------ | -------------------------------- |
+| No symbol colour                   | Blue (`#2c7bb6`)               | Red (`#d7191c`)                  |
+| `psSettings({ fill })`             | Solid, in that colour          | Outline, in that colour          |
+| `positiveFill` and `negativeFill`   | Your positive colour           | Your negative colour             |
+| Colour shows a second variable     | Solid, in the class colour     | Outline, in the class colour     |
+
+```javascript
+map.psSettings({ positiveFill: '#1b7837', negativeFill: '#762a83' })
+    .legend({ sizeLegend: { positiveText: 'More arrivals', negativeText: 'More departures' } })
+```
+
 It is also possible to prevent overlapping via the 'dorling' method:
 
 ```javascript
@@ -469,7 +485,7 @@ Please be aware that by using this method you will essentially be turning the ma
 
 | Method                                      | Type             | Default value                                                      | Description                                                                                                                                                                                                                |
 | ------------------------------------------- | ---------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| _map_.**psSettings**([*value*])             | object           | Varies by setting | Grouped proportional-symbol settings, including `ringWidth`, `ringColor`, and `ringTrackColor` for percentage rings. |
+| _map_.**psSettings**([*value*])             | object           | Varies by setting | Grouped proportional-symbol settings, including `ringWidth`, `ringColor`, and `ringTrackColor` for percentage rings, and `positiveFill` and `negativeFill` for [negative values](#negative-values). |
 | _map_.**psShape**([*value*])                | string           | _circle_                                                           | The shape of the symbol. Accepted values: circle, spike, bar, square, star, cross, diamond, triangle, wye or custom                                                                                                        |
 | _map_.**psCustomShape**([*value*])          | Object           | null                                                               | A custom symbol to be used with d3.symbol when psShape is set to "custom". See http://using-d3js.com/05_10_symbols.html#h_66iIQ5sJIT                                                                                       |
 | _map_.**psCustomSVG**([*value*])            | Template Literal | null                                                               | Use this method for defining a custom SVG, which will be used as the proportional symbol. E.g. map.psSettings({ customSVG: `<svg width="100" height="100"><rect width="100" height="100" /></svg>` }).                     |
@@ -1872,6 +1888,9 @@ The following parameters are properties of the sizeLegend object:
 | **shapeStrokeWidth** | Number   | _undefined_                       | The stroke width of the symbols in the size legend.                                           |
 | **labels**           | String[] | _null_                            | User-defined labels, one for each size.                                                       |
 | **ringLabel**        | String or false | _'Share (%)'_                 | Label for the half-filled ring on the largest circle when `ring` is encoded. Set to false to hide the callout and sample. |
+| **signKey**          | Boolean  | _true_                            | Explain the two signs when the data has negative values.                                      |
+| **positiveText**     | String   | _'Positive'_                      | Label of positive values in that key.                                                         |
+| **negativeText**     | String   | _'Negative'_                      | Label of negative values in that key.                                                         |
 | **noData**           | Boolean  | _false_                           | Show a 'no data' legend item in the size legend.                                              |
 | **noDataText**       | String   | _'No data'_                       | Text shown in the 'no data' legend item in the size legend.                                   |
 

@@ -4,6 +4,7 @@ import { getResponsiveSymbolSize } from '../../core/responsive.js'
 import { min, max } from 'd3-array'
 import { getCentroidsGroup } from '../../core/geo/centroids.js'
 import { warnUnknownClassification } from '../../core/option-check.js'
+import { hasNegativeValues, sizeByMagnitude } from './ps-sign.js'
 
 /**
  * @description defines classifier functions (layer.classifierColor and layer.classifierSize) for both symbol size and color
@@ -72,6 +73,8 @@ function defineSizeClassifier(layer) {
     // raw values (size-specific first, fallback)
     let rawData = getSizeData(layer)?.getArray() ?? []
 
+    layer._psSigned = hasNegativeValues(getSizeData(layer))
+
     // Also check custom size legend values
     const legendConfig = layer.legend()
     if (legendConfig && legendConfig.sizeLegend && Array.isArray(legendConfig.sizeLegend.values)) {
@@ -83,10 +86,11 @@ function defineSizeClassifier(layer) {
     const maxSize = getResponsiveSymbolSize(layer.psMaxSize_, 2)
     const minSize = getResponsiveSymbolSize(layer.psMinSize_ || 0, 0)
 
-    const classifier = isLinear ? createLinearScale(rawData, maxSize, minSize) : createSqrtScale(rawData, maxSize, minSize)
+    const magnitudes = rawData.map((v) => Math.abs(Number(v)))
+    const classifier = isLinear ? createLinearScale(magnitudes, maxSize, minSize) : createSqrtScale(magnitudes, maxSize, minSize)
 
     // expose on layer instance
-    layer.classifierSize(classifier)
+    layer.classifierSize(sizeByMagnitude(classifier))
 }
 
 /**

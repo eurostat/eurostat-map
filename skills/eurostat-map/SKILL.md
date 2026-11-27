@@ -78,6 +78,8 @@ Rules that cause most mistakes:
   `nutsYear`.
 - **Use `nutsLevel` and `nutsYear` that exist for your data.** Defaults are level 3 and year 2024,
   and not every Eurostat dataset is published at every level. `'mixed'` shows several levels.
+- Proportional symbols draw negative values by their amount: blue and red by default, solid and outline with your own
+  `fill` (`psSettings({ positiveFill, negativeFill })`).
 - Choropleths are for _intensive_ values (rates, densities, shares). Use proportional symbols for
   _extensive_ values (counts, totals). This is the library's own guidance.
 

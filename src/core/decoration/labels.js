@@ -218,6 +218,9 @@ function applyLabelOverlapPrevention(labelItems, labelTexts) {
  *   Halos are rendered when map.labels_.halos is truthy, consistent with choropleth behaviour.
  */
 export const appendLabelsToSymbols = function (map, sizeData, out) {
+    // an outline symbol (transparent fill) shows the light map behind it
+    const opaqueFill = (fill) => (fill === 'transparent' || fill === 'rgba(0, 0, 0, 0)' ? '#ffffff' : fill)
+
     // Ensure the formatter is set (mirrors the guard in addLabelsToMap / updateLabels)
     const formatter = out.labels_?.valuesFormatter ? out.labels_.valuesFormatter : compactFormatter.format
 
@@ -272,7 +275,7 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
                 })
                 .attr('fill', function (d) {
                     const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill
-                    return getTextColorForBackground(fill)
+                    return getTextColorForBackground(opaqueFill(fill))
                 })
                 .attr('paint-order', 'stroke')
                 .attr('dominant-baseline', 'auto') // override for overflowing labels so y positions top of text
@@ -316,7 +319,7 @@ export const appendLabelsToSymbols = function (map, sizeData, out) {
                     // colour, matching choropleth/geographic label behaviour (statLabelTextColor).
                     if (out.labels_?.statLabelTextColor) return out.labels_.statLabelTextColor
                     const fill = window.getComputedStyle(this.parentNode.firstChild)?.fill || out.psFill_
-                    return getTextColorForBackground(fill)
+                    return getTextColorForBackground(opaqueFill(fill))
                 })
                 .attr('stroke', (d) => {
                     if (!isHalo) return 'none'

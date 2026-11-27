@@ -174,6 +174,14 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
+- Proportional symbol maps draw negative values, which were invisible and missing from the legend. Their size shows the amount, and colour or an outline shows the sign, with a key in the legend.
+
+Example
+
+```javascript
+map.psSettings({ positiveFill: '#2c7bb6', negativeFill: '#d7191c' })
+```
+
 - Asking Eurostat for several time periods no longer puts values on the wrong regions. With more than one value per region, the latest time period (or the first category of another dimension) is used, and a console warning says so.
 
 Example

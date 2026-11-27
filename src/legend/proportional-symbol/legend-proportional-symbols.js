@@ -35,6 +35,9 @@ export const legend = function (map, config) {
         ringLabel: 'Share (%)',
         noData: false, // show no data legend item
         noDataText: 'No data', //no data text label
+        signKey: true, // explain the two signs when the data has negative values
+        positiveText: 'Positive',
+        negativeText: 'Negative',
         _totalBarsHeight: 0,
         _totalD3SymbolsHeight: 0,
     }
