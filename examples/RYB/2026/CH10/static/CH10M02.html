@@ -131,11 +131,13 @@
                     .subtitle('(by NUTS 2 regions, 2024)')
                     .position({ x: 4800000, y: 3400000, z: 7000 })
                     .dorling(true)
-                    .dorlingStrength({ x: 10, y: 10 }) // Gravity toward original position
-                    .dorlingIterations(1) // Collision detection iterations
-                    .dorlingPadding(-1) // Minimum distance between circles
-                    .animateDorling(false) // Skip animation for immediate result
-                    .dorlingWorker(false) // Run synchronously - no Web Worker so the page has no vendor chunk dependency
+                    .dorlingSettings({
+                        strength: { x: 10, y: 10 }, // Gravity toward original position
+                        iterations: 1, // Collision detection iterations
+                        padding: -1, // Minimum distance between circles
+                        animate: false, // Skip animation for immediate result
+                        worker: false, // Run synchronously - no Web Worker so the page has no vendor chunk dependency
+                    })
                     .nutsLevel('mixed')
                     .statCoxcomb({
                         customData: customData,
@@ -168,7 +170,7 @@
                         colorLegend: { title: 'Residence of tourist', marginTop: 35, titlePadding: 10, noData: false },
                         timeLegend: { title: 'Month', titlePadding: 33, marginTop: -33 },
                     })
-                    .bottomText(false)
+                    .footnote(false)
                     .header(true)
                     .footer(true)
                     .showEstatLogo(false)

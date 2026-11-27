@@ -50,7 +50,7 @@ export function renderMap(code) {
         .footnote(' <tspan style="font-style: italic;">Source</tspan>: Eurostat <a href="https://ec.europa.eu/eurostat" target="_blank">(sbs_r_nuts2021)</a>')
         .footnoteTooltipText(false)
 
-        .showZoomButtons(true)
+        .zoomButtons(true)
         .insets('default')
         .insetsButton(true)
         //end SE settings

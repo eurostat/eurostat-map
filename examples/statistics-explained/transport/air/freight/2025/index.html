@@ -265,7 +265,7 @@
                         // zoom min/max
                         .zoomExtent([0.6, 10])
 
-                        .callback(() => {
+                        .onBuild(() => {
                             // set fill of regions
                             const countries = d3.selectAll('#air-freight-map .em-worldrg path')
                             countries.style('fill', (d) => {

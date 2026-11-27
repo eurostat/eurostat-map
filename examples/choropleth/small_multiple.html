@@ -34,9 +34,13 @@
 
             for (let year = 2021; year >= 2000; year--) {
                 for (let q = 1; q <= 4; q++) {
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+                    svg.id = 'map_' + year + '_Q' + q
+                    document.body.appendChild(svg)
+
                     eurostatmap
                         .map('choropleth')
-                        .svgId('map_' + year + '_Q' + q)
+                        .svgId(svg.id)
                         .title(year + ' ' + 'Q' + q)
                         .scale('60M')
                         .width(250)
@@ -50,7 +54,7 @@
 
                         .colorFunction(d3.interpolateRdYlBu)
                         .classificationMethod('threshold')
-                        .thresholds([-15, -10, -8, -6, -4, -2, -1, -0.5, 0, 0.5, , 1, 2, 4, 6, 7, 10, 15])
+                        .thresholds([-15, -10, -8, -6, -4, -2, -1, -0.5, 0, 0.5, 1, 2, 4, 6, 7, 10, 15])
 
                         .footnote(false)
                         .showSourceLink(false)

@@ -55,7 +55,7 @@ export function renderMap(code) {
         )
         .footnoteTooltipText(false)
 
-        .showZoomButtons(true)
+        .zoomButtons(true)
         .insets('default')
         //end SE settings
         .nutsLevel(2)

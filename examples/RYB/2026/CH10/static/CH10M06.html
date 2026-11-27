@@ -125,11 +125,13 @@
                     .subtitle('(offered via selected online booking platforms, by NUTS 2 regions, 2025)')
                     .position({ x: 4800000, y: 3400000, z: 7000 })
                     .dorling(true)
-                    .dorlingStrength({ x: 10, y: 10 })
-                    .dorlingIterations(1)
-                    .dorlingPadding(-1)
-                    .animateDorling(false)
-                    .dorlingWorker(false) // Run synchronously - no Web Worker so the page has no vendor chunk dependency
+                    .dorlingSettings({
+                        strength: { x: 10, y: 10 },
+                        iterations: 1,
+                        padding: -1,
+                        animate: false,
+                        worker: false, // Run synchronously - no Web Worker so the page has no vendor chunk dependency
+                    })
                     .nutsLevel('mixed')
                     .statCoxcomb({
                         customData: customData,
@@ -161,7 +163,7 @@
                         colorLegend: { title: 'Residence of guest', marginTop: 35, titlePadding: 10, noData: false },
                         timeLegend: { title: 'Month', titlePadding: 33, marginTop: -33 },
                     })
-                    .bottomText(false)
+                    .footnote(false)
                     .header(true)
                     .footer(true)
                     .showEstatLogo(false)

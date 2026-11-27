@@ -6,6 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <style>
             @import url('./airports.css');
+            svg.em-map {
+                font-family: Arial;
+            }
         </style>
     </head>
 
@@ -107,7 +110,6 @@
 
                     const map = eurostatmap
                         .map('flow')
-                        .fontFamily('Arial')
                         .svgId('airport-pairs-map')
                         .width(width)
                         .height(height)
@@ -285,7 +287,7 @@
                         .zoomExtent([1, 10])
 
                         // fires when map is built
-                        .callback(() => {
+                        .onBuild(() => {
                             const labels = d3.selectAll('#em-labels')
                             labels.raise()
                             const annotations = d3.selectAll('.em-annotations')
