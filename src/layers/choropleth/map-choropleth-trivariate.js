@@ -1,3 +1,4 @@
+import { reportConfigError } from '../../core/errors.js'
 import { select } from 'd3-selection'
 import { median } from 'd3-array'
 import { buildSingleLayerMap } from '../../core/stat-map'
@@ -106,7 +107,26 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
     // Classification (compute colors ONCE)
     // ===============================
     //@override
+    // three datasets: a mistake in naming them is reported rather than drawing an empty map
+    function hasThreeDatasets() {
+        const map = out.map || out
+        const encoding = out.encoding?.('color')
+        const codes = out.getTernaryStatCodes()
+        const named = encoding?.stats || encoding?.stat
+        const unknown = named ? codes.filter((c) => !map.stat_?.[c] && !map.statData_?.[c]?.hasData()) : []
+        // read by updateStyle() and the legend, which have nothing to draw then
+        out._ternaryInvalid = codes.length !== 3 || unknown.length > 0
+        if (!out._ternaryInvalid) return true
+        reportConfigError(
+            map,
+            "Trivariate maps need encoding('color', { stats: [a, b, c] }) with the names of three statistics" +
+                (unknown.length ? `: there is no statistic named '${unknown.join("', '")}'.` : '.')
+        )
+        return false
+    }
+
     out.updateClassification = function () {
+        if (!hasThreeDatasets()) return out
         applyClassificationToMap(out)
         return out
     }
@@ -229,6 +249,7 @@ export const decorateTrivariateChoroplethLayer = function (out, config) {
     // ===============================
     //@override
     out.updateStyle = function () {
+        if (out._ternaryInvalid) return out
         if (out.insetTemplates_) {
             executeForAllInsets(out.insetTemplates_, out.svgId_, styleRegions)
         }

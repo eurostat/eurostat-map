@@ -94,7 +94,8 @@ Rules that cause most mistakes:
 | Two variables at once           | `bivariateChoropleth` (`chbi`)                          | `x`, `y`                      |
 | Three shares summing to a whole | `trivariateChoropleth` (`chtri`)                        | see reference                 |
 | Categories (typologies)         | `categorical` (`ct`)                                    | `fill` + `classToFillStyle`   |
-| Composition of a total          | `pie`, `coxcomb`, `waffle`, `bar`, `mushroom`, `stripe` | `composition`                 |
+| Composition of a total          | `pie`, `waffle`, `bar`, `mushroom`, `stripe`            | `composition`                 |
+| Composition over several times  | `coxcomb`                                               | `statCoxcomb({ ... })`        |
 | Time trend per region           | `sparkline`                                             | see reference                 |
 | Flows between places            | `flow`                                                  | `flowGraph({ nodes, links })` |
 

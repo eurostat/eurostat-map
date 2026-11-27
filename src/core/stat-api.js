@@ -71,7 +71,13 @@ export const attachStatChannels = function (out) {
             return out
         }
 
-        if (!options.totalCodeKey && channel === 'composition') {
+        // The chart maps read the datasets by category code. That is true of the primary statistic whatever its name: the
+        // reserved channel names, or the only multi-category statistic of the map.
+        const isPrimaryCategoricalChannel =
+            ['default', 'composition', 'height'].includes(channel) ||
+            (!['width', 'color', 'size', 'ring'].includes(channel) && !Object.keys(out.statChannels_).some((c) => c !== channel))
+
+        if (!options.totalCodeKey && isPrimaryCategoricalChannel && channel !== 'height') {
             const totalCodeKeysByMapType = {
                 pie: 'compositionTotalCode_',
                 waffle: 'waffleTotalCode_',
@@ -80,7 +86,6 @@ export const attachStatChannels = function (out) {
             options.totalCodeKey = totalCodeKeysByMapType[out._mapType]
         }
 
-        const isPrimaryCategoricalChannel = channel === 'default' || channel === 'composition' || channel === 'height'
         const statKeyPrefix = options.statKeyPrefix === undefined ? (isPrimaryCategoricalChannel ? '' : channel) : options.statKeyPrefix
         const statKeys = {}
 
@@ -189,13 +194,15 @@ export const attachStatAccessors = function (out) {
         // registered on the shared map (for example, spark maps register one dataset per date).
         // Keep stat()/statData() map-owned to avoid map <-> layer forwarding recursion, but let
         // the active layer explicitly handle this specialized config shape when required.
-        if (arguments.length === 1 && k && typeof k === 'object' && !Array.isArray(k)) {
+        // A name given to such a config changes nothing: the layer names the datasets itself.
+        const special = arguments.length === 1 ? k : arguments.length === 2 && v?.dates ? v : null
+        if (special && typeof special === 'object' && !Array.isArray(special)) {
             const layer = out.activeLayer?.()
             const handler =
                 layer && Object.prototype.hasOwnProperty.call(layer, 'handleStatConfig') && typeof layer.handleStatConfig === 'function'
                     ? layer.handleStatConfig
                     : null
-            if (handler?.call(layer, k)) return out
+            if (handler?.call(layer, special)) return out
         }
 
         //legacy multi-argument API for categorical composition stats:

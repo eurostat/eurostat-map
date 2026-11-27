@@ -3,6 +3,7 @@ import { arc, stack } from 'd3-shape'
 import { max } from 'd3-array'
 import { buildSingleLayerMap } from '../../core/stat-map'
 import * as StatisticalData from '../../core/stat-data'
+import { reportConfigError } from '../../core/errors'
 import { registerLayerType } from '../../core/layer-registry'
 import { applyPatternFill } from '../../core/decoration/pattern-fill'
 import { executeForAllInsets, getRegionsSelector } from '../../core/utils'
@@ -252,15 +253,12 @@ export const decorateCoxcombLayer = function (out, config) {
 
         // Set category colors and labels
         const assignCategoryProperties = () => {
+            out.catColors_ = out.catColors_ || {}
+            out.catLabels_ = out.catLabels_ || {}
             categoryCodes.forEach((category, idx) => {
-                if (categoryColors?.[idx]) {
-                    out.catColors_ = out.catColors_ || {}
-                    out.catColors_[category] = categoryColors[idx]
-                }
-                if (categoryLabels?.[idx]) {
-                    out.catLabels_ = out.catLabels_ || {}
-                    out.catLabels_[category] = categoryLabels[idx]
-                }
+                const color = categoryColors?.[idx] || out.catColors_[category]
+                out.catColors_[category] = color || DEFAULT_CATEGORICAL_COLORS[idx % DEFAULT_CATEGORICAL_COLORS.length]
+                if (categoryLabels?.[idx]) out.catLabels_[category] = categoryLabels[idx]
             })
 
             if (totalCode) {
@@ -354,8 +352,19 @@ export const decorateCoxcombLayer = function (out, config) {
 
     // ── Classification ───────────────────────────────────────────────────────
 
+    // a coxcomb has two dimensions, time periods and categories, which only statCoxcomb() describes
+    const isConfigured = () => {
+        if (out._coxTimes) return true
+        reportConfigError(
+            out.map || out,
+            "Coxcomb maps are set up with statCoxcomb({ times, categoryCodes, ... }), not with stat() and encoding('composition')."
+        )
+        return false
+    }
+
     //@override
     out.updateClassification = function () {
+        if (!isConfigured()) return out
         if (out.insetTemplates_) {
             executeForAllInsets(out.insetTemplates_, out.svgId_, applyClassificationToMap)
         }
@@ -381,6 +390,7 @@ export const decorateCoxcombLayer = function (out, config) {
 
     //@override
     out.updateStyle = function () {
+        if (!out._coxTimes) return out
         out._anyRegionHasOther_ = false
 
         if (!out.catColors_) {

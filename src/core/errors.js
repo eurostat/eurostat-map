@@ -51,3 +51,16 @@ export const showMapErrorMessage = function (map, message = GEO_ERROR_MESSAGE) {
             .text(line)
     })
 }
+
+/**
+ * Reports a mistake in how a map was set up (the console and map.onError()), once per message.
+ * @param {*} map The main map
+ * @param {string} message
+ */
+export const reportConfigError = function (map, message) {
+    map._configErrors = map._configErrors || new Set()
+    if (map._configErrors.has(message)) return
+    map._configErrors.add(message)
+    console.error('[eurostat-map] ' + message)
+    reportMapError(map, { type: 'data', message })
+}

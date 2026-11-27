@@ -174,6 +174,16 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
+- Coxcomb maps work without `totalCode`, and say what to use instead of `encoding('composition')`.
+- Pie, stripe and waffle maps accept a composition statistic of any name, and sparkline maps a named statistic with `dates`. A trivariate map set up wrongly says so instead of staying empty.
+
+Example
+
+```javascript
+map.stat('ages', { eurostatDatasetCode: 'demo_r_pjanaggr3', categoryParameter: 'age', categoryCodes: ['Y_LT15', 'Y15-64', 'Y_GE65'] })
+    .encoding('composition', { stat: 'ages' })
+```
+
 - Data that cannot be drawn is reported instead of giving a legend of "NaN": a filter that matches nothing and values such as `'1,5'` reach `onError`, and those regions show as unavailable.
 - Ties, or fewer distinct values than classes, no longer repeat legend labels: classes that no value can fall into are left out (thresholds you set are kept).
 

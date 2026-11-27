@@ -46,7 +46,7 @@ export const legend = function (map, /** @type {TrivariateLegendConfig} */ confi
         out.updateConfig()
         out.updateContainer()
 
-        if (!out.lgg.node()) return out
+        if (!out.lgg.node() || (out.layer || out.map)._ternaryInvalid) return out
 
         out.makeBackgroundBox()
         if (out.title) out.addTitle()

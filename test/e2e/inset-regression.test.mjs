@@ -614,7 +614,6 @@ const compSteps = [
 ]
 for (const [type, insets] of [
     ['pieChart', INSETS.default],
-    ['coxcomb', INSETS.custom],
     ['waffle', INSETS.default],
     ['bar', INSETS.default],
     ['stripeComposition', INSETS.default],
@@ -622,6 +621,18 @@ for (const [type, insets] of [
     add(`${type} nl2 insets`, type, `m.nutsLevel(2).stat('composition', ${comp()}).encoding('composition', { stat: 'composition' })${insets}`, {
         steps: compSteps,
     })
+// a coxcomb has two dimensions (time periods and categories), which only statCoxcomb() describes
+add(
+    'coxcomb nl2 insets',
+    'coxcomb',
+    `m.nutsLevel(2).statCoxcomb({ eurostatDatasetCode: 'apro_mt_ls_r', timeParameter: 'time', times: ['2019', '2020', '2021'], categoryParameter: 'animals', categoryCodes: ['A2000', 'A3100', 'A4100'], categoryLabels: ['a', 'b', 'c'], categoryColors: ['#0060FA', '#E04040', '#40A040'] })${INSETS.custom}`,
+    {
+        steps: [
+            ['updateStatData', `m.updateStatData()`],
+            ['rebuild (geometry cached)', `m.build()`],
+        ],
+    }
+)
 add(
     'pieChart mixed image insets',
     'pieChart',

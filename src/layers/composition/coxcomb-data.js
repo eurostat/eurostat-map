@@ -4,6 +4,9 @@ import { spaceAsThousandSeparator } from '../../core/utils'
 import { createRadialScale } from '../../core/scale.js'
 import { getResponsiveSymbolSize } from '../../core/responsive'
 
+/** A value as a number to add up: ':' (no data), text and missing values count as nothing. */
+const asNumber = (v) => (Number.isFinite(+v) ? +v : 0)
+
 export function buildTooltipCache(out) {
     out._tooltipCache = new Map()
     const months = out._coxTimes || []
@@ -19,8 +22,8 @@ export function buildTooltipCache(out) {
         const includeOther =
             out.totalCode_ &&
             months.some((month) => {
-                const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
-                const sumCauses = out._coxCategoryCodes.reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
+                const totalVal = asNumber(out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value)
+                const sumCauses = out._coxCategoryCodes.reduce((a, c) => a + (asNumber(out.statData(`${month}:${c}`)?.get(regionId)?.value)), 0)
                 return totalVal > sumCauses
             })
 
@@ -44,13 +47,13 @@ export function buildTooltipCache(out) {
             causes.forEach((cause) => {
                 let rawVal = 0
                 if (cause === 'other') {
-                    const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+                    const totalVal = asNumber(out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value)
                     const sumCauses = causes
                         .filter((c) => c !== 'other')
-                        .reduce((a, c) => a + (out.statData(`${month}:${c}`)?.get(regionId)?.value || 0), 0)
+                        .reduce((a, c) => a + (asNumber(out.statData(`${month}:${c}`)?.get(regionId)?.value)), 0)
                     rawVal = Math.max(totalVal - sumCauses, 0)
                 } else {
-                    rawVal = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
+                    rawVal = asNumber(out.statData(`${month}:${cause}`)?.get(regionId)?.value)
                 }
                 cells.push(rawVal > 0 ? `<td><span class="em-breakdown-value">${spaceAsThousandSeparator(rawVal)}</span></td>` : '<td></td>')
             })
@@ -96,7 +99,7 @@ export function computeTotals(out) {
             if (!stat?._data_) return
 
             for (const region in stat._data_) {
-                const v = stat._data_[region]?.value || 0
+                const v = asNumber(stat._data_[region]?.value)
                 monthlyTotals[region] = monthlyTotals[region] || {}
                 monthlyTotals[region][month] = v
                 yearlyTotals[region] = (yearlyTotals[region] || 0) + v
@@ -112,7 +115,7 @@ export function computeTotals(out) {
                 if (!stat?._data_) return
 
                 for (const region in stat._data_) {
-                    const v = stat._data_[region]?.value || 0
+                    const v = asNumber(stat._data_[region]?.value)
                     perRegionMonthSum[region] = (perRegionMonthSum[region] || 0) + v
                 }
             })
@@ -228,11 +231,11 @@ export function getCoxcombTopRadius(out, regionId) {
     let maxR = 0
     ;[months[0], months[months.length - 1]].forEach((month) => {
         let stackSum = out._coxCategoryCodes.reduce((a, cause) => {
-            return a + (out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0)
+            return a + (asNumber(out.statData(`${month}:${cause}`)?.get(regionId)?.value))
         }, 0)
 
         if (out.totalCode_) {
-            const total = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+            const total = asNumber(out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value)
             if (total > stackSum) stackSum = total
         }
 
@@ -257,13 +260,13 @@ export function buildMonthData(out, regionId, months, causes) {
             let sumCauses = 0
 
             causes.forEach((cause) => {
-                const val = out.statData(`${month}:${cause}`)?.get(regionId)?.value || 0
+                const val = asNumber(out.statData(`${month}:${cause}`)?.get(regionId)?.value)
                 row[cause] = val
                 sumCauses += val
             })
 
             if (out.totalCode_) {
-                const totalVal = out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value || 0
+                const totalVal = asNumber(out.statData(`${month}:${out.totalCode_}`)?.get(regionId)?.value)
                 const otherVal = totalVal > sumCauses ? totalVal - sumCauses : 0
                 if (otherVal > 0) row['other'] = otherVal
             }
