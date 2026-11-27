@@ -4,6 +4,31 @@
 
 ### New
 
+- **Negative values on proportional symbol maps**, which were invisible and missing from the legend. Size shows the amount; blue and red show the sign (solid and outline with your own symbol colour), with a key in the legend.
+
+Example
+
+```javascript
+map.psSettings({ positiveFill: '#2c7bb6', negativeFill: '#d7191c' })
+    .legend({ sizeLegend: { positiveText: 'More arrivals', negativeText: 'More departures' } })
+```
+
+- **A class break at the point of divergence**, so that values on its two sides never share a colour.
+
+Example
+
+```javascript
+map.colors('cobalt-plum').pointOfDivergence(0).divergingBreak(true)
+```
+
+- **Exported PNG and SVG images carry the boundary copyright** in a line below the map, in place of "Credits". `exportAttribution()` rewords it or turns it off.
+
+Example
+
+```javascript
+map.exportAttribution('Boundaries: ©EuroGeographics').exportMapToPNG()
+```
+
 - **Maps work with a keyboard and a screen reader.** A built map is a named group, its zoom, legend and inset buttons are keyboard-operable, and one tab stop on the map lets the arrow keys move between regions, showing and announcing each tooltip (Page Up and Page Down change country, Escape leaves). On flow maps they move through places and flows. Legends that highlight the map on hover do the same from the keyboard. `keyboardNavigation(false)` turns this off.
 
 Example
@@ -98,6 +123,38 @@ map.annotations({ annotations: [{ x: 300, y: 200, align: 'right', note: { label:
 
 ### Improvements
 
+- **Legend numbers are formatted alike**, with the precision of the data ("1.0", "51.0", "100.0" for data with one decimal), and another decimal where two would look the same. Your own formatter or `decimals` still win.
+
+Example
+
+```javascript
+map.legend({ sizeLegend: { decimals: 1 } })
+```
+
+- **Legends name their variables**: bivariate, trivariate and mushroom legends show your labels, else the statistic's `label`, the Eurostat dataset title or the statistic's name, instead of "Variable 1" or "v1".
+
+Example
+
+```javascript
+map.stat('density', { eurostatDatasetCode: 'demo_r_d3dens', label: 'Population density' })
+```
+
+- **Easier to read**: the sparkline legend is a key (an example line, the lowest and highest values, the first and last date), pie legends have headings, and titles drawn over the map have a halo.
+
+Example
+
+```javascript
+map.legend({ scaleLegend: { showAllSeries: true } }) // the previous sparkline legend
+```
+
+- **Legends keep clear of insets**: with no legend position set, the legend moves to the left where it would cover them.
+
+Example
+
+```javascript
+map.insets('default').legend({ position: 'top right' }) // keeps it on the right
+```
+
 - **A real ES module build for bundlers.** The package's `module` entry (`build/eurostatmap.mjs`) imports D3 and most other dependencies instead of containing them (proj4 and the annotation library excepted): in a test application that also uses D3, the bundle is about 12% smaller gzipped than with 4.15.0. `import eurostatmap from 'eurostat-map'` now works in webpack, where it returned `undefined` before. The `build/eurostatmap.js` and `build/eurostatmap.min.js` files are unchanged in kind.
 
 Example
@@ -174,50 +231,7 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
-- The numbers of every legend are formatted alike, with the precision of the data ("1.0", "51.0", "100.0" for data with one decimal), with another decimal where two would look the same. Your own formatter or `decimals` still win.
-
-Example
-
-```javascript
-map.legend({ sizeLegend: { decimals: 1 } })
-```
-
-- `divergingBreak(true)` puts a class boundary at the point of divergence, so values on its two sides never share a colour.
-- The sparkline legend is a readable key (an example line, the lowest and highest values, the first and last date); `scaleLegend: { showAllSeries: true }` draws every series as before.
-- Pie legends have headings and a smaller circle large enough to see, titles drawn over the map have a halo, and the docs show how to use the Equal Earth projection and how to put values on a continuous legend.
-
-Example
-
-```javascript
-map.colors('cobalt-plum').pointOfDivergence(0).divergingBreak(true)
-```
-
-- Bivariate, trivariate and mushroom legends name their variables instead of showing "Variable 1" or "v1": your legend labels, else the statistic's `label`, the Eurostat dataset title (with the category that tells two variables apart) or the statistic's name.
-
-Example
-
-```javascript
-map.stat('density', { eurostatDatasetCode: 'demo_r_d3dens', label: 'Population density' })
-```
-
-- With insets shown and no legend position set, the legend moves to the left instead of covering them.
-- A footnote that gives a source ("Source: ...") no longer appears beside a second, automatic source link; `showSourceLink(true)` keeps both.
-
-Example
-
-```javascript
-map.insets('default').footnote('Source: Eurostat').showSourceLink(true)
-```
-
-- Exported PNG and SVG images carry the boundary copyright ("Administrative boundaries: ©EuroGeographics ©OpenStreetMap") in a line below the map, in place of "Credits". `exportAttribution()` rewords it or turns it off.
-
-Example
-
-```javascript
-map.exportAttribution('Boundaries: ©EuroGeographics').exportMapToPNG()
-```
-
-- TypeScript accepts the documented examples: legend options of every map type, sparkline `stat()` configs and the methods of an added choropleth or proportional symbol layer. A check keeps the documentation and the typings in step.
+- TypeScript accepts the documented examples: legend options of every map type, sparkline `stat()` configs and the methods of an added choropleth or proportional symbol layer.
 
 Example
 
@@ -250,14 +264,6 @@ Example
 
 ```javascript
 map.onError((error) => console.log(error.message))
-```
-
-- Proportional symbol maps draw negative values, which were invisible and missing from the legend. Their size shows the amount, and colour or an outline shows the sign, with a key in the legend.
-
-Example
-
-```javascript
-map.psSettings({ positiveFill: '#2c7bb6', negativeFill: '#d7191c' })
 ```
 
 - Asking Eurostat for several time periods no longer puts values on the wrong regions. With more than one value per region, the latest time period (or the first category of another dimension) is used, and a console warning says so.
@@ -304,6 +310,12 @@ const inset: InsetConfig = { geo: 'MT', zoomButtons: true }
 
 No API was removed, but these can change how an existing page looks or behaves:
 
+- Maps that requested several values per region showed some of them against the wrong regions: they now show the latest time period, or the first category.
+- Proportional symbol maps with negative values gain symbols, in blue and red unless a symbol colour is set.
+- Data with ties or few distinct values gets fewer classes.
+- Legend numbers may gain decimals ("131" becomes "131.0" for data with one decimal), and flow and coxcomb legends write millions in words ("1.7 million").
+- Sparkline, pie and multi-variable legends have new contents; with insets, a legend with no position may move to the left.
+- A footnote containing "Source:" hides the automatic source link, and exported images are one line taller for the copyright.
 - Narrow containers switch to the compact layout, whatever the window width. Use `layout('desktop')` to keep the old one.
 - Maps, legends and buttons add tab stops to the page. `keyboardNavigation(false)` removes the map's and the legend's.
 - Some legends move slightly where parts used to touch or overlap; very short swatches grow to fit their labels.
