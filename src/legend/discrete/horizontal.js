@@ -192,5 +192,7 @@ export function appendHorizontalExtraItems(out, config) {
         appendExtraSwatchRow(out, rows, 0, box.y + box.height + 8)
         return
     }
-    appendExtraSwatchRow(out, rows, barWidth + 16, getTitlePadding(out))
+    // level with the bar: centred on it, less the padding every extra swatch draws above itself
+    const y = getTitlePadding(out) + (config.shapeHeight - out.noDataShapeHeight) / 2 - out.noDataPadding
+    appendExtraSwatchRow(out, rows, barWidth + 16, y)
 }

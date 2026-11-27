@@ -189,7 +189,7 @@
   "text em-legend-label em-legend-label-min \"10\" x=0 y=41 dy=0.9em anchor=start",
   "line em-legend-tick em-legend-tick-max 247,66 0x4",
   "text em-legend-label em-legend-label-max \"94\" x=240 y=41 dy=0.9em anchor=end",
-  "rect em-legend-rect 263,51 25x20",
+  "rect em-legend-rect 263,46 25x20",
   "text em-legend-label em-legend-label-no-data \"Data unavailable\" x=30 y=15 dy=0.35em anchor="
  ],
  "choropleth horizontal ranges with no data": [
@@ -202,7 +202,7 @@
   "rect em-legend-rect 167,46 80x20",
   "line em-legend-separator 167,46 0x20",
   "text em-legend-label \"> 68\" x=200 y=39 dy=0.9em anchor=middle",
-  "rect em-legend-rect 263,51 25x20",
+  "rect em-legend-rect 263,46 25x20",
   "text em-legend-label em-legend-label-no-data \"No data\" x=30 y=15 dy=0.35em anchor="
  ],
  "choropleth with subtitle": [

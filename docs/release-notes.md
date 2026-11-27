@@ -231,6 +231,7 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
+- **Horizontal legends:** the "no data" and category swatches beside the bar are level with the class swatches; they sat a few pixels lower.
 - TypeScript accepts the documented examples: legend options of every map type, sparkline `stat()` configs and the methods of an added choropleth or proportional symbol layer.
 
 Example
