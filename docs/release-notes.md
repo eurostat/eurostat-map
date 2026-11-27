@@ -1,5 +1,17 @@
 # Release notes
 
+## Unreleased
+
+### Fixes
+
+- `null` takes back a proportional symbol colour: `fill`, `positiveFill` and `negativeFill` could not be unset once chosen.
+
+Example
+
+```javascript
+map.psSettings({ positiveFill: null, negativeFill: null }).updateStyle()
+```
+
 ## 4.16.0
 
 ### New

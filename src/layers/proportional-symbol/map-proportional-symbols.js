@@ -61,15 +61,17 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
 
     //colour
     // an accessor, so that a colour set by any route (setter, config, inset copy) counts as the author's choice
-    let psFill = '#009569'
+    const defaultFill = '#009569'
+    let psFill = defaultFill
     layer._psFillChosen = false
     Object.defineProperty(layer, 'psFill_', {
         enumerable: true,
         configurable: true,
         get: () => psFill,
+        // null gives the choice back: the default colour, and the default sign colours again
         set: (v) => {
-            psFill = v
             layer._psFillChosen = v !== undefined && v !== null
+            psFill = v === null ? defaultFill : v
         },
     })
     // colours used when the size values include negative ones (see ps-sign.js)
@@ -156,8 +158,9 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         if (v.minValue !== undefined) layer.psMinValue_ = v.minValue
         if (v.maxValue !== undefined) layer.psMaxValue_ = v.maxValue
         if (v.fill !== undefined) layer.psFill_ = v.fill
-        if (v.positiveFill !== undefined) layer.psPositiveFill_ = v.positiveFill
-        if (v.negativeFill !== undefined) layer.psNegativeFill_ = v.negativeFill
+        // null unsets a colour chosen earlier
+        if (v.positiveFill !== undefined) layer.psPositiveFill_ = v.positiveFill ?? undefined
+        if (v.negativeFill !== undefined) layer.psNegativeFill_ = v.negativeFill ?? undefined
         if (v.fillOpacity !== undefined) layer.psFillOpacity_ = v.fillOpacity
         if (v.stroke !== undefined) layer.psStroke_ = v.stroke
         if (v.strokeWidth !== undefined) layer.psStrokeWidth_ = v.strokeWidth

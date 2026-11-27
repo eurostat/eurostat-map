@@ -12,11 +12,12 @@ export interface ProportionalSymbolSettings {
     barWidth?: number
     minValue?: number | undefined
     maxValue?: number | undefined
-    fill?: string
+    /** Symbol colour. `null` goes back to the default. */
+    fill?: string | null
     /** Fill of positive values when the data has negative ones. @default '#2c7bb6', or `fill` when that is set */
-    positiveFill?: string
+    positiveFill?: string | null
     /** Fill of negative values. @default '#d7191c', or an outline in `fill` (or in the colour class) when that is used */
-    negativeFill?: string
+    negativeFill?: string | null
     fillOpacity?: number
     stroke?: string
     strokeWidth?: number

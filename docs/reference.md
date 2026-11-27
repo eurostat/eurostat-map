@@ -464,6 +464,8 @@ map.psSettings({ positiveFill: '#1b7837', negativeFill: '#762a83' })
     .legend({ sizeLegend: { positiveText: 'More arrivals', negativeText: 'More departures' } })
 ```
 
+To take a choice back on a built map, pass `null`: `psSettings({ fill: null, positiveFill: null, negativeFill: null })` returns to the default colours.
+
 It is also possible to prevent overlapping via the 'dorling' method:
 
 ```javascript
