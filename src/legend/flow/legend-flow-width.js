@@ -1,10 +1,10 @@
 import { select } from 'd3-selection'
-import { format as d3format } from 'd3-format'
-import { getFontSizeFromClass, spaceAsThousandSeparator } from '../../core/utils'
+import { getFontSizeFromClass } from '../../core/utils'
+import { formatLegendValues } from '../legend-utils'
 import { assignLabelRows } from '../legend-swatch'
 
-const fmt = d3format ? d3format('.2s') : (v) => String(v)
-const comma = d3format ? d3format(',') : (v) => String(v)
+/** The flows' own values, whose precision the labels take. */
+const flowValues = (layer) => (layer.flowGraph_?.links || []).map((link) => link.value)
 
 export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
     if (!out) return null
@@ -51,6 +51,7 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
         sampleVals.push(min + t * (max - min))
     }
     const values = cfg.values || sampleVals
+    const format = formatLegendValues([...values, min, max], flowValues(map))
 
     const slabWidth = innerWidth / values.length // ← divide by count, not count-1
 
@@ -63,7 +64,7 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
 
     // labels first, to know how much room they need: labels that would touch go on a second row
     const labels = values.map((val, i) => {
-        const text = cfg.labels?.[i] ?? (cfg.labelFormatter ? cfg.labelFormatter(val) : fmt(val))
+        const text = cfg.labels?.[i] ?? (cfg.labelFormatter ? cfg.labelFormatter(val) : format(val))
         return texts
             .append('text')
             .attr('x', innerStart + (i + 0.5) * slabWidth)
@@ -111,7 +112,7 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
         .attr('y', captionY)
         .attr('class', 'em-legend-label em-flow-legend-min-label')
         .attr('dy', '0.9em')
-        .text(comma(Math.round(min)))
+        .text(format(min))
 
     texts
         .append('text')
@@ -119,7 +120,7 @@ export function drawHorizontalFlowWidthLegend(out, baseX, baseY) {
         .attr('y', captionY)
         .attr('class', 'em-legend-label em-flow-legend-max-label')
         .attr('dy', '0.9em')
-        .text(comma(Math.round(max)))
+        .text(format(max))
 }
 
 export function drawVerticalFlowWidthLegend(out, baseX, baseY) {
@@ -153,6 +154,7 @@ export function drawVerticalFlowWidthLegend(out, baseX, baseY) {
         sampleVals.push(min + t * (max - min))
     }
     const values = cfg.values || sampleVals
+    const format = formatLegendValues(values, flowValues(map))
 
     const labelHeight = getFontSizeFromClass('em-legend-label') || 12
     const padding = 7 // spacing between the lines
@@ -169,7 +171,7 @@ export function drawVerticalFlowWidthLegend(out, baseX, baseY) {
             currentY = top + Math.max(half, labelHeight / 2) // the first label must clear the title too
         else currentY += Math.max(scale(values[i - 1]) / 2 + half + padding, labelHeight + 2)
 
-        let label = cfg.labelFormatter ? cfg.labelFormatter(val) : spaceAsThousandSeparator(val)
+        let label = cfg.labelFormatter ? cfg.labelFormatter(val) : format(val)
         if (cfg.labels && cfg.labels[i]) label = cfg.labels[i] //manual override
 
         out._flowWidthContainer

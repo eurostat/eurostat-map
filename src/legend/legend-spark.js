@@ -4,6 +4,7 @@ import { axisLeft, axisBottom } from 'd3-axis'
 import { line } from 'd3-shape'
 import * as Legend from './legend'
 import { getRegionById } from '../core/utils'
+import { formatLegendValues } from './legend-utils'
 import { getCentroidsGroup } from '../core/geo/centroids'
 //types
 /** @typedef {import('../types/legend/composition/SparklineLegendConfig').SparklineScaleLegendConfig} SparklineScaleLegendConfig */
@@ -24,6 +25,7 @@ export const legend = function (map, config) {
     out.scaleLegend = {
         title: null, // Title for the scale legend section
         titlePadding: 5, // Padding between title and chart
+        showAllSeries: false, // plot every region's series instead of a key with one example line
         showExampleChart: false, // Whether to show an example sparkline (averaged data)
         showMaxRegion: true, // Whether to show the region with maximum value
         exampleData: null, // Custom example data, or null to use averaged data
@@ -213,6 +215,11 @@ export const legend = function (map, config) {
         const [yMin, yMax] = getLegendYDomain(allSeries)
         const yScale = scaleLinear().domain([yMin, yMax]).range([height, 0])
 
+        if (!config.showAllSeries) {
+            drawKey(legend, container, layer, allSeries, dates, margin)
+            return
+        }
+
         // -----------------------------------
         // Root group
         // -----------------------------------
@@ -309,6 +316,51 @@ export const legend = function (map, config) {
         // Height bookkeeping
         // -----------------------------------
         legend._scaleLegendHeight = margin.top + height + margin.bottom
+    }
+
+    /**
+     * How to read the sparklines: one example line between the lowest and highest values of the data, with the first and
+     * last date. The line's shape is an example (or scaleLegend.exampleData), not a region's series.
+     */
+    function drawKey(legend, container, layer, allSeries, dates, margin) {
+        const config = legend.scaleLegend
+        const values = allSeries.flatMap(({ series }) => series.map((d) => +d.y))
+        if (!values.length) return
+        const low = Math.min(...values)
+        const high = Math.max(...values)
+        const format = config.tickFormat || formatLegendValues([low, high], values)
+        const g = container.append('g').attr('class', 'em-spark-legend-key').attr('transform', `translate(0, ${margin.top})`)
+
+        const highLabel = g.append('text').attr('class', 'em-legend-label').attr('y', 0).attr('dy', '0.8em').text(format(high))
+        const lowLabel = g.append('text').attr('class', 'em-legend-label').attr('x', 0).text(format(low))
+        const x = Math.max(highLabel.node().getBBox().width, lowLabel.node().getBBox().width) + 8
+        const width = Math.max(60, legend.width - x - 10)
+        const height = 40
+        lowLabel.attr('y', height)
+
+        const example = config.exampleData?.length > 1 ? config.exampleData : [0, 0.7, 0.35, 1]
+        const [from, to] = [Math.min(...example), Math.max(...example)]
+        const lineGen = line()
+            .x((d, i) => x + (i * width) / (example.length - 1))
+            .y((d) => height - 4 - ((d - from) / (to - from || 1)) * (height - 8))
+        g.append('path')
+            .attr('class', 'em-spark-legend-example')
+            .attr('d', lineGen(example))
+            .attr('fill', 'none')
+            .attr('stroke', typeof layer.sparkLineColor_ === 'string' ? layer.sparkLineColor_ : '#000')
+            .attr('stroke-width', 1.5)
+
+        const label = (date) => layer.catLabels_?.[date] || date
+        const dateY = height + 18
+        g.append('text').attr('class', 'em-legend-label').attr('x', x).attr('y', dateY).text(label(dates[0]))
+        g.append('text')
+            .attr('class', 'em-legend-label')
+            .attr('x', x + width)
+            .attr('y', dateY)
+            .attr('text-anchor', 'end')
+            .text(label(dates[dates.length - 1]))
+
+        legend._scaleLegendHeight = margin.top + dateY + 8
     }
 
     function drawColorLegend(legend, container, offsetY) {

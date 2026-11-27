@@ -1,7 +1,7 @@
 import { select } from 'd3-selection'
 import { max } from 'd3-array'
 import { getFontSizeFromClass, spaceAsThousandSeparator } from '../core/utils'
-import { formatSizeLabel } from './legend-utils'
+import { formatLegendValues } from './legend-utils'
 import { appendCircleRing } from '../layers/proportional-symbol/symbols/circle-ring'
 
 /**
@@ -80,7 +80,8 @@ export function drawCircleSizeLegend(out, container, values, sizeScale, title, t
         .attr('r', sizeScale)
 
     //labels
-    let labelFormatter = out.sizeLegend?.labelFormatter || formatSizeLabel
+    const ownDecimals = (out.layer || out.map)?.legend_?.sizeLegend?.decimals
+    let labelFormatter = out.sizeLegend?.labelFormatter || formatLegendValues(values, out._sizeDataValues, ownDecimals)
     if (out.nodeSizeLegend?.labelFormatter) {
         labelFormatter = out.nodeSizeLegend.labelFormatter
     }

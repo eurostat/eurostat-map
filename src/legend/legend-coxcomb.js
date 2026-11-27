@@ -1,3 +1,4 @@
+import { formatLegendValues } from './legend-utils'
 import { legibleSwatchHeight, titleClearance } from './legend-swatch'
 import { select } from 'd3-selection'
 import * as Legend from './legend'
@@ -102,13 +103,10 @@ export const legend = function (map, config) {
         }
 
         const labels = out.sizeLegend?.labels
-        const labelFormatter =
-            out.sizeLegend?.labelFormatter ||
-            ((v) => {
-                if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M'
-                if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K'
-                return String(v)
-            })
+        const data = Object.keys(out.map.statData_ || {})
+            .filter((key) => key.includes(':'))
+            .flatMap((key) => out.map.statData(key).getArray() || [])
+        const labelFormatter = out.sizeLegend?.labelFormatter || formatLegendValues(values, data)
 
         // All wedges share a fixed angle — one slice wide enough to read clearly
         const wedgeHalfAngle = Math.PI / 8

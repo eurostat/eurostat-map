@@ -185,16 +185,12 @@ export const legend = function (map, config) {
 }
 
 function getPsColorThresholds(out) {
-    const map = out.map
-    const thresholds =
-        map.psThresholds_.length > 1
-            ? map.psThresholds_
-            : Array.from({ length: map.psClasses_ })
-                  .map((_, index) => {
-                      return map.classifier().invertExtent(index)[out.ascending ? 0 : 1]
-                  })
-                  .slice(1) // Remove the first entry and return the rest as an array
-    return thresholds
+    const layer = out.layer || out.map
+    if (layer.psThresholds_.length > 1) return layer.psThresholds_
+    const classifier = out.getColorClassifier(out)
+    return Array.from({ length: out.getNumberOfClasses(out) })
+        .map((_, index) => classifier.invertExtent(index)[out.ascending ? 0 : 1])
+        .slice(1) // Remove the first entry and return the rest as an array
 }
 
 export function getPropSymbolColorLabelFormatter(out) {

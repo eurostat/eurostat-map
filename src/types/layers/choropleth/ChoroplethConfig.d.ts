@@ -48,4 +48,6 @@ export interface ChoroplethConfig extends MapConfig {
     /** Named stretching of the colour distribution of a continuous scheme: 'linear', 'sqrt' (square root), 'cbrt' (cube root) or 'log'. It is applied to the distance from the point of divergence, or from the lowest value, and sets valueTransform and valueUntransform. */
     colorStretch?: 'linear' | 'sqrt' | 'cbrt' | 'log' | null
     pointOfDivergence?: number | null
+    /** Put a class boundary exactly at pointOfDivergence (default 0), so values on its two sides never share a class. @default false */
+    divergingBreak?: boolean
 }

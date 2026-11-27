@@ -10,6 +10,12 @@ export interface SparklineScaleLegendConfig {
     /** Padding between title and chart in pixels. @default 5 */
     titlePadding?: number
 
+    /**
+     * Plot every region's series with axes, instead of the key: one example line between the lowest and highest values,
+     * with the first and last date. @default false
+     */
+    showAllSeries?: boolean
+
     /** Whether to show an example sparkline with averaged data. @default false */
     showExampleChart?: boolean
 

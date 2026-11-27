@@ -1,3 +1,4 @@
+import { formatLegendValues } from './legend-utils'
 import { getVariableName, wrapName } from '../core/variable-names.js'
 import { arc } from 'd3-shape'
 import * as Legend from './legend'
@@ -182,6 +183,9 @@ function drawMushroomSizeLegend(out, x, y, side = null) {
     const maxR = Math.max(...radii)
     if (!Number.isFinite(maxR) || maxR <= 0) return y
 
+    const data = map.mushroomCodes().flatMap((code) => map.statData(code)?.getArray?.() || [])
+    const format = formatLegendValues(legendValues, data)
+
     // labels (per side)
     const labels = getLabels(cfg, legendValues, hasIndependentScales, side)
 
@@ -238,7 +242,7 @@ function drawMushroomSizeLegend(out, x, y, side = null) {
             .attr('dy', '0.35em')
             .attr('dominant-baseline', 'middle')
             .attr('class', 'em-legend-label')
-            .text(labels ? labels[i] : spaceAsThousandSeparator(v))
+            .text(labels ? labels[i] : format(v))
     })
 
     const bbox = g.node()?.getBBox()

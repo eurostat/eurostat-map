@@ -1,3 +1,4 @@
+import { formatLegendValues } from '../legend-utils'
 import { getSizeLegendFill } from './legend-size-fill'
 import { getFontSizeFromClass, spaceAsThousandSeparator } from '../../core/utils'
 
@@ -7,7 +8,6 @@ export function buildSpikeLegend(out) {
     // SVG path for a spike
     const spike = (length, width = map.psSpikeWidth_) => `M${-width / 2},0L0,${-length}L${width / 2},0`
 
-    const labelFormatter = out.sizeLegend?.labelFormatter || spaceAsThousandSeparator
 
     const sizeDomain = map.classifierSize_.domain()
     const maxStat = sizeDomain[1]
@@ -16,6 +16,7 @@ export function buildSpikeLegend(out) {
 
     // Legend values (max → min by default)
     const legendValues = out.sizeLegend.values || [maxStat, minStat]
+    const labelFormatter = out.sizeLegend?.labelFormatter || formatLegendValues(legendValues, out._sizeDataValues)
 
     // Typography
     const labelFontSize = getFontSizeFromClass('em-legend-label')

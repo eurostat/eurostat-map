@@ -47,6 +47,9 @@ export interface ChoroplethMap extends MapInstance {
 
     pointOfDivergence(): number | null
     pointOfDivergence(v: number | null): this
+    /** Whether the class boundary nearest to pointOfDivergence is moved onto it. @default false */
+    divergingBreak(): boolean
+    divergingBreak(v: boolean): this
 
     skipNormalization(): boolean
     skipNormalization(v: boolean): this

@@ -7,7 +7,7 @@ export interface PieChartSizeLegendConfig {
     /** Title for the size legend. */
     title?: string | null
 
-    /** Padding between title and legend content in pixels. @default 10 */
+    /** Padding between title and legend content in pixels. @default 14 */
     titlePadding?: number
 
     /** Custom values to display in the size legend. If not specified, values are auto-generated. */

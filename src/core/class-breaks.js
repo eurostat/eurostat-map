@@ -29,6 +29,25 @@ export function mergeClassBreaks(values, breaks, method, requested = breaks.leng
 }
 
 /**
+ * Moves the boundary nearest to the point of divergence onto it, keeping the number of classes.
+ *
+ * @param {number[]} breaks the computed boundaries
+ * @param {number[]} values the numeric data
+ * @param {number} pivot the point of divergence
+ * @returns {number[]|null} the new boundaries, or null when there is nothing to move: no values on one side of the
+ * pivot, no boundary, or one already there
+ */
+export function breakAtPivot(breaks, values, pivot) {
+    if (!breaks.length || breaks.includes(pivot)) return null
+    if (!values.some((v) => v < pivot) || !values.some((v) => v >= pivot)) return null
+    let nearest = 0
+    breaks.forEach((b, i) => {
+        if (Math.abs(b - pivot) < Math.abs(breaks[nearest] - pivot)) nearest = i
+    })
+    return breaks.map((b, i) => (i === nearest ? pivot : b))
+}
+
+/**
  * Reports values that a numeric map cannot draw (shown as unavailable), such as '1,5'.
  *
  * @param {*} map the main map

@@ -1,5 +1,5 @@
 //map-choropleth.js
-import { mergeClassBreaks, reportNonNumericValues } from '../../core/class-breaks.js'
+import { breakAtPivot, mergeClassBreaks, reportNonNumericValues } from '../../core/class-breaks.js'
 import { warnUnknownClassification } from '../../core/option-check'
 import { select } from 'd3-selection'
 import { min, max } from 'd3-array'
@@ -91,6 +91,7 @@ export const decorateChoroplethLayer = function (layer, config) {
     layer.colorStretch_ = null // named stretching of a continuous scheme: 'linear', 'sqrt', 'cbrt' or 'log' (sets valueTransform/valueUntransform)
     layer.skipNormalization_ = false // whether to skip normalization step for continuous color schemes (e.g. for pre-normalized data like quantile)
     layer.pointOfDivergence_ = null // the point in the domain where the color diverges (e.g. 0 for a diverging color scheme)
+    layer.divergingBreak_ = false // a class boundary at pointOfDivergence
 
     // Getter/setters for exposed attributes
     const paramNames = [
@@ -111,6 +112,7 @@ export const decorateChoroplethLayer = function (layer, config) {
         'valueUntransform_',
         'colorStretch_',
         'pointOfDivergence_',
+        'divergingBreak_',
         'skipNormalization_',
     ]
     paramNames.forEach(function (att) {
@@ -375,6 +377,14 @@ export const decorateChoroplethLayer = function (layer, config) {
                     const rawThresholds = layer.classifier_.domain()
                     const niceThresholds = applyNiceNumbers(rawThresholds, dataArrayNumeric)
                     layer.classifier_.domain(niceThresholds)
+                }
+
+                // a boundary at the point of divergence, so that the values below and above it never share a class
+                if (layer.divergingBreak_ && layer.colorSchemeType_ !== 'continuous' && layer.classificationMethod_ !== 'threshold') {
+                    const current = layer.classifier_
+                    const breaks = (current.quantiles || current.thresholds || current.domain).call(current)
+                    const moved = breakAtPivot(breaks, dataArrayNumeric, layer.pointOfDivergence_ ?? 0)
+                    if (moved) layer.classifier(scaleThreshold().domain(moved).range(generateRange(moved.length + 1)))
                 }
 
                 // ties, or fewer values than classes: leave out the classes no value could fall into

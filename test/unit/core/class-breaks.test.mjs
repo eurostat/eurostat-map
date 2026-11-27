@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { mergeClassBreaks, reportNonNumericValues } from '../../../src/core/class-breaks.js'
+import { breakAtPivot, mergeClassBreaks, reportNonNumericValues } from '../../../src/core/class-breaks.js'
 
 test('classes that the data fills are kept', () => {
     assert.equal(mergeClassBreaks([1, 2, 3, 4, 5, 6], [2.5, 4.5], 'quantile', 3), null)
@@ -37,4 +37,10 @@ test('values that are not numbers are reported once, categories and no data are 
     assert.equal(errors.length, 1)
     assert.equal(errors[0].type, 'data')
     assert.match(errors[0].message, /2 values are not numbers, for example '1,5'/)
+})
+
+test('the boundary nearest the point of divergence moves onto it', () => {
+    assert.deepEqual(breakAtPivot([-1.7, 1.4, 3, 5], [-4, -1, 0, 2, 6], 0), [-1.7, 0, 3, 5])
+    assert.equal(breakAtPivot([0, 3], [-1, 1], 0), null)
+    assert.equal(breakAtPivot([2, 3], [1, 4], 0), null)
 })

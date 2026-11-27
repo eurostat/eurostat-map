@@ -112,7 +112,7 @@ _overlay_ layers (symbols, pies, flows...). See [docs/multi-layer-guide.md](../.
 
 | Need                 | Use                                                                                                                                                                                 |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Classes and colours  | `numberOfClasses`, `classificationMethod` (`quantile`, `equinter`, `ckmeans`, `jenks`, `threshold` + `thresholds`), `colors('teal')` or an array, `colorSchemeType('continuous')`   |
+| Classes and colours  | `numberOfClasses`, `classificationMethod` (`quantile`, `equinter`, `ckmeans`, `jenks`, `threshold` + `thresholds`), `colors('teal')` or an array, `colorSchemeType('continuous')` (its legend shows values only with `legend({ ticks: 5 })`)   |
 | Diverging data       | `colors('cobalt-plum')` plus `pointOfDivergence(0)`; `colorStretch('sqrt')` (or `'cbrt'`, `'log'`) for skewed data with a continuous scheme                                         |
 | Flow route shape     | `flowSettings({ lineType: 'straight', lineGeometry: 'greatCircle' })` for world maps. `edgeBundling` + `bundleSettings.chargeStrength`: > 0 bundles, < 0 un-bundles (fans routes out) |
 | Flow small multiples | `flowSettings({ widthDomain: [0, max] })` with the same domain in every map keeps widths comparable; draw one shared legend with `legend({ svgId })` and `legend(false)` on the rest (see `examples/flow/flights/capital-airports.html`) |

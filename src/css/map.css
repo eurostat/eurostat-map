@@ -117,6 +117,20 @@ a text {
     font-weight: 100;
 }
 
+/* titles drawn over the map get a halo; in their own header band they need none */
+.em-title,
+.em-subtitle {
+    stroke: #ffffff;
+    stroke-width: 3px;
+    stroke-opacity: 0.85;
+    stroke-linejoin: round;
+    paint-order: stroke;
+}
+.em-header .em-title,
+.em-header .em-subtitle {
+    stroke: none;
+}
+
 .em-source-pretext {
     fill: #848280;
     font-size: 11px;

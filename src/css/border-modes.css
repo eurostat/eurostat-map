@@ -10,6 +10,14 @@
 .em--dark .em-sea {
     fill: #1a1a2e;
 }
+.em--dark .em-title,
+.em--dark .em-subtitle {
+    stroke: #1a1a2e;
+}
+.em--dark .em-header .em-title,
+.em--dark .em-header .em-subtitle {
+    stroke: none;
+}
 .em--dark .em-cntrg,
 .em--dark .em-worldrg,
 .em--dark .em-nutsrg,

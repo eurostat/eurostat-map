@@ -31,7 +31,18 @@ export function buildDiscreteLabelFormatter(out, getThresholdsFn, statData, labe
         return (...args) => normalizeMinus(userFormatter(...args))
     }
 
-    const decimals = resolveDecimals(out, statData)
+    let decimals = resolveDecimals(out, statData)
+    const own = typeof out.decimals === 'number' || typeof out.colorLegend?.decimals === 'number'
+    if (!own) {
+        let boundaries = []
+        try {
+            boundaries = (getThresholdsFn() || []).filter(Number.isFinite)
+        } catch (e) {
+            // boundaries that cannot be read ahead of the labels leave the decimals as they are
+        }
+        const alike = () => new Set(boundaries.map((v) => v.toFixed(decimals))).size < new Set(boundaries).size
+        while (decimals < 4 && alike()) decimals++
+    }
     const decimalFormatter = format(`,.${decimals}f`)
     const fmt = (value) => normalizeMinus(decimalFormatter(value))
 

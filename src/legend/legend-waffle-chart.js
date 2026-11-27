@@ -4,7 +4,7 @@ import { select } from 'd3-selection'
 import * as Legend from './legend'
 import { executeForAllInsets } from '../core/utils'
 import { appendPatternFillLegend } from './legend-pattern-fill'
-import { formatSizeLabel } from './legend-utils'
+import { formatLegendValues } from './legend-utils'
 
 /**
  * A legend for waffle chart maps.
@@ -272,6 +272,9 @@ export const legend = function (map, config) {
             y += legend.titleFontSize + titlePadding
         }
 
+        const data = (legend.layer?.statCodes_ || []).flatMap((code) => legend.map.statData(code)?.getArray?.() || [])
+        const format = legend.sizeLegend?.labelFormatter || formatLegendValues(sortedValues, data)
+
         // Track max waffle size for label positioning
         const maxWaffleSize = classifierSize(sortedValues[0])
 
@@ -308,7 +311,7 @@ export const legend = function (map, config) {
                 .attr('x', labelX)
                 .attr('y', y + labelY)
                 .attr('dominant-baseline', 'middle')
-                .text(formatSizeLabel(val, legend.sizeLegend?.labelFormatter))
+                .text(format(val))
 
             y += waffleSize + 8
         }

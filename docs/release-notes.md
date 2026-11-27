@@ -174,6 +174,24 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
+- The numbers of every legend are formatted alike, with the precision of the data ("1.0", "51.0", "100.0" for data with one decimal), with another decimal where two would look the same. Your own formatter or `decimals` still win.
+
+Example
+
+```javascript
+map.legend({ sizeLegend: { decimals: 1 } })
+```
+
+- `divergingBreak(true)` puts a class boundary at the point of divergence, so values on its two sides never share a colour.
+- The sparkline legend is a readable key (an example line, the lowest and highest values, the first and last date); `scaleLegend: { showAllSeries: true }` draws every series as before.
+- Pie legends have headings and a smaller circle large enough to see, titles drawn over the map have a halo, and the docs show how to use the Equal Earth projection and how to put values on a continuous legend.
+
+Example
+
+```javascript
+map.colors('cobalt-plum').pointOfDivergence(0).divergingBreak(true)
+```
+
 - Bivariate, trivariate and mushroom legends name their variables instead of showing "Variable 1" or "v1": your legend labels, else the statistic's `label`, the Eurostat dataset title (with the category that tells two variables apart) or the statistic's name.
 
 Example

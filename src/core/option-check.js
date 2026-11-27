@@ -130,6 +130,7 @@ export const LEGEND_OPTIONS = [
     'regionColorLegend',
     'right',
     'ringLabel',
+    'showAllSeries',
     'signKey',
     'positiveText',
     'negativeText',

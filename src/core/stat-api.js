@@ -130,6 +130,7 @@ export const attachStatChannels = function (out) {
         out.statChannels_[channel] = {
             name: channel,
             categoryCodes,
+            categoryParameter,
             statKeys,
             categoryLabels,
             categoryColors,

@@ -11,6 +11,8 @@ import { getCircleRingStatData } from '../../layers/proportional-symbol/symbols/
 import { getCentroidsGroup } from '../../core/geo/centroids'
 import { getSignStyle, OUTLINE_STROKE_WIDTH } from '../../layers/proportional-symbol/ps-sign'
 import { getSizeLegendFill } from './legend-size-fill'
+import { formatLegendValues } from '../legend-utils'
+import { getSizeStatData } from '../../layers/proportional-symbol/map-proportional-symbols'
 
 /**
  * Builds a legend which illustrates the statistical values of different symbol sizes
@@ -27,6 +29,9 @@ export function drawSizeLegend(out, baseX, baseY) {
         .attr('class', 'em-size-legend-container')
         .attr('id', 'em-size-legend-container')
         .attr('transform', `translate(${baseX},${baseY})`)
+
+    // the size data, whose precision the labels take
+    out._sizeDataValues = getSizeStatData(map)?.getArray?.()
 
     // reset per-draw cursors/accumulators
     out.sizeLegend._cursorY = null
@@ -79,7 +84,6 @@ export function drawSizeLegend(out, baseX, baseY) {
         }
 
         // define format for labels
-        const labelFormatter = out.sizeLegend?.labelFormatter || spaceAsThousandSeparator
         const domain = map.classifierSize_.domain()
 
         // for custom paths
@@ -89,6 +93,10 @@ export function drawSizeLegend(out, baseX, baseY) {
         if (!out.sizeLegend.values) {
             out.sizeLegend.values = [domain[1], domain[0]] // default to min and max values
         }
+
+        const labelFormatter =
+            out.sizeLegend?.labelFormatter ||
+            formatLegendValues(out.sizeLegend.values, out._sizeDataValues, map.legend_?.sizeLegend?.decimals)
 
         let length = out.sizeLegend.values.length
         if (!length || length < 2) {

@@ -413,6 +413,9 @@ export const statData = function (config) {
                     if (dimension !== 'geo') used[dimension] = jsd.Dimension(dimension).id[0]
                 })
 
+                out.metadata.dimensionNames = {}
+                jsd.id?.forEach((dimension) => (out.metadata.dimensionNames[dimension] = jsd.Dimension(dimension).label))
+
                 //index
                 out._data_ = jsonstatToIndex(jsd, (choices) => {
                     choices.forEach((c) => (used[c.dimension] = c.used))

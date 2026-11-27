@@ -62,6 +62,48 @@ export function formatSizeLabel(value, formatterOrDecimals) {
     return compactFormatter.format(normalizedValue)
 }
 
+/**
+ * The most decimal places among some values: the precision of a dataset.
+ * @param {Array<*>} values
+ * @param {number=} limit
+ */
+export function getDecimals(values, limit = 4) {
+    return (values || []).reduce((most, value) => {
+        if (value === '' || value === null || !Number.isFinite(Number(value))) return most
+        const text = String(normalizeFloatingPointValue(Number(value)))
+        const decimals = text.includes('e') || !text.includes('.') ? 0 : text.split('.')[1].length
+        return Math.min(limit, Math.max(most, decimals))
+    }, 0)
+}
+
+/**
+ * One format for all the numbers of a legend: the same decimal places for each, those of the data ("1.0", "51.0",
+ * "100.0" for data with one decimal), with more where two different numbers would otherwise look the same. Millions and
+ * above are written in words.
+ *
+ * @param {number[]} values the numbers the legend shows
+ * @param {Array<*>=} data the dataset, which gives the precision (otherwise the shown numbers do)
+ * @param {number=} decimals the author's own number of decimal places
+ * @returns {function(number): string}
+ */
+export function formatLegendValues(values, data, decimals) {
+    const shown = values.map(Number).filter(Number.isFinite)
+    const format = (places) => (value) => {
+        if (!Number.isFinite(Number(value))) return ''
+        const number = normalizeFloatingPointValue(Number(value))
+        if (Math.abs(number) >= WORD_NOTATION_THRESHOLD) return formatSizeLabel(number)
+        const [whole, fraction] = number.toFixed(places).split('.')
+        const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+        return fraction ? grouped + '.' + fraction : grouped
+    }
+    if (decimals !== undefined) return format(decimals)
+
+    let places = getDecimals(data?.length ? data : shown)
+    const distinct = new Set(shown).size
+    while (places < 4 && new Set(shown.map(format(places))).size < distinct) places++
+    return format(places)
+}
+
 function normalizeFloatingPointValue(value) {
     const rounded = Number.parseFloat(value.toFixed(12))
     return Object.is(rounded, -0) ? 0 : rounded

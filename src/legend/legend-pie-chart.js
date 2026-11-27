@@ -1,7 +1,7 @@
 import { legibleSwatchHeight, titleClearance } from './legend-swatch'
 import { select } from 'd3-selection'
 import * as Legend from './legend'
-import { executeForAllInsets } from '../core/utils'
+import { executeForAllInsets, roundToNiceNumber } from '../core/utils'
 import { drawCircleSizeLegend } from './legend-circle-size'
 import { appendPatternFillLegend } from './legend-pattern-fill'
 
@@ -17,7 +17,7 @@ export const legend = function (map, config) {
     //size legend config (legend illustrating the values of different pie sizes)
     out.sizeLegend = {
         title: null,
-        titlePadding: 10, //padding between title and body
+        titlePadding: 14, //padding between title and body
         values: null,
         labelFormatter: undefined, // user-defined format function
         noData: false, // show no data legend item
@@ -81,6 +81,20 @@ export const legend = function (map, config) {
         const baseY = out.getBaseY()
         const baseX = out.getBaseX()
 
+        // headings the author left unset (null or '' leave one out)
+        const given = layer.legend_ || {}
+        const channel = Object.values(map.statChannels_ || {}).find((c) => c.categoryCodes?.length)
+        const dataset = map.statData(layer.statCodes_?.[0])
+        if (out.sizeLegend && given.sizeLegend?.title === undefined) {
+            const unit = dataset?.unitText?.() || channel?.unitText
+            out.sizeLegend.title = unit ? `Total (${unit})` : 'Total'
+        }
+        if (out.colorLegend && given.colorLegend?.title === undefined) {
+            out.colorLegend.title = dataset?.metadata?.dimensionNames?.[channel?.categoryParameter] || null
+        }
+
+        out._sizeDataValues = (layer.statCodes_ || []).flatMap((code) => map.statData(code)?.getArray?.() || [])
+
         // Reset stale references so layout is based only on legends drawn in this update.
         out._sizeLegendContainer = null
 
@@ -91,7 +105,7 @@ export const legend = function (map, config) {
             drawCircleSizeLegend(
                 out,
                 out._sizeLegendContainer,
-                out.sizeLegend.values,
+                out.sizeLegend.values || readableValues(layer.classifierSize_),
                 layer.classifierSize_,
                 out.sizeLegend.title,
                 out.sizeLegend.titlePadding
@@ -112,6 +126,15 @@ export const legend = function (map, config) {
 
         //set legend box dimensions
         out.setBoxDimension()
+    }
+
+    // the largest pie and a smaller one that can still be seen, with room between their labels
+    function readableValues(scale) {
+        const [low, high] = scale.domain()
+        const smallest = 7 // radius in pixels
+        if (!scale.invert || scale(low) >= smallest || scale(high) <= smallest * 1.5) return null
+        const value = roundToNiceNumber(scale.invert(Math.max(smallest, scale(high) * 0.5)), low, high)
+        return [high, value]
     }
 
     /**
