@@ -1,3 +1,4 @@
+import { checkMapSetup } from './setup-check.js'
 import { executeForAllInsets } from './utils'
 import { isCompact, observeContainer } from './layout-profile'
 import * as StatisticalData from './stat-data'
@@ -730,6 +731,7 @@ export const createStatMap = function (config, withCenterPoints, mapType) {
         }
 
         out.updateAllLayers()
+        if (out.svg_ && out.Geometries.isGeoReady()) checkMapSetup(out)
 
         return out
     }

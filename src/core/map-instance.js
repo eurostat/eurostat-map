@@ -1,3 +1,4 @@
+import { parsePixelSize } from './option-check'
 import { executeForAllInsets } from './utils'
 import { appendAnnotations } from './decoration/annotations'
 import { updateLabels, updateValuesLabels } from './decoration/labels'
@@ -265,8 +266,12 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
     // a width set by the caller is kept as it is; otherwise it follows the container (see buildMapTemplateBase)
     const setWidth = out.width
     out.width = function (v) {
-        if (arguments.length) out._widthExplicit_ = true
-        return setWidth.apply(out, arguments)
+        if (!arguments.length) return setWidth.apply(out, arguments)
+        const size = parsePixelSize(v, 'width')
+        // an unusable value leaves the width as it was
+        if (size === undefined && v !== undefined && v !== null) return out
+        out._widthExplicit_ = size !== undefined
+        return setWidth.call(out, size)
     }
 
     const setHeight = out.height
@@ -277,11 +282,12 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
             out._heightAuto_ = true
             return out
         }
-        if (arguments.length) {
-            out._heightAuto_ = false
-            out._heightFn_ = undefined
-        }
-        return setHeight.apply(out, arguments)
+        if (!arguments.length) return setHeight.apply(out, arguments)
+        const size = parsePixelSize(v, 'height')
+        if (size === undefined && v !== undefined && v !== null) return out
+        out._heightAuto_ = false
+        out._heightFn_ = undefined
+        return setHeight.call(out, size)
     }
 
     out.isInset = config?.isInset || false
@@ -435,7 +441,12 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
         else if (arguments.length == 1 && arguments[0] === true) out.insets_ = 'default'
         else if (arguments.length == 1 && arguments[0] === false) out.insets_ = false
         else if (arguments.length == 1 && Array.isArray(arguments[0])) out.insets_ = arguments[0]
-        else out.insets_ = arguments
+        else if (arguments.length == 1 && typeof arguments[0] === 'string') {
+            console.warn(
+                `[eurostat-map] Unknown inset preset "${arguments[0]}": no insets are drawn. Presets: ${insetPresetNames.join(', ')}.`
+            )
+            out.insets_ = []
+        } else out.insets_ = arguments
         return out
     }
 

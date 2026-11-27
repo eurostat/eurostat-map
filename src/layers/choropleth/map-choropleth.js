@@ -62,6 +62,7 @@ export const decorateChoroplethLayer = function (layer, config) {
     layer.classificationMethod_ = 'quantile' // or: ckmeans, jenks, equinter, threshold
     //the threshold, when the classification method is 'threshold'
     layer.thresholds_ = [0]
+    layer._defaultThresholds = layer.thresholds_
     //colors to use for classes
     layer.colors_ = null
     //when computed automatically, ensure the threshold are nice rounded values

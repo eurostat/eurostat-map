@@ -174,6 +174,14 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
+- `width('800px')` is read as 800 pixels, other unusable sizes and unknown inset presets give a warning instead of breaking the map, and mistakes that left a map empty without a word (unknown statistic or CSV column, region ids that match nothing, a misspelt data source) are reported to `onError`, with a suggestion where there is one.
+
+Example
+
+```javascript
+map.onError((error) => console.log(error.message)) // "None of the data's region ids is on this map ... Did you mean 'EL' instead of 'GR'?"
+```
+
 - Coxcomb maps work without `totalCode`, and say what to use instead of `encoding('composition')`.
 - Pie, stripe and waffle maps accept a composition statistic of any name, and sparkline maps a named statistic with `dates`. A trivariate map set up wrongly says so instead of staying empty.
 

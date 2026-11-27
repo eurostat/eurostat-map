@@ -246,6 +246,22 @@ export const warnMisspelledOptions = function (config, known = LEGEND_OPTIONS, c
     })
 }
 
+/**
+ * A width or height as a number of pixels: 800, '800' or '800px'. Anything else (e.g. '50%') gives undefined, with a
+ * warning, so that the map takes its default size.
+ * @param {*} value
+ * @param {string} name 'width' or 'height'
+ * @returns {number|undefined}
+ */
+export const parsePixelSize = function (value, name) {
+    if (value === undefined || value === null) return undefined
+    const text = typeof value === 'string' ? value.trim().replace(/px$/i, '') : value
+    const size = text === '' ? NaN : Number(text)
+    if (Number.isFinite(size) && size > 0) return size
+    console.warn(`[eurostat-map] ${name}(${JSON.stringify(value)}) is not a size in pixels: the default ${name} is used.`)
+    return undefined
+}
+
 /** @param {string} method @param {string[]} valid */
 export const warnUnknownClassification = function (method, valid) {
     console.warn(`[eurostat-map] Unknown classification method "${method}": using "quantile". Valid methods: ${valid.join(', ')}.`)

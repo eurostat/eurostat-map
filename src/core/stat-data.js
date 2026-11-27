@@ -3,6 +3,7 @@ import { getEstatDataURL } from './utils'
 import JSONstat from 'jsonstat-toolkit'
 import { csvToIndex, jsonstatToIndex } from './utils'
 import { showEurostatApiErrorToast } from './toast'
+import { warnMisspelledOptions, suggestOption } from './option-check.js'
 
 const EUROSTAT_API_DOWN_MESSAGE =
     'The Eurostat data service is currently unavailable, possibly for maintenance (announced on ec.europa.eu/eurostat). Please try again later.'
@@ -52,6 +53,29 @@ const fetchEurostatJSON = async function (url) {
     }
     throw userFacingError(EUROSTAT_API_DOWN_MESSAGE)
 }
+
+/** Every option of a stat() config. */
+export const STAT_OPTIONS = [
+    'eurostatDatasetCode',
+    'filters',
+    'precision',
+    'csvURL',
+    'geoCol',
+    'valueCol',
+    'unitText',
+    'preprocess',
+    'transform',
+    'label',
+    'labels',
+    'code',
+    'customData',
+    'categoryParameter',
+    'categoryCodes',
+    'categoryLabels',
+    'categoryColors',
+    'totalCode',
+    'dates',
+]
 
 /** @typedef {import('../types/core/stat/StatData').StatData} StatData */
 /** @typedef {import('../types/core/stat/StatConfig').StatConfig} StatConfig */
@@ -302,6 +326,11 @@ export const statData = function (config) {
     out.retrieveFromRemote = function (nutsLevel, lang, callback) {
         if (out.eurostatDatasetCode_) updateEurobase(nutsLevel, lang, callback)
         else if (out.csvURL_) updateCSV(callback)
+        else {
+            // a misspelt data source leaves the map with nothing to load
+            const typo = Object.keys(config || {}).find((key) => ['eurostatDatasetCode', 'csvURL'].includes(suggestOption(key, STAT_OPTIONS)))
+            if (typo && callback) callback(userFacingError(`stat() option "${typo}": did you mean "${suggestOption(typo, STAT_OPTIONS)}"?`))
+        }
         return out
     }
 
@@ -469,6 +498,15 @@ export const statData = function (config) {
         //retrieve csv data
         getCSVPromise()
             .then(function (data___) {
+                const columns = data___.columns || []
+                const missing = [out.geoCol_, out.valueCol_].filter((c) => !columns.includes(c))
+                if (missing.length) {
+                    const message = `CSV column "${missing.join('", "')}" not found in ${out.csvURL_}. Columns: ${columns.join(', ')}.`
+                    console.error('[eurostat-map] ' + message)
+                    if (callback) callback(userFacingError(message))
+                    return
+                }
+
                 //decode stat data
                 out._data_ = csvToIndex(data___, out.geoCol_, out.valueCol_)
 
@@ -505,6 +543,7 @@ export const statData = function (config) {
     })
 
     //override attribute values with config values
+    if (config) warnMisspelledOptions(config, STAT_OPTIONS, 'stat')
     if (config) for (let key in config) out[key + '_'] = config[key]
 
     return out
