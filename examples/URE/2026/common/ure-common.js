@@ -157,7 +157,6 @@
             .legend({
                 position: 'top right',
                 boxOpacity: 0.8,
-                boxFill: 'white',
                 sizeLegend: {
                     title: config.sizeLegendTitle,
                     titlePadding: 10,

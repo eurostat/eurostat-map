@@ -2,6 +2,8 @@
  * Parent configuration for map legends. Each map type will extend this with its own specific properties, but these are the common ones that apply to all legend types.
  */
 export interface LegendConfig {
+    /** Id of an element of the page to draw the legend in, instead of inside the map. */
+    svgId?: string
     /** Legend origin x-coordinate in pixels. */
     x?: number
     /** Legend origin y-coordinate in pixels. */

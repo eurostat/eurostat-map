@@ -174,6 +174,14 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
+- TypeScript accepts the documented examples: legend options of every map type, sparkline `stat()` configs and the methods of an added choropleth or proportional symbol layer. A check keeps the documentation and the typings in step.
+
+Example
+
+```typescript
+eurostatmap.map('flow').legend({ flowWidthLegend: { title: 'Passengers' } })
+```
+
 - `width('800px')` is read as 800 pixels, other unusable sizes and unknown inset presets give a warning instead of breaking the map, and mistakes that left a map empty without a word (unknown statistic or CSV column, region ids that match nothing, a misspelt data source) are reported to `onError`, with a suggestion where there is one.
 
 Example

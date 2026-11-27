@@ -260,7 +260,7 @@ Specify statistical data to be retrieved on-the-fly from [Eurostat database](htt
 Example:
 
 ```javascript
-map = eurostatmap.map(...);
+map = eurostatmap.map('choropleth');
 map.stat( {
 	eurostatDatasetCode: "lfst_r_lfu3rt",
 	filters:{
@@ -289,7 +289,7 @@ Specify statistical data to be retrieved from CSV data.
 Example:
 
 ```javascript
-map = eurostatmap.map(...);
+map = eurostatmap.map('choropleth');
 map.stat( {
 	csvURL: "https://raw.githubusercontent.com/eurostat/eurostat-map/master/examples/urb_rur_typo.csv",
 	geoCol: "NUTS_ID_2013",
@@ -310,7 +310,7 @@ Specify statistical data region by region, from JavaScript code, or any kind of 
 Example:
 
 ```javascript
-map = eurostatmap.map(...);
+map = eurostatmap.map('choropleth');
 
 //specify values region by region
 map.statData().set("LU",500).set("DE",400).set("FR",100).set("IT",600)
@@ -1236,7 +1236,6 @@ const map = eurostatmap
         x: 10,
         y: 150,
         boxOpacity: 0.8,
-        boxFill: 'white',
         sizeLegend: { title: 'Nights spent', titlePadding: 15 },
         colorLegend: { title: 'Tourist origin', noData: false },
     })
@@ -1448,7 +1447,7 @@ Specify the map title, its style and position.
 You can customise the labels shown on the map using the following settings:
 
 ```javascript
-map = eurostatmap.map(...)
+map = eurostatmap.map('choropleth')
 	.labels({
         labels: [
             { text: 'Test label', x: 3500000, y: 4260000, class: 'test' },
@@ -1667,7 +1666,7 @@ Specify the style of the map legend with _map_.**legend**({_parameters_}).
 Example:
 
 ```javascript
-map = eurostatmap.map(...)
+map = eurostatmap.map('choropleth')
 	.legend({
 		title: "Legend (%)",
 		x: 10, y: 120,
@@ -2318,14 +2317,14 @@ You can configure the style and content of the tooltip.
 Example:
 
 ```javascript
-map = eurostatmap.map(...)
+map = eurostatmap.map('choropleth')
 	.tooltip({
         id: 'em-tooltip', // id to give the tooltip element
         containerId: 'map-container', // eurostat-map ensures that the tooltip doesnt leave the bounds of this container
 		transitionDuration: 200,
 		xOffset: 30,
 		yOffset: 20,
-		textFunction: ((region, map) => { return feature.properties.na;  })
+		textFunction: (region, map) => region.properties.na,
 		showFlags: false
 	});
 ```
@@ -2397,7 +2396,7 @@ To add map insets, use the _map_.**insets**([*values*]) method.
 For default map insets showing European overseas territories and small countries, use:
 
 ```javascript
-eurostatmap.map(...)
+eurostatmap.map('choropleth')
 	.insets("default");
 ```
 
@@ -2406,7 +2405,7 @@ eurostatmap.map(...)
 To specify more precisely which insets to show, their geographical extent, scale, position, etc., specify the list of insets such as:
 
 ```javascript
-eurostatmap.map(...)
+eurostatmap.map('choropleth')
 	.insets(
 		{ geo:"MQ", scale:"01M", position: { z: 1000 }, title:"Martinique", width:200, height:90, x:0, y:0 },
 		{ geo:"GF", scale:"03M", position: { z: 9000 }, title:"French Guyana", width:200, height:90, x:210, y:0 }
@@ -2565,8 +2564,8 @@ Recommended pattern:
 
 ```javascript
 map
-    .stat('population', { ... })
-    .stat('growthRate', { ... })
+    .stat('population', { /* ... */ })
+    .stat('growthRate', { /* ... */ })
     .encoding('size', { stat: 'population' })
     .encoding('color', { stat: 'growthRate' })
 ```
@@ -2578,7 +2577,7 @@ map
     .stat('composition', {
         categoryParameter: 'age',
         categoryCodes: ['Y_LT15', 'Y15-64', 'Y_GE65'],
-        ...
+        // ...
     })
     .encoding('composition', { stat: 'composition' })
 ```

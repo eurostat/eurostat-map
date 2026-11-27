@@ -5,6 +5,10 @@ import type { Layer } from './layer/Layer'
 import type { LayerConfig } from './layer/LayerConfig'
 import type { CompositionStatConfig } from '../layers/composition/CompositionStatConfig'
 import type { LegendConfig } from '../legend/LegendConfig'
+import type { AnyLegendConfig } from '../legend/AnyLegendConfig'
+import type { SparkStatConfig } from '../layers/spark/SparkStatConfig'
+import type { ChoroplethMap } from '../layers/choropleth/ChoroplethMap'
+import type { ProportionalSymbolMap } from '../layers/proportional-symbol/ProportionalSymbolMap'
 import type { TrivariateLegendConfig } from '../legend/choropleth/TrivariateLegendConfig'
 import type { TrivariateChoroplethLayer } from '../layers/choropleth/TrivariateChoroplethMap'
 import type { RankedBarChartConfig } from './decoration/RankedBarChartConfig'
@@ -209,9 +213,9 @@ export interface MapInstance {
      * @example map.stat({ eurostatDatasetCode: 'demo_r_d3dens', filters: { TIME: '2024' } })
      */
     stat(): StatConfig | CompositionStatConfig | undefined
-    stat(config: StatConfig | CompositionStatConfig): this
+    stat(config: StatConfig | CompositionStatConfig | SparkStatConfig): this
     stat(key: string): StatConfig | CompositionStatConfig | undefined
-    stat(key: string, config: StatConfig | CompositionStatConfig): this
+    stat(key: string, config: StatConfig | CompositionStatConfig | SparkStatConfig): this
     /**
      * Legacy compatibility overload for composition channels.
      * Preferred: pass category fields directly inside config.
@@ -285,7 +289,7 @@ export interface MapInstance {
      * @example map.legend({ x: 10, y: 90, title: 'Density, people/km²' })
      */
     legend(): LegendConfig | false
-    legend(config: LegendConfig | false): this
+    legend(config: AnyLegendConfig | false): this
 
     /** Force-update the legend after data or style changes. */
     updateLegend(): this
@@ -352,6 +356,7 @@ export interface MapInstance {
      */
     insets(): InsetConfig[] | 'default' | 'image' | 'eu' | 'euEfta' | false
     insets(config: InsetConfig[] | 'default' | 'image' | 'eu' | 'euEfta' | true | false): this
+    insets(...configs: InsetConfig[]): this
 
     /** Position [x, y] of the box containing the default/named-preset insets layout. */
     insetBoxPosition(): [number, number] | undefined
@@ -742,6 +747,8 @@ export interface MapInstance {
     layers(): Layer[]
     layers(configs: LayerConfig[]): this
     addLayer(type: 'trivariateChoropleth' | 'ternary' | 'chtri', config?: Omit<LayerConfig, 'type' | 'legend'> & { legend?: TrivariateLegendConfig | false }): TrivariateChoroplethLayer
+    addLayer(type: 'choropleth' | 'ch', config?: LayerConfig): Layer & Omit<ChoroplethMap, keyof Layer>
+    addLayer(type: 'proportionalSymbol' | 'proportionalSymbols' | 'ps', config?: LayerConfig): Layer & Omit<ProportionalSymbolMap, keyof Layer>
     addLayer(type: string, config?: LayerConfig): Layer
     addLayer(config: LayerConfig): Layer
     removeLayer(ref: number | string): this

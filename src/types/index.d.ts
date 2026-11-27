@@ -86,6 +86,7 @@ export type { CategoricalLegendConfig } from './legend/CategoricalLegendConfig'
 export type { MushroomLegendConfig } from './legend/MushroomLegendConfig'
 export type { MushroomSizeLegendConfig, MushroomColorLegendConfig } from './legend/MushroomLegendConfig'
 export type { PatternFillLegendConfig } from './legend/PatternFillLegendConfig'
+export type { AnyLegendConfig } from './legend/AnyLegendConfig'
 
 // Choropleth legend types
 export type { ChoroplethLegendConfig } from './legend/choropleth/ChoroplethLegendConfig'

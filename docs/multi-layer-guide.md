@@ -8,7 +8,7 @@ This guide introduces the **Multi-Layer Stack API** in `eurostat-map`. This feat
 
 In the legacy API, a map was created with a single type:
 ```javascript
-eurostatmap.map('choropleth')...
+eurostatmap.map('choropleth') // ...
 ```
 This fused the map frame (dimensions, zoom, projections, dataset registry) with the thematic visualization (class breaks, coloring, styling, legends).
 
