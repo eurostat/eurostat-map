@@ -4,6 +4,7 @@ import { getResponsiveSymbolSize } from '../../core/responsive.js'
 import { min, max } from 'd3-array'
 import { getCentroidsGroup } from '../../core/geo/centroids.js'
 import { warnUnknownClassification } from '../../core/option-check.js'
+import { mergeClassBreaks, reportNonNumericValues } from '../../core/class-breaks.js'
 import { hasNegativeValues, sizeByMagnitude } from './ps-sign.js'
 
 /**
@@ -42,15 +43,22 @@ function defineColorClassifier(layer) {
     const getA = function (nb) {
         return [...Array(nb).keys()]
     }
+    layer._classCount = undefined
+    const numbers = () =>
+        getColorData(layer)
+            .getArray()
+            .filter((v) => v !== ':' && v !== '')
+            .map(Number)
+            .filter(Number.isFinite)
     //use suitable classification type for colouring
     if (layer.psClassificationMethod_ === 'quantile') {
         //https://github.com/d3/d3-scale#quantile-scales
-        const domain = getColorData(layer).getArray()
+        const domain = numbers()
         const range = getA(layer.psClasses_)
         layer.classifierColor(scaleQuantile().domain(domain).range(range))
     } else if (layer.psClassificationMethod_ === 'equinter') {
         //https://github.com/d3/d3-scale#quantize-scales
-        const domain = getColorData(layer).getArray()
+        const domain = numbers()
         const range = getA(layer.psClasses_)
         layer.classifierColor(
             scaleQuantize()
@@ -65,7 +73,19 @@ function defineColorClassifier(layer) {
         layer.classifierColor(scaleThreshold().domain(layer.psThresholds_).range(range))
     } else {
         warnUnknownClassification(layer.psClassificationMethod_, ['quantile', 'equinter', 'threshold'])
-        if (!layer.classifierColor_) layer.classifierColor(scaleQuantile().domain(getColorData(layer).getArray()).range(getA(layer.psClasses_)))
+        if (!layer.classifierColor_) layer.classifierColor(scaleQuantile().domain(numbers()).range(getA(layer.psClasses_)))
+    }
+
+    // ties, or fewer values than classes: leave out the classes no value could fall into
+    const method = layer.psClassificationMethod_
+    if (method === 'quantile' || method === 'equinter') {
+        const current = layer.classifierColor_
+        const merged = mergeClassBreaks(numbers(), (current.quantiles || current.thresholds).call(current), method, layer.psClasses_)
+        if (merged) {
+            layer._classCount = merged.length + 1
+            layer.classifierColor(scaleThreshold().domain(merged).range(getA(layer._classCount)))
+            console.warn(`[eurostat-map] The data has too few distinct values for ${layer.psClasses_} classes: ${layer._classCount} shown.`)
+        }
     }
 }
 
@@ -87,6 +107,11 @@ function defineSizeClassifier(layer) {
     const minSize = getResponsiveSymbolSize(layer.psMinSize_ || 0, 0)
 
     const magnitudes = rawData.map((v) => Math.abs(Number(v)))
+    const map = layer.map || layer
+    reportNonNumericValues(map, getSizeData(layer)?.getArray(), layer.categoryFillStyle_)
+    // no number at all: no size legend, rather than one of made-up sizes
+    layer._psNoSizes = !magnitudes.some((v) => v > 0)
+
     const classifier = isLinear ? createLinearScale(magnitudes, maxSize, minSize) : createSqrtScale(magnitudes, maxSize, minSize)
 
     // expose on layer instance
@@ -127,6 +152,7 @@ export function applyClassificationToMap(map, layer) {
         const v = sv.value
         if ((v !== 0 && !v) || v === ':') return 'nd'
         if (activeLayer.categoryFillStyle_ && Object.prototype.hasOwnProperty.call(activeLayer.categoryFillStyle_, v)) return 'nd'
+        if (!Number.isFinite(Number(v))) return 'nd'
 
         return +classifier(+v)
     })

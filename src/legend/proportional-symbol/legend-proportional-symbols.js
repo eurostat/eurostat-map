@@ -132,7 +132,8 @@ export const legend = function (map, config) {
             const baseX = out.getBaseX()
 
             // legend for size
-            if (map.classifierSize_ && out.sizeLegend) {
+            out._sizeLegendContainer = null
+            if (map.classifierSize_ && out.sizeLegend && !out.layer._psNoSizes) {
                 drawSizeLegend(out, baseX, baseY)
             }
             if (map.classifierColor_ && out.colorLegend) {

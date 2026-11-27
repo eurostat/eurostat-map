@@ -11,6 +11,8 @@ import { getCentroidsGroup } from '../core/geo/centroids'
 
 // All of the above with or without .valueTransform / .valueUntransform
 export function createContinuousLegend(out, baseX, baseY) {
+    // with no number to show a scale of, only the no-data item is drawn
+    const hasNumbers = (out.layer || out.map)?.dataExtent_ !== null
     const m = out.map
     out._continuousLegendContainer = out.lgg
         .append('g')
@@ -25,18 +27,21 @@ export function createContinuousLegend(out, baseX, baseY) {
     const legendWidth = out.width || out.shapeWidth * 6
     const legendHeight = isVertical ? out.shapeWidth : out.shapeHeight
 
-    createLegendGradient(out, legendId, isVertical)
-    drawLegendRect(legendId, out, legendWidth, legendHeight, isVertical)
+    if (hasNumbers) {
+        createLegendGradient(out, legendId, isVertical)
+        drawLegendRect(legendId, out, legendWidth, legendHeight, isVertical)
 
-    if (hasTicks(out)) {
-        drawTickLabels(out, legendWidth, legendHeight, isVertical)
-    } else {
-        drawLowHighLabels(out, legendWidth, legendHeight, isVertical)
+        if (hasTicks(out)) {
+            drawTickLabels(out, legendWidth, legendHeight, isVertical)
+        } else {
+            drawLowHighLabels(out, legendWidth, legendHeight, isVertical)
+        }
     }
 
     if (out.noData) {
         let y = (isVertical ? out.width + 5 : legendHeight + 30) + getTitlePadding(out)
         const x = 0
+        if (!hasNumbers) y = getTitlePadding(out)
         if (config.pointOfDivergence && config.pointOfDivergencePadding) y += config.pointOfDivergencePadding // shift legend items down after point of divergence
         const container = out._continuousLegendContainer.append('g').attr('class', 'em-no-data-legend').attr('transform', `translate(${x},${y})`)
         const highlightFn = getHighlightFunction(out.map)

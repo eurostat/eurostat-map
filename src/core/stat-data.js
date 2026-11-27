@@ -231,22 +231,22 @@ export const statData = function (config) {
                 .filter((item, i, ar) => ar.indexOf(item) === i)
         }
     }
+    /** The values that are numbers (not ':', empty or other text). */
+    const numericValues = () =>
+        Object.values(out._data_)
+            .map((s) => s.value)
+            .filter((v) => v !== '' && v !== null && v !== ':' && Number.isFinite(Number(v)))
+            .map(Number)
     /** Get min value. */
     out.getMin = function () {
         if (out.hasNumericData()) {
-            return Object.values(out._data_)
-                .map((s) => s.value)
-                .filter((s) => s == 0 || (s && s !== ':'))
-                .reduce((acc, v) => Math.min(acc, v))
+            return numericValues().reduce((acc, v) => Math.min(acc, v), Infinity)
         }
     }
     /** Get max value. */
     out.getMax = function () {
         if (out.hasNumericData()) {
-            return Object.values(out._data_)
-                .map((s) => s.value)
-                .filter((s) => s == 0 || (s && s !== ':'))
-                .reduce((acc, v) => Math.max(acc, v))
+            return numericValues().reduce((acc, v) => Math.max(acc, v), -Infinity)
         }
     }
     /** Get max value region. */
@@ -404,6 +404,14 @@ export const statData = function (config) {
                 removeNonGeoRegions(out._data_)
 
                 applyPreprocessAndTransform()
+
+                const values = Object.values(out._data_)
+                if (!values.some((v) => v && v.value !== ':')) {
+                    const message = `${out.eurostatDatasetCode_}: no values matched these filters.`
+                    console.warn('[eurostat-map] ' + message)
+                    if (callback) callback(userFacingError(message))
+                    return
+                }
 
                 if (callback) callback()
             })

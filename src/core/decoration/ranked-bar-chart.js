@@ -164,6 +164,7 @@ export const rankedBarChart = function (map, config = {}) {
         const layer = out.layer
         const map = out.map
         const mapType = map._mapType
+        if (layer._classCount !== undefined) return layer._classCount
         return layer.numberOfClasses_ !== undefined ? layer.numberOfClasses_ : mapType === 'ps' ? map.psClasses_ : map.numberOfClasses_
     }
 

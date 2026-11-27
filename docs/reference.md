@@ -280,6 +280,8 @@ map.stat( {
 
 A map shows one value per region, so give a filter for every dimension except `geo`. If the response has several values per region, the map uses the latest time period, or the first category of any other dimension, and a console warning names each choice.
 
+Values must be numbers on numeric maps (use a dot as the decimal separator). Other values show as unavailable and are reported through `onError`, as is a filter that matches no value. When ties, or fewer distinct values than classes, would leave classes that no value can fall into, the map draws fewer classes.
+
 #### CSV
 
 Specify statistical data to be retrieved from CSV data.

@@ -397,7 +397,8 @@ export const legend = function (map) {
         const mapType = map._mapType
         const numberOfClasses =
             layer.numberOfClasses_ !== undefined ? layer.numberOfClasses_ : mapType === 'ps' ? map.psClasses_ : map.numberOfClasses_
-        return numberOfClasses
+        // fewer when the data could not fill the classes asked for
+        return layer._classCount ?? numberOfClasses
     }
 
     /**

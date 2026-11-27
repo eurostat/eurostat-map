@@ -1,4 +1,5 @@
 //map-choropleth.js
+import { mergeClassBreaks, reportNonNumericValues } from '../../core/class-breaks.js'
 import { warnUnknownClassification } from '../../core/option-check'
 import { select } from 'd3-selection'
 import { min, max } from 'd3-array'
@@ -150,13 +151,24 @@ export const decorateChoroplethLayer = function (layer, config) {
         layer.colors_ = layer.colorsName_ ? null : v
         return layer
     }
+    // the number of classes drawn: fewer than asked for when the data cannot fill them
+    const classCount = () => layer._classCount ?? layer.numberOfClasses_
+    // the colours of the classes. A list of colours is spread over fewer classes, keeping both its ends.
+    function classColors() {
+        const colors = resolveNamedColors()
+        if (layer._classCount === undefined || layer.colorsName_ || !colors?.length) return colors
+        const k = Math.max(1, layer._classCount)
+        const at = (j) => (k === 1 ? Math.floor(colors.length / 2) : Math.round((j * (colors.length - 1)) / (k - 1)))
+        return Array.from({ length: k }, (_, j) => colors[at(j)])
+    }
     // regenerate a named palette for the current number of classes
     function resolveNamedColors() {
         const name = layer.colorsName_
         if (!name) return layer.colors_
         if (layer.colorSchemeType_ === 'continuous') return (layer.colors_ = null) // the colour function drives continuous schemes
         if (!layer.divergingScheme_) {
-            layer.colors_ = singleHuePalette(name, layer.numberOfClasses_)
+            // a single class takes the darker of two shades
+            layer.colors_ = classCount() === 1 ? singleHuePalette(name, 2).slice(1) : singleHuePalette(name, classCount())
         } else {
             layer.colors_ = divergingColorsForClasses(name)
         }
@@ -164,7 +176,7 @@ export const decorateChoroplethLayer = function (layer, config) {
     }
     // class colours of a diverging scheme: the neutral sits at the point of divergence
     function divergingColorsForClasses(name) {
-        const n = layer.numberOfClasses_
+        const n = classCount()
         const classifier = layer.classifier_
         const extent = layer.dataExtent_
         if (!classifier || !extent || typeof classifier.invertExtent !== 'function') return divergingPalette(name, n)
@@ -259,9 +271,20 @@ export const decorateChoroplethLayer = function (layer, config) {
         const dataArrayNumeric = (dataArray || []).map((v) => +v).filter((v) => Number.isFinite(v))
         layer.dataExtent_ = dataArrayNumeric.length ? [min(dataArrayNumeric), max(dataArrayNumeric)] : null // used to place a diverging scheme's neutral
 
+        if (map === layer.map) reportNonNumericValues(layer.map, dataArray, layer.categoryFillStyle_)
+
         if (dataArray) {
             const setupClassifier = () => {
                 const range = generateRange(layer.numberOfClasses_)
+                layer._classCount = undefined
+                layer._singleClassValue = undefined
+
+                // nothing to classify: no classes, rather than a legend of NaN
+                if (!dataArrayNumeric.length && layer.colorSchemeType_ !== 'continuous' && layer.classificationMethod_ !== 'threshold') {
+                    layer.classifier(scaleThreshold().domain([]).range([0]))
+                    layer._classCount = 0
+                    return
+                }
 
                 if (layer.colorSchemeType_ === 'continuous') {
                     if (layer.colorStretch_) {
@@ -352,6 +375,24 @@ export const decorateChoroplethLayer = function (layer, config) {
                     const niceThresholds = applyNiceNumbers(rawThresholds, dataArrayNumeric)
                     layer.classifier_.domain(niceThresholds)
                 }
+
+                // ties, or fewer values than classes: leave out the classes no value could fall into
+                const method = layer.classificationMethod_
+                if (layer.colorSchemeType_ !== 'continuous' && ['quantile', 'equinter', 'equal-interval', 'jenks', 'ckmeans'].includes(method)) {
+                    const current = layer.classifier_
+                    const breaks = (current.quantiles || current.thresholds || current.domain).call(current)
+                    const merged = mergeClassBreaks(dataArrayNumeric, breaks, method, layer.numberOfClasses_)
+                    if (merged) {
+                        layer._classCount = merged.length + 1
+                        if (!merged.length) layer._singleClassValue = dataArrayNumeric[0]
+                        layer.classifier(scaleThreshold().domain(merged).range(generateRange(layer._classCount)))
+                        if (map === layer.map) {
+                            console.warn(
+                                `[eurostat-map] The data has too few distinct values for ${layer.numberOfClasses_} classes: ${layer._classCount} shown.`
+                            )
+                        }
+                    }
+                }
             }
 
             // add class attributes to region elements
@@ -382,7 +423,7 @@ export const decorateChoroplethLayer = function (layer, config) {
                     }
 
                     // no data
-                    if (value === ':' || value == null || Number.isNaN(value)) {
+                    if (value === ':' || value == null || value === '' || !Number.isFinite(Number(value))) {
                         sel.attr('ecl', 'nd')
                         return
                     }
@@ -439,7 +480,9 @@ export const decorateChoroplethLayer = function (layer, config) {
             layer.classToFillStyle(getFillPatternLegend())
         } else {
             // Color legend style
-            layer.classToFillStyle(getColorFunction(layer.colorFunction_, resolveNamedColors()))
+            const fill = getColorFunction(layer.colorFunction_, classColors())
+            // a single class of a colour function takes its darker half
+            layer.classToFillStyle(layer._classCount === 1 && !layer.colors_ ? () => fill(1, 2) : fill)
         }
 
         // Apply color and events to regions if SVG exists
@@ -575,16 +618,16 @@ export const decorateChoroplethLayer = function (layer, config) {
 
         // Discrete color scheme
         if (layer.map.Geometries?.userGeometries) {
-            return layer.classToFillStyle_(ecl, layer.numberOfClasses_ || 1)
+            return layer.classToFillStyle_(ecl, classCount() || 1)
         }
 
         if (layer.map.geo_ === 'WORLD') {
-            const fillStyle = layer.classToFillStyle_(ecl, layer.numberOfClasses_ || 1)
+            const fillStyle = layer.classToFillStyle_(ecl, classCount() || 1)
             return fillStyle || layer.map.cntrgFillStyle_
         }
 
         // Default (NUTS case)
-        return layer.classToFillStyle_(ecl, layer.numberOfClasses_ || 1)
+        return layer.classToFillStyle_(ecl, classCount() || 1)
     }
 
     const addMouseEventsToRegions = function (map, regions) {

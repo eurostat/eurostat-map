@@ -174,6 +174,15 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
+- Data that cannot be drawn is reported instead of giving a legend of "NaN": a filter that matches nothing and values such as `'1,5'` reach `onError`, and those regions show as unavailable.
+- Ties, or fewer distinct values than classes, no longer repeat legend labels: classes that no value can fall into are left out (thresholds you set are kept).
+
+Example
+
+```javascript
+map.onError((error) => console.log(error.message))
+```
+
 - Proportional symbol maps draw negative values, which were invisible and missing from the legend. Their size shows the amount, and colour or an outline shows the sign, with a key in the legend.
 
 Example

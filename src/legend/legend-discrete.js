@@ -1,4 +1,6 @@
 // legends for discrete color scales
+import { getTitlePadding } from './discrete/shared'
+import { spaceAsThousandSeparator } from '../core/utils'
 import { legibleSwatchHeight } from './legend-swatch'
 import { format } from 'd3-format'
 import { getFontSizeFromClass } from '../core/utils'
@@ -70,6 +72,13 @@ export function resolveDecimals(out, statData) {
     const values = arr.filter((v) => Number.isFinite(v))
     if (!values.length) return 0
 
+    // classes placed between the values (too few of them for the classes asked for) need the decimals of their boundaries
+    const layer = out.layer
+    const classifier = layer?.classifier_ || layer?.classifierColor_
+    if (layer?._classCount !== undefined && classifier?.domain) {
+        values.push(...classifier.domain().map((v) => +Number(v).toFixed(4)))
+    }
+
     let max = 0
     for (const v of values) {
         const str = v.toString()
@@ -111,8 +120,18 @@ export function drawDiscreteLegend(out, x, y) {
     // rows closer together than the label text is tall would print the labels over each other
     if (!horizontal) config.shapeHeight = legibleSwatchHeight(config.shapeHeight, getFontSizeFromClass('em-legend-label'))
 
+    const classes = out.getNumberOfClasses(out)
+    const single = out.layer?._singleClassValue
     // thresholds vs ranges
-    if (horizontal) {
+    if (classes === 0) {
+        // no value to classify: only the no-data and category items below
+        appendExtraSwatchStack(out, extraSwatchRows(out, config), getTitlePadding(out))
+        return
+    } else if (classes === 1 && single !== undefined) {
+        // every value is the same: one swatch, labelled with it
+        const label = config.labels?.[0] ?? spaceAsThousandSeparator(single)
+        createRangesLegend(out, Object.assign(Object.create(config), { labels: [label], maxMin: false }))
+    } else if (horizontal) {
         createHorizontalLegend(out, config)
     } else if (out.labelType === 'ranges' || out.colorLegend?.labelType === 'ranges') {
         createRangesLegend(out, config)
@@ -120,7 +139,7 @@ export function drawDiscreteLegend(out, x, y) {
         createThresholdsLegend(out, config)
     }
 
-    if (horizontal) {
+    if (horizontal && !(classes === 1 && single !== undefined)) {
         appendHorizontalExtraItems(out, config)
         return
     }

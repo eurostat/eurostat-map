@@ -311,7 +311,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
         const hasBaseLayer = map.layers_ && map.layers_.some((l) => l.role === 'base' && l !== layer)
         if (!hasBaseLayer) {
             // update region color according to symbol color
-            const backgroundSymbolFill = layer.classifierColor_ ? layer.psClassToFillStyle_(layer.psClasses_ - 1, layer.psClasses_) : layer.psFill_
+            const backgroundSymbolFill = layer.classifierColor_ ? layer.psClassToFillStyle_((layer._classCount ?? layer.psClasses_) - 1, layer._classCount ?? layer.psClasses_) : layer.psFill_
             updateBackgroundColor(map, usesNeutralBackground(layer) ? '#000000' : backgroundSymbolFill)
         }
 
@@ -470,7 +470,7 @@ export const decorateProportionalSymbolLayer = function (layer, config) {
             if (layer.classifierColor_) {
                 //for ps, ecl attribute belongs to the parent g.em-centroid node created in map-template
                 const ecl = select(node.parentNode).attr('ecl')
-                classColor = !ecl || ecl === 'nd' ? layer.noDataFillStyle_ || 'gray' : layer.psClassToFillStyle_(ecl, layer.psClasses_)
+                classColor = !ecl || ecl === 'nd' ? layer.noDataFillStyle_ || 'gray' : layer.psClassToFillStyle_(ecl, layer._classCount ?? layer.psClasses_)
             }
             if (!layer._psSigned) return { fill: layer.classifierColor_ ? classColor : layer.psFill_ }
             const value = sizeData.get(node.__data__?.properties?.id)?.value
