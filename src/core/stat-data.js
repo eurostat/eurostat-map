@@ -406,8 +406,16 @@ export const statData = function (config) {
                 }
                 out.metadata.time = jsd.Dimension('time').id[0]
 
+                // the label of the category shown in each dimension, which tells two variables of one dataset apart
+                out.metadata.dimensions = {}
+                const used = {}
+                jsd.id?.forEach((dimension) => {
+                    if (dimension !== 'geo') used[dimension] = jsd.Dimension(dimension).id[0]
+                })
+
                 //index
                 out._data_ = jsonstatToIndex(jsd, (choices) => {
+                    choices.forEach((c) => (used[c.dimension] = c.used))
                     const time = choices.find((c) => c.dimension === 'time')
                     if (time) out.metadata.time = time.used
                     const list = choices.map((c) => `"${c.dimension}" has ${c.count} values, using "${c.used}"`).join('; ')
@@ -416,6 +424,10 @@ export const statData = function (config) {
                     )
                 })
                 //TODO: use maybe https://github.com/badosa/JSON-stat/blob/master/utils/fromtable.md to build directly an index ?
+
+                Object.entries(used).forEach(([dimension, code]) => {
+                    out.metadata.dimensions[dimension] = jsd.Dimension(dimension).Category(code)?.label || code
+                })
 
                 //handle null values
                 // #172 when using jsonstat-toolkit, values of null mean 'no data' and are converted to ":"

@@ -610,6 +610,7 @@ export interface MapInstance {
 
     /** Show the link to the remote Eurostat statistical dataset. */
     showSourceLink(): boolean
+    /** The link is left out beside a footnote that contains "Source:", unless this is set to `true`. */
     showSourceLink(show: boolean): this
 
     /** Pattern fill (hatching/dots/crosshatch) overlays for specific regions. */

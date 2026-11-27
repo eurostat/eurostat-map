@@ -280,6 +280,8 @@ map.stat( {
 
 A map shows one value per region, so give a filter for every dimension except `geo`. If the response has several values per region, the map uses the latest time period, or the first category of any other dimension, and a console warning names each choice.
 
+Give a statistic a `label` to name it in legends with several variables (bivariate, trivariate, mushroom); without one they use the Eurostat dataset title, or the statistic's name.
+
 Values must be numbers on numeric maps (use a dot as the decimal separator). Other values show as unavailable and are reported through `onError`, as is a filter that matches no value. When ties, or fewer distinct values than classes, would leave classes that no value can fall into, the map draws fewer classes.
 
 #### CSV
@@ -1640,7 +1642,7 @@ By default, hover over or focus **Credits** to see the boundary attribution and 
 | ----------------------------------------- | --------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
 | _map_.**footnote**([*value*])             | String or false | Credits                         | The footer label. Hover over or focus Credits to reveal the administrative boundary attribution. Set to false to hide the footnote. |
 | _map_ .**footnoteTooltipText**([*value*]) | String or false | The default disclaimer message. | Tooltip content for the footnote. The default Credits also shows boundary attribution. Set to false to omit the configured text.   |
-| _map_ .**showSourceLink**([*value*])      | Boolean         | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatasetcode specified when using the stat() function). |
+| _map_ .**showSourceLink**([*value*])      | Boolean         | true                            | Shows a link to the source dataset in the bottom right corner. (uses eurostatdatasetcode specified when using the stat() function). Left out when your footnote contains "Source:", unless you call showSourceLink(true). |
 | _map_ .**exportAttribution**([*value*]) | String or false | boundary copyright | Notice written in a line below exported PNG and SVG images, in place of "Credits". Not added by default with geometries you supply, or where your own text already names EuroGeographics. |
 | _map_.**footnoteWrap**([*value*])         | Number or false | false                           | Wrap the footnote text at this many characters.                                                                                     |
 | _map_.**footnotePosition**([*value*])     | Array ([x,y])   | auto                            | Position adjustment of the footnote text.                                                                                           |

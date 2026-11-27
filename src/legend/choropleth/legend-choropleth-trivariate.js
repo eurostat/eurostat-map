@@ -1,4 +1,5 @@
 // legend-choropleth-trivariate.js
+import { getVariableName } from '../../core/variable-names.js'
 import * as Legend from '../legend'
 import { select } from 'd3-selection'
 import { TricoloreViz } from '../../lib/tricolore/src'
@@ -59,6 +60,23 @@ export const legend = function (map, /** @type {TrivariateLegendConfig} */ confi
         return out
     }
 
+    // the author's labels, or a name found for each variable (one line each: there is no room for more)
+    function axisNames() {
+        const layer = out.layer || map
+        if (layer.legend_?.labels !== undefined || config?.labels !== undefined) return out.labels
+        const keys = layer.getTernaryStatCodes?.() || layer.ternaryCodes_ || []
+        return out.labels.map((placeholder, i) => {
+            const name = getVariableName(out.map, keys[i], keys)
+            return name ? shortName(name) : placeholder
+        })
+    }
+
+    // an edge of the triangle holds about 14 characters: what tells the variable apart, or the start of its name
+    function shortName(name) {
+        const short = name.match(/\(([^()]*)\)\s*$/)?.[1] || name
+        return short.length > 14 ? short.slice(0, 13).trimEnd() + '…' : short
+    }
+
     function drawTricoloreLegend() {
         // Force clear any lingering highlight state from previous render
         cancelReset()
@@ -95,7 +113,7 @@ export const legend = function (map, /** @type {TrivariateLegendConfig} */ confi
             contrast: map.ternarySettings_.contrast,
             spread: map.ternarySettings_.spread,
             values: map.ternarySettings_.sextantColors,
-            labels: out.labels,
+            labels: axisNames(),
             labelPosition: out.labelPosition,
             showCenter: out.showCenter,
             centerLabel: out.centerLabel,

@@ -5,7 +5,7 @@ import { executeForAllInsets, getFontSizeFromClass, getLegendRegionsSelector } f
 import { BOX_CORNER_RADIUS } from '../core/buttons/corner-radius'
 import { legendsBelowMap, placeLegendsBelow } from '../core/legend-below'
 import { recalculateLayout } from '../core/layout'
-import { getCornerPosition, getCornerCoords } from '../core/decoration/corner-position'
+import { getCornerPosition, getCornerCoords, getDefaultLegendCorner } from '../core/decoration/corner-position'
 import { getChoroplethLabelFormatter } from './choropleth/legend-choropleth'
 import { getPropSymbolColorLabelFormatter, highlightPsSymbols, unhighlightPsSymbols } from './proportional-symbol/legend-proportional-symbols'
 //types
@@ -210,10 +210,12 @@ export const legend = function (map) {
         // themselves and expects us to leave that transform alone unless they also opt into
         // x/y/position explicitly.
         const autoCornerFallback = !out._hasExternalSvgId
-        const cornerPosition = userCornerPosition || (!hasManualX && !hasManualY && autoCornerFallback ? 'top right' : null)
-        if (!hasManualX && !hasManualY && !cornerPosition) return
+        const useDefault = !userCornerPosition && !hasManualX && !hasManualY && autoCornerFallback
+        if (!hasManualX && !hasManualY && !userCornerPosition && !useDefault) return
 
         const bbox = getLegendBBox(container, out)
+        // the default is the top right corner, or the left one where the insets are
+        const cornerPosition = userCornerPosition || (useDefault ? getDefaultLegendCorner(map, bbox, out.boxPadding) : null)
         const buttonReserve = cornerPosition ? getLegendButtonReserve(map, cornerPosition) : 0
         const cornerCoords = cornerPosition ? getCornerCoords(cornerPosition, bbox, map, out.boxPadding, buttonReserve) : null
 
@@ -230,7 +232,11 @@ export const legend = function (map) {
                     const leg = l.legendObj_
                     if (leg && leg.lgg && !leg.lgg.empty()) {
                         const legUserPos = getCornerPosition(leg.position)
-                        const legPos = legUserPos || (!(leg.x != null) && !(leg.y != null) ? 'top right' : null)
+                        const legPos =
+                            legUserPos ||
+                            (!(leg.x != null) && !(leg.y != null)
+                                ? getDefaultLegendCorner(map, getLegendBBox(leg.lgg, leg), leg.boxPadding)
+                                : null)
                         if (legPos === cornerPosition) {
                             sharingLegends.push(leg)
                         }

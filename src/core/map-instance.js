@@ -294,6 +294,13 @@ export const createMapInstance = function (config, withCenterPoints, mapType) {
 
     out.isInset = config?.isInset || false
 
+    // showSourceLink(true) keeps the link even beside a footnote that gives a source (see addSourceLink)
+    const setShowSourceLink = out.showSourceLink
+    out.showSourceLink = function (v) {
+        if (arguments.length) out._sourceLinkAsked = v === true
+        return setShowSourceLink.apply(out, arguments)
+    }
+
     // accessibility settings also apply to an already-built map
     ;['ariaLabel', 'ariaDescription', 'keyboardNavigation'].forEach(function (name) {
         out[name] = function (v) {

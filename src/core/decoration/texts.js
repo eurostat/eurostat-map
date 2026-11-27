@@ -271,6 +271,9 @@ export const addFootnote = function (out) {
     return out
 }
 
+/** Whether a footnote already gives the source of the data ("Source: ..."). */
+export const footnoteGivesSource = (footnote) => typeof footnote === 'string' && /source\s*:/i.test(footnote.replace(/<[^>]*>/g, ''))
+
 export function addSourceLink(out, withCenterPoints) {
     const svg = out.svg()
 
@@ -290,6 +293,9 @@ export function addSourceLink(out, withCenterPoints) {
 
     // --- Remove any existing source link ---
     parent.selectAll('#em-source-link, .em-source-dataset-link, .em-source-pretext').remove()
+
+    // the author's footnote gives the source: not twice, unless showSourceLink(true) asks for the link
+    if (!out._sourceLinkAsked && footnoteGivesSource(out.footnote_)) return
 
     // --- Retrieve dataset info ---
     // Spark / multiseries maps define a primary dataset explicitly

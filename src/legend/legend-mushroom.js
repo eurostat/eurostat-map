@@ -1,3 +1,4 @@
+import { getVariableName, wrapName } from '../core/variable-names.js'
 import { arc } from 'd3-shape'
 import * as Legend from './legend'
 import { executeForAllInsets, spaceAsThousandSeparator } from '../core/utils'
@@ -116,7 +117,8 @@ function drawSideLabel(out, x, y, side) {
     const colors = map.mushroomColors()
     const [c1, c2] = map.mushroomCodes()
 
-    const label = side === 'v1' ? map.statData(c1)?.label_ || c1 : map.statData(c2)?.label_ || c2
+    const key = side === 'v1' ? c1 : c2
+    const lines = wrapName(getVariableName(map, key, [c1, c2]) || key)
 
     const color = side === 'v1' ? colors[0] : colors[1]
 
@@ -128,7 +130,7 @@ function drawSideLabel(out, x, y, side) {
         .attr('font-weight', '600')
         .attr('dominant-baseline', 'hanging') // ← IMPORTANT
         .attr('class', 'em-legend-label')
-        .text(label)
+    appendNameLines(text, lines, x)
 
     return text.node().getBBox()
 }
@@ -279,6 +281,18 @@ function getLabels(cfg, legendValues, hasIndependentScales, side) {
     return labels && labels.length >= legendValues.length ? labels : null
 }
 
+/** Writes a name over one or more lines. */
+function appendNameLines(text, lines, x) {
+    if (lines.length === 1) return text.text(lines[0])
+    lines.forEach((line, i) => {
+        text.append('tspan')
+            .attr('x', x)
+            .attr('dy', i ? '1.15em' : 0)
+            .text(line)
+    })
+    return text
+}
+
 /* ------------------------ Color key ---------------------------------- */
 
 function drawColorKey(out, x, y) {
@@ -286,7 +300,10 @@ function drawColorKey(out, x, y) {
     const colors = map.mushroomColors()
     const [c1, c2] = map.mushroomCodes()
 
-    const labels = out.colorLegend.labels ?? [map.statData(c1)?.label_ || c1, map.statData(c2)?.label_ || c2]
+    const labels = out.colorLegend.labels ?? [c1, c2].map((key) => getVariableName(map, key, [c1, c2]) || key)
+    // names found for the author may be long: they are wrapped, their rows made taller
+    const rowLines = labels.map((label) => (out.colorLegend.labels ? [label] : wrapName(label)))
+    const rowHeights = rowLines.map((lines) => Math.max(out.shapeHeight, lines.length * 15 + 4))
 
     const g = out.lgg.append('g').attr('class', 'em-mushroom-color-legend').attr('transform', `translate(${x}, ${y})`)
 
@@ -307,7 +324,7 @@ function drawColorKey(out, x, y) {
     labels.forEach((lab, i) => {
         const row = g
             .append('g')
-            .attr('transform', `translate(0, ${rowsOffsetY + i * out.shapeHeight})`)
+            .attr('transform', `translate(0, ${rowsOffsetY + rowHeights.slice(0, i).reduce((a, b) => a + b, 0)})`)
             .style('cursor', 'pointer')
             .on('mouseover', () => {
                 highlightMushroomSide(map, i)
@@ -327,11 +344,13 @@ function drawColorKey(out, x, y) {
 
         row.append('rect').attr('width', out.shapeWidth).attr('height', out.shapeHeight).attr('fill', colors[i]).attr('class', 'em-legend-rect')
 
-        row.append('text')
-            .attr('x', out.shapeWidth + out.colorLegend.labelOffsets.x)
+        const x = out.shapeWidth + out.colorLegend.labelOffsets.x
+        const text = row
+            .append('text')
+            .attr('x', x)
             .attr('y', out.shapeHeight / 2 + out.colorLegend.labelOffsets.y)
             .attr('class', 'em-legend-label')
-            .text(lab)
+        appendNameLines(text, rowLines[i].length > 1 ? rowLines[i] : [lab], x)
     })
 }
 

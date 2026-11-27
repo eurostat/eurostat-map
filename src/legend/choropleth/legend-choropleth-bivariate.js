@@ -1,3 +1,4 @@
+import { getVariableName, wrapName } from '../../core/variable-names.js'
 import { separateStackedParts } from '../legend-swatch'
 import { select } from 'd3-selection'
 import * as Legend from '../legend'
@@ -543,6 +544,19 @@ export const legend = function (map, config) {
         }
     }
 
+    // a label of the author's as it is written; otherwise a name found for the variable, wrapped
+    function axisTitleLines(index) {
+        const key = index ? 'label2' : 'label1'
+        if ((out.layer || out.map).legend_?.[key] !== undefined || config?.[key] !== undefined) return splitMultilineText(out[key])
+        const layer = out.layer || out.map
+        const keys = [
+            layer.getEncodingStat?.('x', layer.getEncodingStat?.('v1', 'v1')) || 'v1',
+            layer.getEncodingStat?.('y', layer.getEncodingStat?.('v2', 'v2')) || 'v2',
+        ]
+        const name = getVariableName(out.map, keys[index], keys)
+        return name ? wrapName(name, 26, 2) : splitMultilineText(out[key])
+    }
+
     function addAxisTitles() {
         const xc = out.rotation === 0 ? 0 : 0.7071 * out.squareSize + out.boxPadding
 
@@ -580,11 +594,11 @@ export const legend = function (map, config) {
             .attr('text-anchor', 'middle')
             .attr('dominant-baseline', 'hanging')
             .attr('alignment-baseline', 'hanging')
-        appendMultilineText(xAxisTitle, splitMultilineText(out.label1), xAxisTitleX, false)
+        appendMultilineText(xAxisTitle, axisTitleLines(0), xAxisTitleX, false)
 
         // Y axis title centered on the Y arrow segment and placed outside arrow + endpoint labels.
         const yAxisTitlePadding = 12
-        const yAxisTitleLines = splitMultilineText(out.label2)
+        const yAxisTitleLines = axisTitleLines(1)
         let yAxisTitleX = out._yAxisArrowX - (hasAxisArrow('y') ? out.arrowHeight + yAxisTitlePadding : 8 + yAxisTitlePadding)
         let yAxisTitleY = (spans.yStart + spans.yEnd) / 2
 

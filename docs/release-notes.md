@@ -174,6 +174,23 @@ map.footnoteTooltipText(false) // keep only the attribution
 
 ### Fixes
 
+- Bivariate, trivariate and mushroom legends name their variables instead of showing "Variable 1" or "v1": your legend labels, else the statistic's `label`, the Eurostat dataset title (with the category that tells two variables apart) or the statistic's name.
+
+Example
+
+```javascript
+map.stat('density', { eurostatDatasetCode: 'demo_r_d3dens', label: 'Population density' })
+```
+
+- With insets shown and no legend position set, the legend moves to the left instead of covering them.
+- A footnote that gives a source ("Source: ...") no longer appears beside a second, automatic source link; `showSourceLink(true)` keeps both.
+
+Example
+
+```javascript
+map.insets('default').footnote('Source: Eurostat').showSourceLink(true)
+```
+
 - Exported PNG and SVG images carry the boundary copyright ("Administrative boundaries: ©EuroGeographics ©OpenStreetMap") in a line below the map, in place of "Credits". `exportAttribution()` rewords it or turns it off.
 
 Example

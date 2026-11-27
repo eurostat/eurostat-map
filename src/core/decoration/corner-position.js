@@ -95,3 +95,42 @@ export function getCornerCoords(position, bbox, map, padding, buttonReserve = 0)
         y: top - bbox.y,
     }
 }
+
+/**
+ * The frames of the inset maps, relative to the inset box. They come from each inset's own size: a bounding box would
+ * include the geometry an inset clips away.
+ */
+function insetFrames(group) {
+    return Array.from(group.querySelectorAll(':scope > .em-inset')).flatMap((wrapper) => {
+        const move = (wrapper.getAttribute('transform') || '').match(/translate\(\s*([-\d.]+)[,\s]+([-\d.]+)/)
+        const inset = wrapper.querySelector(':scope > svg')
+        const width = Number(inset?.getAttribute('width'))
+        const height = Number(inset?.getAttribute('height'))
+        return move && width && height ? [{ x: Number(move[1]), y: Number(move[2]), width, height }] : []
+    })
+}
+
+/**
+ * Where a legend goes when no position is given: the top right corner, or the top left one where the insets would be
+ * under it.
+ * @param {*} map
+ * @param {{x:number,y:number,width:number,height:number}} bbox the legend's own box
+ * @param {number} padding
+ * @returns {'top right'|'top left'}
+ */
+export function getDefaultLegendCorner(map, bbox, padding) {
+    const insets = map.svg?.()?.select?.('#em-insets-group')
+    if (!insets || insets.empty() || !map.insetBoxPosition_ || insets.style('display') === 'none') return 'top right'
+
+    const extent = getMapDrawingExtent(map)
+    // where the legend would be drawn in the top right corner
+    const corner = getCornerCoords('top right', bbox, map, padding)
+    const left = corner.x + bbox.x
+    const top = corner.y + bbox.y
+    const covers = insetFrames(insets.node()).some((frame) => {
+        const x = extent.x + map.insetBoxPosition_[0] + frame.x
+        const y = extent.y + map.insetBoxPosition_[1] + frame.y
+        return left < x + frame.width && left + bbox.width > x && top < y + frame.height && top + bbox.height > y
+    })
+    return covers ? 'top left' : 'top right'
+}
